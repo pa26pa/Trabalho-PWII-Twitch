@@ -1,1 +1,2 @@
-# Trabalho-PWII---Twitch
+# Trabalho de PWII - Twitch
+- Recriar site da Twitch
