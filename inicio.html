@@ -32,10 +32,82 @@
         <div class="menu-modals">
             <!--MODAL DO LOGIN-->
             <button class="open-modal" data-modal="modal-1">Entrar</button>
-            <dialog id="modal-1">
-                <h1>teste 1</h1>
-                <button class="close-modal" data-modal="modal-1">X</button>
+
+            <dialog id="modal-1"> <!--CRIAR UM DIV PRA TODO ESSE RAIO-->
+                
+                    <div id="wrap">
+                        <!--botão para alternar entre cadastro e login-->
+                        <div class="change-button">
+                            <div class="change-button1">
+                                <button class="close-modal login-close-button" data-modal="modal-1">X</button>
+                                <h6><span>Cadastrar</span><span>Entrar</span></h6>
+                                <input type="checkbox" class="checkbox" id="checkbox">
+                                <label for="checkbox"></label>
+                            </div>
+                            <div class="change-button2">
+                                <button class="close-modal login-close-button" data-modal="modal-1">X</button>
+                                <h6><span>Cadastrar</span><span>Entrar</span></h6>
+                                <input type="checkbox" class="checkbox" id="checkbox">
+                                <label for="checkbox"></label>
+                            </div>
+                        </div>
+
+                        <div id="wrapper">
+                            <div id="login">   
+                                <div class="center-wrap">
+                                    <form action="#" method="post" class="login">
+                                        <h2>Entrar</h2>
+                                        <div class="caixa-input">
+                                            <input type="text" id="nome-login" name="nome" minlength="10" required><br>
+                                            <label for="nome">Nome Completo</label><br>
+                                        </div>
+                                        <div class="caixa-input">
+                                            <input type="email" id="email-login" name="email" required><br>
+                                            <label for="email">Email</label><br>
+                                        </div>
+                                        <div class="caixa-input">
+                                            <input type="password" id="senha-login" name="senha" minlength="5" required><br>
+                                            <label for="senha">Senha</label><br>
+                                        </div>
+                                        <button type="submit">Entrar</button>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <div id="cadastro">
+                                <div class="center-wrap">
+                                    <form action="#" method="post" class="sign">
+                                        <h2>Cadastre-se</h2>
+                                        <div class="caixa-input">
+                                            <input type="text" id="nome-cadastro" name="nome" minlength="10" required><br>
+                                            <label for="nome">Nome Completo</label><br>
+                                        </div>
+                                        <div class="caixa-input">
+                                            <input type="text" id="idade-cadastro" name="idade" required><br>
+                                            <label for="idade">Idade</label><br>
+                                            
+                                        </div>
+                                        <div class="caixa-input">
+                                            <input type="email" id="email-cadastro" name="email" required><br>
+                                            <label for="email">Email</label><br>
+                                        </div>
+                                        <div class="caixa-input">
+                                            <input type="text" id="user-cadastro" name="user" required><br>
+                                            <label for="user">Usuário</label><br>
+                                        </div>
+                                        <div class="caixa-input">
+                                            <input type="password" id="senha-cadastro" name="senha" minlength="5" required><br>
+                                            <label for="senha">Senha</label><br>
+                                        </div>
+                                        <button type="submit">Cadastrar</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                
             </dialog>
+
             <!--MODAL DO MENU HAMBÚRGUER-->
             <button class="open-modal" data-modal="modal-2">Menu</button>
             <dialog id="modal-2">

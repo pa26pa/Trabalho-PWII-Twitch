@@ -131,3 +131,241 @@
     height: 35px;
     transition: all 0.8s ease;
 }
+
+/*MODALS DO HEADER*/
+/*modal de login/cadastro*/
+#modal-1 {
+    position: fixed;
+    margin: 0 auto;
+    top: 10px;
+    width: 550px;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    padding: 10px;
+    border: none;
+    transform-style: preserve-3d;
+    perspective: 300px;
+    background: transparent;
+   
+}
+#modal-1[open] {
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+/*conteúdo do modal login/cadastro*/
+#wrap {
+    position: fixed;
+    top: 8%;
+    left: 10%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 90%;
+    height: 95%;
+    background: transparent;
+}
+#wrapper {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 90%;
+    height: 90%;
+    transform-style: preserve-3d;
+    transition: all 0.6s ease-out;
+    background-color: #c7b2e7;
+    box-shadow: 0px 0px 10px 25px rgba(0,0,0,0.2);
+    border-radius: 30px;
+    transform-origin: center;
+}
+#login, #cadastro {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: transparent;
+    border: 2px solid white;
+    border-radius: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0px 5px 15px 5px rgb(255, 255, 255);
+    backdrop-filter: blur(10px);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transform-style: preserve-3d;
+}
+#login {
+    transform: rotateY(180deg);
+}
+#cadastro {
+    transform: rotateY(0deg);
+}
+h2 {
+    text-align: center;
+    font-size: 2em;
+    color: #48237f;
+}
+
+.caixa-input {
+    position: relative;
+    width: 310px;
+    margin: 20px 0;
+    border-bottom: 1px solid #48237f;
+}
+.caixa-input label {
+    position: absolute;
+    top: 50%;
+    left: 5px;
+    transform: translateY(-25%);
+    font-size: 1em;
+    pointer-events: none;
+    transition: 0.3s;
+    color: #48237f;
+}
+.caixa-input input:focus  ~ label,
+.caixa-input input:valid  ~ label {
+    top: -5px;
+}
+.caixa-input input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-size: 1em;
+    color: #48237f;
+    padding: 20px 5px 0 5px;
+    font-family: 'Times New Roman', Times, serif;
+    font-weight: bold;
+}
+#wrapper button {
+    width: 300px;
+    height: 40px;
+    border-radius: 30px;
+    background-color: #48237f ;
+    color: #F4ECFF;
+    font-size: 20px;
+    border: 2px solid #F4ECFF;
+}
+#wrapper button:hover {
+    background-color: #351b5d;
+    color: #e1cdff;
+}
+
+/*botão que alterna entre cadastro e login*/
+.change-button1, .change-button2 {
+    position: absolute;
+    width: 100%;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    top: 0;
+    left: 0;
+    line-height: 0;
+    justify-content: center;
+    align-items: center;
+    background-color: transparent;
+    border: none;
+    color: #48237f;
+    font-size: 16px;
+    cursor: pointer;
+    z-index: 10;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transform-style: preserve-3d;
+}
+.change-button1 {
+    transform: rotateY(180deg);
+}
+.change-button2 {
+    transform: rotateY(0deg);
+}
+.change-button {
+    position: absolute;
+    width: 90%;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    top: 3%;
+    left: 45%;
+    line-height: 0;
+    justify-content: center;
+    align-items: center;
+    background-color: transparent;
+    border: none;
+    color: #48237f;
+    font-size: 16px;
+    cursor: pointer;
+    z-index: 10;
+    transform: translateX(-50%) rotateY(180deg);
+    transform-style: preserve-3d;
+}
+.change-button h6 span {
+    font-size: 13px;
+    padding: 0 15px;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+/*para desaparecer a caixa do checkbox*/
+.change-button [type="checkbox"]:checked,
+.change-button [type="checkbox"]:not(:checked) {
+    display: none;
+}
+/*aderindo a função do checkbox no label com rotaçãoX*/
+.change-button .checkbox:checked + label,
+.change-button .checkbox:not(:checked) + label {
+    position: relative;
+    display: block;
+    width: 100px;
+    height: 14px;
+    border-radius: 8px;
+    margin: 15px auto;
+    cursor: pointer;
+    background-color: #DEC7FF;
+}
+.checkbox:checked + label:before,
+.checkbox:not(:checked) + label::before {
+    position: absolute;
+    display: block;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    color: #DEC7FF;
+    background-color: #9147FF;
+    font-family: 'unicons';
+    content: '';
+    top: -8px;
+    left: -5px;
+    line-height: 36px;
+    text-align: center;
+    font-size: 24px;
+    transition: all 0.5s ease;
+}
+.checkbox:checked + label:before {
+    transform: translateX(80px);
+}
+
+
+/*relaciona o checkbox com o wrapper, já que estão em divs diferentes mas dentro do dialog*/
+#modal-1:has(#checkbox:checked) #wrapper {
+    transform: rotateY(180deg);
+}
+#modal-1:has(#checkbox:checked) .change-button {
+    transform: rotateY(180deg) translateX(50%);
+}
+
+.login-close-button {
+    position: absolute;
+    top: 2px;
+    left: 20px;
+    background-color: transparent;
+    border: none;
+    font-size: 35px;
+    color: #48237f;
+    cursor: pointer;
+}
