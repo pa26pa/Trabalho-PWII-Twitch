@@ -10,19 +10,19 @@
 
 /*HEADER*/
 #header {
-    position: sticky; /*fixa após certa rolagem*/
+    position: sticky; /*mantém o header fixo no topo da página mesmo ao rolar o conteúdo*/
     top: 0;
-    display: grid;
-    grid-template-columns: 90px 1fr 150px;
-    place-items: center;
+    display: grid; /*organiza os elementos do header em uma grade*/
+    grid-template-columns: 90px 1fr 150px; /*define as colunas da grade: 90px logo, 1fr menu, 150px barra de pesquisa*/
+    place-items: center; /*alinha os itens da grade ao centro horizontalmente e verticalmente*/
     width: 100%;
     height: 90px;
     background-color: #DEC7FF;
-    transition: all 0.1s ease;
+    transition: all 0.1s ease; /*transição suave para as mudanças de estilo, como ao encolher o header*/
     border-bottom: 2px solid #48237f;
 }
 .header-center {
-    line-height: 40px;
+    line-height: 40px; /*ajusta o espaçamento vertical do texto*/
     justify-items: center;
 }
 
@@ -45,8 +45,8 @@
     transition: all 0.8s ease;
 }
 .search-bar {
-    display: flex;
-    align-items: center;
+    display: flex; /*organiza a barra de pesquisa e o ícone em linha*/
+    align-items: center; /*alinha os itens ao centro verticalmente*/
     width: 500px;
     height: 30px;
     border-radius: 30px;
@@ -56,7 +56,7 @@
 .search-icon {
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: center; /*alinha os itens ao centro horizontalmente e verticalmente*/
     width: 33px;
     height: 28px;
     margin-left: 4px;
@@ -95,6 +95,12 @@
     font-size: 15px;
     font-weight: lighter;
     border: none;
+    cursor: pointer;
+}
+.open-modal:hover {
+    background-color: #7029db;
+    color: #ede9f4;
+    transition: all 0.3s ease;
 }
 
 /*ANIMAÇÃO PARA SUMIR MENU SUPERIOR*/
@@ -134,27 +140,29 @@
 
 /*MODALS DO HEADER*/
 /*modal de login/cadastro*/
+body.modal-open {
+    overflow: hidden;
+}
 #modal-1 {
     position: fixed;
     margin: 0 auto;
     top: 10px;
     width: 550px;
     height: 100vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    opacity: 0;
+    display: none;
     padding: 10px;
     border: none;
     transform-style: preserve-3d;
     perspective: 300px;
     background: transparent;
-   
 }
 #modal-1[open] {
     opacity: 1;
     transition: opacity 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
 /*conteúdo do modal login/cadastro*/
@@ -166,7 +174,7 @@
     justify-content: center;
     align-items: center;
     width: 90%;
-    height: 95%;
+    height: 90%;
     background: transparent;
 }
 #wrapper {
@@ -215,7 +223,7 @@ h2 {
 .caixa-input {
     position: relative;
     width: 310px;
-    margin: 20px 0;
+    margin: 25px 0;
     border-bottom: 1px solid #48237f;
 }
 .caixa-input label {
@@ -230,7 +238,8 @@ h2 {
 }
 .caixa-input input:focus  ~ label,
 .caixa-input input:valid  ~ label {
-    top: -5px;
+    top: -1px;
+    font-size: 0.8em;
 }
 .caixa-input input {
     width: 100%;
@@ -258,6 +267,28 @@ h2 {
 }
 
 /*botão que alterna entre cadastro e login*/
+.change-button {
+    position: absolute;
+    width: 90%;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    top: 3%;
+    left: 45%;
+    line-height: 0;
+    justify-content: center;
+    align-items: center;
+    background-color: #c7b2e7;
+    border: none;
+    color: #48237f;
+    font-size: 16px;
+    cursor: pointer;
+    transform: translateX(-50%);
+    z-index: 1;
+    transform-style: preserve-3d;
+    transition: all 0.6s ease-out;
+    transform-origin: center;
+}
 .change-button1, .change-button2 {
     position: absolute;
     width: 100%;
@@ -274,7 +305,6 @@ h2 {
     color: #48237f;
     font-size: 16px;
     cursor: pointer;
-    z-index: 10;
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
     transform-style: preserve-3d;
@@ -284,26 +314,6 @@ h2 {
 }
 .change-button2 {
     transform: rotateY(0deg);
-}
-.change-button {
-    position: absolute;
-    width: 90%;
-    height: auto;
-    display: flex;
-    flex-direction: column;
-    top: 3%;
-    left: 45%;
-    line-height: 0;
-    justify-content: center;
-    align-items: center;
-    background-color: transparent;
-    border: none;
-    color: #48237f;
-    font-size: 16px;
-    cursor: pointer;
-    z-index: 10;
-    transform: translateX(-50%) rotateY(180deg);
-    transform-style: preserve-3d;
 }
 .change-button h6 span {
     font-size: 13px;
