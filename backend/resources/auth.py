@@ -95,3 +95,93 @@ class login(Resource):
             'status':'error',
             'mensagem':'get não é um metodo aceito'
         }, 400
+    
+class forgot(Resource):
+    def post(self):
+        data = request.get_json()
+        
+        con = connection()
+        cursor = con.cursor()
+        
+        cpf = data.get('cpf')
+        
+        query = """select * from usuarios where cpf = %s"""
+        cursor.execute(query,(cpf,))
+        achou_email = cursor.fetchone()
+        
+        if not achou_email:
+            cursor.close()
+            con.close()
+            
+            return{
+                'status':'success',
+                'mensagem':'Este CPF ainda não está cadastrado'
+            }
+        
+        q = """select email from usuarios where cpf = %s"""
+        cursor.execute(q,(cpf))
+
+        email_achado = cursor.fetchone()
+        
+        codigo = random.randint(100000,999999)
+        
+        session['code'] = str(codigo)
+        
+        de = 'paula.pires2640@gmail.com'
+        to = email_achado
+        password = 'rvcr wtfd gtal ijog'
+        
+        info = 'Twitch | Código redefinir senha'
+        
+        msg = EmailMessage()
+        msg['From'] = de
+        msg['To'] = to
+        msg['Subject'] = info
+        msg.set_content(f'Olá, este é o seu código --> {codigo}')
+        
+        with smtplib.SMTP_SSL("smtp.gmail.com",425) as email:
+            email.login(de,password)
+            email.send_message(msg)
+        
+        return {
+            'status':'success',
+            'mensagem':'O código foi enviado no seu email'
+        }, 200
+      
+    def get(self):
+        return{
+            'status':'error',
+            'mensagem':'get não é um metodo aceito'
+        }, 400  
+
+class redefine_password(Resource):
+    def post(self):
+        data = request.get_json()
+        
+        con = connection()
+        cursor = con.cursor()
+        
+        codigo_inserido = data.get('codigo')
+        nova_senha = data.get('nova_senha')
+        
+        nova_senha_hash = generate_password_hash(nova_senha)
+        
+        if codigo_inserido != session['code']:
+            session.pop('code',None)
+            return {
+                'status':'error',
+                'mensagem':'Código invalido'
+            }, 400
+        
+        session.pop('code',None)
+        update = """ update usuarios set senha = %s whre id_usuario = %s"""
+        cursor.execute(update,(nova_senha_hash,session['usuario_id']))
+        cursor.commit()
+        
+        cursor.close()
+        con.close()
+        
+        return {
+            'status':'success',
+            'mensagem':'senha modificada com sucesso'
+        }, 200
