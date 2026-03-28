@@ -192,9 +192,6 @@ class redefine_password(Resource):
             'mensagem':'get não é um metodo aceito'
         }, 400  
 
-#class search(Resource):
-#    def post(self):
-        
 class subscribe(Resource):
     def post(self):
         data = request.get_json()
@@ -220,3 +217,30 @@ class subscribe(Resource):
             'status':'success',
             'mensagem':'Você se inscreveu'
         }, 200
+        
+class search(Resource):
+    def post(self):
+        data = request.get_json()
+        
+        con = connection()
+        cursor = con.cursor(dictionary=True)
+        
+        #fetchall
+        
+        pesquisa = data.get('pesquisa')
+        p = f"%{pesquisa}%"
+        
+        query1 = """select id_usuario, user_name, 'streamer' as tipo from usuarios where user_name like = %s """
+        cursor.execute(query1,(p,))
+        usuarios = cursor.fetchall()
+        
+        
+        query2 = """select id_stream, categoria, titulo, id_streamer, 'stream' as tipo from streams where titulo like %s or categoria like %s"""
+        cursor.execute(query2,(pesquisa,pesquisa))
+        streams = cursor.fetchall()
+        
+        return {
+            'status':'success',
+            'mensagem':'Resultados da pesquisa',
+            'resultado':f'{usuarios},{streams}'
+        }

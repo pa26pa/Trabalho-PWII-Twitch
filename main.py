@@ -1,6 +1,6 @@
 from flask import Flask
 from flask_restful import Api, Resource
-from backend import signin, login, forgot, redefine_password
+from backend.resources import signin, login, forgot, redefine_password
 app = Flask(__name__)
 api = Api(app)
 app.secret_key = 'projeto_secreto'
