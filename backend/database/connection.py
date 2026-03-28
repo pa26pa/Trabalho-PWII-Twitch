@@ -6,5 +6,5 @@ def connection():
         user='root',
         password='Pg260410',
         database='twitch-projeto',
-        cursorclass=pymysql.cursor.Cursor
+        cursorclass=pymysql.cursors.Cursor
     )

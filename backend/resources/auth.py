@@ -6,7 +6,7 @@ import random
 import smtplib
 from email.message import EmailMessage
 import mimetypes
-from backend.database import connection
+from backend.database.connection import connection
 from datetime import date, timedelta
 
 # criação do signin
@@ -18,7 +18,8 @@ class signin(Resource):
         cursor = con.cursor()
         
         # retirando dados do js
-        cpf = data.get('cpf')
+        cpf = str(data.get('cpf'))
+        cpf = cpf.strip()
         email = data.get('email')
         user_name = data.get('user_name')
         data_nascimento = data.get('data_nascimento')
@@ -42,7 +43,7 @@ class signin(Resource):
         
         insert = """insert into usuarios(cpf,email,user_name,senha,data_nascimento) values (%s,%s,%s,%s,%s)"""
         cursor.execute(insert,(cpf,email,user_name,senha_hash,data_nascimento))
-        cursor.commit()
+        con.commit()
         
         cursor.close()
         con.close()
@@ -62,7 +63,7 @@ class login(Resource):
         data = request.get_json()
         
         con = connection()
-        cursor = con.cursor()
+        cursor = con.cursor(pymysql.cursors.DictCursor)
         
         email = data.get('email')
         senha = data.get('senha')
@@ -103,7 +104,8 @@ class forgot(Resource):
         con = connection()
         cursor = con.cursor()
         
-        cpf = data.get('cpf')
+        cpf = str(data.get('cpf'))
+        cpf = cpf.strip()
         
         query = """select * from usuarios where cpf = %s"""
         cursor.execute(query,(cpf,))
@@ -114,12 +116,12 @@ class forgot(Resource):
             con.close()
             
             return{
-                'status':'success',
+                'status':'error',
                 'mensagem':'Este CPF ainda não está cadastrado'
             }
         
         q = """select email from usuarios where cpf = %s"""
-        cursor.execute(q,(cpf))
+        cursor.execute(q,(cpf,))
 
         email_achado = cursor.fetchone()
         
@@ -128,7 +130,7 @@ class forgot(Resource):
         session['code'] = str(codigo)
         
         de = 'paula.pires2640@gmail.com'
-        to = email_achado
+        to = email_achado[0]
         password = 'rvcr wtfd gtal ijog'
         
         info = 'Twitch | Código redefinir senha'
@@ -139,7 +141,7 @@ class forgot(Resource):
         msg['Subject'] = info
         msg.set_content(f'Olá, este é o seu código --> {codigo}')
         
-        with smtplib.SMTP_SSL("smtp.gmail.com",425) as email:
+        with smtplib.SMTP_SSL("smtp.gmail.com",465) as email:
             email.login(de,password)
             email.send_message(msg)
         
@@ -174,9 +176,9 @@ class redefine_password(Resource):
             }, 400
         
         session.pop('code',None)
-        update = """ update usuarios set senha = %s whre id_usuario = %s"""
+        update = """ update usuarios set senha = %s where id_usuario = %s"""
         cursor.execute(update,(nova_senha_hash,session['usuario_id']))
-        cursor.commit()
+        con.commit()
         
         cursor.close()
         con.close()
@@ -211,7 +213,7 @@ class subscribe(Resource):
             
         insert = """insert into seguidores (id_seguidor,id_seguido) values (%s,%s)"""
         cursor.execute(insert,(session['usuario_id'],id_criador))
-        cursor.commit()
+        con.commit()
         
         return {
             'status':'success',
@@ -223,7 +225,7 @@ class search(Resource):
         data = request.get_json()
         
         con = connection()
-        cursor = con.cursor(dictionary=True)
+        cursor = con.cursor(pymysql.cursors.DictCursor)
         
         #fetchall
         
