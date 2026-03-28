@@ -185,3 +185,38 @@ class redefine_password(Resource):
             'status':'success',
             'mensagem':'senha modificada com sucesso'
         }, 200
+    
+    def get(self):
+        return{
+            'status':'error',
+            'mensagem':'get não é um metodo aceito'
+        }, 400  
+
+#class search(Resource):
+#    def post(self):
+        
+class subscribe(Resource):
+    def post(self):
+        data = request.get_json()
+        
+        con = connection()
+        cursor = con.cursor()
+        
+        id_criador = data.get('criador')
+        
+        if not session['usuario_id']:
+            cursor.close()
+            con.close()
+            return {
+                'status':'error',
+                'mensagem':'Você precisa estar logado pra se inscrever'
+            }, 400
+            
+        insert = """insert into seguidores (id_seguidor,id_seguido) values (%s,%s)"""
+        cursor.execute(insert,(session['usuario_id'],id_criador))
+        cursor.commit()
+        
+        return {
+            'status':'success',
+            'mensagem':'Você se inscreveu'
+        }, 200
