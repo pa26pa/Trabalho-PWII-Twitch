@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Teste API</title>
+</head>
+<body>
+
+<h2>Cadastro</h2>
+
+<input type="text" id="cpf_cadastro" placeholder="CPF"><br>
+<input type="text" id="email_cadastro" placeholder="Email"><br>
+<input type="text" id="user_name_cadastro" placeholder="Username"><br>
+<input type="date" id="data_nascimento_cadastro"><br>
+<input type="password" id="senha_cadastro" placeholder="Senha"><br>
+
+<button onclick="cadastrar()">Cadastrar</button>
+
+<hr>
+
+<h2>Login</h2>
+
+<input type="text" id="email_login" placeholder="Email"><br>
+<input type="password" id="senha_login" placeholder="Senha"><br>
+
+<button onclick="login()">Entrar</button>
+
+<hr>
+
+<h2>Forgot</h2>
+
+<input type="text" id="cpf_forgot" placeholder="CPF"><br>
+
+<button onclick="forgot()">Mandar codigo</button>
+
+<hr> 
+
+<h2>redefine_password</h2>
+
+<input type="text" id="codigo_redefine_password" placeholder="Email"><br>
+<input type="password" id="nova_senha_redefine_password" placeholder="Senha"><br>
+
+<button onclick="redefine_password()">Redefinir</button>
+
+<hr>
+
+<h2>Resposta da API:</h2>
+<pre id="resposta"></pre>
+
+<script src="{{ url_for('static', filename='teste.js') }}"></script>
+
+</body>
+</html>
