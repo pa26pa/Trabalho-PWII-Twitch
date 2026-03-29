@@ -7,7 +7,7 @@ app.secret_key = 'projeto_secreto'
 
 @app.route("/")
 def home():
-    return render_template("teste.html")
+    return render_template("inicio.html")
 
 api.add_resource(signin,'/signin')
 api.add_resource(login,'/login')
