@@ -22,7 +22,7 @@
     border-bottom: 2px solid #48237f;
 }
 .header-center {
-    line-height: 40px; /*ajusta o espaçamento vertical do texto*/
+    line-height: 40px; /*altura da linhaentre elementos*/
     justify-items: center;
 }
 
@@ -67,7 +67,7 @@
     width: 100%;
     padding: 8px 10px;
     border: none;
-    outline: none;
+    outline: none; /*remove a borda e o contorno padrão do input*/
     background: transparent;
     font-size: 16px;
     font-weight: lighter;
@@ -102,6 +102,26 @@
     color: #ede9f4;
     transition: all 0.3s ease;
 }
+/*div do X e do checkbox*/
+.form-header {
+    position: absolute;
+    top: 5%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 90%;
+    z-index: 2;
+}
+/*X pra sair do modal*/
+.login-close-button {
+    position: absolute;
+    background-color: transparent;
+    border: none;
+    font-size: 35px;
+    color: #48237f;
+    cursor: pointer;
+    z-index: 2;
+}
 
 /*ANIMAÇÃO PARA SUMIR MENU SUPERIOR*/
 /*menu superior*/
@@ -111,6 +131,8 @@
     transition: opacity 1.0s;
 }
 /*quando rolar a página*/
+/*classe .shrink criada para ser usada pelo js, estabelecendo como deve
+ficar cada elemento após a rolagem, no .shrink*/
 #header.shrink {
     padding: 3px;
     height: 60px;
@@ -120,19 +142,16 @@
 #header.shrink .top-menu {
     opacity: 0;
     height: 0;
-    overflow: hidden;
+    overflow: hidden; /*esconde o conteúdo do menu superior*/
 }
-
 #header.shrink .search-bar {
     width: 300px;
     transition: all 0.8s ease;
 }
-
 #header.shrink #logo {
     width: 50px;
     transition: all 0.8s ease;
 }
-
 #header.shrink .open-modal {
     height: 35px;
     transition: all 0.8s ease;
@@ -140,6 +159,7 @@
 
 /*MODALS DO HEADER*/
 /*modal de login/cadastro*/
+/*outra classe criada para controlar rolagem da página atrás do modal*/
 body.modal-open {
     overflow: hidden;
 }
@@ -152,15 +172,16 @@ body.modal-open {
     display: none;
     padding: 10px;
     border: none;
-    transform-style: preserve-3d;
-    perspective: 300px;
+    transform-style: preserve-3d; /*habilita o efeito 3D para os elementos filhos do modal*/
+    perspective: 300px; /*define a distância entre o plano de visualização e os elementos 3D, controlando a intensidade do efeito de profundidade*/
     background: transparent;
 }
+/*quando o modal estiver aberto, exibe:*/
 #modal-1[open] {
     opacity: 1;
-    transition: opacity 0.3s ease;
+    transition: opacity 0.3s ease; /*transição suave para a aparição do modal*/
     display: flex;
-    flex-direction: column;
+    flex-direction: column; /*organiza os elementos do modal em uma coluna*/
     justify-content: center;
     align-items: center;
 }
@@ -183,12 +204,14 @@ body.modal-open {
     top: 0;
     width: 90%;
     height: 90%;
+    justify-content: center;
     transform-style: preserve-3d;
     transition: all 0.6s ease-out;
     background-color: #c7b2e7;
     box-shadow: 0px 0px 10px 25px rgba(0,0,0,0.2);
     border-radius: 30px;
-    transform-origin: center;
+    border: 4px solid #48237f;
+    transform-origin: center; /*define o ponto de origem para as transformações*/
 }
 #login, #cadastro {
     position: absolute;
@@ -203,23 +226,22 @@ body.modal-open {
     align-items: center;
     justify-content: center;
     box-shadow: 0px 5px 15px 5px rgb(255, 255, 255);
-    backdrop-filter: blur(10px);
-    backface-visibility: hidden;
-    -webkit-backface-visibility: hidden;
+    backdrop-filter: blur(10px); /*aplica um efeito de desfoque ao fundo do modal*/
+    backface-visibility: hidden; /*oculta o lado oposto do elemento quando ele é rotacionado, evitando que o conteúdo seja visível durante a rotação*/
+    -webkit-backface-visibility: hidden; /*suporte para navegadores baseados em WebKit, como Safari e Chrome, garantindo que o backface-visibility funcione corretamente nesses navegadores*/
     transform-style: preserve-3d;
 }
 #login {
-    transform: rotateY(180deg);
+    transform: rotateY(0deg); /*mantém o elemento na posição original, sem rotação, começa com ele*/
 }
 #cadastro {
-    transform: rotateY(0deg);
+    transform: rotateY(180deg); /*gira o elemento 180 graus no eixo Y*/
 }
 h2 {
     text-align: center;
     font-size: 2em;
     color: #48237f;
 }
-
 .caixa-input {
     position: relative;
     width: 310px;
@@ -230,9 +252,9 @@ h2 {
     position: absolute;
     top: 50%;
     left: 5px;
-    transform: translateY(-25%);
-    font-size: 1em;
-    pointer-events: none;
+    transform: translateY(-25%); /*ajusta a posição vertical do label para que fique centralizado em relação ao input*/
+    font-size: 1em; 
+    pointer-events: none; /*impede que o label interfira na interação com o input, permitindo que o usuário clique diretamente no input para focar*/
     transition: 0.3s;
     color: #48237f;
 }
@@ -252,6 +274,22 @@ h2 {
     font-family: 'Times New Roman', Times, serif;
     font-weight: bold;
 }
+/*estilo do 'esqueci a senha'*/
+.forgot-password {
+    display: flex;
+    width: 100%;
+    margin-bottom: 10px;
+}   
+.forgot-password a {
+    text-decoration: none;
+    color: #48237f;
+    font-size: 13px;
+}
+.forgot-password a:hover {
+    text-decoration: underline;
+}
+
+/*estilo do botão de login e cadastro*/
 #wrapper button {
     width: 300px;
     height: 40px;
@@ -283,8 +321,8 @@ h2 {
     color: #48237f;
     font-size: 16px;
     cursor: pointer;
-    transform: translateX(-50%);
-    z-index: 1;
+    transform: translateX(-50%); /*centraliza o botão horizontalmente em relação ao ponto definido por left: 45%*/
+    z-index: 1; /*garante que o botão fique acima dos outros elementos do modal*/
     transform-style: preserve-3d;
     transition: all 0.6s ease-out;
     transform-origin: center;
@@ -338,6 +376,7 @@ h2 {
     cursor: pointer;
     background-color: #DEC7FF;
 }
+/*o + relaciona o checkbox com o label, já que estão em divs diferentes mas dentro do dialog*/
 .checkbox:checked + label:before,
 .checkbox:not(:checked) + label::before {
     position: absolute;
@@ -360,8 +399,11 @@ h2 {
     transform: translateX(80px);
 }
 
-
 /*relaciona o checkbox com o wrapper, já que estão em divs diferentes mas dentro do dialog*/
+/*quando o checkbox estiver marcado, aplica a rotação ao wrapper e ao botão de alternância, criando o efeito de flip entre login e cadastro*/
+/*:has é um seletor CSS que permite selecionar um elemento com base em seus 
+descendentes. No caso, #modal-1:has(#checkbox:checked) seleciona o elemento 
+com id "modal-1" apenas se ele contiver um elemento com id "checkbox" que esteja marcado (checked)*/
 #modal-1:has(#checkbox:checked) #wrapper {
     transform: rotateY(180deg);
 }
@@ -369,13 +411,121 @@ h2 {
     transform: rotateY(180deg) translateX(50%);
 }
 
-.login-close-button {
-    position: absolute;
-    top: 2px;
-    left: 20px;
-    background-color: transparent;
-    border: none;
-    font-size: 35px;
-    color: #48237f;
-    cursor: pointer;
+/*card de colocar email para receber o código*/
+#email-forgot-password {
+    display: none;
+    margin: 30px;
+}
+.center-wrap {
+    display: flex;
+    text-align: center;
+}
+.center-wrap h2 {
+    font-size: 2em;
+    margin-top: 30%;
+}
+.center-wrap .caixa-input {
+    margin: 20px auto;
+}
+
+/*card de inserir o código*/
+#insert-code {
+    display: none;
+}
+.center-wrap .otp-container {
+    margin: 40px 70px;
+}
+.otp-container {
+    display: flex;
+    gap: 10px;
+}
+.otp-input {
+    width: 50px;
+    height: 60px;
+    font-size: 24px;
+    text-align: center;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    outline: none;
+    transition: 0.2s;
+}
+.otp-input:focus {
+    border-color: #9147FF;
+    box-shadow: 0px 5px 5px rgba(145, 71, 255, 0.5);
+}
+#resendBtn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/*card de redefinir senha*/
+#new-password {
+    display: none;
+    margin: 30px;
+}
+
+
+/*AJUSTE DO BUG DE QUANDO COLA NO INPUT (autofill)*/
+/*remove fundo branco*/
+input::selection { /*:: = pseudo-elemento (parte interna)*/
+    background: transparent;
+    color: inherit;
+}
+/*Firefox*/
+input::-moz-selection { /*usa-se -moz- para firefox*/
+    background: transparent;
+    color: inherit;
+}
+/*remove destaque padrão de foco*/
+input:focus { /*: = pseudo-classe(estado)*/
+    outline: none;
+    box-shadow: none;
+}
+/*Chrome, Edge, Safari (AUTOFILL)*/
+input:-webkit-autofill, /*usa-se -webkit-*/
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0 1000px transparent inset !important;
+    -webkit-text-fill-color: inherit !important;
+    transition: background-color 9999s ease-in-out 0s;
+}
+
+/*RESPONSIVIDADE = não é adaptar para telas, é permitir que o layout se adapte sozinho*/
+/*@media = "if"*/
+@media (max-width: 768px) {/*desktop-first; min-width: 768px = mobile-first*/
+    #header {
+        grid-template-columns: 70px 1fr 100px;
+        gap: 10px;
+        transition: all 0.8s ease;
+    }
+    #header.shrink {
+        transition: all 0.8s ease;
+    }
+    .search-bar {
+        width: 200px;
+        transition: all 0.8s ease;
+    }
+    #header.shrink .search-bar {
+        width: 150px;
+        transition: all 0.8s ease;
+    }
+    .top-menu {
+        gap: 15px;
+    }
+    .menu-nav {
+        font-size: 14px;
+    }
+    #logo {
+        width: 50px;
+        transition: all 0.8s ease;
+    }
+    #header.shrink #logo {
+        width: 40px;
+        transition: all 0.8s ease;
+    }
+    .menu-modals {
+        gap: 5px;
+        margin-right: 20px;
+    }
 }

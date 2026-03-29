@@ -33,65 +33,121 @@
             <!--MODAL DO LOGIN-->
             <button class="open-modal" data-modal="modal-1">Entrar</button>
 
+            <!--dialog = modal-->
             <dialog id="modal-1">
                     <div id="wrap">
-                        <!--botão para alternar entre cadastro e login-->
-                        <div class="change-button">
-                            <div class="change-button1">
-                                <button class="close-modal login-close-button" data-modal="modal-1">X</button>
-                                <h6><span>Cadastrar</span><span>Entrar</span></h6>
-                                <input type="checkbox" class="checkbox" id="checkbox">
-                                <label for="checkbox"></label>
-                            </div>
-                            <div class="change-button2">
-                                <button class="close-modal login-close-button" data-modal="modal-1">X</button>
-                                <h6><span>Cadastrar</span><span>Entrar</span></h6>
-                                <input type="checkbox" class="checkbox" id="checkbox">
-                                <label for="checkbox"></label>
+                        <div class="form-header">
+                            <button class="close-modal login-close-button" data-modal="modal-1">X</button>
+                            <!--botão para alternar entre cadastro e login-->
+                            <div class="change-button">
+                                <!--frente da div de trocar card-->
+                                <div class="change-button1">
+                                    <!--note que um eemento pode ter mais de um nome de class, apenas separe por um espaço-->
+                                    <h6><span>Entrar</span><span>Cadastrar</span></h6>
+                                    <input type="checkbox" class="checkbox" id="checkbox">
+                                    <label for="checkbox"></label>
+                                </div>
+                                <!--costas da div de trocar card-->
+                                <div class="change-button2">
+                                    <h6><span>Entrar</span><span>Cadastrar</span></h6>
+                                    <input type="checkbox" class="checkbox" id="checkbox">
+                                    <label for="checkbox"></label>
+                                </div>
                             </div>
                         </div>
 
+                        <!--card do login-->
                         <div id="wrapper">
-                            <div id="login">   
+                            <div id="login">
+                                <form action="#" method="post" class="login">
+                                    <h2>Entrar</h2>
+                                    <div class="caixa-input">
+                                        <input type="text" id="user_email" name="user_email" required>
+                                        <label for="user_email">Nome de Usuário ou Email</label>
+                                    </div>
+                                    <div class="caixa-input">
+                                        <input type="password" id="senha-login" name="senha" required>
+                                        <label for="senha">Senha</label>
+                                    </div>
+                                    <div class="forgot-password">
+                                        <a href="#">Esqueceu a senha?</a>
+                                    </div>
+                                    <button type="submit">Entrar</button>
+                                </form>
+                            </div>
+
+                            <!--card de colocar email para receber o código-->
+                            <div id="email-forgot-password">
                                 <div class="center-wrap">
-                                    <form action="#" method="post" class="login">
-                                        <h2>Entrar</h2>
+                                    <form action="#" method="post" class="email-forgot-password">
+                                        <h2>Insira seu Email para receber o Código</h2>
                                         <div class="caixa-input">
-                                            <input type="text" id="user_email" name="user_email" required>
-                                            <label for="user_email">Nome de Usuário ou Email</label>
+                                            <input type="email" id="email" name="email" required>
+                                            <label for="email">Email</label>
                                         </div>
-                                        <div class="caixa-input">
-                                            <input type="password" id="senha-login" name="senha" required>
-                                            <label for="senha">Senha</label>
-                                        </div>
-                                        <button type="submit">Entrar</button>
+                                        <button type="submit" id="receber-codigo">Receber Código</button>
                                     </form>
                                 </div>
                             </div>
 
-                            <div id="cadastro">
+                            <!--card de colocar o código recebido por email-->
+                            <div id="insert-code">
                                 <div class="center-wrap">
-                                    <form action="#" method="post" class="sign">
-                                        <h2>Cadastre-se</h2>
-                                        <div class="caixa-input">
-                                            <input type="text" id="user-cadastro" name="user" required>
-                                            <label for="user">Usuário</label>
+                                    <form action="#" method="post" class="insert-code">
+                                        <h2>Insira o Código Recebido</h2>
+                                        <div class="otp-container">
+                                            <input type="text" maxlength="1" class="otp-input">
+                                            <input type="text" maxlength="1" class="otp-input">
+                                            <input type="text" maxlength="1" class="otp-input">
+                                            <input type="text" maxlength="1" class="otp-input">
+                                            <input type="text" maxlength="1" class="otp-input">
                                         </div>
-                                        <div class="caixa-input">
-                                            <input type="email" id="email-cadastro" name="email" required>
-                                            <label for="email">Email</label>
-                                        </div>
-                                        <div class="caixa-input">
-                                            <input type="text" id="data-nascimento" name="data_nascimento" pattern="\d{2}\/\d{2}\/\d{4}" required>
-                                            <label for="data_nascimento">Data de Nascimento</label>
-                                        </div>
-                                        <div class="caixa-input">
-                                            <input type="password" id="senha-cadastro" name="senha" required>
-                                            <label for="senha">Senha</label>
-                                        </div>
-                                        <button type="submit">Cadastrar</button>
+                                        <p id="timerText">Reenviar código em 30s</p>
+                                        <button id="resendBtn" disabled>Reenviar Código</button>
+                                        <button type="submit" id="continueBtn">Continuar</button>
                                     </form>
                                 </div>
+                            </div>
+
+                            <div id="new-password">
+                                <div class="center-wrap">
+                                    <form action="#" method="post" class="new-password">
+                                        <h2>Redefina sua Senha</h2>
+                                        <div class="caixa-input">
+                                            <input type="password" id="nova-senha" name="nova_senha" required>
+                                            <label for="nova_senha">Nova Senha</label>
+                                        </div>
+                                        <div class="caixa-input">
+                                            <input type="password" id="confirmar-senha" name="confirmar_senha" required>
+                                            <label for="confirmar_senha">Confirmar Senha</label>
+                                        </div>
+                                        <button type="submit" id="backLogin">Voltar ao Login</button>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <!--card do cadastro-->
+                            <div id="cadastro">
+                                <form action="#" method="post" class="sign">
+                                    <h2>Cadastre-se</h2>
+                                    <div class="caixa-input">
+                                        <input type="text" id="user-cadastro" name="user" required>
+                                        <label for="user">Usuário</label>
+                                    </div>
+                                    <div class="caixa-input">
+                                        <input type="email" id="email-cadastro" name="email" required>
+                                        <label for="email">Email</label>
+                                    </div>
+                                    <div class="caixa-input"> <!--pattern = regex, expressão regular, formato específico para o input-->
+                                        <input type="text" id="data-nascimento" name="data_nascimento" pattern="\d{2}\/\d{2}\/\d{4}" required>
+                                        <label for="data_nascimento">Data de Nascimento</label>
+                                    </div>
+                                    <div class="caixa-input">
+                                        <input type="password" id="senha-cadastro" name="senha" required>
+                                        <label for="senha">Senha</label>
+                                    </div>
+                                    <button type="submit">Cadastrar</button>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -109,7 +165,7 @@
 
     <h1>asdfghjklhhhh <br>
         sssssssssssssssss<br>ssssssssssssssssssssss<br>
-    <br><br><br><br><br><br><br><br><br><br>ssssssssssssssssssssssssssss<br><br><br><br><br><br><br><br><br><br><br><br><br><br>sssssssssss</h1>
+    <br><br><br><br><br><br><br><br><br><br>ssssssssssssssss<br><br><br><br><br><br><br><br><br><br><br><br><br><br>sssssssssss</h1>
 
     <script src="script.js"></script>
 </body>
