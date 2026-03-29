@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>oiii</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
-    <link rel="icon" type="image/x-icon" href="logo.png">
+    <link rel="stylesheet" href="static/style.css">
+    <link rel="icon" type="image/x-icon" href="static/logo.png">
 </head>
 <body>
     <header id="header">
@@ -132,7 +132,7 @@
 
                             <!--card do cadastro-->
                             <div id="cadastro">
-                                <form action="#" method="post" class="sign">
+                                <form action="#" class="sign">
                                     <h2>Cadastre-se</h2>
                                     <div class="caixa-input">
                                         <input type="text" id="user-cadastro" name="user" required>
@@ -152,11 +152,11 @@
                                         <p id="erroIdade">Deve ser maior de 18 anos</p>
                                     </div>
                                     <div class="caixa-input password-box">
-                                        <input type="password" class="password" name="password" required>
+                                        <input type="password" class="password" id='senha-cadastro' name="password" required>
                                         <label for="password">Senha</label>
                                         <p class="erroSenha">Senha Inválida (mínimo 5 caracteres)</p>
                                     </div>
-                                    <button type="submit">Cadastrar</button>
+                                    <button type="submit" onclick='cadastrar()'>Cadastrar</button>
                                 </form>
                             </div>
                         </div>
@@ -177,6 +177,6 @@
         sssssssssssssssss<br>ssssssssssssssssssssss<br>
     <br><br><br><br><br><br><br><br><br><br>ssssssssssssssss<br><br><br><br><br><br><br><br><br><br><br><br><br><br>sssssssssss</h1>
 
-    <script src="script.js"></script>
+    <script src="static/script.js"></script>
 </body>
 </html>

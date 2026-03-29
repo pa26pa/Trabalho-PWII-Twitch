@@ -7,7 +7,7 @@ import smtplib
 from email.message import EmailMessage
 import mimetypes
 from backend.database.connection import connection, send_code
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 from time import sleep
 
 # criação do signin
@@ -26,6 +26,7 @@ class signin(Resource):
         data_nascimento = data.get('data_nascimento')
         senha = data.get('senha')
         
+        data_formatada = datetime.strptime(data_nascimento,"%d/%m/%Y").strftime('%Y-%m-%d')
         # criptografando a senhaaaaaa :)
         senha_hash = generate_password_hash(senha)
         
@@ -43,7 +44,7 @@ class signin(Resource):
             }, 400
         
         insert = """insert into usuarios(cpf,email,user_name,senha,data_nascimento) values (%s,%s,%s,%s,%s)"""
-        cursor.execute(insert,(cpf,email,user_name,senha_hash,data_nascimento))
+        cursor.execute(insert,(cpf,email,user_name,senha_hash,data_formatada))
         con.commit()
         
         cursor.close()

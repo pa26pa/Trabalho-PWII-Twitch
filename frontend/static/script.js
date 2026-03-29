@@ -309,6 +309,30 @@ document.addEventListener('DOMContentLoaded', function () {
         return false;
     }
     
+    // Conectando cadastro com api
+    function cadastrar() {
+
+    const dados = {
+        cpf: document.getElementById("cpf").value,
+        email: document.getElementById("email-cadastro").value,
+        user_name: document.getElementById("user-cadastro").value,
+        data_nascimento: document.getElementById("data-nascimento").value,
+        senha: document.getElementById("senha-cadastro").value
+    };
+
+    fetch("http://127.0.0.1:5000/signin", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(dados)
+    })
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById("resposta").innerText = JSON.stringify(data, null, 2);
+    });
+    }
+
     //VALIDAÇÃO NA TROCA DE SENHA
     const senhaInput1 = document.querySelector('.password1');
     const senhaInput2 = document.querySelector('.password2');
@@ -336,35 +360,39 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     //ENVIO DO FORM
-    document.querySelectorAll('.sign').forEach(form => { //o mesmo que function (form)
+    document.querySelectorAll('.sign').forEach(form => { 
         form.addEventListener('submit', function (validarForm) {
-            let envio = true;
-            //checkValidity() = método que verifica se os campos do formulário estão válidos de acordo com os atributos HTML (required, pattern, etc.)
-            if (!form.checkValidity()) {
-                envio = false;
-            }
-            //verifica se o formulário tem um campo de data de nascimento e se a idade é válida, se não for, impede o envio
-            if (form.querySelector('#data-nascimento') && !validarIdade()) {
-                envio = false;
-            }
-            //verifica se o formulário tem um campo de confirmação de senha e se as senhas coincidem, se não for, impede o envio
-            if (form.querySelector('.password2') && !confirmarSenha()) {
-                envio = false;
-            }
+        let envio = true;
 
-            form.querySelectorAll('.password-box').forEach(box => {
-                const senhaInput = box.querySelector('.password');
-                const erroSenha = box.querySelector('.erroSenha');
+        if (!form.checkValidity()) {
+            envio = false;
+        }
 
-                if (!validarSenha(senhaInput, erroSenha)) {
-                    envio = false;
-                }
-            });
+        if (form.querySelector('#data-nascimento') && !validarIdade()) {
+            envio = false;
+        }
 
-            if (!envio) {
-                validarForm.preventDefault(); 
-                form.reportValidity();
+        if (form.querySelector('.password2') && !confirmarSenha()) {
+            envio = false;
+        }
+
+        form.querySelectorAll('.password-box').forEach(box => {
+            const senhaInput = box.querySelector('.password');
+            const erroSenha = box.querySelector('.erroSenha');
+
+            if (!validarSenha(senhaInput, erroSenha)) {
+                envio = false;
             }
         });
+
+        validarForm.preventDefault(); 
+
+        if (!envio) {
+            form.reportValidity();
+            return;
+        }
+
+        cadastrar();
+    });
     });
 });
