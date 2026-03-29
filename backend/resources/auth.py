@@ -133,8 +133,10 @@ class forgot(Resource):
         
         codigo = send_code(email)
         
+        
         session['usuario_id'] = id
-        session['code '] = codigo 
+        session['code'] = codigo 
+        print(session.get('code'))
         
         cursor.close()
         con.close()
@@ -154,13 +156,14 @@ class resend_code(Resource):
         con = connection()
         cursor = con.cursor()
         
+        print('yey')
         query = """select email from usuarios where id_usuario = %s"""
         cursor.execute(query,(session['usuario_id']))
         email = cursor.fetchone()
         
         codigo = send_code(email)
         
-        session['code '] = codigo 
+        session['code'] = codigo 
         
         cursor.close()
         con.close()
@@ -178,15 +181,17 @@ class check_codigo(Resource):
         cursor = con.cursor()
         
         codigo_inserido = data.get('codigo')
+        codigo_salvo = str(session.get('code'))
+        print(codigo_inserido)
         
-        if codigo_inserido != session['code']:
+        if codigo_inserido != codigo_salvo:
             session.pop('code',None)
             return {
                 'status':'error',
                 'mensagem':'Código invalido'
             }, 400
         
-        session.pop['code']
+        session.pop('code')
         return{
             'status':'success',
             'mensagem':'Codigo correto'

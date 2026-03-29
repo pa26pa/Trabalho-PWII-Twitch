@@ -60,9 +60,35 @@ function forgot() {
     });
 }
 
+function check_codigo() {
+    const dados = {
+        codigo: document.getElementById("codigo_check_codigo").value
+    };
+
+    fetch("http://127.0.0.1:5000/check_codigo", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(dados)
+    })
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById("resposta").innerText = JSON.stringify(data, null, 2);
+    });
+}
+
+function resend_code() {
+
+    fetch("http://127.0.0.1:5000/resend")
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById("resposta").innerText = JSON.stringify(data, null, 2);
+    });
+}
+
 function redefine_password() {
     const dados = {
-        codigo: document.getElementById("codigo_redefine_password").value,
         nova_senha: document.getElementById("nova_senha_redefine_password").value
     };
 
