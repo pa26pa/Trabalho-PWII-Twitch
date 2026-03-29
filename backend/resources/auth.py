@@ -8,6 +8,7 @@ from email.message import EmailMessage
 import mimetypes
 from backend.database.connection import connection
 from datetime import date, timedelta
+from time import sleep
 
 # criação do signin
 class signin(Resource):
@@ -123,27 +124,39 @@ class forgot(Resource):
                 'status':'error',
                 'mensagem':f'Este email ainda não está cadastrado {email_forgot}'
             }
-    
-        codigo = random.randint(10000,99999)
         
-        session['code'] = str(codigo)
+        a = 1
         
-        de = 'paula.pires2640@gmail.com'
-        to = email_forgot
-        password = 'rvcr wtfd gtal ijog'
+        while a == 1:
+            codigo = random.randint(10000,99999)
         
-        info = 'Twitch | Código redefinir senha'
+            session['code'] = str(codigo)
         
-        msg = EmailMessage()
-        msg['From'] = de
-        msg['To'] = to
-        msg['Subject'] = info
-        msg.set_content(f'Olá, este é o seu código --> {codigo}')
+            de = 'paula.pires2640@gmail.com'
+            to = email_forgot
+            password = 'rvcr wtfd gtal ijog'
         
-        with smtplib.SMTP_SSL("smtp.gmail.com",465) as email:
-            email.login(de,password)
-            email.send_message(msg)
+            info = 'Twitch | Código redefinir senha'
         
+            msg = EmailMessage()
+            msg['From'] = de
+            msg['To'] = to
+            msg['Subject'] = info
+            msg.set_content(f'Olá, este é o seu código --> {codigo}')
+            
+            with smtplib.SMTP_SSL("smtp.gmail.com",465) as email:
+                email.login(de,password)
+                email.send_message(msg)
+                
+            sleep(50)
+            
+            code = data.get('codigo')
+            
+            if code != codigo:
+                flash('Outro código será enviado para vc por email')
+            else:
+                a = 2
+            
         return {
             'status':'success',
             'mensagem':'O código foi enviado no seu email'
