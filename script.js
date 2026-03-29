@@ -92,6 +92,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     
         //backspace para voltar ao campo anterior   
+        //keydown = evento de pressionar uma tecla, e.key = tecla pressionada
         input.addEventListener('keydown', (e) => {
             if (e.key === 'Backspace' && !input.value && index > 0) {
                 inputs[index - 1].focus();
@@ -100,9 +101,12 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     //colar código inteiro de uma vez
+    //paste = evento de colar, e.clipboardData.getData('text') = pega o texto do clipboard
     document.addEventListener('paste', (e) => {
         const paste = e.clipboardData.getData('text').replace(/[^0-9]/g, '');
+        //i = posição do campo atual, paste[i] = caractere correspondente do código colado
         inputs.forEach((input, i) => {
+            //preenche os campos com os caracteres do código colado, ou deixa vazio se não houver mais caracteres
             input.value = paste[i] || '';
         });
         checkCode();
@@ -110,6 +114,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
     //verifica se completou
     function checkCode() {
+        //cria uma string com os valores dos campos de código
+        //array.from(inputs) = transforma a NodeList de inputs em um array para usar o map
+        // join('') = junta os valores sem espaço
+        //nodelist = lista de elementos, array = estrutura de dados que pode usar métodos como map
+        // map = para cada input pega o valor
         const code = Array.from(inputs).map(input => input.value).join('');
         if (code.length === 5) {
             console.log('Código completo:', code);
@@ -128,25 +137,27 @@ document.addEventListener('DOMContentLoaded', function () {
     const timerText = document.getElementById('timerText');
 
     let timeLeft = 30;
+    //interval = variável para armazenar o intervalo do timer
     let interval;
 
     //inicia o timer
     function startTimer() {
         resendBtn.disabled = true;
-        timeLeft = 70;
-
+        timeLeft = 60;
+        //atualiza o texto do timer para mostrar o tempo restante
         timerText.textContent = `Reenviar código em ${timeLeft}s`;
-
+        //limpa qualquer intervalo anterior para evitar múltiplos timers rodando ao mesmo tempo
         interval = setInterval(() => {
             timeLeft--;
-
+            //atualiza o texto do timer a cada segundo
             timerText.textContent = `Reenviar código em ${timeLeft}s`;
-
+            //quando o tempo acabar, para o timer, habilita o botão de reenviar e atualiza o texto
             if (timeLeft <= 0) {
                 clearInterval(interval);
                 timerText.textContent = 'Reenviar Código';
                 resendBtn.disabled = false;
             }
+            //1000 = 1 segundo, o timer atualiza a cada segundo
         }, 1000);
     }
 
@@ -158,7 +169,8 @@ document.addEventListener('DOMContentLoaded', function () {
         startTimer(); //reinicia o tempo
     });
 
-    startTimer(); //inicia o timer quando a página carrega
+    startTimer(); //inicia o timer quando a página carrega (quando abre o modal)
+    //tem que iniciar o timer quando abrir a tela do código
 
     //TROCA DE CARDS INSERIR CODIGO-CRIAR NOVA SENHA
     const newpasswordBox = document.getElementById('new-password');

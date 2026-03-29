@@ -512,9 +512,11 @@ textarea:-webkit-autofill {
     }
     .top-menu {
         gap: 15px;
+        transition: all 0.8s ease;
     }
     .menu-nav {
         font-size: 14px;
+        transition: all 0.8s ease;
     }
     #logo {
         width: 50px;
