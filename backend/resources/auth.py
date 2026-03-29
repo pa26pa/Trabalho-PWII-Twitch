@@ -104,12 +104,16 @@ class forgot(Resource):
         con = connection()
         cursor = con.cursor()
         
-        cpf = str(data.get('cpf'))
-        cpf = cpf.strip()
+        #cpf = str(data.get('cpf'))
+        #cpf = cpf.strip()
         
-        query = """select * from usuarios where cpf = %s"""
-        cursor.execute(query,(cpf,))
+        email_forgot = str(data.get('email_forgot'))
+        
+        print(email_forgot)
+        query = """select * from usuarios where email = %s"""
+        cursor.execute(query,(email_forgot,))
         achou_email = cursor.fetchone()
+        
         
         if not achou_email:
             cursor.close()
@@ -117,20 +121,15 @@ class forgot(Resource):
             
             return{
                 'status':'error',
-                'mensagem':'Este CPF ainda não está cadastrado'
+                'mensagem':f'Este email ainda não está cadastrado {email_forgot}'
             }
-        
-        q = """select email from usuarios where cpf = %s"""
-        cursor.execute(q,(cpf,))
-
-        email_achado = cursor.fetchone()
-        
-        codigo = random.randint(100000,999999)
+    
+        codigo = random.randint(10000,99999)
         
         session['code'] = str(codigo)
         
         de = 'paula.pires2640@gmail.com'
-        to = email_achado[0]
+        to = email_forgot
         password = 'rvcr wtfd gtal ijog'
         
         info = 'Twitch | Código redefinir senha'
