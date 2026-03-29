@@ -44,7 +44,7 @@ function login() {
 
 function forgot() {
     const dados = {
-        cpf: document.getElementById("cpf_forgot").value
+        email_forgot: document.getElementById("email_forgot").value
     };
 
     fetch("http://127.0.0.1:5000/forgot", {
@@ -67,6 +67,24 @@ function redefine_password() {
     };
 
     fetch("http://127.0.0.1:5000/redefine_password", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(dados)
+    })
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById("resposta").innerText = JSON.stringify(data, null, 2);
+    });
+}
+
+function pesquisa() {
+    const dados = {
+        pesquisa: document.getElementById("pesquisa").value,
+    };
+
+    fetch("http://127.0.0.1:5000/search", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
