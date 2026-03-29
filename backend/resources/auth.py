@@ -6,7 +6,7 @@ import random
 import smtplib
 from email.message import EmailMessage
 import mimetypes
-from backend.database.connection import connection
+from backend.database.connection import connection, send_code
 from datetime import date, timedelta
 from time import sleep
 
@@ -124,51 +124,53 @@ class forgot(Resource):
                 'status':'error',
                 'mensagem':f'Este email ainda não está cadastrado {email_forgot}'
             }
-        
-        a = 1
-        
-        while a == 1:
-            codigo = random.randint(10000,99999)
-        
-            session['code'] = str(codigo)
-        
-            de = 'paula.pires2640@gmail.com'
-            to = email_forgot
-            password = 'rvcr wtfd gtal ijog'
-        
-            info = 'Twitch | Código redefinir senha'
-        
-            msg = EmailMessage()
-            msg['From'] = de
-            msg['To'] = to
-            msg['Subject'] = info
-            msg.set_content(f'Olá, este é o seu código --> {codigo}')
             
-            with smtplib.SMTP_SSL("smtp.gmail.com",465) as email:
-                email.login(de,password)
-                email.send_message(msg)
-                
-            sleep(50)
-            
-            code = data.get('codigo')
-            
-            if code != codigo:
-                flash('Outro código será enviado para vc por email')
-            else:
-                a = 2
-            
+        email = email_forgot
+        
+        w = """select id_usuario from usuarios where email = %s"""
+        cursor.execute(w,(email,))
+        id = cursor.fetchone()
+        
+        codigo = send_code(email)
+        
+        session['usuario_id'] = id
+        session['code '] = codigo 
+        
+        cursor.close()
+        con.close()
         return {
             'status':'success',
             'mensagem':'O código foi enviado no seu email'
         }, 200
-      
+
     def get(self):
         return{
             'status':'error',
             'mensagem':'get não é um metodo aceito'
         }, 400  
 
-class redefine_password(Resource):
+class resend_code(Resource):
+    def get(self):
+        con = connection()
+        cursor = con.cursor()
+        
+        query = """select email from usuarios where id_usuario = %s"""
+        cursor.execute(query,(session['usuario_id']))
+        email = cursor.fetchone()
+        
+        codigo = send_code(email)
+        
+        session['code '] = codigo 
+        
+        cursor.close()
+        con.close()
+        
+        return {
+            'status':'success',
+            'mensagem':'Código enviado'
+        }
+    
+class check_codigo(Resource):
     def post(self):
         data = request.get_json()
         
@@ -176,9 +178,6 @@ class redefine_password(Resource):
         cursor = con.cursor()
         
         codigo_inserido = data.get('codigo')
-        nova_senha = data.get('nova_senha')
-        
-        nova_senha_hash = generate_password_hash(nova_senha)
         
         if codigo_inserido != session['code']:
             session.pop('code',None)
@@ -186,6 +185,22 @@ class redefine_password(Resource):
                 'status':'error',
                 'mensagem':'Código invalido'
             }, 400
+        
+        session.pop['code']
+        return{
+            'status':'success',
+            'mensagem':'Codigo correto'
+        }
+class redefine_password(Resource):
+    def post(self):
+        data = request.get_json()
+        
+        con = connection()
+        cursor = con.cursor()
+        
+        nova_senha = data.get('nova_senha')
+        
+        nova_senha_hash = generate_password_hash(nova_senha)
         
         session.pop('code',None)
         update = """ update usuarios set senha = %s where id_usuario = %s"""
