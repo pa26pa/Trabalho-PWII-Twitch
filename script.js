@@ -124,7 +124,7 @@ document.addEventListener('DOMContentLoaded', function () {
             console.log('Código completo:', code);
 
             //validar no back depois
-            const isValid = true
+            const isValid = true;
 
             if (isValid) {
                 continueBtn.click();
@@ -136,41 +136,37 @@ document.addEventListener('DOMContentLoaded', function () {
     const resendBtn = document.getElementById('resendBtn');
     const timerText = document.getElementById('timerText');
 
-    let timeLeft = 30;
+    let timeLeft = 60;
     //interval = variável para armazenar o intervalo do timer
     let interval;
-
-    //inicia o timer
-    function startTimer() {
-        resendBtn.disabled = true;
-        timeLeft = 60;
-        //atualiza o texto do timer para mostrar o tempo restante
-        timerText.textContent = `Reenviar código em ${timeLeft}s`;
-        //limpa qualquer intervalo anterior para evitar múltiplos timers rodando ao mesmo tempo
-        interval = setInterval(() => {
-            timeLeft--;
-            //atualiza o texto do timer a cada segundo
-            timerText.textContent = `Reenviar código em ${timeLeft}s`;
-            //quando o tempo acabar, para o timer, habilita o botão de reenviar e atualiza o texto
-            if (timeLeft <= 0) {
-                clearInterval(interval);
-                timerText.textContent = 'Reenviar Código';
-                resendBtn.disabled = false;
-            }
-            //1000 = 1 segundo, o timer atualiza a cada segundo
-        }, 1000);
-    }
 
     //botão de reenviar
     resendBtn.addEventListener('click', () => {
         console.log('Código reenviado');
 
-        //chamar API de envio de email
-        startTimer(); //reinicia o tempo
-    });
+        //inicia o timer
+        function startTimer() {
+            resendBtn.disabled = true;
+            timeLeft = 60;
 
-    startTimer(); //inicia o timer quando a página carrega (quando abre o modal)
-    //tem que iniciar o timer quando abrir a tela do código
+            timerText.textContent = `Reenviar código em ${timeLeft}s`;
+            //limpa qualquer intervalo anterior para evitar múltiplos timers rodando ao mesmo tempo
+            interval = setInterval(() => {
+                timeLeft--;
+                //atualiza o texto do timer a cada segundo
+                timerText.textContent = `Reenviar código em ${timeLeft}s`;
+                //quando o tempo acabar, para o timer, habilita o botão de reenviar e atualiza o texto
+                if (timeLeft <= 0) {
+                    //clearInterval = para o timer
+                    clearInterval(interval);
+                    timerText.textContent = 'Reenviar Código';
+                    resendBtn.disabled = false;
+                }
+            //1000 = 1 segundo, o timer atualiza a cada segundo
+            }, 1000);
+        }
+        startTimer();
+    });
 
     //TROCA DE CARDS INSERIR CODIGO-CRIAR NOVA SENHA
     const newpasswordBox = document.getElementById('new-password');
@@ -194,4 +190,181 @@ document.addEventListener('DOMContentLoaded', function () {
             changeButton.style.display = 'flex';
         });
     }
+
+    //CADASTRO
+    //máscara de CPF
+    const cpfInput = document.getElementById('cpf');
+    if (cpfInput) {
+        cpfInput.addEventListener('input', function (maskCpf) {
+            //target = campo de entrada onde o evento ocorreu
+            // /\D/g = expressão regular para remover tudo que não for número
+            // g = global (remove todos)
+            // \D = negação de dígito (qualquer caractere que não seja número)
+            // '' = string vazia, ou seja, substitui os caracteres não numéricos por nada
+            let mc = maskCpf.target.value.replace(/\D/g, '');
+            //slice = corta o valor para no máximo 11 dígitos, evitando que o usuário digite mais do que o permitido
+            if (mc.length > 11) mc = mc.slice(0, 11);
+            //replace = aplica a formatação do CPF conforme o usuário digita
+            mc = mc.replace(/^(\d{3})(\d)/, '$1.$2');
+            mc = mc.replace(/(\d{3})(\d)/, '$1.$2');
+            mc = mc.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+            maskCpf.target.value = mc;
+        });
+    }
+    //MÁSCARA DATA DE NASCIMENTO
+    const nascInput = document.getElementById('data-nascimento');
+    if (nascInput) {
+        nascInput.addEventListener('input', function (maskNasc) {
+            //remove tudo que não for número e limita a 8 dígitos (DDMMAAAA)
+            let mn = maskNasc.target.value.replace(/\D/g, '');
+            if (mn.length > 8) mn = mn.slice(0, 8);
+            //aplica a formatação de data conforme o usuário digita
+            mn = mn.replace(/^(\d{2})(\d)/, '$1/$2');
+            mn = mn.replace(/(\d{2})(\d)/, '$1/$2');
+            mn = mn.replace(/(\d{4})(\d)/, '$1/$2');
+            maskNasc.target.value = mn;
+        });
+    }
+    //LIMITES DE IDADE 
+    const erroIdade = document.getElementById('erroIdade'); 
+    function calcularIdade() {
+        //verifica se os elementos necessários existem antes de tentar acessá-los
+        if(!nascInput || !erroIdade) return null;
+         
+        const valor = nascInput.value; 
+        //verifica se o formato da data é válido (DD/MM/AAAA), se não for, retorna null
+        if(!/^\d{2}\/\d{2}\/\d{4}$/.test(valor)) return null; 
+        //split = divide a string em partes usando o separador '/' e map(Number) torna a string do input em número
+        const [dia, mes, ano] = valor.split('/').map(Number); 
+        //cria um objeto Date com a data de nascimento, lembrando que o mês em JavaScript é zero-indexado (0 = janeiro, 1 = fevereiro, etc.)
+        const nascimento = new Date(ano, mes - 1, dia); 
+        //cria um objeto Date com a data atual
+        const hoje = new Date(); 
+        //calcula a idade subtraindo o ano de nascimento do ano atual
+        let idade = hoje.getFullYear() - nascimento.getFullYear(); 
+        //calcula a diferença de meses entre a data atual e a data de nascimento
+        const m = hoje.getMonth() - nascimento.getMonth(); 
+        //se a diferença de meses for negativa ou se for o mesmo mês mas o dia atual for menor que o dia de nascimento, subtrai 1 da idade
+        if (m < 0 || (m === 0 && hoje.getDate() < nascimento.getDate())) { 
+            idade--; 
+        } 
+        //retorna a idade calculada
+        return idade;
+    }
+    //função para validar a idade e exibir mensagem de erro se for menor que 18 anos
+    function validarIdade() {
+        let valorIdade = calcularIdade();
+        console.log(valorIdade);
+        //se o valor da idade for null (data inválida), retorna false para não permitir o cadastro
+        if (valorIdade === null) return false;
+        //se a idade for menor que 18, exibe a mensagem de erro e adiciona uma classe de erro ao campo de data de nascimento
+        if (valorIdade < 18) { 
+            erroIdade.style.display = 'block'; 
+            nascInput.classList.add('input-erro'); 
+            return false;
+                    
+        } 
+        erroIdade.style.display = 'none'; 
+        nascInput.classList.remove('input-erro'); 
+        return true;
+    }
+    //adiciona um evento de blur (perda de foco) ao campo de data de nascimento para validar a idade quando o usuário terminar de digitar
+    if (nascInput && erroIdade) {
+        nascInput.addEventListener('blur', validarIdade); //blur = perde foco
+        //adiciona um evento de input para esconder a mensagem de erro e remover a classe de erro assim que o usuário começar a corrigir a data
+        nascInput.addEventListener('input', () => {
+            erroIdade.style.display = 'none';
+            nascInput.classList.remove('input-erro');
+        });
+    }
+    //VALIDAÇÃO DE SENHA
+    const passwordBox = document.querySelectorAll('.password-box');
+
+    passwordBox.forEach(passBox => {
+        const senhaInput = passBox.querySelector('.password');
+        const erroSenha = passBox.querySelector('.erroSenha');
+
+        if (!senhaInput || !erroSenha) return;
+        //adiciona blur ao campo de senha para validar a senha quando terminar de digitar
+        senhaInput.addEventListener('blur', () => {
+            validarSenha(senhaInput, erroSenha);
+        });
+
+        senhaInput.addEventListener('input', () => {
+            erroSenha.style.display = 'none';
+            senhaInput.classList.remove('input-erro');
+        })
+    });
+
+    function validarSenha(senhaInput, erroSenha) {
+        if (!senhaInput || !erroSenha) return true;
+        
+        if (senhaInput.value.length >= 5 || senhaInput.value === '') {
+            erroSenha.style.display = 'none';
+            senhaInput.classList.remove('input-erro');
+            return true;
+        } 
+        erroSenha.style.display = 'block';
+        senhaInput.classList.add('input-erro');
+        return false;
+    }
+
+    //VALIDAÇÃO NA TROCA DE SENHA
+    const senhaInput1 = document.querySelector('.password1');
+    const senhaInput2 = document.querySelector('.password2');
+    const erroSenha2 = document.querySelector('.erroSenha2');
+
+    function confirmarSenha() {
+        if (!senhaInput1 || !senhaInput2 || !erroSenha2) return true;
+
+        if (senhaInput2.value === '' || senhaInput1.value === senhaInput2.value) {
+            erroSenha2.style.display = 'none';
+            senhaInput2.classList.remove('input-erro');
+            return true;
+        }
+        erroSenha2.style.display = 'block';
+        senhaInput2.classList.add('input-erro');
+        return false;
+    }
+
+    if (senhaInput1 && senhaInput2 && erroSenha2) {
+        senhaInput2.addEventListener('blur', confirmarSenha);
+        senhaInput2.addEventListener('input', () => { // sem parâmetro ()
+            erroSenha2.style.display = 'none';
+            senhaInput2.classList.remove('input-erro');
+        });
+    }
+
+    //ENVIO DO FORM
+    document.querySelectorAll('.sign').forEach(form => { //o mesmo que function (form)
+        form.addEventListener('submit', function (validarForm) {
+            let envio = true;
+            //checkValidity() = método que verifica se os campos do formulário estão válidos de acordo com os atributos HTML (required, pattern, etc.)
+            if (!form.checkValidity()) {
+                envio = false;
+            }
+            //verifica se o formulário tem um campo de data de nascimento e se a idade é válida, se não for, impede o envio
+            if (form.querySelector('#data-nascimento') && !validarIdade()) {
+                envio = false;
+            }
+            //verifica se o formulário tem um campo de confirmação de senha e se as senhas coincidem, se não for, impede o envio
+            if (form.querySelector('.password2') && !confirmarSenha()) {
+                envio = false;
+            }
+
+            form.querySelectorAll('.password-box').forEach(box => {
+                const senhaInput = box.querySelector('.password');
+                const erroSenha = box.querySelector('.erroSenha');
+
+                if (!validarSenha(senhaInput, erroSenha)) {
+                    envio = false;
+                }
+            });
+
+            if (!envio) {
+                validarForm.preventDefault(); 
+                form.reportValidity();
+            }
+        });
+    });
 });

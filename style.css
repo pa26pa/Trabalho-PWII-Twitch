@@ -269,10 +269,19 @@ h2 {
     border: none;
     outline: none;
     font-size: 1em;
-    color: #48237f;
+    color: black;
     padding: 20px 5px 0 5px;
     font-family: 'Times New Roman', Times, serif;
     font-weight: bold;
+}
+/*MESAGEM DE ERRO*/
+#erroIdade, .erroSenha, .erroSenha2 {
+    display: none;
+    color: #48237f;
+    font-weight: bold;
+    text-align: center;
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 14px;
 }
 /*estilo do 'esqueci a senha'*/
 .forgot-password {
