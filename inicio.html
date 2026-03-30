@@ -37,8 +37,15 @@
             <dialog id="modal-1">
                     <div id="wrap">
                         <div class="form-header">
-                            <button class="close-modal login-close-button" data-modal="modal-1">X</button>
-                            <!--botão para alternar entre cadastro e login-->
+                            <div id="close-modal">
+                                <div class="login-close-button1">
+                                    <button class="close-modal login-close-button" data-modal="modal-1">X</button>
+                                </div>
+                                <div class="login-close-button2">
+                                    <button class="close-modal login-close-button" data-modal="modal-1">X</button>
+                                </div>
+                            </div>
+                                <!--botão para alternar entre cadastro e login-->
                             <div class="change-button">
                                 <!--frente da div de trocar card-->
                                 <div class="change-button1">
@@ -59,7 +66,7 @@
                         <!--card do login-->
                         <div id="wrapper">
                             <div id="login">
-                                <form action="#" method="post" class="login">
+                                <form action="#" method="post" class="login forms">
                                     <h2>Entrar</h2>
                                     <div class="caixa-input">
                                         <input type="text" id="user_email" name="user_email" required>
@@ -80,10 +87,10 @@
                             <!--card de colocar email para receber o código-->
                             <div id="email-forgot-password">
                                 <div class="center-wrap">
-                                    <form action="#" method="post" class="email-forgot-password">
+                                    <form action="#" method="post" class="email-forgot-password forms">
                                         <h2>Insira seu Email para receber o Código</h2>
                                         <div class="caixa-input">
-                                            <input type="email" id="email" name="email" required>
+                                            <input type="email" class="email" name="email" required>
                                             <label for="email">Email</label>
                                         </div>
                                         <button type="submit" id="receber-codigo">Receber Código</button>
@@ -94,7 +101,7 @@
                             <!--card de colocar o código recebido por email-->
                             <div id="insert-code">
                                 <div class="center-wrap">
-                                    <form action="#" method="post" class="insert-code">
+                                    <form action="#" method="post" class="insert-code forms">
                                         <h2>Insira o Código Recebido</h2>
                                         <div class="otp-container">
                                             <input type="text" maxlength="1" class="otp-input">
@@ -113,7 +120,7 @@
                             <!--card de criar nova senha-->
                             <div id="new-password">
                                 <div class="center-wrap">
-                                    <form action="#" method="post" class="new-password">
+                                    <form action="#" method="post" class="new-password forms">
                                         <h2>Redefina sua Senha</h2>
                                         <div class="caixa-input password-box">
                                             <input type="password" class="password password1" name="password" required>
@@ -132,7 +139,7 @@
 
                             <!--card do cadastro-->
                             <div id="cadastro">
-                                <form action="#" method="post" class="sign">
+                                <form action="#" method="post" class="sign forms">
                                     <h2>Cadastre-se</h2>
                                     <div class="caixa-input">
                                         <input type="text" id="user-cadastro" name="user" required>
@@ -143,7 +150,7 @@
                                         <label for="cpf">CPF</label>
                                     </div>
                                     <div class="caixa-input">
-                                        <input type="email" id="email-cadastro" name="email" required>
+                                        <input type="email" class="email" name="email" required>
                                         <label for="email">Email</label>
                                     </div>
                                     <div class="caixa-input"> <!--pattern = regex, expressão regular, formato específico para o input-->
