@@ -230,7 +230,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function calcularIdade() {
         //verifica se os elementos necessários existem antes de tentar acessá-los
         if(!nascInput || !erroIdade) return null;
-         
+
         const valor = nascInput.value; 
         //verifica se o formato da data é válido (DD/MM/AAAA), se não for, retorna null
         if(!/^\d{2}\/\d{2}\/\d{4}$/.test(valor)) return null; 
