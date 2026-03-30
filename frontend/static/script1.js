@@ -20,7 +20,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
     //para fechar modal
-    const forms = document.querySelectorAll('.forms');
     const closeButtons = document.querySelectorAll('.close-modal');
     closeButtons.forEach(button => {
         button.addEventListener('click', () => {
@@ -231,7 +230,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function calcularIdade() {
         //verifica se os elementos necessários existem antes de tentar acessá-los
         if(!nascInput || !erroIdade) return null;
-
+         
         const valor = nascInput.value; 
         //verifica se o formato da data é válido (DD/MM/AAAA), se não for, retorna null
         if(!/^\d{2}\/\d{2}\/\d{4}$/.test(valor)) return null; 
@@ -309,7 +308,7 @@ document.addEventListener('DOMContentLoaded', function () {
         senhaInput.classList.add('input-erro');
         return false;
     }
-
+    
     // Conectando cadastro com api
     function cadastrar() {
 
