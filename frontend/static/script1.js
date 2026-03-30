@@ -20,7 +20,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
     //para fechar modal
-    const forms = document.querySelectorAll('.forms');
     const closeButtons = document.querySelectorAll('.close-modal');
     closeButtons.forEach(button => {
         button.addEventListener('click', () => {
@@ -309,7 +308,7 @@ document.addEventListener('DOMContentLoaded', function () {
         senhaInput.classList.add('input-erro');
         return false;
     }
-
+    
     // Conectando cadastro com api
     function cadastrar() {
 
