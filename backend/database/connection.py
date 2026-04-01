@@ -5,13 +5,20 @@ import random
 from flask import Flask
 from email_validator import EmailNotValidError, validate_email
 from datetime import datetime
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+bd_password = os.getenv("DB_PASSWORD")
+email_password = os.getenv("EMAIL_PASSWORD")
 
 # Conectando com o Mysql :):)
 def connection():
     return pymysql.connect (
         host='localhost',
         user='root',
-        password='Pg260410',
+        password=bd_password,
         database='twitch-projeto',
         cursorclass=pymysql.cursors.Cursor
     )
@@ -23,7 +30,7 @@ def send_code(email_forgot):
 
     de = 'paula.pires2640@gmail.com'
     to = email_forgot
-    password = 'rvcr wtfd gtal ijog'
+    password = email_password
 
     info = 'Twitch | Código redefinir senha'
 
@@ -44,7 +51,9 @@ def send_code(email_forgot):
 def email_valido(email):
     try:
         check = validate_email(email)
-        email = check.email
+        
+        # Normalizando o email, e deixando ele minusculo
+        email = check.email.lower()
         
         return email
         

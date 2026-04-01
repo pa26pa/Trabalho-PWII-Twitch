@@ -26,6 +26,6 @@ api.add_resource(redefine_password,'/redefine_password')
 
 api.add_resource(search,'/search')
 
-# É só pra garantir que só se poder rodar ele pela main
+# É só pra garantir que só se pode rodar ele pela main
 if __name__ == "__main__":
     app.run(debug=True)

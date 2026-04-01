@@ -30,7 +30,7 @@ class signin(Resource):
         
         # vendo se o email é valido 
         valido = email_valido(email)
-        if valido == 'False':
+        if valido == False:
             return {
                 'status':'error',
                 'mensagem':'Este email não é valido'
