@@ -309,6 +309,43 @@ document.addEventListener('DOMContentLoaded', function () {
         senhaInput.classList.add('input-erro');
         return false;
     }
+    // Conectando login com api
+    function login() {
+    const dados = {
+        username_email: document.getElementById("user_email").value,
+        senha: document.getElementById("password").value
+    };
+
+    fetch("http://127.0.0.1:5000/login", {
+        method: "POST",
+        headers: {
+            "COntent-Type": "application/json"
+        }
+    })
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById("resposta").innerText = JSON.stringify(data, null, 2);
+    });
+    }
+
+    // Conectando esqueci a senha com api
+    function forgot(){
+    const dados = {
+        email: document.getElementById('email-esqueci').value
+    }
+
+    fetch("http://127.0.0.1:5000/forgot", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(dados)
+    })
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById("resposta").innerText = JSON.stringify(data, null, 2);
+    });
+    }
 
     // Conectando cadastro com api
     function cadastrar() {

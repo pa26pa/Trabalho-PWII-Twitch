@@ -13,7 +13,7 @@ app.secret_key = os.getenv("SECRET_KEY")
 #  é pra ficar mais fácil, porque ele abre o site 
 @app.route("/")
 def home():
-    return render_template("teste.html")
+    return render_template("inicio.html")
 
 # Aqui eu defino os endpoints que o js pode acessar, e defino uma função para cada um delessssssss
 api.add_resource(signin,'/signin')
