@@ -6,9 +6,9 @@ import random
 import smtplib
 from email.message import EmailMessage
 import mimetypes
-from backend.database.connection import connection, send_code
+from backend.database.connection import connection, send_code, email_valido, data_valida
 from datetime import date, datetime, timedelta
-from time import sleep
+from email_validator import validate_email, EmailNotValidError
 
 # criação do signin
 class signin(Resource):
@@ -20,14 +20,29 @@ class signin(Resource):
         
         # retirando dados do js
         cpf = str(data.get('cpf'))
+        
+        # tendo certeza que o cpf não vai estar com algum espaço
         cpf = cpf.strip()
         email = data.get('email')
         user_name = data.get('user_name')
         data_nascimento = data.get('data_nascimento')
         senha = data.get('senha')
         
-        data_formatada = datetime.strptime(data_nascimento,"%d/%m/%Y").strftime('%Y-%m-%d')
-        # criptografando a senhaaaaaa :)
+        # vendo se o email é valido 
+        valido = email_valido(email)
+        if valido == 'False':
+            return {
+                'status':'error',
+                'mensagem':'Este email não é valido'
+            }
+        
+        email = valido
+        
+        #reorganizando a data para que entre direitinho no BD
+        data_formatada = data_valida(data_nascimento)
+        
+        
+        # fazendo hash na senhaaaaaa :)
         senha_hash = generate_password_hash(senha)
         
         # vendo se já existe uma conta com este cpf, email ou username
@@ -38,11 +53,14 @@ class signin(Resource):
         if existe:
             cursor.close()
             con.close()
+            
+            #retornando msg json
             return{
                 'status':'error',
                 'mensagem':'Já existe um usuário com este CPF, email ou nome de usuario'
             }, 400
         
+        # inserindo as info no BD
         insert = """insert into usuarios(cpf,email,user_name,senha,data_nascimento) values (%s,%s,%s,%s,%s)"""
         cursor.execute(insert,(cpf,email,user_name,senha_hash,data_formatada))
         con.commit()
@@ -55,6 +73,7 @@ class signin(Resource):
         }, 200
   
     def get(self):
+        # Só pra deixar organizado e deixar claro que get não está desponivel
         return{
             'status':'error',
             'mensagem':'get não é um metodo aceito'
@@ -67,13 +86,24 @@ class login(Resource):
         con = connection()
         cursor = con.cursor(pymysql.cursors.DictCursor)
         
-        email = data.get('email')
+        #retirando dados do js
+        username_email = data.get('username_email')
         senha = data.get('senha')
+
+        # sabendo se é um email ou um nome de usuário
+        vendo = email_valido(username_email)
+
+        if vendo == False:
+            coluna = 'user_name'
+        else:
+            coluna = 'email'
         
-        query = """select id_usuario, senha from usuarios where email = %s"""
-        cursor.execute(query,(email,))
+        # vendo se realmente existe alguem com aquele email ou nome de usuario
+        query = f"""select id_usuario, senha from usuarios where {coluna} = %s"""
+        cursor.execute(query,(username_email,))
         login_valido = cursor.fetchone()
         
+        # Checkando se existe o email ou nome de usuario e se a senha em hash é correta
         if login_valido and check_password_hash(login_valido['senha'], senha):
             session['usuario_id'] = login_valido['id_usuario']
             
@@ -90,7 +120,7 @@ class login(Resource):
             con.close()
             return {
                 'status':'error',
-                'mensagem':'email ou senha incorretos'
+                'mensagem':f'{coluna} ou senha incorretos'
             }, 400
     
     def get(self):
@@ -106,12 +136,10 @@ class forgot(Resource):
         con = connection()
         cursor = con.cursor()
         
-        #cpf = str(data.get('cpf'))
-        #cpf = cpf.strip()
-        
+        # pegando email do js
         email_forgot = str(data.get('email_forgot'))
         
-        print(email_forgot)
+        # vendo se o email existe e está cadastrado
         query = """select * from usuarios where email = %s"""
         cursor.execute(query,(email_forgot,))
         achou_email = cursor.fetchone()
@@ -132,12 +160,12 @@ class forgot(Resource):
         cursor.execute(w,(email,))
         id = cursor.fetchone()
         
+        # mandando código no email
         codigo = send_code(email)
         
-        
+        # guardando o id e o código na session
         session['usuario_id'] = id
         session['code'] = codigo 
-        print(session.get('code'))
         
         cursor.close()
         con.close()
@@ -157,13 +185,15 @@ class resend_code(Resource):
         con = connection()
         cursor = con.cursor()
         
-        print('yey')
+        # Usando a session para pegar o email so usuario
         query = """select email from usuarios where id_usuario = %s"""
         cursor.execute(query,(session['usuario_id']))
         email = cursor.fetchone()
         
+        # enviando código
         codigo = send_code(email)
         
+        # atualizando a session
         session['code'] = codigo 
         
         cursor.close()
@@ -181,11 +211,12 @@ class check_codigo(Resource):
         con = connection()
         cursor = con.cursor()
         
+        # pegando o código do js
         codigo_inserido = data.get('codigo')
         codigo_salvo = str(session.get('code'))
-        print(codigo_inserido)
         
         if codigo_inserido != codigo_salvo:
+            # Retirando o código da session
             session.pop('code',None)
             return {
                 'status':'error',
@@ -204,11 +235,13 @@ class redefine_password(Resource):
         con = connection()
         cursor = con.cursor()
         
+        # pegando a nova senha do JS
         nova_senha = data.get('nova_senha')
         
+        # tranformando ela em hash
         nova_senha_hash = generate_password_hash(nova_senha)
         
-        session.pop('code',None)
+        # atualizando a senha
         update = """ update usuarios set senha = %s where id_usuario = %s"""
         cursor.execute(update,(nova_senha_hash,session['usuario_id']))
         con.commit()

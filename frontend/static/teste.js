@@ -25,7 +25,7 @@ function cadastrar() {
 // 🔑 LOGIN
 function login() {
     const dados = {
-        email: document.getElementById("email_login").value,
+        username_email: document.getElementById("email_login").value,
         senha: document.getElementById("senha_login").value
     };
 
