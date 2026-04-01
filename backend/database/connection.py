@@ -3,6 +3,10 @@ from email.message import EmailMessage
 import pymysql
 import random
 from flask import Flask
+from email_validator import EmailNotValidError, validate_email
+from datetime import datetime
+
+# Conectando com o Mysql :):)
 def connection():
     return pymysql.connect (
         host='localhost',
@@ -11,8 +15,10 @@ def connection():
         database='twitch-projeto',
         cursorclass=pymysql.cursors.Cursor
     )
-    
+
+# enviando email com um código novo 
 def send_code(email_forgot):
+    # criação do código aleatórioooo 
     codigo = random.randint(10000,99999)
 
     de = 'paula.pires2640@gmail.com'
@@ -31,4 +37,24 @@ def send_code(email_forgot):
         email.login(de,password)
         email.send_message(msg)
     
+    # retorna o código para salvar na session
     return(codigo)
+
+# vendo se o email é valido
+def email_valido(email):
+    try:
+        check = validate_email(email)
+        email = check.email
+        
+        return email
+        
+    except EmailNotValidError:
+        return False
+
+# fiz para garantir que não ia ter erro nessa parte de trazer a data para o BD
+def data_valida(data):
+    try:
+        a = datetime.strptime(data, '%Y-%m-%d').strftime('%Y-%m-%d')
+    
+    except ValueError:
+        a = datetime.strptime(data, '%d/%m/%Y').strftime('%Y-%m-%d')
