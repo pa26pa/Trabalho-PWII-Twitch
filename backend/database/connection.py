@@ -19,7 +19,7 @@ def connection():
         host='localhost',
         user='root',
         password=bd_password,
-        database='twitch-projeto',
+        database='twitch',
         cursorclass=pymysql.cursors.Cursor
     )
 
