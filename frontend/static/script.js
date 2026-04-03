@@ -319,12 +319,21 @@ document.addEventListener('DOMContentLoaded', function () {
     fetch("http://127.0.0.1:5000/login", {
         method: "POST",
         headers: {
-            "COntent-Type": "application/json"
-        }
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(dados)
     })
     .then(res => res.json())
     .then(data => {
-        document.getElementById("resposta").innerText = JSON.stringify(data, null, 2);
+        const resposta = document.getElementById("resposta");
+
+        if (data.status === "error") {
+            resposta.innerText = data.mensagem;
+            resposta.style.color = "red";
+        } else {
+            resposta.innerText = data.mensagem;
+            resposta.style.color = "green";
+        }
     });
     }
 
@@ -343,7 +352,15 @@ document.addEventListener('DOMContentLoaded', function () {
     })
     .then(res => res.json())
     .then(data => {
-        document.getElementById("resposta").innerText = JSON.stringify(data, null, 2);
+        const resposta = document.getElementById("resposta");
+
+        if (data.status === "error") {
+            resposta.innerText = data.mensagem;
+            resposta.style.color = "red";
+        } else {
+            resposta.innerText = data.mensagem;
+            resposta.style.color = "green";
+        }
     });
     }
 
@@ -367,7 +384,15 @@ document.addEventListener('DOMContentLoaded', function () {
     })
     .then(res => res.json())
     .then(data => {
-        document.getElementById("resposta").innerText = JSON.stringify(data, null, 2);
+        const resposta = document.getElementById("resposta");
+
+        if (data.status === "error") {
+            resposta.innerText = data.mensagem;
+            resposta.style.color = "red";
+        } else {
+            resposta.innerText = data.mensagem;
+            resposta.style.color = "green";
+        }
     });
     }
 
