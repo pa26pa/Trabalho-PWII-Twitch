@@ -46,23 +46,36 @@ class signin(Resource):
         senha_hash = generate_password_hash(senha)
         
         # vendo se já existe uma conta com este cpf, email ou username
-        query = """select * from usuarios where CPF = %s or email = %s or user_name = %s"""
+        
+        query = """select * from usuarios where cpf = %s or email = %s or user_name = %s"""
         cursor.execute(query,(cpf,email,user_name))
         existe = cursor.fetchone()
         
+        
+                
         if existe:
             cursor.close()
             con.close()
-            
-            #retornando msg json
+
             return{
                 'status':'error',
                 'mensagem':'Já existe um usuário com este CPF, email ou nome de usuario'
             }, 400
+            
+       
+
         
         # inserindo as info no BD
-        insert = """insert into usuarios(cpf,email,user_name,senha,data_nascimento) values (%s,%s,%s,%s,%s)"""
-        cursor.execute(insert,(cpf,email,user_name,senha_hash,data_formatada))
+        try:
+            insert = """insert into usuarios(cpf,email,user_name,senha,data_nascimento) values (%s,%s,%s,%s,%s)"""
+            cursor.execute(insert,(cpf,email,user_name,senha_hash,data_formatada))
+        
+        except pymysql.err.IntegrityError:
+            return {
+            'status':'error',
+            'mensagem':'Ouve um erro, informações duplicadas'
+            }, 400
+        
         con.commit()
         
         cursor.close()
