@@ -4,7 +4,9 @@ from backend.resources.auth import signin, login, forgot, redefine_password, sea
 from dotenv import load_dotenv
 import os
 
+# aqui eu to carregando o .env pra que eu possa pegar as senhas dele
 load_dotenv()
+
 # Oiii prof aqui eu to expecificando aonde tão as pastas porque ele não tava encontrando
 app = Flask(__name__, template_folder='frontend/templates', static_folder='frontend/static')
 api = Api(app)
@@ -13,7 +15,7 @@ app.secret_key = os.getenv("SECRET_KEY")
 #  é pra ficar mais fácil, porque ele abre o site 
 @app.route("/")
 def home():
-    return render_template("inicio.html")
+    return render_template("teste.html")
 
 # Aqui eu defino os endpoints que o js pode acessar, e defino uma função para cada um delessssssss
 api.add_resource(signin,'/signin')

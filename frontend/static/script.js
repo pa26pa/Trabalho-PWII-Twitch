@@ -363,7 +363,25 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
     }
+    // conctando reenviar email com api 
+    function cadastrar() {
 
+    fetch("http://127.0.0.1:5000/resend", {
+        method: "get"
+    })
+    .then(res => res.json())
+    .then(data => {
+        const resposta = document.getElementById("resposta");
+
+        if (data.status === "error") {
+            resposta.innerText = data.mensagem;
+            resposta.style.color = "red";
+        } else {
+            resposta.innerText = data.mensagem;
+            resposta.style.color = "green";
+        }
+    });
+    }
     // Conectando cadastro com api
     function cadastrar() {
 

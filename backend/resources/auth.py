@@ -164,7 +164,7 @@ class forgot(Resource):
             
             return{
                 'status':'error',
-                'mensagem':f'Este email ainda não está cadastrado {email_forgot}'
+                'mensagem':'Este email ainda não está cadastrado'
             }
             
         email = email_forgot
@@ -215,7 +215,7 @@ class resend_code(Resource):
         return {
             'status':'success',
             'mensagem':'Código enviado'
-        }
+        }, 200
     
 class check_codigo(Resource):
     def post(self):
@@ -325,3 +325,12 @@ class search(Resource):
             'mensagem':'Resultados da pesquisa',
             'resultado':f'{usuarios},{streams}'
         }
+
+class block_code(Resource):
+    def get(self):
+        session.pop('code', None)
+        
+        return {
+            'status':'success',
+            'mensagem':'Seu código espirou'
+        }, 200
