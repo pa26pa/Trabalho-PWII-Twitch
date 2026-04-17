@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     //TROCA DE CARDS LOGIN-RECEBER CODIGO
-    const forgotLink = document.querySelector('.forgot-password a');
+    const forgotLink = document.querySelector('.forgot-password a'); 
     const loginBox = document.getElementById('login');
     const emailBox = document.getElementById('email-forgot-password');
     const changeButton = document.querySelector('.change-button');

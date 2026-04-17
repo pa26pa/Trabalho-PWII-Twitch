@@ -3,6 +3,7 @@
     padding: 0;
     box-sizing: border-box;
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-size: 15px;
 }
 #logo {
     width: 60px;
@@ -30,7 +31,7 @@
 .menu-nav {
     text-decoration: none;
     color: #48237f;
-    font-size: 18px;
+    font-size: 1.2em;
     font-weight: bold;
 }
 
@@ -105,55 +106,27 @@
 /*div do X e do checkbox*/
 .form-header {
     position: absolute;
-    top: 5%;
+    top: 6%;
+    left: 10%;
     display: flex;
     align-items: center;
     justify-content: space-between;
     width: 90%;
     z-index: 2;
 }
-#close-modal {
-    border: 4px solid red;
-    width: 40px;
-    height: auto;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: absolute;
-    top: 1px;
-    z-index: 1;
-    transform: translateX(-20%);
-    transform-style: preserve-3d;
-    transition: all 0.6s ease-out;
-    transform-origin: center;
-}
+
 /*X pra sair do modal*/
-.login-close-button {
+.close-modal {
     position: absolute;
-    width: 100%;
-    height: auto;
-    display: flex;
-    flex-direction: column;
-    top: 0;
     left: 0;
-    line-height: 0;
-    justify-content: center;
-    align-items: center;
+    top: 0;
     background-color: transparent;
     border: none;
     color: #48237f;
     font-size: 35px;
     cursor: pointer;
-    backface-visibility: hidden;
-    -webkit-backface-visibility: hidden;
-    transform-style: preserve-3d;
 }
-#close-modal .login-close-button1 {
-    transform: rotateY(180deg);
-}
-#close-modal .login-close-button2 {
-    transform: rotateY(0deg);
-}
+
 /*ANIMAÇÃO PARA SUMIR MENU SUPERIOR*/
 /*menu superior*/
 .top-menu {
@@ -197,9 +170,10 @@ body.modal-open {
 #modal-1 {
     position: fixed;
     margin: 0 auto;
-    top: 10px;
     width: 550px;
-    height: 100vh;
+    height: 700px;
+    max-height: 700px;
+    min-height: 650px;
     display: none;
     padding: 10px;
     border: none;
@@ -220,43 +194,41 @@ body.modal-open {
 /*conteúdo do modal login/cadastro*/
 #wrap {
     position: fixed;
-    top: 8%;
-    left: 10%;
     display: flex;
     justify-content: center;
     align-items: center;
+    padding: 10px;
     width: 90%;
     height: 90%;
+    border: none;
     background: transparent;
 }
 #wrapper {
     position: absolute;
-    left: 0;
-    top: 0;
+    border: none;
     width: 90%;
     height: 90%;
     justify-content: center;
     transform-style: preserve-3d;
     transition: all 0.6s ease-out;
     background-color: #c7b2e7;
-    box-shadow: 0px 0px 10px 25px rgba(0,0,0,0.2);
+    box-shadow: 0px 0px 15px 15px rgba(0,0,0,0.2);
     border-radius: 30px;
-    border: 4px solid #48237f;
+    border: 3px double #48237f;
     transform-origin: center; /*define o ponto de origem para as transformações*/
 }
 #login, #cadastro {
     position: absolute;
-    left: 0;
-    top: 0;
     width: 100%;
-    height: 100%;
+    height: 90%;
+    bottom: 0;
     background-color: transparent;
-    border: 2px solid white;
+    border: none;
     border-radius: 30px;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0px 5px 15px 5px rgb(255, 255, 255);
+    border: none;
     backdrop-filter: blur(10px); /*aplica um efeito de desfoque ao fundo do modal*/
     backface-visibility: hidden; /*oculta o lado oposto do elemento quando ele é rotacionado, evitando que o conteúdo seja visível durante a rotação*/
     -webkit-backface-visibility: hidden; /*suporte para navegadores baseados em WebKit, como Safari e Chrome, garantindo que o backface-visibility funcione corretamente nesses navegadores*/
@@ -344,20 +316,19 @@ h2 {
     color: #e1cdff;
 }
 
+#texto {font-size: 3em;}
+
 /*botão que alterna entre cadastro e login*/
 .change-button {
-    position: absolute;
-    width: 90%;
-    height: auto;
-    display: flex;
-    flex-direction: column;
-    top: 3%;
+    position: relative; 
+    top: 0;
     left: 45%;
-    line-height: 0;
-    justify-content: center;
-    align-items: center;
-    background-color: #c7b2e7;
-    border: 4px solid red;
+    width: 95%;
+    height: 70px;
+    display: grid;
+    grid-template-columns: 25px 1fr;
+    background-color: transparent;
+    border: none;
     color: #48237f;
     font-size: 16px;
     cursor: pointer;
@@ -370,12 +341,9 @@ h2 {
 .change-button1, .change-button2 {
     position: absolute;
     width: 100%;
-    height: auto;
+    height: 100%;
     display: flex;
     flex-direction: column;
-    top: 0;
-    left: 0;
-    line-height: 0;
     justify-content: center;
     align-items: center;
     background-color: transparent;
@@ -452,32 +420,36 @@ com id "modal-1" apenas se ele contiver um elemento com id "checkbox" que esteja
 }
 
 /*card de colocar email para receber o código*/
-#email-forgot-password {
+#email-forgot-password, #insert-code, #new-password {
     display: none;
-    margin: 30px;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    border: none;
 }
 .center-wrap {
     display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    bottom: 0;
     text-align: center;
+    border: none;
 }
-.center-wrap h2 {
-    font-size: 2em;
-    margin-top: 30%;
-}
-.center-wrap .caixa-input {
-    margin: 20px auto;
-}
+.center-wrap h2 {font-size: 2em;}
+.center-wrap .caixa-input {margin: 20px auto;}
+#email-forgot-password p {width: 320px;}
 
 /*card de inserir o código*/
-#insert-code {
-    display: none;
-}
-.center-wrap .otp-container {
-    margin: 40px 70px;
-}
 .otp-container {
     display: flex;
+    align-items: center;
+    margin: 20px auto;
     gap: 10px;
+    justify-content: center;
+    border: none;
 }
 .otp-input {
     width: 50px;
@@ -496,12 +468,6 @@ com id "modal-1" apenas se ele contiver um elemento com id "checkbox" que esteja
 #resendBtn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
-}
-
-/*card de redefinir senha*/
-#new-password {
-    display: none;
-    margin: 30px;
 }
 
 
