@@ -9,7 +9,7 @@ import mimetypes
 from backend.database.connection import connection, send_code, email_valido, data_valida
 from datetime import date, datetime, timedelta
 from email_validator import validate_email, EmailNotValidError
-
+from main import app, google, User
 # criação do signin
 class signin(Resource):
     def post(self):
@@ -133,7 +133,7 @@ class login(Resource):
             con.close()
             return {
                 'status':'error',
-                'mensagem':f'{coluna} ou senha incorretos'
+                'mensagem':'Email, nome de usuario ou senha incorretos'
             }, 400
     
     def get(self):
@@ -141,7 +141,56 @@ class login(Resource):
             'status':'error',
             'mensagem':'get não é um metodo aceito'
         }, 400
-    
+        
+class google(Resource):
+    def post(self):
+        data = request.get_json()
+        
+        con = connection()
+        cursor = con.cursor()
+        try: 
+            redirect_uri = url_for('authorize',_external=True)
+            return google.authorize_redirect(redirect_uri)
+        except Exception as e:
+            app.logger.error(f"Erro durante login:{str(e)}")
+            return {
+                'status':'error',
+                'mensagem':'Erro durante login'
+            }, 500
+
+class auth_google(Resource):
+    def post(self):
+        data = request.get_json()
+        
+        con = connection()
+        cursor = con.cursor()
+        
+        token = google.authorize_access_token()
+        userinfo_endpoint = google.server_metadata['userinfo_endpoin']
+        resp = google.get(userinfo_endpoint)
+        user_info = resp.json()
+        email = user_info['email']
+        
+        query = """select id_usuario from usuarios where email = %s"""
+        cursor.execute(query,(email,))
+        existe = cursor.fetchone()
+        
+        session['oauth_token'] = token
+        
+        if not existe: 
+            session['email_google'] = email
+            mensagem = 'Por favor faça o cadastro'
+        else: 
+            session['usuario_id'] = existe
+            mensagem = 'Login feito com sucesso'
+
+        session['oauth_token'] = token
+            
+        return {
+            'status':'success',
+            'mensagem':f'{mensagem}.'
+        }
+        
 class forgot(Resource):
     def post(self):
         data = request.get_json()
@@ -311,7 +360,7 @@ class search(Resource):
         pesquisa = data.get('pesquisa')
         p = f"%{pesquisa}%"
         
-        query1 = """select id_usuario, user_name, 'streamer' as tipo from usuarios where user_name like = %s """
+        query1 = """select id_usuario, user_name, 'streamer' as tipo from usuarios where user_name like %s """
         cursor.execute(query1,(p,))
         usuarios = cursor.fetchall()
         

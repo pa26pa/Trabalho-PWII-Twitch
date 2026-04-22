@@ -1,4 +1,4 @@
-// 🔐 CADASTRO
+
 function cadastrar() {
     const dados = {
         cpf: document.getElementById("cpf_cadastro").value,
@@ -21,8 +21,6 @@ function cadastrar() {
     });
 }
 
-
-// 🔑 LOGIN
 function login() {
     const dados = {
         username_email: document.getElementById("email_login").value,
@@ -120,5 +118,12 @@ function pesquisa() {
     .then(res => res.json())
     .then(data => {
         document.getElementById("resposta").innerText = JSON.stringify(data, null, 2);
+        const div = document.getElementById("resultados");
+        div.innerHTML = ""; // limpa resultados antigos
+
+       data.resultados.forEach(item => {
+        const nome = item.user_name || item.titulo;
+        div.innerHTML += `<p>${nome}</p>`;
+});
     });
 }

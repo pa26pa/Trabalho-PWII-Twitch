@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     //TROCA DE CARDS LOGIN-RECEBER CODIGO
-    const forgotLink = document.querySelector('.forgot-password a');
+    const forgotLink = document.querySelector('.forgot-password a'); 
     const loginBox = document.getElementById('login');
     const emailBox = document.getElementById('email-forgot-password');
     const changeButton = document.querySelector('.change-button');
@@ -63,37 +63,74 @@ document.addEventListener('DOMContentLoaded', function () {
     //TROCA DE CARDS RECEBER CODIGO-INSERIR CODIGO
     const btnreceberCodigo = document.getElementById('receber-codigo');
     const insertcodeBox = document.getElementById('insert-code');
+    const inputEmail = document.getElementById('email');
 
-    if (emailBox && insertcodeBox && btnreceberCodigo) {
-        btnreceberCodigo.addEventListener('click', function (troca) {
-            troca.preventDefault();
-            emailBox.style.display = 'none';
-            insertcodeBox.style.display = 'flex';
-        });
+    // Alternativa mais semântica: ouvir o input no campo de email
+    inputEmail.addEventListener('input', function () {
+        btnreceberCodigo.disabled = !inputEmail.checkValidity();
+    });
+
+    btnreceberCodigo.disabled = true;
+
+    btnreceberCodigo.addEventListener('click', function (troca) {
+        troca.preventDefault();
+        emailBox.style.display = 'none';
+        insertcodeBox.style.display = 'flex';
+        startTimer(); // inicia o timer ao clicar para receber o código
+    });
+
+    // REENVIO DO CÓDIGO COM TIMER
+    const resendBtn = document.getElementById('resendBtn');
+    const timerText = document.getElementById('timerText');
+
+    // Variável para controlar o tempo restante e o intervalo do timer
+    let timeLeft = 60;
+    let interval;
+
+    //função para iniciar o timer de 60 segundos
+    function startTimer() {
+        resendBtn.disabled = true;
+        timeLeft = 60;
+        clearInterval(interval); // limpa timer anterior antes de iniciar novo
+
+        timerText.textContent = `Reenviar código em ${timeLeft}s`;
+
+        //atualiza o timer a cada segundo
+        interval = setInterval(() => {
+            timeLeft--;
+            timerText.textContent = `Reenviar código em ${timeLeft}s`;
+
+            //quando o tempo acabar, limpa o timer, esconde o texto e habilita o botão de reenviar
+            if (timeLeft <= 0) {
+                clearInterval(interval);
+                timerText.textContent = '';
+                resendBtn.disabled = false;
+            }
+        }, 1000);
     }
 
-    //INSERINDO CÓDIGO DE VERIFICAÇÃO
+    //evento de clique para o botão de reenviar código
+    resendBtn.addEventListener('click', () => {
+        console.log('Código reenviado');
+        startTimer();
+    });
+
+    // INSERINDO CÓDIGO DE VERIFICAÇÃO
     const inputs = document.querySelectorAll('.otp-input');
     const continueBtn = document.getElementById('continueBtn');
 
-    //função para verificar se todos os campos de código estão preenchidos
     inputs.forEach((input, index) => {
         input.addEventListener('input', (e) => {
-            //pega o valor do campo de entrada
-            const value = e.target.value;
-            //remove qualquer caractere que não seja número
-            input.value = value.replace(/[^0-9]/g, ''); 
-            //se o campo tiver um valor e não for o último campo, foca no próximo campo
-            //index = posição do campo atual, inputs.length - 1 = posição do último campo
+            input.value = e.target.value.replace(/[^0-9]/g, '');
+
+            //move para o próximo campo automaticamente enquanto digita
             if (input.value && index < inputs.length - 1) {
                 inputs[index + 1].focus();
             }
-            //verifica se todos os campos estão preenchidos para habilitar o botão de continuar
             checkCode();
         });
-    
-        //backspace para voltar ao campo anterior   
-        //keydown = evento de pressionar uma tecla, e.key = tecla pressionada
+
+        // Permite usar Backspace para voltar ao campo anterior
         input.addEventListener('keydown', (e) => {
             if (e.key === 'Backspace' && !input.value && index > 0) {
                 inputs[index - 1].focus();
@@ -101,84 +138,75 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    //colar código inteiro de uma vez
-    //paste = evento de colar, e.clipboardData.getData('text') = pega o texto do clipboard
+    // Permite colar o código completo de uma vez
     document.addEventListener('paste', (e) => {
         const paste = e.clipboardData.getData('text').replace(/[^0-9]/g, '');
-        //i = posição do campo atual, paste[i] = caractere correspondente do código colado
         inputs.forEach((input, i) => {
-            //preenche os campos com os caracteres do código colado, ou deixa vazio se não houver mais caracteres
             input.value = paste[i] || '';
         });
         checkCode();
     });
 
-    //verifica se completou
-    function checkCode() {
-        //cria uma string com os valores dos campos de código
-        //array.from(inputs) = transforma a NodeList de inputs em um array para usar o map
-        // join('') = junta os valores sem espaço
-        //nodelist = lista de elementos, array = estrutura de dados que pode usar métodos como map
-        // map = para cada input pega o valor
-        const code = Array.from(inputs).map(input => input.value).join('');
-        if (code.length === 5) {
-            console.log('Código completo:', code);
-
-            //validar no back depois
-            const isValid = true;
-
-            if (isValid) {
-                continueBtn.click();
-            }
-        }
-    }
-
-    //REENVIO DO CÓDIGO COM TIMER
-    const resendBtn = document.getElementById('resendBtn');
-    const timerText = document.getElementById('timerText');
-
-    let timeLeft = 60;
-    //interval = variável para armazenar o intervalo do timer
-    let interval;
-
-    //botão de reenviar
-    resendBtn.addEventListener('click', () => {
-        console.log('Código reenviado');
-
-        //inicia o timer
-        function startTimer() {
-            resendBtn.disabled = true;
-            timeLeft = 60;
-
-            timerText.textContent = `Reenviar código em ${timeLeft}s`;
-            //limpa qualquer intervalo anterior para evitar múltiplos timers rodando ao mesmo tempo
-            interval = setInterval(() => {
-                timeLeft--;
-                //atualiza o texto do timer a cada segundo
-                timerText.textContent = `Reenviar código em ${timeLeft}s`;
-                //quando o tempo acabar, para o timer, habilita o botão de reenviar e atualiza o texto
-                if (timeLeft <= 0) {
-                    //clearInterval = para o timer
-                    clearInterval(interval);
-                    timerText.textContent = 'Reenviar Código';
-                    resendBtn.disabled = false;
-                }
-            //1000 = 1 segundo, o timer atualiza a cada segundo
-            }, 1000);
-        }
-        startTimer();
-    });
-
-    //TROCA DE CARDS INSERIR CODIGO-CRIAR NOVA SENHA
     const newpasswordBox = document.getElementById('new-password');
+    /* LETAAAAAAAAAAAAAAAAAAAAAAAAA 
+    const dados = {
+        codigo: code;
 
-    if (insertcodeBox && newpasswordBox && continueBtn) {
-        continueBtn.addEventListener('click', function (troca) {
-            troca.preventDefault();
+    fetch("http://127.0.0.1:5000/check_codigo", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(dados)
+    })
+    .then(res => res.json())
+    .then(data => {
+
+        if (data.mensagem === 'Código invalido'{
             insertcodeBox.style.display = 'none';
             newpasswordBox.style.display = 'flex';
-        });
+            continueBtn.disabled = false;
+        } else {
+             continueBtn.disabled = true;   
+        } CABOUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU
+    });*/
+}
+    /*function checkCode() {
+        const code = Array.from(inputs).map(input => input.value).join('');
+        const continueBtn = document.getElementById('continueBtn');
+
+        continueBtn.disabled = code.length !== 5;
+        if (code.length === 5) {
+            continueBtn.addEventListener('click', function (troca) {
+                troca.preventDefault();
+                insertcodeBox.style.display = 'none';
+                newpasswordBox.style.display = 'flex';
+                continueBtn.disabled = false;
+            });
+        }
+    } */
+    /*const code = Array.from(inputs).map(input => input.value).join('');
+    continueBtn.disabled = true; // começa desabilitado
+
+    function checkCode() {
+        continueBtn.disabled = code.length !== 5;
     }
+
+    continueBtn.addEventListener('click', function (troca) {
+        troca.preventDefault();
+
+        if (code === codigo) { // código de exemplo, substitua pela lógica real de verificação
+            insertcodeBox.style.display = 'none';
+            newpasswordBox.style.display = 'flex';
+            continueBtn.disabled = false;
+        } 
+    });*/
+    continueBtn.addEventListener('click', function (troca) {
+        troca.preventDefault();
+        insertcodeBox.style.display = 'none';
+        newpasswordBox.style.display = 'flex';
+    });
+
 
     //TROCA DE CARDS CRIAR NOVA SENHA-LOGIN
     const backLogin = document.getElementById('backLogin');
@@ -231,7 +259,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function calcularIdade() {
         //verifica se os elementos necessários existem antes de tentar acessá-los
         if(!nascInput || !erroIdade) return null;
-
+         
         const valor = nascInput.value; 
         //verifica se o formato da data é válido (DD/MM/AAAA), se não for, retorna null
         if(!/^\d{2}\/\d{2}\/\d{4}$/.test(valor)) return null; 
@@ -309,80 +337,33 @@ document.addEventListener('DOMContentLoaded', function () {
         senhaInput.classList.add('input-erro');
         return false;
     }
-    // Conectando login com api
-    function login() {
-    const dados = {
-        username_email: document.getElementById("user_email").value,
-        senha: document.getElementById("password").value
-    };
 
-    fetch("http://127.0.0.1:5000/login", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(dados)
-    })
-    .then(res => res.json())
-    .then(data => {
-        const resposta = document.getElementById("resposta");
+    //VALIDAÇÃO NA TROCA DE SENHA
+    const senhaInput1 = document.querySelector('.password1');
+    const senhaInput2 = document.querySelector('.password2');
+    const erroSenha2 = document.querySelector('.erroSenha2');
 
-        if (data.status === "error") {
-            resposta.innerText = data.mensagem;
-            resposta.style.color = "red";
-        } else {
-            resposta.innerText = data.mensagem;
-            resposta.style.color = "green";
+    function confirmarSenha() {
+        if (!senhaInput1 || !senhaInput2 || !erroSenha2) return true;
+
+        if (senhaInput2.value === '' || senhaInput1.value === senhaInput2.value) {
+            erroSenha2.style.display = 'none';
+            senhaInput2.classList.remove('input-erro');
+            return true;
         }
-    });
+        erroSenha2.style.display = 'block';
+        senhaInput2.classList.add('input-erro');
+        return false;
     }
 
-    // Conectando esqueci a senha com api
-    function forgot(){
-    const dados = {
-        email: document.getElementById('email-esqueci').value
+    if (senhaInput1 && senhaInput2 && erroSenha2) {
+        senhaInput2.addEventListener('blur', confirmarSenha);
+        senhaInput2.addEventListener('input', () => { // sem parâmetro ()
+            erroSenha2.style.display = 'none';
+            senhaInput2.classList.remove('input-erro');
+        });
     }
-
-    fetch("http://127.0.0.1:5000/forgot", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(dados)
-    })
-    .then(res => res.json())
-    .then(data => {
-        const resposta = document.getElementById("resposta");
-
-        if (data.status === "error") {
-            resposta.innerText = data.mensagem;
-            resposta.style.color = "red";
-        } else {
-            resposta.innerText = data.mensagem;
-            resposta.style.color = "green";
-        }
-    });
-    }
-    // conctando reenviar email com api 
-    function cadastrar() {
-
-    fetch("http://127.0.0.1:5000/resend", {
-        method: "get"
-    })
-    .then(res => res.json())
-    .then(data => {
-        const resposta = document.getElementById("resposta");
-
-        if (data.status === "error") {
-            resposta.innerText = data.mensagem;
-            resposta.style.color = "red";
-        } else {
-            resposta.innerText = data.mensagem;
-            resposta.style.color = "green";
-        }
-    });
-    }
-    // Conectando cadastro com api
+ // Conectando cadastro com api
     function cadastrar() {
 
     const dados = {
@@ -412,68 +393,36 @@ document.addEventListener('DOMContentLoaded', function () {
             resposta.style.color = "green";
         }
     });
-    }
-
-    //VALIDAÇÃO NA TROCA DE SENHA
-    const senhaInput1 = document.querySelector('.password1');
-    const senhaInput2 = document.querySelector('.password2');
-    const erroSenha2 = document.querySelector('.erroSenha2');
-
-    function confirmarSenha() {
-        if (!senhaInput1 || !senhaInput2 || !erroSenha2) return true;
-
-        if (senhaInput2.value === '' || senhaInput1.value === senhaInput2.value) {
-            erroSenha2.style.display = 'none';
-            senhaInput2.classList.remove('input-erro');
-            return true;
-        }
-        erroSenha2.style.display = 'block';
-        senhaInput2.classList.add('input-erro');
-        return false;
-    }
-
-    if (senhaInput1 && senhaInput2 && erroSenha2) {
-        senhaInput2.addEventListener('blur', confirmarSenha);
-        senhaInput2.addEventListener('input', () => { // sem parâmetro ()
-            erroSenha2.style.display = 'none';
-            senhaInput2.classList.remove('input-erro');
-        });
-    }
-
+    };
     //ENVIO DO FORM
-    document.querySelectorAll('.sign').forEach(form => { 
+    document.querySelectorAll('.forms').forEach(form => { //o mesmo que function (form)
         form.addEventListener('submit', function (validarForm) {
-        let envio = true;
-
-        if (!form.checkValidity()) {
-            envio = false;
-        }
-
-        if (form.querySelector('#data-nascimento') && !validarIdade()) {
-            envio = false;
-        }
-
-        if (form.querySelector('.password2') && !confirmarSenha()) {
-            envio = false;
-        }
-
-        form.querySelectorAll('.password-box').forEach(box => {
-            const senhaInput = box.querySelector('.password');
-            const erroSenha = box.querySelector('.erroSenha');
-
-            if (!validarSenha(senhaInput, erroSenha)) {
+            let envio = true;
+            //checkValidity() = método que verifica se os campos do formulário estão válidos de acordo com os atributos HTML (required, pattern, etc.)
+            if (!form.checkValidity()) {
                 envio = false;
             }
+            //verifica se o formulário tem um campo de data de nascimento e se a idade é válida, se não for, impede o envio
+            if (form.querySelector('#data-nascimento') && !validarIdade()) {
+                envio = false;
+            }
+            //verifica se o formulário tem um campo de confirmação de senha e se as senhas coincidem, se não for, impede o envio
+            if (form.querySelector('.password2') && !confirmarSenha()) {
+                envio = false;
+            }
+
+            form.querySelectorAll('.password-box').forEach(box => {
+                const senhaInput = box.querySelector('.password');
+                const erroSenha = box.querySelector('.erroSenha');
+
+                if (!validarSenha(senhaInput, erroSenha)) {
+                    envio = false;
+                }
+            });
+
+            if (!envio) {
+                validarForm.preventDefault(); 
+                form.reportValidity();
+            }
         });
-
-        validarForm.preventDefault(); 
-
-        if (!envio) {
-            form.reportValidity();
-            return;
-        }
-
-        cadastrar();
     });
-    });
-});
