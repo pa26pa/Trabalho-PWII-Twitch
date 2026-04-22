@@ -424,5 +424,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 validarForm.preventDefault(); 
                 form.reportValidity();
             }
+
+            cadastrar();
         });
     });
