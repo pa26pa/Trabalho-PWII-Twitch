@@ -9,7 +9,7 @@ import mimetypes
 from backend.database.connection import connection, send_code, email_valido, data_valida
 from datetime import date, datetime, timedelta
 from email_validator import validate_email, EmailNotValidError
-from main import app, google, User
+#from main import app, google, User
 # criação do signin
 class signin(Resource):
     def post(self):

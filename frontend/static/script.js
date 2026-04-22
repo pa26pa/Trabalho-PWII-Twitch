@@ -148,29 +148,29 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     const newpasswordBox = document.getElementById('new-password');
-    /* LETAAAAAAAAAAAAAAAAAAAAAAAAA 
+    // LETAAAAAAAAAAAAAAAAAAAAAAAAA 
     const dados = {
-        codigo: code;
-
-    fetch("http://127.0.0.1:5000/check_codigo", {
+        codigo: code
+    };
+    fetch("http://127.0.0.1:5000/check_codigo"), {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
         },
         body: JSON.stringify(dados)
-    })
+    }
     .then(res => res.json())
     .then(data => {
 
-        if (data.mensagem === 'Código invalido'{
+        if (data.mensagem === 'Código invalido'){
             insertcodeBox.style.display = 'none';
             newpasswordBox.style.display = 'flex';
             continueBtn.disabled = false;
         } else {
             continueBtn.disabled = true;   
         } CABOUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU
-    });*/
-}
+    });
+    
     /*function checkCode() {
         const code = Array.from(inputs).map(input => input.value).join('');
         const continueBtn = document.getElementById('continueBtn');
@@ -201,6 +201,7 @@ document.addEventListener('DOMContentLoaded', function () {
             continueBtn.disabled = false;
         } 
     });*/
+
     continueBtn.addEventListener('click', function (troca) {
         troca.preventDefault();
         insertcodeBox.style.display = 'none';
@@ -395,36 +396,39 @@ document.addEventListener('DOMContentLoaded', function () {
     });
     };
     //ENVIO DO FORM
-    document.querySelectorAll('.forms').forEach(form => { //o mesmo que function (form)
+    document.querySelectorAll('.sign').forEach(form => {
         form.addEventListener('submit', function (validarForm) {
             let envio = true;
-            //checkValidity() = método que verifica se os campos do formulário estão válidos de acordo com os atributos HTML (required, pattern, etc.)
+
             if (!form.checkValidity()) {
                 envio = false;
             }
-            //verifica se o formulário tem um campo de data de nascimento e se a idade é válida, se não for, impede o envio
+
             if (form.querySelector('#data-nascimento') && !validarIdade()) {
                 envio = false;
             }
-            //verifica se o formulário tem um campo de confirmação de senha e se as senhas coincidem, se não for, impede o envio
+
             if (form.querySelector('.password2') && !confirmarSenha()) {
                 envio = false;
             }
 
-            form.querySelectorAll('.password-box').forEach(box => {
-                const senhaInput = box.querySelector('.password');
-                const erroSenha = box.querySelector('.erroSenha');
+        form.querySelectorAll('.password-box').forEach(box => {
+            const senhaInput = box.querySelector('.password');
+            const erroSenha = box.querySelector('.erroSenha');
 
-                if (!validarSenha(senhaInput, erroSenha)) {
-                    envio = false;
-                }
-            });
-
-            if (!envio) {
-                validarForm.preventDefault(); 
-                form.reportValidity();
+            if (!validarSenha(senhaInput, erroSenha)) {
+                envio = false;
             }
+        });
+
+        validarForm.preventDefault(); 
+
+        if (!envio) {
+            form.reportValidity();
+            return;
+        }
 
             cadastrar();
         });
     });
+});

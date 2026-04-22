@@ -15,23 +15,23 @@ app.secret_key = os.getenv("SECRET_KEY")
 
 oauth = OAuth(app)
 
-google = oauth.register(
-    name='google',
-    client_id=os.getenv("CLIENT_ID"),
-    client_secret=os.getenv("CLIENT_SECRET_KEY") ,
-    server_metadata_url="https://accounts.google.com/.well-known/openid-configuration",
-    client_kwargs={'scope':'openid profile email'}
-)
+#google = oauth.register(
+#    name='google',
+#    client_id=os.getenv("CLIENT_ID"),
+#    client_secret=os.getenv("CLIENT_SECRET_KEY") ,
+#    server_metadata_url="https://accounts.google.com/.well-known/openid-configuration",
+#    client_kwargs={'scope':'openid profile email'}
+#)
 
 #  é pra ficar mais fácil, porque ele abre o site 
 @app.route("/")
 def home():
-    return render_template("teste.html")
+    return render_template("inicio.html")
 
 # Aqui eu defino os endpoints que o js pode acessar, e defino uma função para cada um delessssssss
 api.add_resource(signin,'/signin')
 api.add_resource(login,'/login')
-api.add_resource(google,'/login/google')
+#api.add_resource(google,'/login/google')
 
 api.add_resource(forgot,'/forgot')
 api.add_resource(resend_code,'/resend')
