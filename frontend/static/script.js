@@ -167,7 +167,7 @@ document.addEventListener('DOMContentLoaded', function () {
             newpasswordBox.style.display = 'flex';
             continueBtn.disabled = false;
         } else {
-             continueBtn.disabled = true;   
+            continueBtn.disabled = true;   
         } CABOUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU
     });*/
 }
