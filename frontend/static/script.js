@@ -149,7 +149,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const newpasswordBox = document.getElementById('new-password');
     // LETAAAAAAAAAAAAAAAAAAAAAAAAA 
-    const dados = {
+    /* const dados = {
         codigo: code
     };
     fetch("http://127.0.0.1:5000/check_codigo"), {
@@ -169,7 +169,7 @@ document.addEventListener('DOMContentLoaded', function () {
         } else {
             continueBtn.disabled = true;   
         } CABOUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU
-    });
+    });*/
     
     /*function checkCode() {
         const code = Array.from(inputs).map(input => input.value).join('');

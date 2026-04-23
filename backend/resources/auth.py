@@ -152,7 +152,7 @@ class google(Resource):
             redirect_uri = url_for('authorize',_external=True)
             return google.authorize_redirect(redirect_uri)
         except Exception as e:
-            app.logger.error(f"Erro durante login:{str(e)}")
+            #app.logger.error(f"Erro durante login:{str(e)}")
             return {
                 'status':'error',
                 'mensagem':'Erro durante login'
