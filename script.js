@@ -147,7 +147,34 @@ document.addEventListener('DOMContentLoaded', function () {
         checkCode();
     });
 
+    /*
     const newpasswordBox = document.getElementById('new-password');
+    const dados = {
+        codigo: code
+    };
+
+    fetch("http://127.0.0.1:5000/check_codigo", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(dados)
+    })
+    .then(res => res.json())
+    .then(data => {
+
+        if (data.mensagem === 'Código invalido'){
+            continueBtn.addEventListener('click', function (troca) {
+                troca.preventDefault();
+                insertcodeBox.style.display = 'none';
+                newpasswordBox.style.display = 'flex';
+                continueBtn.disabled = false;
+            });
+        } else {
+            continueBtn.disabled = true;   
+        } 
+    });
+
     /*function checkCode() {
         const code = Array.from(inputs).map(input => input.value).join('');
         const continueBtn = document.getElementById('continueBtn');
@@ -177,13 +204,23 @@ document.addEventListener('DOMContentLoaded', function () {
             newpasswordBox.style.display = 'flex';
             continueBtn.disabled = false;
         } 
-    });*/
+    });
     continueBtn.addEventListener('click', function (troca) {
         troca.preventDefault();
         insertcodeBox.style.display = 'none';
         newpasswordBox.style.display = 'flex';
-    });
+    });*/
 
+    //TROCA DE CARDS INSERIR CODIGO - REDEFINIR SENHA
+    const newpasswordBox = document.getElementById('new-password');
+
+    if (insertcodeBox &&newpasswordBox) {
+        continueBtn.addEventListener('click', function (troca) {
+            troca.preventDefault();
+            insertcodeBox.style.display = 'none';
+            newpasswordBox.style.display = 'flex';
+        });
+    }
 
     //TROCA DE CARDS CRIAR NOVA SENHA-LOGIN
     const backLogin = document.getElementById('backLogin');
@@ -341,6 +378,38 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    /* Conectando cadastro com api
+    function cadastrar() {
+
+        const dados = {
+            cpf: document.getElementById("cpf").value,
+            email: document.getElementById("email-cadastro").value,
+            user_name: document.getElementById("user-cadastro").value,
+            data_nascimento: document.getElementById("data-nascimento").value,
+            senha: document.getElementById("senha-cadastro").value
+        };
+
+        fetch("http://127.0.0.1:5000/signin", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(dados)
+        })
+        .then(res => res.json())
+        .then(data => {
+            const resposta = document.getElementById("resposta");
+
+            if (data.status === "error") {
+                resposta.innerText = data.mensagem;
+                resposta.style.color = "red";
+            } else {
+                resposta.innerText = data.mensagem;
+                resposta.style.color = "green";
+            }
+        });
+    };*/
+
     //ENVIO DO FORM
     document.querySelectorAll('.forms').forEach(form => { //o mesmo que function (form)
         form.addEventListener('submit', function (validarForm) {
@@ -372,5 +441,21 @@ document.addEventListener('DOMContentLoaded', function () {
                 form.reportValidity();
             }
         });
+    });
+
+    //MENU LATERAL
+    const backAside = document.getElementById('back-aside');
+    const aside = document.querySelector('aside');
+    let asideOpen = true;
+
+    backAside.addEventListener('click', () => {
+        if (asideOpen) {
+            aside.style.width = '5%';
+            backAside.style.transform = 'rotate(180deg)';
+        } else {
+            aside.style.width = '20%';
+            backAside.style.transform = 'rotate(0deg)';
+        }
+        asideOpen = !asideOpen; // alterna o estado do menu (aberto/fechado) a cada clique
     });
 });
