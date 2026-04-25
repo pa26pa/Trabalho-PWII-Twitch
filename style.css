@@ -539,6 +539,155 @@ aside {
     transition: transform 0.3s ease;
 }
 
+/*---------------- LUNA ---------------------*/
+#luna-header {
+    display: flex;
+    justify-content: flex-start;
+    text-align: center;
+    width: 100vw;
+    height: 10%;
+    background-color: #180F2C;
+}
+#luna-header h1 {
+    font-size: 3em;
+    color: #fff;
+    margin-left: 20px;
+}
+.luna-main {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    width: 100vw;
+    height: 100vh;
+    background-color: #521da2;
+    gap: 30px;
+}
+#context, #catalog {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    width: 50%;
+    height: auto;
+    color: #fff;
+}
+#context h2, #catalog h2 {
+    color: #fff;
+    font-size: 2.5em;
+    margin-bottom: 20px;
+}
+#context p {
+    font-size: 1.5em;
+    width: 50%;
+    margin: 0 auto;
+}
+#catalog {margin-right: 5%;}
+/*CARROUSSEL DE IMG*/
+/* ── Container principal ── */
+.carousel-wrap {
+    position: relative;
+    width: 100%;
+    max-width: 680px;
+    overflow: hidden; /* esconde slides fora da área visível */
+    border-radius: 12px;
+    background: #111;
+    margin: 0 auto;
+}
+
+/* ── Trilha que contém todas as slides lado a lado ── */
+.carousel-track {
+    display: flex; /* slides em linha horizontal */
+    transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1); /* efeito suave */
+    will-change: transform;
+}
+
+/* ── Cada slide ocupa 100% da largura do container ── */
+.carousel-slide {
+    min-width: 100%;
+    position: relative;
+    flex-shrink: 0;
+}
+
+.carousel-slide img {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+    display: block;
+}
+
+/* ── Label sobre a imagem ── */
+.slide-label {
+    position: absolute;
+    bottom: 14px;
+    left: 18px;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    background: rgba(0, 0, 0, 0.55);
+    padding: 5px 10px;
+    border-radius: 4px;
+}
+
+/* ── Botões de seta ── */
+.arrow-btn {
+    position: absolute;
+    top: calc(50% - 16px); /* centraliza na área da imagem, não conta os dots */
+    transform: translateY(-50%);
+    background: #180F2C;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+    z-index: 10;
+}
+.arrow-btn:hover {background: #8257dd;}
+.arrow-prev { left: 12px; }
+.arrow-next { right: 12px; }
+
+/* ── Bolinhas indicadoras ── */
+.dots {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    padding: 5px 0 5px;
+    background: #111;
+}
+.dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+}
+.dot.active {
+    background: #fff;
+    transform: scale(1.5);
+}
+
+#btnCatalog {
+    margin-top: 20px;
+    width: 200px;
+    height: 40px;
+    border-radius: 30px;
+    background-color: #48237f ;
+    color: #F4ECFF;
+    font-size: 1.2em;
+    font-weight: bold;
+    border: 2px solid #F4ECFF;
+}
+#btnCatalog:hover {
+    background-color: #351b5d;
+    color: #e1cdff;
+}
 /*RESPONSIVIDADE = não é adaptar para telas, é permitir que o layout se adapte sozinho*/
 /*@media = "if"*/
 @media (max-width: 768px) {/*desktop-first; min-width: 768px = mobile-first*/
