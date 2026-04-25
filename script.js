@@ -238,7 +238,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const senhaInput = passBox.querySelector('.password');
         const erroSenha = passBox.querySelector('.erroSenha');
         if (!senhaInput || !erroSenha) return;
-        senhaInput.addEventListener('blur', () => validarSenha(senhaInput, erroSenha));
+        senhaInput.addEventListener('blur', () => validarSenha(senhaInput, erroSenha));//adiciona um evento de blur (quando o input perde o foco) para validar a senha quando o usuário terminar de digitar
         senhaInput.addEventListener('input', () => {
             erroSenha.style.display = 'none';
             senhaInput.classList.remove('input-erro');
@@ -262,6 +262,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const senhaInput2 = document.querySelector('.password2');
     const erroSenha2 = document.querySelector('.erroSenha2');
 
+    //função para validar se a senha de confirmação é igual à senha original, exibindo uma mensagem de erro e aplicando uma classe de erro ao input de confirmação se as senhas não coincidirem
     function confirmarSenha() {
         if (!senhaInput1 || !senhaInput2 || !erroSenha2) return true;
         if (senhaInput2.value === '' || senhaInput1.value === senhaInput2.value) {
@@ -294,7 +295,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 const erroSenha = box.querySelector('.erroSenha');
                 if (!validarSenha(senhaInput, erroSenha)) envio = false;
             });
-            if (!envio) {
+            if (!envio) {//se envio for false, ou seja, se alguma validação falhou, o formulário não será enviado e as mensagens de erro serão exibidas
                 validarForm.preventDefault();
                 form.reportValidity();
             }
@@ -314,29 +315,34 @@ document.addEventListener('DOMContentLoaded', function () {
                 aside.style.width = '20%';
                 backAside.style.transform = 'rotate(0deg)';
             }
-            asideOpen = !asideOpen;
+            asideOpen = !asideOpen;//alterna o estado do menu lateral entre aberto e fechado a cada clique
         });
     }
 
-    // CARROSSEL (luna.html)
+    //----------------LUNA--------------------
+    // CARROSSEL 
     const carousel = document.querySelector('.carousel-wrap');
     const track = document.getElementById('track');
     if (carousel && track) {
         const dots = document.querySelectorAll('.dot');
-        const total = 3;
-        let current = 0;
+        const total = 3;//total de slides no carrossel, usado para calcular o índice do slide atual e garantir que o carrossel funcione em loop (voltando ao primeiro slide após o último)
+        let current = 0;//variável para rastrear o índice do slide atual, iniciando em 0 (primeiro slide)
 
+        //função para navegar para um slide específico
         function goTo(i) {
-            current = (i + total) % total;
-            const slideWidth = track.children[0].offsetWidth;
-            track.style.transform = `translateX(-${current * slideWidth}px)`;
-            dots.forEach((d, idx) => d.classList.toggle('active', idx === current));
+            current = (i + total) % total;//calcula o índice do slide atual usando módulo para garantir que o índice fique dentro do intervalo de 0 a total-1, permitindo que o carrossel funcione em loop
+            const slideWidth = track.children[0].offsetWidth;//obtém a largura de um slide (assumindo que todos os slides têm a mesma largura) para calcular a distância de deslocamento necessária para mostrar o slide correto
+            //track.children[0] é usado para acessar o primeiro slide dentro do track
+            // offsetWidth é usado para obter a largura total do slide, incluindo bordas e margens
+            track.style.transform = `translateX(-${current * slideWidth}px)`;//aplica uma transformação CSS para deslocar o track horizontalmente, movendo-o para a esquerda em uma distância proporcional ao índice do slide atual multiplicado pela largura do slide, mostrando assim o slide correto
+            dots.forEach((d, idx) => d.classList.toggle('active', idx === current));//atualiza a classe 'active' nos pontos de navegação, destacando o ponto correspondente ao slide atual e removendo a classe dos outros pontos
+            //toggle: alterna a classe 'active' em cada ponto, adicionando-a se o índice do ponto for igual ao índice do slide atual (idx === current) e removendo-a caso contrário
         }
 
-        document.getElementById('prev').addEventListener('click', () => goTo(current - 1));
+        document.getElementById('prev').addEventListener('click', () => goTo(current - 1));//evento de clique para o botão de slide anterior, que chama a função goTo com o índice do slide atual decrementado em 1, navegando para o slide anterior
         document.getElementById('next').addEventListener('click', () => goTo(current + 1));
-        dots.forEach(d => d.addEventListener('click', () => goTo(+d.dataset.i)));
-        window.addEventListener('resize', () => goTo(current));
+        dots.forEach(d => d.addEventListener('click', () => goTo(+d.dataset.i)));//evento de clique para cada ponto de navegação, que chama a função goTo com o índice do slide correspondente ao ponto clicado, permitindo que o usuário navegue diretamente para um slide específico
+        window.addEventListener('resize', () => goTo(current));//evento de resize para garantir que o carrossel se ajuste corretamente quando a janela for redimensionada, recalculando a posição do slide atual com base na nova largura dos slides
     }
 
 });
