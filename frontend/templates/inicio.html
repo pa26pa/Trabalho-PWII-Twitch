@@ -5,12 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>oiii</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
-    <link rel="stylesheet" href="static/style.css">
+    <link rel="stylesheet" href="/static/style.css">
     <link rel="icon" type="image/x-icon" href="static/logo1.png">
 </head>
 <body>
     <header id="header">
-        <div class="logo"><a href="inicio.html"><img id="logo" src="logo1.png" alt="logo"></a></div>
+        <div class="logo"><a href="inicio.html"><img id="logo" src="/static/logo1.png" alt="logo"></a></div>
         <div class="header-center">
             <!--MENU SUPERIOR-->
             <div class="top-menu">
@@ -137,7 +137,7 @@
 
                             <!--card do cadastro-->
                             <div id="cadastro">
-                                <form action="#" method="post" class="sign forms">
+                                <form id='formCadastro' class="sign forms">
                                     <h2>Cadastre-se</h2>
                                     <div class="caixa-input">
                                         <input type="text" id="user-cadastro" name="user" required>
@@ -148,7 +148,7 @@
                                         <label for="cpf">CPF</label>
                                     </div>
                                     <div class="caixa-input">
-                                        <input type="email" class="email" name="email" required>
+                                        <input type="email" id='email-cadastro' class="email" name="email" required>
                                         <label for="email">Email</label>
                                     </div>
                                     <div class="caixa-input"> <!--pattern = regex, expressão regular, formato específico para o input-->
@@ -157,7 +157,7 @@
                                         <p id="erroIdade">Deve ser maior de 18 anos</p>
                                     </div>
                                     <div class="caixa-input password-box">
-                                        <input type="password" class="password" name="password" required>
+                                        <input type="password" id='senha-cadastro' class="password" name="password" required>
                                         <label for="password">Senha</label>
                                         <p class="erroSenha">Senha Inválida (mínimo 5 caracteres)</p>
                                     </div>
@@ -170,7 +170,7 @@
             </dialog>
 
             <!--MODAL DO MENU HAMBÚRGUER-->
-            <input type="" class="open-menu"><img src="menu.png" alt="menu" id="menu-icon"></button>
+            <input type="" class="open-menu"><img src="/static/menu.png" alt="menu" id="menu-icon"></button>
         </div>
     </header>
 

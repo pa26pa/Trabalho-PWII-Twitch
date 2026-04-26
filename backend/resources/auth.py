@@ -141,7 +141,33 @@ class login(Resource):
             'status':'error',
             'mensagem':'get não é um metodo aceito'
         }, 400
+
+class logout(Resource):
+    def post(self):
+        session.clear()
+        return {
+            "status":'success',
+            'mensagem':'Você saiu da sua conta'
+        }, 200
+    
+    def get(self):
+        return {
+            'status':'error',
+            'mensagem':'Esse metodo não é reconhecido'
+        }, 500
         
+class check_login(Resource):
+    def post(self):
+        if 'usuario_id' in session:
+            return {
+                'status':'success',
+                'mensagem':'logado'
+            }, 200
+        
+        return {
+            'status':'success',
+            'mensagem':'não está logado'
+        }, 200
 class google(Resource):
     def post(self):
         data = request.get_json()

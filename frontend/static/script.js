@@ -374,33 +374,42 @@ document.addEventListener('DOMContentLoaded', function () {
         data_nascimento: document.getElementById("data-nascimento").value,
         senha: document.getElementById("senha-cadastro").value
     };
-
-    fetch("http://127.0.0.1:5000/signin", {
+    try {
+        fetch("/signin", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
         },
         body: JSON.stringify(dados)
-    })
-    .then(res => res.json())
-    .then(data => {
-        const resposta = document.getElementById("resposta");
+        })
+        .then(res => res.json())
+        .then(data => {
 
-        if (data.status === "error") {
-            resposta.innerText = data.mensagem;
+            if (data.status === "error") {
+                resposta.innerText = data.mensagem;
+                resposta.style.color = "red";
+            } else {
+                resposta.innerText = data.mensagem;
+                resposta.style.color = "green";
+            }
+        });
+        } catch (error) {
+            resposta.innerText = "Erro";
             resposta.style.color = "red";
-        } else {
-            resposta.innerText = data.mensagem;
-            resposta.style.color = "green";
-        }
-    });
+        }    
     };
+    
     //ENVIO DO FORM
     document.querySelectorAll('.sign').forEach(form => {
-        form.addEventListener('submit', function (validarForm) {
-            let envio = true;
+        console.log("OIEE");
+        form.addEventListener('submit', async (e) =>  {
 
-            if (!form.checkValidity()) {
+            e.preventDefault();
+
+            let envio = true;
+            console.log("OIEE");
+            
+            /*if (!form.checkValidity()) {
                 envio = false;
             }
 
@@ -419,15 +428,15 @@ document.addEventListener('DOMContentLoaded', function () {
             if (!validarSenha(senhaInput, erroSenha)) {
                 envio = false;
             }
-        });
+        });*/
 
-        validarForm.preventDefault(); 
+        //validarForm.preventDefault(); 
 
-        if (!envio) {
-            form.reportValidity();
-            return;
-        }
-
+        //if (!envio) {
+        //    form.reportValidity();
+        //    return;
+        //}
+        
             cadastrar();
         });
     });
