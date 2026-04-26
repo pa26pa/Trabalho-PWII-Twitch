@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lunar</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="icon" type="image/x-icon" href="logo1.png">
+    <link rel="stylesheet" href="{{url_for('static', filename='style.css')}}">
+    <link rel="icon" type="image/x-icon" href="{{url_for('static', filename='logo1.png')}}">
 </head>
 <body>
     <header id="luna-header">
@@ -32,17 +32,17 @@
                     <div class="carousel-track" id="track">
                     
                         <div class="carousel-slide">
-                            <img src="img1.jpg" alt="Imagem 1" />
+                            <img src="{{url_for('static', filename='img1.jpg')}}" alt="Imagem 1" />
                             <span class="slide-label">Rebel Galaxy</span>
                         </div>
                     
                         <div class="carousel-slide">
-                            <img src="img2.jpg" alt="Imagem 2" />
+                            <img src="{{url_for('static', filename='img2.jpg')}}" alt="Imagem 2" />
                             <span class="slide-label">Nebulosa do Caranguejo</span>
                         </div>
                     
                         <div class="carousel-slide">
-                            <img src="img3.jpg" alt="Imagem 3" />
+                            <img src="{{url_for('static', filename='img3.jpg')}}" alt="Imagem 3" />
                             <span class="slide-label">Planeta Distante</span>
                         </div>
                 
@@ -73,6 +73,6 @@
             </section>
         </div>
     </main>
-    <script src="script.js"></script>
+    <script src="{{url_for('static', filename='script.js')}}"></script>
 </body>
 </html>

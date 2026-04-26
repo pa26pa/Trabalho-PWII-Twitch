@@ -14,7 +14,7 @@ from email_validator import validate_email, EmailNotValidError
 class signin(Resource):
     def post(self):
         data = request.get_json()
-        
+         
         con = connection()
         cursor = con.cursor()
         
@@ -31,10 +31,14 @@ class signin(Resource):
         # vendo se o email é valido 
         valido = email_valido(email)
         if valido == False:
+            print(cpf)
+            print(user_name)
+            print(email)
+            print(senha)
             return {
                 'status':'error',
-                'mensagem':'Este email não é valido'
-            }
+                'mensagem':f'Este email não é valido {email}'
+            }, 400
         
         email = valido
         

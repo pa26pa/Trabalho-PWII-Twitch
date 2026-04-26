@@ -28,6 +28,10 @@ oauth = OAuth(app)
 def home():
     return render_template("inicio.html")
 
+@app.route("/luna")
+def luna():
+    return render_template("luna.html")
+
 # Aqui eu defino os endpoints que o js pode acessar, e defino uma função para cada um delessssssss
 api.add_resource(signin,'/signin')
 api.add_resource(login,'/login')
