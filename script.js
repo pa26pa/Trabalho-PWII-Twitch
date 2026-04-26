@@ -14,18 +14,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    const closeButtons = document.querySelectorAll('.close-modal');
-    closeButtons.forEach(button => {
-        button.addEventListener('click', () => {//=> : é uma função anônima, mais curta que function(){} e mantém o contexto de 'this'
-            const modalId = button.getAttribute('data-modal');
-            const modal = document.getElementById(modalId);
-            if (modal) {  // ← proteção
-                modal.close();
-                document.body.classList.remove('modal-open');
-            }
-        });
-    });
-
     // MENU SUPERIOR SOME AO ROLAR
     const header = document.getElementById('header');
     if (header) {//usa o if para garantir que o código só tente acessar o header se ele existir, evitando erros em páginas sem header
@@ -39,9 +27,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // TROCA DE CARDS LOGIN → RECEBER CÓDIGO
     const forgotLink = document.querySelector('.forgot-password a');
-    const loginBox = document.getElementById('login');
     const emailBox = document.getElementById('email-forgot-password');
     const changeButton = document.querySelector('.change-button');
+    const loginBox = document.getElementById('login');
 
     if (forgotLink && loginBox && emailBox && changeButton) {// ← proteção do bloco inteiro
         forgotLink.addEventListener('click', function (troca) {
@@ -49,6 +37,9 @@ document.addEventListener('DOMContentLoaded', function () {
             loginBox.style.display = 'none';
             changeButton.style.display = 'none';
             emailBox.style.display = 'flex';
+
+            //resete dos inputs
+            loginBox.querySelectorAll('input').forEach(input => input.value = '');
         });
     }
 
@@ -66,6 +57,13 @@ document.addEventListener('DOMContentLoaded', function () {
             troca.preventDefault();
             emailBox.style.display = 'none';
             insertcodeBox.style.display = 'flex';
+
+            //resete dos inputs
+            emailBox.querySelectorAll('input').forEach(input => input.value = '');
+            btnreceberCodigo.disabled = true;
+        
+            inputs.forEach(input => input.value = '');//limpa os inputs de código para garantir que o usuário comece com campos vazios ao receber um novo código
+            if (continueBtn) continueBtn.disabled = true;
             startTimer();//inicia o timer de reenvio do código assim que o usuário clica para receber o código
         });
     }
@@ -104,6 +102,8 @@ document.addEventListener('DOMContentLoaded', function () {
     // INSERINDO CÓDIGO DE VERIFICAÇÃO
     const inputs = document.querySelectorAll('.otp-input');
     const continueBtn = document.getElementById('continueBtn');
+
+    if (continueBtn) continueBtn.disabled = true;//desabilita o botão de continuar inicialmente, garantindo que o usuário só possa avançar após inserir um código válido
 
     //função para verificar se o código inserido tem 5 dígitos e habilitar/desabilitar o botão de continuar
     function checkCode() {
@@ -153,17 +153,9 @@ document.addEventListener('DOMContentLoaded', function () {
             troca.preventDefault();//preventDefault():evita que o formulário seja enviado ou que a página seja recarregada quando o botão de continuar for clicado
             insertcodeBox.style.display = 'none';
             newpasswordBox.style.display = 'flex';
-        });
-    }
-
-    // TROCA NOVA SENHA → LOGIN
-    const backLogin = document.getElementById('backLogin');
-    if (loginBox && changeButton && newpasswordBox && backLogin) {
-        backLogin.addEventListener('click', function (troca) {
-            troca.preventDefault();
-            newpasswordBox.style.display = 'none';
-            loginBox.style.display = 'flex';
-            changeButton.style.display = 'flex';
+            // limpa os inputs do código ao sair
+            inputs.forEach(input => input.value = '');
+            if (continueBtn) continueBtn.disabled = true;
         });
     }
 
@@ -302,17 +294,93 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
+    const closeButtons = document.querySelectorAll('.close-modal');
+    closeButtons.forEach(button => {
+        button.addEventListener('click', () => {//=> : é uma função anônima, mais curta que function(){} e mantém o contexto de 'this'
+            const modalId = button.getAttribute('data-modal');
+            const modal = document.getElementById(modalId);
+            if (modal) {  // ← proteção
+                modal.close();
+                document.body.classList.remove('modal-open');
+
+                // limpa todos os inputs do modal ao fechar
+                modal.querySelectorAll('input').forEach(input => input.value = '');
+                modal.querySelectorAll('.erroSenha, .erroSenha2, #erroIdade').forEach(el => el.style.display = 'none');
+                modal.querySelectorAll('.input-erro').forEach(el => el.classList.remove('input-erro'));
+                if (continueBtn) continueBtn.disabled = true;
+                if (btnreceberCodigo) btnreceberCodigo.disabled = true;
+
+                // <- volta sempre para o lado do login ao fechar o modal
+                const wrapper = document.getElementById('wrapper');
+                if (loginBox) {loginBox.style.display = ''};
+                if (emailBox) {emailBox.style.display = 'none'};
+                if (insertcodeBox) {insertcodeBox.style.display = 'none' };
+                if (newpasswordBox) {newpasswordBox.style.display = 'none' };
+                if (changeButton) {changeButton.style.display = ''}
+
+                //volta o checkbox do flip para login
+                const checkbox = document.getElementById('checkbox');
+                if (checkbox) checkbox.checked = false;
+            }
+        });
+    });
+
+    // FLIP LOGIN ↔ CADASTRO — limpa inputs dos dois lados
+    const checkbox = document.getElementById('checkbox');
+    if (checkbox) {
+        checkbox.addEventListener('change', () => { 
+            document.getElementById('wrap').querySelectorAll('input').forEach(input => input.value = '');
+            document.querySelectorAll('.erroSenha, .erroSenha2, #erroIdade').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('.input-erro').forEach(el => el.classList.remove('input-erro'));
+        });
+    }
+
+    // BOTÃO VOLTAR AO LOGIN — desabilitado até senhas válidas e iguais
+    const backLogin = document.getElementById('backLogin');
+    if (loginBox && changeButton && newpasswordBox && backLogin) {
+        if (backLogin) backLogin.disabled = true; // ← começa desabilitado
+
+        // verifica se pode habilitar sempre que digitar
+        function checkNewPassword() {
+            if (!senhaInput1 || !senhaInput2) return;
+            const valid = senhaInput1.value.length >= 5
+                && senhaInput2.value.length >= 5
+                && senhaInput1.value === senhaInput2.value;
+            backLogin.disabled = !valid;
+        }
+
+        if (senhaInput1) senhaInput1.addEventListener('input', checkNewPassword);
+        if (senhaInput2) senhaInput2.addEventListener('input', checkNewPassword);
+
+        backLogin.addEventListener('click', function (troca) {
+            troca.preventDefault();
+            newpasswordBox.style.display = 'none';
+            loginBox.style.display = 'flex';
+            changeButton.style.display = 'flex';
+
+            newpasswordBox.querySelectorAll('input').forEach(input => input.value = '');
+            newpasswordBox.querySelectorAll('.erroSenha, .erroSenha2').forEach(el => el.style.display = 'none');
+            newpasswordBox.querySelectorAll('.input-erro').forEach(el => el.classList.remove('input-erro'));
+            backLogin.disabled = true; // ← reseta para desabilitado ao voltar
+        });
+    }
+
     // MENU LATERAL
     const backAside = document.getElementById('back-aside');
     const aside = document.querySelector('aside');
     if (backAside && aside) {  // ← proteção (luna.html não tem aside)
         let asideOpen = true;
+        aside.classList.add('open'); // ← começa aberto
+
         backAside.addEventListener('click', () => {
             if (asideOpen) {
                 aside.style.width = '5%';
+                aside.classList.remove('open'); // ← remove classe quando fecha
+                // apenas vira instantaneamente, sem transição de rotação
                 backAside.style.transform = 'rotate(180deg)';
             } else {
                 aside.style.width = '20%';
+                aside.classList.add('open'); // ← adiciona classe quando abre
                 backAside.style.transform = 'rotate(0deg)';
             }
             asideOpen = !asideOpen;//alterna o estado do menu lateral entre aberto e fechado a cada clique
@@ -344,5 +412,4 @@ document.addEventListener('DOMContentLoaded', function () {
         dots.forEach(d => d.addEventListener('click', () => goTo(+d.dataset.i)));//evento de clique para cada ponto de navegação, que chama a função goTo com o índice do slide correspondente ao ponto clicado, permitindo que o usuário navegue diretamente para um slide específico
         window.addEventListener('resize', () => goTo(current));//evento de resize para garantir que o carrossel se ajuste corretamente quando a janela for redimensionada, recalculando a posição do slide atual com base na nova largura dos slides
     }
-
 });

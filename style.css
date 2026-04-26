@@ -532,11 +532,12 @@ aside {
     font-weight: bold;
     font-size: 2.5em;
     cursor: pointer;
-    transition: width 0.5s ease-in-out;
+    transform: rotate(0deg);
+    transition: transform 0.2s;
 }
-#back-aside:hover {
+aside.open #back-aside:hover {
     transform: translateX(10px);
-    transition: transform 0.3s ease;
+    transition: transform 0.2s;
 }
 
 /*---------------- LUNA ---------------------*/
