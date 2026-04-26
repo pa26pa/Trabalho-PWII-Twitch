@@ -20,9 +20,8 @@ document.addEventListener('DOMContentLoaded', function () {
         window.addEventListener('scroll', function () {
             if (window.scrollY > 80) {//scrollY: distância em pixels que o documento foi rolado verticalmente
                 header.classList.add('shrink'); //adiciona a classe 'shrink' ao header
-                
             } else {
-                header.classList.remove('shrink');
+                header.classList.remove('shrink'); //remove a classe 'shrink' do header
             }
         });
     }
@@ -276,6 +275,14 @@ document.addEventListener('DOMContentLoaded', function () {
             senhaInput2.classList.remove('input-erro');
         });
     }
+    
+    // Toast = é uma aviso que desaparece rapidamente, não precisa apertar no X para sairrrr :)
+    function mostrarToast(mensagem, tipo) {
+        const toast = document.getElementById('toast');
+        toast.textContent = mensagem;
+        toast.className = `show ${tipo}`;
+        setTimeout(() => toast.className = '', 5000); 
+    }
 
     // ENVIO DO FORM
     document.querySelectorAll('.forms').forEach(form => {
@@ -312,14 +319,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 })
                 .then(res => res.json())
                 .then(data => {
-                    if (data.status === 'success') {
-                        alert(data.mensagem);
-                    } else {
-                        alert("Erro: " + data.mensagem);
-                    }
+                    mostrarToast(data.mensagem, data.status)
                 });
-            }       
-        });         
+            }
+        });
     });
 
     const closeButtons = document.querySelectorAll('.close-modal');
@@ -412,6 +415,24 @@ document.addEventListener('DOMContentLoaded', function () {
                 backAside.style.transform = 'rotate(0deg)';
             }
             asideOpen = !asideOpen;//alterna o estado do menu lateral entre aberto e fechado a cada clique
+        });
+    }
+
+    //MENU DROPDOWN
+    const btnDropdown = document.getElementById('btn-dropdown');
+    const dropdownMenu = document.getElementById('dropdown-menu');
+
+    if (btnDropdown && dropdownMenu) {
+        btnDropdown.addEventListener('click', (e) => {
+            e.stopPropagation(); //evita que o clique feche o menu imediatamente
+            dropdownMenu.classList.toggle('show');
+        });
+
+        //fecha ao clicar fora
+        document.addEventListener('click', (e) => {
+            if (!dropdownMenu.contains(e.target) && e.target !== btnDropdown) {
+                dropdownMenu.classList.remove('show');
+            }
         });
     }
 

@@ -6,7 +6,6 @@
     font-size: 15px;
 }
 #logo {width: 60px;}
-#menu-icon {width: 60%;}
 
 /*HEADER*/
 #header {
@@ -86,9 +85,6 @@
     margin-right: 30px;
     align-items: center;
     justify-content: flex-end;
-}
-.open-modal:last-child {
-    width: 45px;
 }
 .open-modal {
     width: 70px;
@@ -180,7 +176,6 @@ body.modal-open {
     margin: 0 auto;
     width: 550px;
     height: 700px;
-    max-height: 700px;
     min-height: 650px;
     display: none;
     padding: 10px;
@@ -540,6 +535,89 @@ aside.open #back-aside:hover {
     transition: transform 0.2s;
 }
 
+/*MENU DROPDOWN*/
+.dropdown-menu-wrap {
+    position: relative;
+}
+#btn-dropdown {width: 45px;}
+#menu-icon {width: 28px;}
+.dropdown-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    background: #DEC7FF;
+    border: 1px solid #251738;
+    border-radius: 8px;
+    min-width: 200px;
+    z-index: 999;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s;
+}
+.dropdown-menu.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+.dropdown-menu ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+.dropdown-menu li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 15px;
+    cursor: pointer;
+    color: #251738;
+    font-size: 1.4em;
+    transition: background 0.2s;
+}
+.dropdown-menu li:hover {
+    background: #b68cf5;
+    color: #fff;
+}
+.dropdown-menu hr {
+    border-color: #251738;
+}
+.arrow {
+    color: #251738;
+    font-size: 1em;
+    font-weight: bold;
+}
+
+/*TOGGLE SWITCH (DARK THEME)*/
+.switch {
+    position: relative;
+    width: 50px;
+    height: 22px;
+}
+.switch input {display: none;}
+.slider {
+    position: absolute;
+    inset: 0;
+    background: #F4ECFF;
+    border-radius: 22px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.slider:before {
+    content: "";
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 16px;
+    height: 16px;
+    background: #9147FF;
+    border-radius: 50%;
+    transition: transform 0.2s;
+}
+.switch input:checked + .slider {background: #9147FF;}
+.switch input:checked + .slider::before {transform: translateX(28px); background: #F4ECFF;}
+
 /*---------------- LUNA ---------------------*/
 #luna-header {
     display: flex;
@@ -747,4 +825,32 @@ aside.open #back-aside:hover {
     #luna {
         width: 25px;
     }
+}
+
+
+/* OIEEE aqui é aleta, to fazendo os negocio do TOAST*/
+#toast {
+    position: fixed;
+    bottom: 60px;
+    right: 30px;
+    padding: 14px 24px;
+    border-radius: 8px;
+    color: white;
+    font-size: 14px;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    z-index: 9999;
+    max-width: 300px;
+}
+
+#toast.show {
+    opacity: 1;
+}
+
+#toast.success {
+    background-color: #2ecc71;
+}
+
+#toast.error {
+    background-color: #e74c3c;
 }
