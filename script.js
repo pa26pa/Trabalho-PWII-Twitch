@@ -388,6 +388,24 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    //MENU DROPDOWN
+    const btnDropdown = document.getElementById('btn-dropdown');
+    const dropdownMenu = document.getElementById('dropdown-menu');
+
+    if (btnDropdown && dropdownMenu) {
+        btnDropdown.addEventListener('click', (e) => {
+            e.stopPropagation(); //evita que o clique feche o menu imediatamente
+            dropdownMenu.classList.toggle('show');
+        });
+
+        //fecha ao clicar fora
+        document.addEventListener('click', (e) => {
+            if (!dropdownMenu.contains(e.target) && e.target !== btnDropdown) {
+                dropdownMenu.classList.remove('show');
+            }
+        });
+    }
+
     //----------------LUNA--------------------
     // CARROSSEL 
     const carousel = document.querySelector('.carousel-wrap');
