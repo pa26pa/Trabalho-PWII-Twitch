@@ -6,11 +6,11 @@
     <title>oiii</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
     <link rel="stylesheet" href="style.css">
-    <link rel="icon" type="image/x-icon" href="logo.png">
+    <link rel="icon" type="image/x-icon" href="logo1.png">
 </head>
 <body>
     <header id="header">
-        <div class="logo"><a href="inicio.html"><img id="logo" src="logo.png" alt="logo"></a></div>
+        <div class="logo"><a href="inicio.html"><img id="logo" src="logo1.png" alt="logo"></a></div>
         <div class="header-center">
             <!--MENU SUPERIOR-->
             <div class="top-menu">
@@ -23,32 +23,35 @@
                 <div class="search-bar">
                     <div class="search-icon">
                         <i class="fa-solid fa-magnifying-glass"></i>
-                    </div>
+                    </div> 
                     <input type="text" id="search" placeholder="Pesquise aqui">
                 </div>
             </div>
         </div>
 
         <div class="menu-modals">
+            <a href="luna.html" target="_blank" aria-placeholder="Luna"><img src="coroa.png" id="luna" alt="coroa"></a>
+
             <!--MODAL DO LOGIN-->
             <button class="open-modal" data-modal="modal-1">Entrar</button>
 
             <!--dialog = modal-->
             <dialog id="modal-1">
                     <div id="wrap">
-                        <div class="form-header">
-                            <button class="close-modal login-close-button" data-modal="modal-1">X</button>
+                        <div class="form-header">                                
                             <!--botão para alternar entre cadastro e login-->
                             <div class="change-button">
                                 <!--frente da div de trocar card-->
                                 <div class="change-button1">
-                                    <!--note que um eemento pode ter mais de um nome de class, apenas separe por um espaço-->
+                                    <!--note que um elemento pode ter mais de um nome de class, apenas separe por um espaço-->
+                                    <button class="close-modal login-close-button" data-modal="modal-1">X</button>
                                     <h6><span>Entrar</span><span>Cadastrar</span></h6>
                                     <input type="checkbox" class="checkbox" id="checkbox">
                                     <label for="checkbox"></label>
                                 </div>
                                 <!--costas da div de trocar card-->
                                 <div class="change-button2">
+                                    <button class="close-modal login-close-button" data-modal="modal-1">X</button>
                                     <h6><span>Entrar</span><span>Cadastrar</span></h6>
                                     <input type="checkbox" class="checkbox" id="checkbox">
                                     <label for="checkbox"></label>
@@ -59,7 +62,7 @@
                         <!--card do login-->
                         <div id="wrapper">
                             <div id="login">
-                                <form action="#" method="post" class="login">
+                                <form action="#" method="post" class="login forms">
                                     <h2>Entrar</h2>
                                     <div class="caixa-input">
                                         <input type="text" id="user_email" name="user_email" required>
@@ -80,12 +83,13 @@
                             <!--card de colocar email para receber o código-->
                             <div id="email-forgot-password">
                                 <div class="center-wrap">
-                                    <form action="#" method="post" class="email-forgot-password">
-                                        <h2>Insira seu Email para receber o Código</h2>
+                                    <form action="#" method="post" class="email-forgot-password forms">
+                                        <h2>Coloque o Email</h2> <br>
+                                        <p>Por favor, insira o email associado à sua conta para receber o código de redefinição de senha.</p> <br><br><br><br><br>
                                         <div class="caixa-input">
-                                            <input type="email" id="email" name="email" required>
+                                            <input type="email" id="email" class="email" name="email" required>
                                             <label for="email">Email</label>
-                                        </div>
+                                        </div> <br><br><br><br><br>
                                         <button type="submit" id="receber-codigo">Receber Código</button>
                                     </form>
                                 </div>
@@ -94,15 +98,17 @@
                             <!--card de colocar o código recebido por email-->
                             <div id="insert-code">
                                 <div class="center-wrap">
-                                    <form action="#" method="post" class="insert-code">
-                                        <h2>Insira o Código Recebido</h2>
+
+                                    <form action="#" method="post" class="insert-code forms">
+                                        <h2>Insira o Código</h2> <br>
+                                        <p>Por favor, insira o código enviado para o seu email.</p> <br><br><br>
                                         <div class="otp-container">
                                             <input type="text" maxlength="1" class="otp-input">
                                             <input type="text" maxlength="1" class="otp-input">
                                             <input type="text" maxlength="1" class="otp-input">
                                             <input type="text" maxlength="1" class="otp-input">
                                             <input type="text" maxlength="1" class="otp-input">
-                                        </div>
+                                        </div> <br><br><br>
                                         <p id="timerText">Reenviar código em 60s</p>
                                         <button id="resendBtn" disabled>Reenviar Código</button>
                                         <button type="submit" id="continueBtn">Continuar</button>
@@ -112,19 +118,20 @@
 
                             <!--card de criar nova senha-->
                             <div id="new-password">
-                                <div class="center-wrap">
-                                    <form action="#" method="post" class="new-password">
-                                        <h2>Redefina sua Senha</h2>
+                                <div class="center-wrap"> 
+                                    <form action="#" method="post" class="new-password forms">
+                                        <h2>Redefina sua Senha</h2> <br>
+                                        <p>Por favor, insira uma nova senha para sua conta, .</p> <br><br><br>
                                         <div class="caixa-input password-box">
                                             <input type="password" class="password password1" name="password" required>
                                             <label for="password">Nova Senha</label>
                                             <p class="erroSenha">Senha Inválida (mínimo 5 caracteres)</p>
-                                        </div>
+                                        </div><br>
                                         <div class="caixa-input">
                                             <input type="password" class="password2" name="password" required>
                                             <label for="password">Confirmar Senha</label>
                                             <p class="erroSenha2">A senha não é igual</p>
-                                        </div>
+                                        </div><br><br><br>
                                         <button type="submit" id="backLogin">Voltar ao Login</button>
                                     </form>
                                 </div>
@@ -132,7 +139,7 @@
 
                             <!--card do cadastro-->
                             <div id="cadastro">
-                                <form action="#" method="post" class="sign">
+                                <form action="#" method="post" class="sign forms">
                                     <h2>Cadastre-se</h2>
                                     <div class="caixa-input">
                                         <input type="text" id="user-cadastro" name="user" required>
@@ -143,7 +150,7 @@
                                         <label for="cpf">CPF</label>
                                     </div>
                                     <div class="caixa-input">
-                                        <input type="email" id="email-cadastro" name="email" required>
+                                        <input type="email" class="email" name="email" required>
                                         <label for="email">Email</label>
                                     </div>
                                     <div class="caixa-input"> <!--pattern = regex, expressão regular, formato específico para o input-->
@@ -165,15 +172,14 @@
             </dialog>
 
             <!--MODAL DO MENU HAMBÚRGUER-->
-            <button class="open-modal" data-modal="modal-2">Menu</button>
-            <dialog id="modal-2">
-                <h1>teste 2</h1>
-                <button class="close-modal" data-modal="modal-2">X</button>
-            </dialog>
+            <button class="open-modal"><img src="menu.png" alt="menu" id="menu-icon"></button>
         </div>
     </header>
 
-    <h1>asdfghjklhhhh <br>
+    <aside>
+        <button type="button" id="back-aside">&#8658;</button><br><br>
+    </aside>
+    <h1 id="texto">asdfghjklhhhh <br>
         sssssssssssssssss<br>ssssssssssssssssssssss<br>
     <br><br><br><br><br><br><br><br><br><br>ssssssssssssssss<br><br><br><br><br><br><br><br><br><br><br><br><br><br>sssssssssss</h1>
 
