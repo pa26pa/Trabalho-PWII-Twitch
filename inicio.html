@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n>oiii</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/x-icon" href="imagens/logo1.png">
+</head>
+<body>
+    <header id="header">
+        <div class="logo"><a href="inicio.html"><img id="logo" src="imagens/logo1.png" alt="logo"></a></div>
+        <div class="header-center">
+            <!--MENU SUPERIOR-->
+            <div class="top-menu">
+                <nav><a class="menu-nav home-page" href="inicio.html" data-i18n>Início</a></nav>
+                <nav><a class="menu-nav following-page" href="seguindo.html" data-i18n>Seguindo</a></nav>
+                <nav><a class="menu-nav explore-page" href="explorar.html" data-i18n>Explorar</a></nav>
+            </div>
+            <!--BARRA DE PESQUISA-->
+            <div class="bottom-menu">
+                <div class="search-bar">
+                    <div class="search-icon">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </div> 
+                    <input type="text" id="search" placeholder="Pesquise aqui">
+                </div>
+            </div>
+        </div>
+
+        <div class="menu-modals">
+            <a href="luna.html" target="_blank" aria-placeholder="Luna"><img src="imagens/coroa.png" id="luna" alt="coroa"></a>
+
+            <!--MODAL DO LOGIN-->
+            <button class="open-modal" data-modal="modal-1" data-i18n>Entrar</button>
+
+            <!--dialog = modal-->
+            <dialog id="modal-1">
+                    <div id="wrap">
+                        <div class="form-header">                                
+                            <!--botão para alternar entre cadastro e login-->
+                            <div class="change-button">
+                                <!--frente da div de trocar card-->
+                                <div class="change-button1">
+                                    <!--note que um elemento pode ter mais de um nome de class, apenas separe por um espaço-->
+                                    <button class="close-modal login-close-button" data-modal="modal-1">X</button>
+                                    <h6><span data-i18n>Entrar</span><span data-i18n>Cadastrar</span></h6>
+                                    <input type="checkbox" class="checkbox" id="checkbox">
+                                    <label for="checkbox"></label>
+                                </div>
+                                <!--costas da div de trocar card-->
+                                <div class="change-button2">
+                                    <button class="close-modal login-close-button" data-modal="modal-1">X</button>
+                                    <h6><span data-i18n>Entrar</span><span data-i18n>Cadastrar</span></h6>
+                                    <input type="checkbox" class="checkbox" id="checkbox">
+                                    <label for="checkbox"></label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!--card do login-->
+                        <div id="wrapper">
+                            <div id="login">
+                                <form action="#" method="post" class="login forms">
+                                    <h2 data-i18n>Entrar</h2>
+                                    <div class="caixa-input">
+                                        <input type="text" id="user_email" name="user_email" required>
+                                        <label for="user_email" data-i18n>Nome de Usuário ou Email</label>
+                                    </div>
+                                    <div class="caixa-input password-box">
+                                        <input type="password" class="password" name="password" required>
+                                        <label for="password" data-i18n>Senha</label>
+                                        <p class="erroSenha" data-i18n>Senha Inválida (mínimo 5 caracteres)</p>
+                                    </div>
+                                    <div class="forgot-password">
+                                        <a href="#" data-i18n>Esqueceu a senha?</a>
+                                    </div>
+                                    <button type="submit" data-i18n>Entrar</button>
+                                </form>
+                            </div>
+
+                            <!--card de colocar email para receber o código-->
+                            <div id="email-forgot-password">
+                                <div class="center-wrap">
+                                    <form action="#" method="post" class="email-forgot-password forms">
+                                        <h2 data-i18n>Coloque o Email</h2> <br>
+                                        <p data-i18n>Por favor, insira o email associado à sua conta para receber o código de redefinição de senha.</p> <br><br><br><br><br>
+                                        <div class="caixa-input">
+                                            <input type="email" id="email" class="email" name="email" required>
+                                            <label for="email" data-i18n>Email</label>
+                                        </div> <br><br><br><br><br>
+                                        <button type="submit" id="receber-codigo" data-i18n>Receber Código</button>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <!--card de colocar o código recebido por email-->
+                            <div id="insert-code">
+                                <div class="center-wrap">
+                                    <form action="#" method="post" class="insert-code forms">
+                                        <h2 data-i18n>Insira o Código</h2> <br>
+                                        <p data-i18n>Por favor, insira o código enviado para o seu email.</p> <br><br><br>
+                                        <div class="otp-container">
+                                            <input type="text" maxlength="1" class="otp-input">
+                                            <input type="text" maxlength="1" class="otp-input">
+                                            <input type="text" maxlength="1" class="otp-input">
+                                            <input type="text" maxlength="1" class="otp-input">
+                                            <input type="text" maxlength="1" class="otp-input">
+                                        </div> <br><br><br>
+                                        <p id="timerText" data-i18n>Reenviar código em 60s</p>
+                                        <button id="resendBtn" disabled data-i18n>Reenviar Código</button>
+                                        <button type="submit" id="continueBtn" data-i18n>Continuar</button>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <!--card de criar nova senha-->
+                            <div id="new-password">
+                                <div class="center-wrap"> 
+                                    <form action="#" method="post" class="new-password forms">
+                                        <h2 data-i18n>Redefina sua Senha</h2> <br>
+                                        <p data-i18n>Por favor, insira uma nova senha para sua conta, .</p> <br><br><br>
+                                        <div class="caixa-input password-box">
+                                            <input type="password" class="password password1" name="password" required>
+                                            <label for="password" data-i18n>Nova Senha</label>
+                                            <p class="erroSenha" data-i18n>Senha Inválida (mínimo 5 caracteres)</p>
+                                        </div><br>
+                                        <div class="caixa-input">
+                                            <input type="password" class="password2" name="password" required>
+                                            <label for="password" data-i18n>Confirmar Senha</label>
+                                            <p class="erroSenha2" data-i18n>A senha não é igual</p>
+                                        </div><br><br><br>
+                                        <button type="submit" id="backLogin" data-i18n>Voltar ao Login</button>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <!--card do cadastro-->
+                            <div id="cadastro">
+                                <form action="#" method="post" class="sign forms">
+                                    <h2 data-i18n>Cadastre-se</h2>
+                                    <div class="caixa-input">
+                                        <input type="text" id="user-cadastro" name="user" required>
+                                        <label for="user" data-i18n>Usuário</label>
+                                    </div>
+                                    <div class="caixa-input">
+                                        <input type="text" id="cpf" name="cpf" pattern="\d{3}\.\d{3}\.\d{3}-\d{2}" required>
+                                        <label for="cpf" data-i18n>CPF</label>
+                                    </div>
+                                    <div class="caixa-input">
+                                        <input type="email" class="email" name="email" required>
+                                        <label for="email" data-i18n>Email</label>
+                                    </div>
+                                    <div class="caixa-input"> <!--pattern = regex, expressão regular, formato específico para o input-->
+                                        <input type="text" id="data-nascimento" name="data_nascimento" pattern="\d{2}\/\d{2}\/\d{4}" required>
+                                        <label for="data_nascimento" data-i18n>Data de Nascimento</label>
+                                        <p id="erroIdade" data-i18n>Deve ser maior de 18 anos</p>
+                                    </div>
+                                    <div class="caixa-input password-box">
+                                        <input type="password" class="password" name="password" required>
+                                        <label for="password" data-i18n>Senha</label>
+                                        <p class="erroSenha" data-i18n>Senha Inválida (mínimo 5 caracteres)</p>
+                                    </div>
+                                    <button type="submit" data-i18n>Cadastrar</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                
+            </dialog>
+
+            <!--MENU HAMBÚRGUER-->
+            <div class="dropdown-menu-wrap">
+                <button class="open-modal" id="btn-dropdown">
+                    <img src="imagens/menu.png" alt="menu" id="menu-icon">
+                </button>
+
+                <div id="dropdown-menu" class="dropdown-menu">
+                    <ul>
+                        <li id="language-item" class="submenu-item">
+                            <span data-i18n>Idioma</span>
+                            <span class="arrow">></span>
+
+                            <div id="language-submenu" class="submenu">
+                                <ul>
+                                    <li class="language-option" data-lang="pt">🇧🇷 Português</li>
+                                    <li class="language-option" data-lang="en">🇺🇸 English</li>
+                                    <li class="language-option" data-lang="es">🇪🇸 Español</li>
+                                </ul>
+                            </div>
+                        </li>
+                        <hr>
+                        <li class="toggle-item">
+                            <span data-i18n>Tema Escuro</span>
+                            <label class="switch">
+                                <input type="checkbox" id="dark-theme">
+                                <span class="slider"></span>
+                            </label>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <aside>
+        <button type="button" id="back-aside">&#8658;</button><br><br>
+    </aside>
+    <h1 id="texto">asdfghjklhhhh <br>
+        sssssssssssssssss<br>ssssssssssssssssssssss<br>
+    <br><br><br><br><br><br><br><br><br><br>ssssssssssssssss<br><br><br><br><br><br><br><br><br><br><br><br><br><br>sssssssssss</h1>
+
+    <script src="tradutor.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
