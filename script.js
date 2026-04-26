@@ -406,6 +406,17 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    //IDIOMAS - TRADUÇÕES
+    const submenuIdioma = document.getElementById('language-submenu');
+
+    document.querySelectorAll('.opcao-idioma').forEach(btn => {
+        btn.addEventListener('click', () => {
+            putLanguage(btn.dataset.lang);
+            submenuIdioma.classList.remove('show');
+            dropdownMenu.classList.remove('show');
+        });
+    });
+
     //----------------LUNA--------------------
     // CARROSSEL 
     const carousel = document.querySelector('.carousel-wrap');

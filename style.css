@@ -539,8 +539,8 @@ aside.open #back-aside:hover {
 .dropdown-menu-wrap {
     position: relative;
 }
-#btn-dropdown {width: 45px;}
-#menu-icon {width: 28px;}
+#btn-dropdown {width: 45px; padding: 3px;}
+#menu-icon {width: 25px;}
 .dropdown-menu {
     position: absolute;
     top: calc(100% + 8px);
@@ -556,7 +556,7 @@ aside.open #back-aside:hover {
     transform: translateY(-8px);
     transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s;
 }
-.dropdown-menu.show {
+.dropdown-menu.show, .submenu.show {
     opacity: 1;
     visibility: visible;
     transform: translateY(0);
@@ -618,6 +618,23 @@ aside.open #back-aside:hover {
 .switch input:checked + .slider {background: #9147FF;}
 .switch input:checked + .slider::before {transform: translateX(28px); background: #F4ECFF;}
 
+/*SUBMENU DO IDIOMA*/
+.submenu-item {position: relative;}
+.submenu {
+    position: absolute;
+    right: calc(100% + 4px);
+    top: 0;
+    background: #DEC7FF;
+    border: 1px solid #251738;
+    border-radius: 8px;
+    min-width: 160px;
+    padding: 4px 0;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(8px);
+    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s;
+}
 /*---------------- LUNA ---------------------*/
 #luna-header {
     display: flex;
