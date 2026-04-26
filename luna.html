@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lunar</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/x-icon" href="logo1.png">
+</head>
+<body>
+    <header id="luna-header">
+        <h1>&Delta; Lunar</h1>
+    </header>
+    <main>
+        <div class="luna-main">
+            <section id="context">
+                <h2>O que é Amazons Lunar?</h2>
+                <p>Amazons Lunar é uma parceria entre a Twitches e Amazons, 
+                permitindo que os assinantes da Amazons Prime tenham acesso
+                a um catálogo de jogos gratuitos e exclusivos na plataforma Twitches.
+                </p> <br> <br>
+
+                <h2>Como jogar os jogos?</h2>
+                <p>Os jogos, ao adquiridos, permitem que o usuário possa jogá-los
+                através da nuvem, sem que seja necessário instalar ou rodar o jogo em sua
+                máquina.
+                </p>
+            </section>
+            <section id="catalog">
+                <h2>Catálogo de Jogos</h2>
+                <div class="carousel-wrap">
+                    <div class="carousel-track" id="track">
+                    
+                        <div class="carousel-slide">
+                            <img src="img1.jpg" alt="Imagem 1" />
+                            <span class="slide-label">Rebel Galaxy</span>
+                        </div>
+                    
+                        <div class="carousel-slide">
+                            <img src="img2.jpg" alt="Imagem 2" />
+                            <span class="slide-label">Nebulosa do Caranguejo</span>
+                        </div>
+                    
+                        <div class="carousel-slide">
+                            <img src="img3.jpg" alt="Imagem 3" />
+                            <span class="slide-label">Planeta Distante</span>
+                        </div>
+                
+                    </div>
+                
+                    <!-- Seta esquerda -->
+                    <button class="arrow-btn arrow-prev" id="prev" aria-label="Anterior">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                            <path d="M10 3L5 8L10 13" stroke="white" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                
+                    <!-- Seta direita -->
+                    <button class="arrow-btn arrow-next" id="next" aria-label="Próximo">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                            <path d="M6 3L11 8L6 13" stroke="white" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+
+                    <!-- Bolinhas -->
+                    <div class="dots">
+                        <div class="dot active" data-i="0"></div>
+                        <div class="dot" data-i="1"></div>
+                        <div class="dot" data-i="2"></div>
+                    </div>
+                </div>
+                <a href="https://luna.amazon.com/claims/home"><button id="btnCatalog">Acessar Catálogo</button></a>
+            </section>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>
