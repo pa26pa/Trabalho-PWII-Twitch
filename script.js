@@ -20,7 +20,8 @@ document.addEventListener('DOMContentLoaded', function () {
         window.addEventListener('scroll', function () {
             if (window.scrollY > 80) {//scrollY: distância em pixels que o documento foi rolado verticalmente
                 header.classList.add('shrink'); //adiciona a classe 'shrink' ao header
-                header.classList.remove('shrink');
+            } else {
+                header.classList.remove('shrink'); //remove a classe 'shrink' do header
             }
         });
     }
