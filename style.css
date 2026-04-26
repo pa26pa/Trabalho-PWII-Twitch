@@ -91,9 +91,9 @@
     height: 40px;
     border-radius: 10px;
     background-color: #9147FF;
-    color: #F4ECFF;
+    color: #000000;
     font-size: 1em;
-    font-weight: lighter;
+    font-weight: bold;
     border: none;
     cursor: pointer;
 }

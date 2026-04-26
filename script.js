@@ -407,15 +407,23 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     //IDIOMAS - TRADUÇÕES
-    const submenuIdioma = document.getElementById('language-submenu');
+    const languageItem = document.getElementById('language-item');
+    const languageSubmenu = document.getElementById('language-submenu');
 
-    document.querySelectorAll('.opcao-idioma').forEach(btn => {
-        btn.addEventListener('click', () => {
-            putLanguage(btn.dataset.lang);
-            submenuIdioma.classList.remove('show');
-            dropdownMenu.classList.remove('show');
+    if (languageItem && languageSubmenu) {
+        languageItem.addEventListener('click', (e) => {
+            if (e.target.closest('.opcao-idioma')) {
+                const btn = e.target.closest('.opcao-idioma');
+                console.log('idioma clicado:', btn.dataset.lang);
+                putLanguage(btn.dataset.lang);
+                languageSubmenu.classList.remove('show');
+                dropdownMenu.classList.remove('show');
+                return;
+            }
+            e.stopPropagation();
+            languageSubmenu.classList.toggle('show');
         });
-    });
+    }        
 
     //----------------LUNA--------------------
     // CARROSSEL 

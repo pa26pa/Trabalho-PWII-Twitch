@@ -4,7 +4,7 @@ const translationCache = {};
 async function translateText(text, targetLanguage) {
     if (targetLanguage === 'pt') return text; // Retorna o texto original
 
-    const cacheKey = `${text}-${targetLanguage}`;
+    const cacheKey = `${text}_${targetLanguage}`;
     if (translationCache[cacheKey]) return translationCache[cacheKey];//retorna do cache se já foi traduzido
 
     try {
@@ -13,7 +13,7 @@ async function translateText(text, targetLanguage) {
         const data = await response.json();
         const translate = data.responseData.translatedText;
 
-        transslateCache[cacheKey] = translate;//salva no cache
+        translationCache[cacheKey] = translate;//salva no cache
         return translate;
     } catch (err) {
         console.error('Erro na tradução:', err);
@@ -22,9 +22,11 @@ async function translateText(text, targetLanguage) {
 }
 
 async function putLanguage(lang) {
+    console.log('aplicando idioma:', lang);
     localStorage.setItem('idioma', lang);
 
     const elements = document.querySelectorAll('[data-i18n]');
+    console.log('elementos encontrados:', elements.length);
 
     //traduz todos em paralelo (mais rápido que um por um)
     await Promise.all(Array.from(elements).map(async el => {
@@ -49,8 +51,8 @@ async function putLanguage(lang) {
     }));
 }
 
-//aplica ao carregar a página
-const savedLanguage = localStorage.getItem('idioma') || 'pt';
 document.addEventListener('DOMContentLoaded', () => {
+    //aplica ao carregar a página
+    const savedLanguage = localStorage.getItem('idioma') || 'pt';
     putLanguage(savedLanguage);
 });
