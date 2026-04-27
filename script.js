@@ -412,8 +412,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     if (languageItem && languageSubmenu) {
         languageItem.addEventListener('click', (e) => {
-            if (e.target.closest('.opcao-idioma')) {
-                const btn = e.target.closest('.opcao-idioma');
+            if (e.target.closest('.language-option')) {
+                const btn = e.target.closest('.language-option');
                 console.log('idioma clicado:', btn.dataset.lang);
                 putLanguage(btn.dataset.lang);
                 languageSubmenu.classList.remove('show');

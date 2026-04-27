@@ -4,26 +4,34 @@
     box-sizing: border-box;
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
     font-size: 15px;
+} 
+.logo {
+    width: 250px; 
+    display: flex;
+    justify-content: flex-start;
+    padding-left: 20px;
 }
-#logo {width: 60px;}
+#logo{width: 60px;}
 
 /*HEADER*/
 #header {
     position: sticky; /*mantém o header fixo no topo da página mesmo ao rolar o conteúdo*/
     top: 0;
     display: grid; /*organiza os elementos do header em uma grade*/
-    grid-template-columns: 90px 1fr 250px; /*define as colunas da grade: 90px logo, 1fr menu, 150px barra de pesquisa*/
+    grid-template-columns: 250px 1fr 250px; /*define as colunas da grade: 90px logo, 1fr menu, 150px barra de pesquisa*/
     place-items: center; /*alinha os itens da grade ao centro horizontalmente e verticalmente*/
     width: 100%;
-    height: 90px;
+    height: 10%;
     background-color: #DEC7FF;
     transition: all 0.1s ease; /*transição suave para as mudanças de estilo, como ao encolher o header*/
     border-bottom: 2px solid #48237f;
     z-index: 10;
+    border: 4px solid red;
 }
 .header-center {
     line-height: 40px; /*altura da linhaentre elementos*/
     justify-items: center;
+    border: 4px solid red;
 }
 
 /*MENU SUPERIOR*/
@@ -85,6 +93,7 @@
     margin-right: 30px;
     align-items: center;
     justify-content: flex-end;
+    border: 4px solid red;
 }
 .open-modal {
     width: 70px;
@@ -139,7 +148,7 @@
 ficar cada elemento após a rolagem, no .shrink*/
 #header.shrink {
     padding: 3px;
-    height: 60px;
+    height: 8%;
     transition: all 0.8s ease;
 }
 /*esconder menu superior*/
@@ -176,7 +185,6 @@ body.modal-open {
     margin: 0 auto;
     width: 550px;
     height: 700px;
-    min-height: 650px;
     display: none;
     padding: 10px;
     border: none;
