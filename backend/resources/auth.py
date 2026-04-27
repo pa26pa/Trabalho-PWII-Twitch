@@ -66,7 +66,7 @@ class signin(Resource):
                 'mensagem':'Já existe um usuário com este CPF, email ou nome de usuario'
             }, 400
             
-       
+    
 
         
         # inserindo as info no BD

@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // TROCA DE CARDS RECEBER CÓDIGO → INSERIR CÓDIGO
     const btnreceberCodigo = document.getElementById('receber-codigo');
     const insertcodeBox = document.getElementById('insert-code');
-    const inputEmail = document.getElementById('email');
+    const inputEmail = document.getElementById('email_forgot');
 
     if (btnreceberCodigo && insertcodeBox && inputEmail) {  // ← proteção do bloco inteiro
         inputEmail.addEventListener('input', function () {
@@ -298,7 +298,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (!validarSenha(senhaInput, erroSenha)) envio = false;
             });
             if (!envio) {//se envio for false, ou seja, se alguma validação falhou, o formulário não será enviado e as mensagens de erro serão exibidas
-                
                 form.reportValidity();
             } else {
                 const dados = {
