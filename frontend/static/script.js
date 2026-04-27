@@ -320,7 +320,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 })
                 .then(res => res.json())
                 .then(data => {
-                    mostrarToast(data.mensagem, data.status)
+                    if (data.status == 'error'){
+                        mostrarToast(data.mensagem, data.status)
+                    }
+                    
                 });
             }
 
@@ -339,7 +342,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 })
                 .then(res => res.json())
                 .then(data => {
-                    mostrarToast(data.mensagem, data.status)
+                    if (data.status == 'error'){
+                        mostrarToast(data.mensagem, data.status)
                 });
             }
         });

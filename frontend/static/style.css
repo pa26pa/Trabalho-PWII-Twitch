@@ -845,16 +845,17 @@ aside.open #back-aside:hover {
 
 /* OIEEE aqui é a leta, to fazendo os negocio do TOAST*/
 #toast {
-    position: fixed;
-    top: 10px;
-    left: 45%;
+    position: absolute;
+    margin: 0 auto;
+    /* top: 10px;
+    left: 45%; */
     padding: 14px 24px;
     border-radius: 8px;
     color: white;
     font-size: 1em;
     opacity: 0;
     transition: opacity 0.4s ease;
-    z-index: 9999;
+    z-index: 999;
     max-width: 300px;
 }
 
