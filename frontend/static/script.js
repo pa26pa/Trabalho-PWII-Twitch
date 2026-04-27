@@ -284,7 +284,7 @@ document.addEventListener('DOMContentLoaded', function () {
         setTimeout(() => toast.className = '', 5000); 
     }
 
-    // ENVIO DO FORM
+    // ENVIO DOS FORMS
     document.querySelectorAll('.forms').forEach(form => {
         form.addEventListener('submit', function (validarForm) {
             validarForm.preventDefault();
@@ -299,7 +299,9 @@ document.addEventListener('DOMContentLoaded', function () {
             });
             if (!envio) {//se envio for false, ou seja, se alguma validação falhou, o formulário não será enviado e as mensagens de erro serão exibidas
                 form.reportValidity();
-            } else {
+            } 
+            
+            if (form.classList.contains('sign')) {
                 const dados = {
                     cpf: document.getElementById("cpf").value,
                     email: document.getElementById("email").value,
@@ -321,8 +323,29 @@ document.addEventListener('DOMContentLoaded', function () {
                     mostrarToast(data.mensagem, data.status)
                 });
             }
+
+            if (form.classList.contains('login')) {
+                const dados = {
+                    username_email: document.getElementById('user_email').value,
+                    senha: document.getElementById('senha_login').value
+                }
+
+                fetch("http://127.0.0.1:5000/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(dados)
+                })
+                .then(res => res.json())
+                .then(data => {
+                    mostrarToast(data.mensagem, data.status)
+                });
+            }
         });
     });
+
+    
 
     const closeButtons = document.querySelectorAll('.close-modal');
     closeButtons.forEach(button => {

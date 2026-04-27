@@ -103,6 +103,13 @@ class login(Resource):
         con = connection()
         cursor = con.cursor(pymysql.cursors.DictCursor)
         
+        # chckando se ele já está logado
+        if 'usuario_id' in session:
+            return {
+                'status':'error',
+                'mensagem':'Você já está logado'
+            }, 400
+            
         #retirando dados do js
         username_email = data.get('username_email')
         senha = data.get('senha')
