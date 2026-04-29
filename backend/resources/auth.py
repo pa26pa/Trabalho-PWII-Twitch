@@ -9,6 +9,7 @@ import mimetypes
 from backend.database.connection import connection, send_code, email_valido, data_valida
 from datetime import date, datetime, timedelta
 from email_validator import validate_email, EmailNotValidError
+from deep_translator import GoogleTranslator
 #from main import app, google, User
 # criação do signin
 class signin(Resource):
@@ -413,3 +414,18 @@ class block_code(Resource):
             'status':'success',
             'mensagem':'Seu código espirou'
         }, 200
+        
+class translate(Resource):
+    def post(self):
+        data = request.get_json()
+        
+        lingua = data.get('lang')
+        texto = data.get('texto')
+        
+        traducao = GoogleTranslator(source='pt', target=lingua).translate(texto)
+        return {
+            'status':'success',
+            'mensagem':'tradução deita com sucesso',
+            'texto': texto
+        }
+        

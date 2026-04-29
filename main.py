@@ -1,6 +1,6 @@
 from flask import Flask, render_template
 from flask_restful import Api, Resource
-from backend.resources.auth import signin, login, forgot, redefine_password, search, resend_code, check_codigo, google
+from backend.resources.auth import signin, login, forgot, redefine_password, search,translate, resend_code, check_codigo, google
 from dotenv import load_dotenv
 from authlib.integrations.flask_client import OAuth
 import os
@@ -25,12 +25,12 @@ oauth = OAuth(app)
 
 #  é pra ficar mais fácil, porque ele abre o site 
 @app.route("/")
-def home():
+def home():  
     return render_template("inicio.html")
 
-@app.route("/luna")
+@app.route("/moon")
 def luna():
-    return render_template("luna.html")
+    return render_template("moon.html")
 
 # Aqui eu defino os endpoints que o js pode acessar, e defino uma função para cada um delessssssss
 api.add_resource(signin,'/signin')
@@ -43,6 +43,7 @@ api.add_resource(check_codigo,'/check_codigo')
 api.add_resource(redefine_password,'/redefine_password')
 
 api.add_resource(search,'/search')
+api.add_resource(translate,'/traduzir')
 
 # É só pra garantir que só se pode rodar ele pela main
 if __name__ == "__main__":
