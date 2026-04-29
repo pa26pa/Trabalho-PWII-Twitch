@@ -369,7 +369,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // MENU LATERAL
     const backAside = document.getElementById('back-aside');
     const aside = document.querySelector('aside');
-    if (backAside && aside) {  // ← proteção (luna.html não tem aside)
+    if (backAside && aside) {  // ← proteção (moon.html não tem aside)
         let asideOpen = true;
         aside.classList.add('open'); // ← começa aberto
 
@@ -407,17 +407,25 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     //IDIOMAS - TRADUÇÕES
-    const submenuIdioma = document.getElementById('language-submenu');
+    const languageItem = document.getElementById('language-item');
+    const languageSubmenu = document.getElementById('language-submenu');
 
-    document.querySelectorAll('.opcao-idioma').forEach(btn => {
-        btn.addEventListener('click', () => {
-            putLanguage(btn.dataset.lang);
-            submenuIdioma.classList.remove('show');
-            dropdownMenu.classList.remove('show');
+    if (languageItem && languageSubmenu) {
+        languageItem.addEventListener('click', (e) => {
+            if (e.target.closest('.language-option')) {
+                const btn = e.target.closest('.language-option');
+                console.log('idioma clicado:', btn.dataset.lang);
+                putLanguage(btn.dataset.lang);
+                languageSubmenu.classList.remove('show');
+                dropdownMenu.classList.remove('show');
+                return;
+            }
+            e.stopPropagation();
+            languageSubmenu.classList.toggle('show');
         });
-    });
+    }        
 
-    //----------------LUNA--------------------
+    //----------------MOON--------------------
     // CARROSSEL 
     const carousel = document.querySelector('.carousel-wrap');
     const track = document.getElementById('track');
