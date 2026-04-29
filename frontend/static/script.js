@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // TROCA DE CARDS RECEBER CÓDIGO → INSERIR CÓDIGO
     const btnreceberCodigo = document.getElementById('receber-codigo');
     const insertcodeBox = document.getElementById('insert-code');
-    const inputEmail = document.getElementById('email');
+    const inputEmail = document.getElementById('email_forgot');
 
     if (btnreceberCodigo && insertcodeBox && inputEmail) {  // ← proteção do bloco inteiro
         inputEmail.addEventListener('input', function () {
@@ -334,6 +334,26 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
 
                 fetch("http://127.0.0.1:5000/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(dados)
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status == 'error'){
+                        mostrarToast(data.mensagem, data.status)
+                    }
+                });
+            }
+
+            if (form.classList.contains('email-forgot')) {
+                const dados = {
+                    email: document.getElementById('email_forgot').value
+                }
+
+                fetch("http://127.0.0.1:5000/forgot", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"

@@ -32,13 +32,9 @@ class signin(Resource):
         # vendo se o email é valido 
         valido = email_valido(email)
         if valido == False:
-            print(cpf)
-            print(user_name)
-            print(email)
-            print(senha)
             return {
                 'status':'error',
-                'mensagem':f'Este email não é valido {email}'
+                'mensagem':'Este email não é valido'
             }, 400
         
         email = valido
@@ -220,7 +216,7 @@ class auth_google(Resource):
         return {
             'status':'success',
             'mensagem':f'{mensagem}.'
-        }
+        }, 500
         
 class forgot(Resource):
     def post(self):
@@ -230,8 +226,16 @@ class forgot(Resource):
         cursor = con.cursor()
         
         # pegando email do js
-        email_forgot = str(data.get('email_forgot'))
+        email_forgot = str(data.get('email'))
         
+        valido = email_valido(email_forgot)
+        
+        if not valido:
+            return {
+                'status':'error',
+                'mensagem':'esse email não é valido'
+            }, 400
+            
         # vendo se o email existe e está cadastrado
         query = """select * from usuarios where email = %s"""
         cursor.execute(query,(email_forgot,))
