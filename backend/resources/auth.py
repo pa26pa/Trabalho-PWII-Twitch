@@ -42,7 +42,7 @@ class signin(Resource):
         #reorganizando a data para que entre direitinho no BD
         data_formatada = data_valida(data_nascimento)
         
-        
+        print(data_formatada)
         # fazendo hash na senhaaaaaa :)
         senha_hash = generate_password_hash(senha)
         
@@ -421,15 +421,21 @@ class block_code(Resource):
         
 class translate(Resource):
     def post(self):
-        data = request.get_json()
+        data = request.json
         
-        lingua = data.get('lang')
-        texto = data.get('texto')
+        lingua = data['lang']
+        texto = data['textos']
+        lingua_atual = data['source']
         
-        traducao = GoogleTranslator(source='pt', target=lingua).translate(texto)
+        
+        print(f"source: {lingua_atual}, target: {lingua}") # ← adiciona isso
+        print(f"textos recebidos: {texto[:3]}") # ← mostra os 3 primeiros
+        
+        traducoes = GoogleTranslator(source=lingua_atual, target=lingua).translate_batch(texto)
+        
         return {
             'status':'success',
             'mensagem':'tradução deita com sucesso',
-            'texto': texto
+            'traducoes': traducoes
         }
         

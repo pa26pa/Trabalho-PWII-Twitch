@@ -32,6 +32,10 @@ def home():
 def luna():
     return render_template("moon.html")
 
+@app.route("/config")
+def config():
+    return render_template('config.html')
+
 # Aqui eu defino os endpoints que o js pode acessar, e defino uma função para cada um delessssssss
 api.add_resource(signin,'/signin')
 api.add_resource(login,'/login')

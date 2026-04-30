@@ -64,6 +64,7 @@ def email_valido(email):
 def data_valida(data):
     try:
         a = datetime.strptime(data, '%Y-%m-%d').strftime('%Y-%m-%d')
-    
+        return a
     except ValueError:
         a = datetime.strptime(data, '%d/%m/%Y').strftime('%Y-%m-%d')
+        return a
