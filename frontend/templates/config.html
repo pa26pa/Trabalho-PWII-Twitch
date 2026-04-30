@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n>Witch | Configurações</title>
+    <link rel="stylesheet" href="{{url_for('static', filename='style.css')}}">
+    <link rel="icon" type="image/x-icon" href="{{url_for('static', filename='logo1.png')}}">
+</head>
+<body>
+    <header id="header">
+        <div class="logo"><a href="inicio.html"><img id="logo" src="{{url_for('static', filename='logo1.png')}}" alt="logo"></a></div>
+        <div class="header-center">
+            <!--MENU SUPERIOR-->
+            <div class="top-menu">
+                <nav><a class="menu-nav home-page" href="inicio.html" data-i18n>Início</a></nav>
+                <nav><a class="menu-nav following-page" href="seguindo.html" data-i18n>Seguindo</a></nav>
+                <nav><a class="menu-nav explore-page" href="explorar.html" data-i18n>Explorar</a></nav>
+            </div>
+            <!--BARRA DE PESQUISA-->
+            <div class="bottom-menu">
+                <div class="search-bar">
+                    <div class="search-icon">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </div> 
+                    <input type="text" id="search" placeholder="Pesquise aqui" data-i18n-placeholder>
+                </div>
+            </div>
+        </div>
+
+        <div class="menu-modals">
+            <a href="{{url_for('luna')}}" target="_blank" aria-placeholder="Luna"><img src="{{url_for('static', filename='coroa.png')}}" id="luna" alt="coroa"></a>
+            <!--MENU HAMBÚRGUER-->
+            <div class="dropdown-menu-wrap">
+                <button class="open-modal" id="btn-dropdown">
+                    <img src="{{url_for('static', filename='menu.png')}}" alt="menu" id="menu-icon">
+                </button>
+
+                <div id="dropdown-menu" class="dropdown-menu">
+                    <ul>
+                        <li id="language-item" class="submenu-item">
+                            <span data-i18n>Idioma</span>
+                            <span class="arrow">></span>
+
+                            <div id="language-submenu" class="submenu">
+                                <ul>
+                                    <li class="language-option" data-lang="pt">🇧🇷 Português</li>
+                                    <li class="language-option" data-lang="en">🇺🇸 English</li>
+                                    <li class="language-option" data-lang="es">🇪🇸 Español</li>
+                                </ul>
+                            </div>
+                        </li>
+                        <hr>
+                        <li class="toggle-item">
+                            <span data-i18n>Tema Escuro</span>
+                            <label class="switch">
+                                <input type="checkbox" id="dark-theme">
+                                <span class="slider"></span>
+                            </label>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <script src="{{url_for('static', filename='script.js')}}"></script>
+</body>
+</html>
