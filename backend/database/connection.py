@@ -2,7 +2,7 @@ import smtplib
 from email.message import EmailMessage
 import pymysql
 import random
-from flask import Flask
+from flask import Flask, json
 from email_validator import EmailNotValidError, validate_email
 from datetime import datetime
 from dotenv import load_dotenv
@@ -68,3 +68,16 @@ def data_valida(data):
     except ValueError:
         a = datetime.strptime(data, '%d/%m/%Y').strftime('%Y-%m-%d')
         return a
+
+file = 'tradução.json'
+def carregar():
+    if os.path.exists(file):
+        with open(file, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    return {}
+
+def salvar(cache):
+    with open(file, 'w', encoding='utf-8') as f:
+        json.dump(cache, f, ensure_ascii=False, indent=2)
+
+cache_traducoes = carregar()

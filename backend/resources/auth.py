@@ -6,12 +6,14 @@ import random
 import smtplib
 from email.message import EmailMessage
 import mimetypes
-from backend.database.connection import connection, send_code, email_valido, data_valida
+from backend.database.connection import connection, send_code, email_valido, data_valida, carregar, salvar, cache_traducoes, file
 from datetime import date, datetime, timedelta
 from email_validator import validate_email, EmailNotValidError
 from deep_translator import GoogleTranslator
+import time
 #from main import app, google, User
 # criação do signin
+
 class signin(Resource):
     def post(self):
         data = request.get_json()
@@ -421,21 +423,42 @@ class block_code(Resource):
         
 class translate(Resource):
     def post(self):
+        inicio = time.time()
+        
         data = request.json
-        
         lingua = data['lang']
-        texto = data['textos']
-        lingua_atual = data['source']
+        textos = data['textos']
+
+        traducoes = []
+        textos_para_traduzir = []
+        indices_para_traduzir = []
+
+        # verifica quais já estão no cache
+        for i, texto in enumerate(textos):
+            chave = f"{texto}_{lingua}"
+            if chave in cache_traducoes:
+                traducoes.append(cache_traducoes[chave])  # ← usa do cache
+            else:
+                traducoes.append(None)
+                textos_para_traduzir.append(texto)
+                indices_para_traduzir.append(i)
+
+        # traduz só os que faltam
+        if textos_para_traduzir:
+            novas = GoogleTranslator(source='pt', target=lingua).translate_batch(textos_para_traduzir)
+            
+            for i, (texto, traducao) in enumerate(zip(textos_para_traduzir, novas)):
+                chave = f"{texto}_{lingua}"
+                cache_traducoes[chave] = traducao  # ← salva no cache
+                traducoes[indices_para_traduzir[i]] = traducao
+            
+            salvar(cache_traducoes)  # ← salva o arquivo
+        fim = time.time()
         
-        
-        print(f"source: {lingua_atual}, target: {lingua}") # ← adiciona isso
-        print(f"textos recebidos: {texto[:3]}") # ← mostra os 3 primeiros
-        
-        traducoes = GoogleTranslator(source=lingua_atual, target=lingua).translate_batch(texto)
-        
+        print(fim - inicio)
         return {
-            'status':'success',
-            'mensagem':'tradução deita com sucesso',
+            'status': 'success',
+            'mensagem': 'tradução feita com sucesso',
             'traducoes': traducoes
         }
         
