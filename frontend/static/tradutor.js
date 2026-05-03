@@ -61,10 +61,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         el.dataset.originalPlaceholder = el.placeholder;
     });
 
-    // aplica o idioma salvo PRIMEIRO — sem travar a página
     await putLanguage(currentLanguage);
 
-    // pré-carrega os outros idiomas em segundo plano (sem await)
+
     const outrosIdiomas = ['en', 'es', 'pt'].filter(l => l !== currentLanguage);
     Promise.all(outrosIdiomas.map(lang => putLanguage(lang))); // ← sem await!
 });

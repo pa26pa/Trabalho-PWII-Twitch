@@ -348,11 +348,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 });
             }
 
-            if (form.classList.contains('email-forgot')) {
+            if (form.classList.contains('email')) {
                 const dados = {
                     email: document.getElementById('email_forgot').value
                 }
-
+                console.log('yeyyyyyyyyyy')
                 fetch("http://127.0.0.1:5000/forgot", {
                 method: "POST",
                 headers: {
