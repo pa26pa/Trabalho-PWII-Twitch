@@ -37,7 +37,7 @@ class signin(Resource):
             return {
                 'status':'error',
                 'mensagem':'Este email não é valido'
-            }, 400
+            }, 406
         
         email = valido
         
@@ -63,7 +63,7 @@ class signin(Resource):
             return{
                 'status':'error',
                 'mensagem':'Já existe um usuário com este CPF, email ou nome de usuario'
-            }, 400
+            }, 406
             
     
 
@@ -86,14 +86,14 @@ class signin(Resource):
         return {
             'status':'success',
             'mensagem':'O cadastro foi feito com sucesso'
-        }, 200
+        }, 201
   
     def get(self):
         # Só pra deixar organizado e deixar claro que get não está desponivel
         return{
             'status':'error',
             'mensagem':'get não é um metodo aceito'
-        }, 400
+        }, 405
 
 class login(Resource):
     def post(self):
@@ -128,7 +128,7 @@ class login(Resource):
             return {
                 'status':'success',
                 'mensagem':'Login feito com sucesso'
-            }, 200
+            }, 202
         
         else:
             
@@ -137,13 +137,13 @@ class login(Resource):
             return {
                 'status':'error',
                 'mensagem':'Email, nome de usuario ou senha incorretos'
-            }, 400
+            }, 401
     
     def get(self):
         return{
             'status':'error',
             'mensagem':'get não é um metodo aceito'
-        }, 400
+        }, 405
 
 class logout(Resource):
     def post(self):
@@ -157,7 +157,7 @@ class logout(Resource):
         return {
             'status':'error',
             'mensagem':'Esse metodo não é reconhecido'
-        }, 500
+        }, 405
         
 class check_login(Resource):
     def post(self):
@@ -230,13 +230,15 @@ class forgot(Resource):
         # pegando email do js
         email_forgot = str(data.get('email'))
         
+        print(email_forgot)
+
         valido = email_valido(email_forgot)
         
         if not valido:
             return {
                 'status':'error',
                 'mensagem':'esse email não é valido'
-            }, 400
+            }, 401
             
         # vendo se o email existe e está cadastrado
         query = """select * from usuarios where email = %s"""
@@ -251,7 +253,7 @@ class forgot(Resource):
             return{
                 'status':'error',
                 'mensagem':'Este email ainda não está cadastrado'
-            }
+            }, 404
             
         email = email_forgot
         
@@ -277,7 +279,7 @@ class forgot(Resource):
         return{
             'status':'error',
             'mensagem':'get não é um metodo aceito'
-        }, 400  
+        }, 405
 
 class resend_code(Resource):
     def get(self):
@@ -320,13 +322,13 @@ class check_codigo(Resource):
             return {
                 'status':'error',
                 'mensagem':'Código invalido'
-            }, 400
+            }, 401
         
         session.pop('code')
         return{
             'status':'success',
             'mensagem':'Codigo correto'
-        }
+        }, 200
 class redefine_password(Resource):
     def post(self):
         data = request.get_json()
@@ -357,7 +359,7 @@ class redefine_password(Resource):
         return{
             'status':'error',
             'mensagem':'get não é um metodo aceito'
-        }, 400  
+        }, 405
 
 class subscribe(Resource):
     def post(self):
@@ -410,7 +412,7 @@ class search(Resource):
             'status':'success',
             'mensagem':'Resultados da pesquisa',
             'resultado':f'{usuarios},{streams}'
-        }
+        }, 200
 
 class block_code(Resource):
     def get(self):
@@ -423,8 +425,7 @@ class block_code(Resource):
         
 class translate(Resource):
     def post(self):
-        inicio = time.time()
-        
+    
         data = request.json
         lingua = data['lang']
         textos = data['textos']
@@ -437,7 +438,7 @@ class translate(Resource):
         for i, texto in enumerate(textos):
             chave = f"{texto}_{lingua}"
             if chave in cache_traducoes:
-                traducoes.append(cache_traducoes[chave])  # ← usa do cache
+                traducoes.append(cache_traducoes[chave]) 
             else:
                 traducoes.append(None)
                 textos_para_traduzir.append(texto)
@@ -449,16 +450,14 @@ class translate(Resource):
             
             for i, (texto, traducao) in enumerate(zip(textos_para_traduzir, novas)):
                 chave = f"{texto}_{lingua}"
-                cache_traducoes[chave] = traducao  # ← salva no cache
+                cache_traducoes[chave] = traducao  
                 traducoes[indices_para_traduzir[i]] = traducao
             
-            salvar(cache_traducoes)  # ← salva o arquivo
-        fim = time.time()
-        
-        print(fim - inicio)
+            salvar(cache_traducoes)  
+
         return {
             'status': 'success',
             'mensagem': 'tradução feita com sucesso',
             'traducoes': traducoes
-        }
+        }, 200
         
