@@ -13,6 +13,10 @@
 }
 #logo{width: 60px;}
 
+/*ALTERNÂNCIA ENTRE LOGADO E DESLOGADO*/
+.with-login  { display: none; } /* começa escondido */
+.without-login { display: flex; align-items: center; gap: 12px; }
+
 /*HEADER*/
 #header {
     position: sticky; /*mantém o header fixo no topo da página mesmo ao rolar o conteúdo*/
@@ -111,6 +115,21 @@
     color: #eee7fa;
     transition: all 0.3s ease;
 }
+/*quando estiver logado troca "Entrar" pelo "Turbo"*/
+#btn-turbo {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: #9147FF;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+#btn-turbo:hover { background: #7029db; }
+#turbo-icon { width: 22px; }
 
 /*div do X e do checkbox*/
 .form-header {
@@ -171,7 +190,7 @@ ficar cada elemento após a rolagem, no .shrink*/
     transition: all 0.5s ease;
 }
 #header.shrink .open-modal:first-child {
-    width: 60px;
+    width: 45px;
 }
 
 /*MODALS DO HEADER*/
@@ -542,6 +561,27 @@ aside.open #back-aside:hover {
     transform: translateX(10px);
     transition: transform 0.2s;
 }
+/* pessoinha no dropdown button quando logado */
+#pessoa-icon { width: 28px; border-radius: 50%; }
+
+/* links do aside */
+.aside-link {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #48237f;
+    text-decoration: none;
+    font-size: 1em;
+    padding: 8px 12px;
+    border-radius: 8px;
+    width: 85%;
+    transition: background 0.2s;
+}
+.aside-link:hover { background: #c7b2e7; }
+
+#aside-config { bottom: 80px; } /* acima de Ajuda */
+.aside-link:last-child { bottom: 30px; } /* Ajuda */
 
 /*MENU DROPDOWN*/
 .dropdown-menu-wrap {
@@ -595,6 +635,21 @@ aside.open #back-aside:hover {
     color: #251738;
     font-size: 1em;
     font-weight: bold;
+}
+/* avatar + nome no dropdown */
+#dropdown-usuario {
+    padding: 12px 15px;
+    gap: 10px;
+    font-weight: bold;
+    cursor: default;
+}
+#dropdown-usuario:hover { background: transparent; } /* sem hover nesse item */
+#avatar-dropdown {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    background: #9147FF;
 }
 
 /*TOGGLE SWITCH (DARK THEME)*/
@@ -796,13 +851,11 @@ aside.open #back-aside:hover {
 /*@media = "if"*/
 @media (max-width: 768px) {/*desktop-first; min-width: 768px = mobile-first*/
     #header {
-        grid-template-columns: 70px 1fr 150px;
+        grid-template-columns: 100px 1fr 100px;
         gap: 10px;
         transition: all 0.8s ease;
     }
-    #header.shrink {
-        transition: all 0.8s ease;
-    }
+    #header.shrink {transition: all 0.8s ease;}
     .search-bar {
         width: 200px;
         transition: all 0.8s ease;
@@ -824,15 +877,12 @@ aside.open #back-aside:hover {
         transition: all 0.8s ease;
     }
     #header.shrink #logo {
-        width: 40px;
+        width: 30px;
         transition: all 0.8s ease;
     }
-    .menu-modals {
+    #header.shrink .menu-modals, .menu-modals {
         gap: 10px;
-        justify-content: flex-end;
-    }
-    .open-modal:last-child {
-        width: 40px;
+        margin-right: 2px;
     }
     .open-modal {
         align-items: center;

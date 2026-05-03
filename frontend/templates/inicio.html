@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-i18n>Witch</title>
+    <title>Witch</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
     <link rel="stylesheet" href="{{url_for('static', filename='style.css')}}">
     <link rel="icon" type="image/x-icon" href="{{url_for('static', filename='logo1.png')}}">
@@ -31,8 +31,16 @@
 
         <div class="menu-modals">
             <a href="{{url_for('luna')}}" target="_blank" aria-placeholder="Luna"><img src="{{url_for('static', filename='coroa.png')}}" id="luna" alt="coroa"></a>
-            <!-- MODAL DO LOGIN -->
-            <button class="open-modal" data-modal="modal-1" data-i18n>Entrar</button>
+            <!--DESLOGADO-->
+            <div class="without-login">
+                <!-- MODAL DO LOGIN -->
+                <button class="open-modal" data-modal="modal-1" data-i18n>Entrar</button>
+            </div>
+            
+            <!--LOGADO-->
+            <div class="with-login">
+                <button id="btn-turbo" title="Turbo"><img src="{{url_for('static', filename='bateria.png')}}" alt=""></button>
+            </div>
 
             <!--dialog = modal-->
             <dialog id="modal-1">
@@ -169,14 +177,25 @@
                 
             </dialog>
 
-            <!--MENU HAMBÚRGUER-->
+            <!--DROPDOWN MENU-->
             <div class="dropdown-menu-wrap">
                 <button class="open-modal" id="btn-dropdown">
-                    <img src="{{url_for('static', filename='menu.png')}}" alt="menu" id="menu-icon">
+                    <!--DESLOGADO = HAMBURGUER-->
+                    <img src="{{url_for('static', filename='menu.png')}}" alt="menu" class="menu-icon without-login">
+                    <!--LOGADO = PESSOINHA-->
+                    <img src="{{url_for('static', filename='user.png')}}" alt="pessoinha" class="menu-icon with-login">
                 </button>
 
                 <div id="dropdown-menu" class="dropdown-menu">
                     <ul>
+                        <!--LOGADO-->
+                        <li class="with-login" id="dropdown-usuario">
+                            <img src="{{url_for('static', filename='user.png')}}" alt="avatar" id="avatar-dropdown">
+                            <span id="nome-dropdown">Usuário</span>
+                        </li>
+                        <hr class="with-login">
+
+                        <!--LOGADO OU NÃO-->
                         <li id="language-item" class="submenu-item">
                             <span data-i18n>Idioma</span>
                             <span class="arrow">></span>
@@ -197,6 +216,9 @@
                                 <span class="slider"></span>
                             </label>
                         </li>
+
+                        <!--LOGADO-->
+                        <li id="btn-logout" class="with-login">Sair</li>
                     </ul>
                 </div>
             </div>
@@ -213,8 +235,10 @@
             <p class="lives-aside"><div class="aside-photo"></div>Pessoa 3.0 <div class="viewers-aside">1.3M</div><div class="red-circle"></div></p>
             <p class="lives-aside"><div class="aside-photo"></div>Pessoa 4.0 <div class="viewers-aside">1.3M</div><div class="red-circle"></div></p>
         </div>
-        <button class="btn-config"><a href="{{url_for('config')}}">Configurações</a></button>
+        <!--CONFIGURAÇÕES APENAS QUANDO LOGADO-->
+        <a href="{{url_for('config')}}" class="aside-link with-login" id="aside-config">Configurações</a>
     </aside>
+
     <h1 id="texto">asdfghjklhhhh <br>
         sssssssssssssssss<br>ssssssssssssssssssssss<br>
     <br><br><br><br><br><br><br><br><br><br>ssssssssssssssss<br><br><br><br><br><br><br><br><br><br><br><br><br><br>sssssssssss</h1>

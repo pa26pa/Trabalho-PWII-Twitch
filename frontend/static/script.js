@@ -1,6 +1,45 @@
 //DOMContentLoaded garante que o script só rode depois de todo o HTML estar carregado
 document.addEventListener('DOMContentLoaded', function () {
 
+    // CONTROLE DE ESTADO LOGADO/DESLOGADO
+    function mostrarLogado(nome) {
+        // esconde elementos de deslogado, mostra de logado
+        document.querySelectorAll('.without-login').forEach(el => el.style.display = 'none');
+        document.querySelectorAll('.with-login').forEach(el => el.style.display = 'flex');
+
+        // nome no dropdown
+        const nomeDropdown = document.getElementById('nome-dropdown');
+        if (nomeDropdown) nomeDropdown.textContent = nome;
+    }
+
+    function mostrarDeslogado() {
+        document.querySelectorAll('.with-login').forEach(el => el.style.display = 'none');
+        document.querySelectorAll('.without-login').forEach(el => el.style.display = '');
+    }
+
+    // verifica sessão ao carregar
+    async function verificarSessao() {
+        try {
+            const res = await fetch('/session');
+            const data = await res.json();
+            data.logado ? mostrarLogado(data.nome) : mostrarDeslogado();
+        } catch {
+            mostrarDeslogado();
+        }
+    }
+
+    // logout
+    const btnLogout = document.getElementById('btn-logout');
+    if (btnLogout) {
+        btnLogout.addEventListener('click', async () => {
+            await fetch('/logout');
+            mostrarDeslogado();
+            if (dropdownMenu) dropdownMenu.classList.remove('show');
+        });
+    }
+    // chama ao carregar
+    verificarSessao();
+    
     // MODAIS
     const openButtons = document.querySelectorAll('.open-modal');
     openButtons.forEach(button => { // para cada botão de abrir modal
