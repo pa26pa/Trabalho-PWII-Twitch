@@ -9,8 +9,9 @@ import mimetypes
 from backend.database.connection import connection, send_code, email_valido, data_valida, carregar, salvar, cache_traducoes, file
 from datetime import date, datetime, timedelta
 from email_validator import validate_email, EmailNotValidError
-from deep_translator import GoogleTranslator
 import time
+
+
 #from main import app, google, User
 # criação do signin
 
@@ -459,5 +460,4 @@ class translate(Resource):
             'status': 'success',
             'mensagem': 'tradução feita com sucesso',
             'traducoes': traducoes
-        }, 200
-        
+        }, 200           

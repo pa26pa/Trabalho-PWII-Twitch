@@ -1,11 +1,11 @@
 from flask import Flask, render_template
 from flask_restful import Api, Resource
-from backend.resources.auth import signin, login, forgot, redefine_password, search,translate, resend_code, check_codigo, google
+from backend.resources.auth import signin, login, forgot, redefine_password, check_login ,search,translate, resend_code, check_codigo, google
 from dotenv import load_dotenv
 from authlib.integrations.flask_client import OAuth
 import os
 
-# aqui eu to carregando o .env pra que eu possa pegar as senhas dele
+# aqui eu to carregando o .env pra que eu possa pegar asn senhas dele
 load_dotenv()
 
 # Oiii prof aqui eu to expecificando aonde tão as pastas porque ele não tava encontrando
@@ -46,6 +46,7 @@ api.add_resource(resend_code,'/resend')
 api.add_resource(check_codigo,'/check_codigo')
 api.add_resource(redefine_password,'/redefine_password')
 
+api.add_resource(check_login, '/session')
 api.add_resource(search,'/search')
 api.add_resource(translate,'/traduzir')
 

@@ -11,6 +11,7 @@ colorama==0.4.6
 cryptography==46.0.7
 DateTime==6.0
 deep-translator==1.11.4
+deepl==1.30.0
 dnspython==2.8.0
 email-validator==2.3.0
 Flask==3.1.3
