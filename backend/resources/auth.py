@@ -9,6 +9,7 @@ import mimetypes
 from backend.database.connection import connection, send_code, email_valido, data_valida, carregar, salvar, cache_traducoes, file
 from datetime import date, datetime, timedelta
 from email_validator import validate_email, EmailNotValidError
+from deep_translator import GoogleTranslator
 import time
 
 

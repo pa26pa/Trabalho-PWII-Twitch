@@ -227,7 +227,7 @@
 
     <div id="toast"></div>
 
-    <aside>
+    <aside class="normal-aside">
         <button type="button" id="back-aside">&#8658;</button><br><br>
         <div class="lives-box">
             <p class="lives-aside"><div class="aside-photo"></div>Pessoa 1.0 <div class="viewers-aside">1.3M</div><div class="red-circle"></div></p>
@@ -237,6 +237,8 @@
         </div>
         <!--CONFIGURAÇÕES APENAS QUANDO LOGADO-->
         <a href="{{url_for('config')}}" class="aside-link with-login" id="aside-config">Configurações</a>
+
+        <a href="{{url_for('ajuda')}}" class="aside-link"><img src="{{url_for('static', filename='help.png')}}" alt="icon-help">Ajuda</a>
     </aside>
 
     <h1 id="texto">asdfghjklhhhh <br>

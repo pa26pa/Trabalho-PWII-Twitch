@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-i18n>Witch | Configurações</title>
+    <title>Witch | Configurações</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
     <link rel="stylesheet" href="{{url_for('static', filename='style.css')}}">
     <link rel="icon" type="image/x-icon" href="{{url_for('static', filename='witch.png')}}">
 </head>
-<body id="body-config">
+<body id="body-config"> 
     <header id="header">
         <div class="logo"><a href="{{url_for('config')}}"><img id="logo" src="{{url_for('static', filename='witch.png')}}" alt="logo"></a></div>
         <div class="header-center">
@@ -85,8 +85,10 @@
         <h1>Preferências</h1>
     </section>
 
-    <aside id="config-aside">
+    <aside class="small-aside">
         <a href="{{url_for('config')}}" class="aside-link" id="aside-config"><img src="{{url_for('static', filename='setting.png')}}" alt="icon-config"></a>
+
+        <a href="{{url_for('ajuda')}}" class="aside-link"><img src="{{url_for('static', filename='help.png')}}" alt="icon-help"></a>
     </aside>
 
     <script src="{{url_for('static', filename='tradutor.js')}}"></script>
