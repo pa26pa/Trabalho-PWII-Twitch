@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     // chama ao carregar
     verificarSessao();
-    
+
     // MODAIS
     const openButtons = document.querySelectorAll('.open-modal');
     openButtons.forEach(button => { // para cada botão de abrir modal
@@ -563,5 +563,28 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('next').addEventListener('click', () => goTo(current + 1));
         dots.forEach(d => d.addEventListener('click', () => goTo(+d.dataset.i)));//evento de clique para cada ponto de navegação, que chama a função goTo com o índice do slide correspondente ao ponto clicado, permitindo que o usuário navegue diretamente para um slide específico
         window.addEventListener('resize', () => goTo(current));//evento de resize para garantir que o carrossel se ajuste corretamente quando a janela for redimensionada, recalculando a posição do slide atual com base na nova largura dos slides
+    }
+
+    //---------------CONFIGURAÇÕS ---------------
+    const configNav = document.querySelectorAll('.nav-config a');
+    const configSections = document.querySelectorAll('.section-config');
+
+    if (configNav.length > 0) {
+        //marca o primeiro link como ativo por padrão
+        configNav[0].classList.add('active');
+
+        configNav.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                
+                //remove active de todos
+                configNav.forEach(l => l.classList.remove('active'));
+                configSections.forEach(s => s.classList.remove('active'));
+
+                //adiciona active no link clicado e na section correspondente
+                link.classList.add('active');
+                document.getElementById(link.dataset.target).classList.add('active');
+            })
+        })
     }
 });

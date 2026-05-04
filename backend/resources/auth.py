@@ -9,6 +9,7 @@ import mimetypes
 from backend.database.connection import connection, send_code, email_valido, data_valida, carregar, salvar, cache_traducoes, file
 from datetime import date, datetime, timedelta
 from email_validator import validate_email, EmailNotValidError
+from deep_translator import GoogleTranslator
 import time
 
 
@@ -157,6 +158,7 @@ class logout(Resource):
 class check_login(Resource):
     def get(self):
         if 'usuario_id' in session:
+           
             return {
                 'status':'success',
                 'mensagem':'logado'
@@ -166,6 +168,25 @@ class check_login(Resource):
             'status':'success',
             'mensagem':'não está logado'
         }, 200
+    
+class email(Resource):
+    def get(self):
+        con = connection()
+        cursor = con.cursor(pymysql.cursors.DictCursor)
+
+        email = """select email from usuarios where id_usuario = %s"""
+        cursor.execute(email,(session['usuario_id'],))
+        email_usuario = cursor.fetchone()
+
+        cursor.close()
+        con.close()
+
+        return {
+            'status':'success',
+            'mensagem':'Email encontrado',
+            'email': email_usuario
+        }, 200
+
 class google(Resource):
     def post(self):
         data = request.get_json()
@@ -455,3 +476,4 @@ class translate(Resource):
             'mensagem': 'tradução feita com sucesso',
             'traducoes': traducoes
         }, 200           
+

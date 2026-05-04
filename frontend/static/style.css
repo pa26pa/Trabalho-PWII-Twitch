@@ -2,7 +2,7 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-family: 'Times New Roman', Times, serif;
     font-size: 15px;
 } 
 .logo {
@@ -41,7 +41,7 @@
 /*MENU SUPERIOR*/
 .menu-nav {
     text-decoration: none;
-    color: #48237f;
+    color: #48287f;
     font-size: 1.2em;
     font-weight: bold;
 }
@@ -527,7 +527,7 @@ textarea:-webkit-autofill {
 }
 
 /*ASIDE*/
-aside {
+.normal-aside {
     position: fixed;
     top: 0;
     right: 0;
@@ -570,18 +570,19 @@ aside.open #back-aside:hover {
     display: flex;
     align-items: center;
     gap: 8px;
-    color: #48237f;
+    color: #000;
+    font-weight: bold;
     text-decoration: none;
-    font-size: 1em;
+    font-size: 1.5em;
     padding: 8px 12px;
     border-radius: 8px;
     width: 85%;
     transition: background 0.2s;
+    justify-content: center;
 }
 .aside-link:hover { background: #c7b2e7; }
-
-#aside-config { bottom: 80px; } /* acima de Ajuda */
-.aside-link:last-child { bottom: 30px; } /* Ajuda */
+#aside-config {bottom: 80px;}
+.normal-aside img {width: 30px;}
 
 /*MENU DROPDOWN*/
 .dropdown-menu-wrap {
@@ -847,6 +848,51 @@ aside.open #back-aside:hover {
     background-color: #351b5d;
     color: #e1cdff;
 }
+
+/*------------CONFIGURAÇÕES---------------*/
+#body-config {background-color: #F4ECFF;}
+.header-config {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100vw;
+    height: auto;
+    padding: 5px 30px;
+}
+.header-config h1 {font-size: 2.5em;}
+.nav-config {
+    display: flex;
+    width: 40%;
+}
+.nav-config a {
+    text-decoration: none;
+    color: black;
+    font-size: 1.2em;
+    border-right: 1px solid black;
+    padding: 0 5%;
+}
+.nav-config a:last-child {border: none;}
+.nav-config a:hover {text-decoration: underline;}
+
+/*SEÇOES DAS CONFIGURAÇÕES*/
+.section-config {display: none;}
+.section-config.active {display: flex;}
+.nav-config a.active {text-decoration: underline; font-weight: bold;}
+
+/*ASIDE DAS CONFIGURAÇÕES*/
+.small-aside {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 5%;
+    height: 100vh;
+    background-color: #ebe2f9;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.small-aside img {width: 40px;}
+.aside-link:last-child { bottom: 30px; }
 /*RESPONSIVIDADE = não é adaptar para telas, é permitir que o layout se adapte sozinho*/
 /*@media = "if"*/
 @media (max-width: 768px) {/*desktop-first; min-width: 768px = mobile-first*/
