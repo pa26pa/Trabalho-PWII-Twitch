@@ -6,18 +6,12 @@
     <title data-i18n>Witch | Configurações</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
     <link rel="stylesheet" href="{{url_for('static', filename='style.css')}}">
-    <link rel="icon" type="image/x-icon" href="{{url_for('static', filename='logo1.png')}}">
+    <link rel="icon" type="image/x-icon" href="{{url_for('static', filename='witch.png')}}">
 </head>
-<body>
+<body id="body-config">
     <header id="header">
-        <div class="logo"><a href="inicio.html"><img id="logo" src="{{url_for('static', filename='logo1.png')}}" alt="logo"></a></div>
+        <div class="logo"><a href="{{url_for('config')}}"><img id="logo" src="{{url_for('static', filename='witch.png')}}" alt="logo"></a></div>
         <div class="header-center">
-            <!--MENU SUPERIOR-->
-            <div class="top-menu">
-                <nav><a class="menu-nav home-page" href="inicio.html" data-i18n>Início</a></nav>
-                <nav><a class="menu-nav following-page" href="seguindo.html" data-i18n>Seguindo</a></nav>
-                <nav><a class="menu-nav explore-page" href="explorar.html" data-i18n>Explorar</a></nav>
-            </div>
             <!--BARRA DE PESQUISA-->
             <div class="bottom-menu">
                 <div class="search-bar">
@@ -31,10 +25,13 @@
 
         <div class="menu-modals">
             <a href="{{url_for('luna')}}" target="_blank" aria-placeholder="Luna"><img src="{{url_for('static', filename='coroa.png')}}" id="luna" alt="coroa"></a>
+            
+            <button id="btn-turbo" title="Turbo"><img src="{{url_for('static', filename='bateria.png')}}" alt=""></button>
+            
             <!--MENU HAMBÚRGUER-->
             <div class="dropdown-menu-wrap">
                 <button class="open-modal" id="btn-dropdown">
-                    <img src="{{url_for('static', filename='menu.png')}}" alt="menu" id="menu-icon">
+                    <img src="{{url_for('static', filename='user.png')}}" alt="menu" id="menu-icon">
                 </button>
 
                 <div id="dropdown-menu" class="dropdown-menu">
@@ -65,10 +62,34 @@
         </div>
     </header>
 
-    <h1 id="texto">asdfghjklhhhh <br>
-        sssssssssssssssss<br>ssssssssssssssssssssss<br>
-    <br><br><br><br><br><br><br><br><br><br>ssssssssssssssss<br><br><br><br><br><br><br><br><br><br><br><br><br><br>sssssssssss</h1>
+    <div class="header-config">
+        <h1 data-i18n>Configurações</h1>
+        <nav class="nav-config">
+            <a data-i18n href="#" data-target="seg">Segurança</a>
+            <a data-i18n href="#" data-target="not">Notificações</a>
+            <a data-i18n href="#" data-target="con">Conexões</a>
+            <a data-i18n href="#" data-target="pref">Preferências</a>
+        </nav>
+    </div>
 
+    <section id="seg" class="section-config active">
+        <h1>Segurança</h1>
+    </section>
+    <section id="not" class="section-config">
+        <h1>Notificações</h1>
+    </section>
+    <section id="con" class="section-config">
+        <h1>Conexões</h1>
+    </section>
+    <section id="pref" class="section-config">
+        <h1>Preferências</h1>
+    </section>
+
+    <aside id="config-aside">
+        <a href="{{url_for('config')}}" class="aside-link" id="aside-config"><img src="{{url_for('static', filename='setting.png')}}" alt="icon-config"></a>
+    </aside>
+
+    <script src="{{url_for('static', filename='tradutor.js')}}"></script>
     <script src="{{url_for('static', filename='script.js')}}"></script>
 </body>
 </html>

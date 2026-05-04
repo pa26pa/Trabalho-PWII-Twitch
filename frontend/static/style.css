@@ -847,6 +847,42 @@ aside.open #back-aside:hover {
     background-color: #351b5d;
     color: #e1cdff;
 }
+
+/*------------CONFIGURAÇÕES---------------*/
+#body-config {background-color: #F4ECFF;}
+.header-config {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100vw;
+    height: auto;
+    padding: 5px 30px;
+}
+.header-config h1 {font-size: 2.5em;}
+.nav-config {
+    display: flex;
+    width: 40%;
+}
+.nav-config a {
+    text-decoration: none;
+    color: black;
+    font-size: 1.2em;
+    border-right: 1px solid black;
+    padding: 0 5%;
+}
+.nav-config a:last-child {border: none;}
+.nav-config a:hover {text-decoration: underline;}
+
+/*SEÇOES DAS CONFIGURAÇÕES*/
+.section-config {display: none;}
+.section-config.active {display: flex;}
+.nav-config a.active {text-decoration: underline; font-weight: bold;}
+
+/*ASIDE DAS CONFIGURAÇÕES*/
+#config-aside {
+    width: 20%;
+}
+
 /*RESPONSIVIDADE = não é adaptar para telas, é permitir que o layout se adapte sozinho*/
 /*@media = "if"*/
 @media (max-width: 768px) {/*desktop-first; min-width: 768px = mobile-first*/
