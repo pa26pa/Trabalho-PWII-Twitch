@@ -630,13 +630,15 @@ aside.open #back-aside:hover {
     color: #fff;
 }
 .dropdown-menu hr {
-    border-color: #251738;
+    border-color: #4e3e65;
+    box-shadow: none;
 }
 .arrow {
     color: #251738;
     font-size: 1em;
     font-weight: bold;
 }
+a {text-decoration: none;}
 /* avatar + nome no dropdown */
 #dropdown-usuario {
     padding: 12px 15px;
@@ -644,13 +646,14 @@ aside.open #back-aside:hover {
     font-weight: bold;
     cursor: default;
 }
-#dropdown-usuario:hover { background: transparent; } /* sem hover nesse item */
+#dropdown-usuario:hover { background: transparent; color: #38294C;}
 #avatar-dropdown {
     width: 36px;
     height: 36px;
     border-radius: 50%;
     object-fit: cover;
     background: #9147FF;
+    padding: 5px;
 }
 
 /*TOGGLE SWITCH (DARK THEME)*/
@@ -851,6 +854,22 @@ aside.open #back-aside:hover {
 
 /*------------CONFIGURAÇÕES---------------*/
 #body-config {background-color: #F4ECFF;}
+
+/*ASIDE DAS CONFIGURAÇÕES*/
+.small-aside {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 5%;
+    height: 100vh;
+    background-color: #ebe2f9;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.small-aside img {width: 40px;}
+.aside-link:last-child { bottom: 30px; }
+
 .header-config {
     display: flex;
     justify-content: space-between;
@@ -862,7 +881,7 @@ aside.open #back-aside:hover {
 .header-config h1 {font-size: 2.5em;}
 .nav-config {
     display: flex;
-    width: 40%;
+    width: 65%;
 }
 .nav-config a {
     text-decoration: none;
@@ -879,20 +898,8 @@ aside.open #back-aside:hover {
 .section-config.active {display: flex;}
 .nav-config a.active {text-decoration: underline; font-weight: bold;}
 
-/*ASIDE DAS CONFIGURAÇÕES*/
-.small-aside {
-    position: fixed;
-    top: 0;
-    right: 0;
-    width: 5%;
-    height: 100vh;
-    background-color: #ebe2f9;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-.small-aside img {width: 40px;}
-.aside-link:last-child { bottom: 30px; }
+
+
 /*RESPONSIVIDADE = não é adaptar para telas, é permitir que o layout se adapte sozinho*/
 /*@media = "if"*/
 @media (max-width: 768px) {/*desktop-first; min-width: 768px = mobile-first*/

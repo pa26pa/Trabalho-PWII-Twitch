@@ -28,7 +28,7 @@
             
             <button id="btn-turbo" title="Turbo"><img src="{{url_for('static', filename='bateria.png')}}" alt=""></button>
             
-            <!--MENU HAMBÚRGUER-->
+            <!--DROPDOWN MENU-->
             <div class="dropdown-menu-wrap">
                 <button class="open-modal" id="btn-dropdown">
                     <img src="{{url_for('static', filename='user.png')}}" alt="menu" id="menu-icon">
@@ -36,6 +36,19 @@
 
                 <div id="dropdown-menu" class="dropdown-menu">
                     <ul>
+                        <li id="dropdown-usuario">
+                            <img src="{{url_for('static', filename='user.png')}}" alt="avatar" id="avatar-dropdown">
+                            <span id="nome-dropdown">Usuário</span> <!--APARECER NOME DE USUÁRIO DA PESSOA-->
+                        </li>
+                        <hr>
+
+                        <a href="{{url_for('perfil')}}">
+                            <li>
+                                <span>Perfil</span>
+                            </li>
+                        </a>
+                        <hr>
+                        
                         <li id="language-item" class="submenu-item">
                             <span data-i18n>Idioma</span>
                             <span class="arrow">></span>
@@ -66,24 +79,48 @@
         <h1 data-i18n>Configurações</h1>
         <nav class="nav-config">
             <a data-i18n href="#" data-target="seg">Segurança</a>
+            <a data-i18n href="#" data-target="priv">Privacidade</a>
             <a data-i18n href="#" data-target="not">Notificações</a>
             <a data-i18n href="#" data-target="con">Conexões</a>
             <a data-i18n href="#" data-target="pref">Preferências</a>
         </nav>
     </div>
 
-    <section id="seg" class="section-config active">
-        <h1>Segurança</h1>
-    </section>
-    <section id="not" class="section-config">
-        <h1>Notificações</h1>
-    </section>
-    <section id="con" class="section-config">
-        <h1>Conexões</h1>
-    </section>
-    <section id="pref" class="section-config">
-        <h1>Preferências</h1>
-    </section>
+    <main>
+        <section id="seg" class="section-config active">
+            <h1>Segurança</h1>
+            <div class="seg-container">
+                <div class="seg-box">
+                    <p>E-mail</p>
+                    <p>(email do usuário)</p>
+                </div>
+                <div class="seg-box">
+                    <p>E-mail</p>
+                    <p>(email do usuário)</p>
+                </div>
+                <div class="seg-box">
+                    <p>CPF</p>
+                    <p>(cpf do usuário)</p>
+                </div>
+                <div class="seg-box">
+                    <p>E-mail</p>
+                    <p>(email do usuário)</p>
+                </div>
+            </div>
+        </section>
+        <section id="priv" class="section-config">
+            <h1>Privacidade</h1>
+        </section>
+        <section id="not" class="section-config">
+            <h1>Notificações</h1>
+        </section>
+        <section id="con" class="section-config">
+            <h1>Conexões</h1>
+        </section>
+        <section id="pref" class="section-config">
+            <h1>Preferências</h1>
+        </section>
+    </main>
 
     <aside class="small-aside">
         <a href="{{url_for('config')}}" class="aside-link" id="aside-config"><img src="{{url_for('static', filename='setting.png')}}" alt="icon-config"></a>

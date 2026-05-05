@@ -40,6 +40,10 @@ def config():
 def ajuda():
     return render_template("ajuda.html")
 
+@app.route("/perfil")
+def perfil():
+    return render_template("perfil.html")
+
 # Aqui eu defino os endpoints que o js pode acessar, e defino uma função para cada um delessssssss
 api.add_resource(signin,'/signin')
 api.add_resource(login,'/login')
