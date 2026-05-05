@@ -339,7 +339,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function mascara_CPF_config(cpf) {
-        return "***.***.***-" + cpf.slice(6,11);
+        return cpf.replace(/(\d{3})\.(\d{3})\.(\d{3})\-(\d{2})/, "$1.***.***-$4");
     }
 
     function info_user() {
