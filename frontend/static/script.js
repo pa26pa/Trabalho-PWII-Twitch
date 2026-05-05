@@ -323,6 +323,42 @@ document.addEventListener('DOMContentLoaded', function () {
         setTimeout(() => toast.className = '', 5000); 
     }
 
+    function info_user_CPF(cpf) {
+        const mostra = document.getElementById('show_cpf')
+        mostra.textContent = cpf 
+    }
+
+    function info_user_email(email) {
+        const mostra = document.getElementById('show_email')
+        mostra.textContent = email
+    }
+
+    function info_user_data(data) {
+        const mostra = document.getElementById('show_data')
+        mostra.textContent = data 
+    }
+
+    function mascara_CPF_config(cpf) {
+        return "***.***.***-" + cpf.slice(6,11);
+    }
+
+    function info_user() {
+        fetch("http://127.0.0.1:5000/dados_config", {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        }) 
+        .then(res => res.json())
+        .then(data => {
+            console.log(data.email);
+
+            cpf = mascara_CPF_config(data.cpf);
+            info_user_CPF(cpf);
+            info_user_data(data.data);
+            info_user_email(data.email);
+        });
+    }
     // ENVIO DOS FORMS
     document.querySelectorAll('.forms').forEach(form => {
         form.addEventListener('submit', function (validarForm) {
@@ -408,6 +444,8 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     });
+
+    info_user()
 
     const closeButtons = document.querySelectorAll('.close-modal');
     closeButtons.forEach(button => {
