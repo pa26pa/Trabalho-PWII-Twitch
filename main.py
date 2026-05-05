@@ -33,7 +33,7 @@ def luna():
     return render_template("moon.html")
 
 @app.route("/config")
-def config():
+def config(): 
     return render_template('inicio.html')
 
 @app.route("/ajuda")
