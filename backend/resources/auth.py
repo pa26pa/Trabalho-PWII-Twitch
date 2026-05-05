@@ -19,21 +19,21 @@ import time
 class signin(Resource):
     def post(self):
         data = request.get_json()
-         
+
         con = connection()
         cursor = con.cursor()
         
         # retirando dados do js
         cpf = str(data.get('cpf'))
         
-        # tendo certeza que o cpf não vai estar com algum espaço
+
         cpf = cpf.strip()
         email = data.get('email')
         user_name = data.get('user_name')
         data_nascimento = data.get('data_nascimento')
         senha = data.get('senha')
         
-        # vendo se o email é valido 
+
         valido = email_valido(email)
         if valido == False:
             return {
@@ -43,14 +43,12 @@ class signin(Resource):
         
         email = valido
         
-        #reorganizando a data para que entre direitinho no BD
+
         data_formatada = data_valida(data_nascimento)
         
-        print(data_formatada)
-        # fazendo hash na senhaaaaaa :)
+
         senha_hash = generate_password_hash(senha)
-        
-        # vendo se já existe uma conta com este cpf, email ou username
+
         
         query = """select * from usuarios where cpf = %s or email = %s or user_name = %s"""
         cursor.execute(query,(cpf,email,user_name))
@@ -67,10 +65,6 @@ class signin(Resource):
                 'mensagem':'Já existe um usuário com este CPF, email ou nome de usuario'
             }, 406
             
-    
-
-        
-        # inserindo as info no BD
         try:
             insert = """insert into usuarios(cpf,email,user_name,senha,data_nascimento) values (%s,%s,%s,%s,%s)"""
             cursor.execute(insert,(cpf,email,user_name,senha_hash,data_formatada))
