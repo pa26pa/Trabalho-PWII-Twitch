@@ -1,5 +1,7 @@
 .env
-api_site.venv
+api_travalho.venv
+venv.venv
+api_travalho/
 tradução.json
 venv/
 .venv/
