@@ -323,25 +323,30 @@ document.addEventListener('DOMContentLoaded', function () {
         setTimeout(() => toast.className = '', 5000); 
     }
 
+    // Função para mostrar o cpf
     function info_user_CPF(cpf) {
         const mostra = document.getElementById('show_cpf')
         mostra.textContent = cpf 
     }
 
+    // função para mostrar email
     function info_user_email(email) {
         const mostra = document.getElementById('show_email')
         mostra.textContent = email
     }
 
+    // função para mostrar data de nascimento
     function info_user_data(data) {
         const mostra = document.getElementById('show_data')
         mostra.textContent = data 
     }
 
+    // função para mascara do cpf, assim ele fica protegito 
     function mascara_CPF_config(cpf) {
         return cpf.replace(/(\d{3})\.(\d{3})\.(\d{3})\-(\d{2})/, "$1.***.***-$4");
     }
 
+    // função que pega as informações da api e relaciona com o htmls
     function info_user() {
         fetch("http://127.0.0.1:5000/dados_config", {
             method: "GET",
