@@ -4,6 +4,7 @@
     box-sizing: border-box;
     font-family: 'Times New Roman', Times, serif;
     font-size: 15px;
+    color: #3B2B4F;
 } 
 .logo {
     width: 250px; 
@@ -186,7 +187,7 @@ ficar cada elemento após a rolagem, no .shrink*/
 }
 #header.shrink .open-modal {
     height: 35px;
-    font-size: 1em;
+    font-size: 1em; 
     transition: all 0.5s ease;
 }
 #header.shrink .open-modal:first-child {
@@ -744,6 +745,7 @@ a {text-decoration: none;}
     font-size: 1.5em;
     width: 50%;
     margin: 0 auto;
+    color: #fff;
 }
 #catalog {margin-right: 5%;}
 /*CARROUSSEL DE IMG*/
@@ -895,8 +897,25 @@ a {text-decoration: none;}
 
 /*SEÇOES DAS CONFIGURAÇÕES*/
 .section-config {display: none;}
-.section-config.active {display: flex;}
 .nav-config a.active {text-decoration: underline; font-weight: bold;}
+
+.section-config.active {
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    width: 40%;
+    height: auto;
+    border: 4px double #9147FF;
+    padding: 20px;
+    background-color: #DEC7FF;
+    border-radius: 12px;
+}
+.section-config h1 {
+    font-size: 2.5em;
+    margin-bottom: 3%;
+}
+
+/*Seção da segurança*/
 
 
 
