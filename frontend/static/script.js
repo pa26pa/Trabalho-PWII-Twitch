@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', function () {
     verificarSessao();
 
     // MODAIS
-    const openButtons = document.querySelectorAll('.open-modal');
+    const openButtons = document.querySelectorAll('.btn-open-modal');
     openButtons.forEach(button => { // para cada botão de abrir modal
         button.addEventListener('click', () => {
             const modalId = button.getAttribute('data-modal');
@@ -409,7 +409,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    const closeButtons = document.querySelectorAll('.close-modal');
+    const closeButtons = document.querySelectorAll('.btn-close-modal');
     closeButtons.forEach(button => {
         button.addEventListener('click', () => {//=> : é uma função anônima, mais curta que function(){} e mantém o contexto de 'this'
             const modalId = button.getAttribute('data-modal');

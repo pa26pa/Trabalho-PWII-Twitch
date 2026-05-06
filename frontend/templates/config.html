@@ -17,7 +17,7 @@
                 <div class="search-bar">
                     <div class="search-icon">
                         <i class="fa-solid fa-magnifying-glass"></i>
-                    </div> 
+                    </div>
                     <input type="text" id="search" placeholder="Pesquise aqui" data-i18n-placeholder>
                 </div>
             </div>
@@ -78,47 +78,82 @@
     <div class="header-config">
         <h1 data-i18n>Configurações</h1>
         <nav class="nav-config">
-            <a data-i18n href="#" data-target="seg">Segurança</a>
-            <a data-i18n href="#" data-target="priv">Privacidade</a>
-            <a data-i18n href="#" data-target="not">Notificações</a>
-            <a data-i18n href="#" data-target="con">Conexões</a>
-            <a data-i18n href="#" data-target="pref">Preferências</a>
+            <a data-i18n href="#" data-target="seg" data-i18n>Segurança</a>
+            <a data-i18n href="#" data-target="priv" data-i18n>Privacidade</a>
+            <a data-i18n href="#" data-target="not" data-i18n>Notificações</a>
+            <a data-i18n href="#" data-target="con" data-i18n>Conexões</a>
+            <a data-i18n href="#" data-target="pref" data-i18n>Preferências</a>
         </nav>
     </div>
 
-    <main>
+    <main id="config-main">
         <section id="seg" class="section-config active">
-            <h1>Segurança</h1>
+            <h1 data-i18n>Segurança</h1>
             <div class="seg-container">
                 <div class="seg-box">
-                    <p>E-mail</p>
-                    <p>(email do usuário)</p>
+                    <p data-i18n>E-mail</p>
+                    <p>(email do usuário)</p> 
                 </div> 
                 <div class="seg-box">
-                    <p>E-mail</p>
-                    <p>(email do usuário)</p>
+                    <p data-i18n>Senha</p>
+                    <button class="btn-open-modal open-modal" data-modal="modal-2" data-i18n>Redefinir Senha</button>
+                    <dialog id="modal-2">
+                        <h1>Crie sua nova Senha</h1>
+                        <form action="#" method="post" class="form-new-password forms">
+                            <div class="caixa-input">
+                                <input type="password" class="password2" name="password" required>
+                                <label for="password" data-i18n>Senha Atual</label>
+                                <p class="erroSenha3" data-i18n>A senha não é a atual</p>
+                            </div>
+                            <div class="caixa-input password-box">
+                                <input type="password" class="password password1" name="password" required>
+                                <label for="password" data-i18n>Nova Senha</label>
+                                <p class="erroSenha" data-i18n>Senha Inválida (mínimo 5 caracteres)</p>
+                            </div><br>
+                            <div class="caixa-input">
+                                <input type="password" class="password2" name="password" required>
+                                <label for="password" data-i18n>Confirmar Senha</label>
+                                <p class="erroSenha2" data-i18n>A senha não é igual</p>
+                            </div>
+                            <div class="btn-modal-seg">
+                                <button class="cancel btn-close-modal"  data-modal="modal-2" data-i18n>Cancelar</button>
+                                <button class="delete" data-i18n>Criar</button>
+                            </div>
+                        </form>
+                    </dialog>
                 </div>
                 <div class="seg-box">
-                    <p>CPF</p>
+                    <p data-i18n>CPF</p>
                     <p>(cpf do usuário)</p>
                 </div>
                 <div class="seg-box">
-                    <p>E-mail</p>
-                    <p>(email do usuário)</p>
+                    <p data-i18n>Data de Nascimento</p>
+                    <p>(DN do usuário)</p>
+                </div>
+                <div class="seg-box">
+                    <button class="btn-open-modal delete-account" data-modal="modal-3" data-i18n>Excluir Conta</button>
+                    <dialog id="modal-3">
+                        <h1 data-i18n>Deseja mesmo excluir sua conta?</h1>
+                        <p data-i18n>Excluir a conta permanentemente apagará todos os seus dados</p>
+                        <div class="btn-modal-seg">
+                            <button class="cancel btn-close-modal"  data-modal="modal-3" data-i18n>Cancelar</button>
+                            <button class="delete" data-i18n>Excluir</button>
+                        </div>
+                    </dialog>
                 </div>
             </div>
         </section>
         <section id="priv" class="section-config">
-            <h1>Privacidade</h1>
+            <h1 data-i18n>Privacidade</h1>
         </section>
         <section id="not" class="section-config">
-            <h1>Notificações</h1>
+            <h1 data-i18n>Notificações</h1>
         </section>
         <section id="con" class="section-config">
-            <h1>Conexões</h1>
+            <h1 data-i18n>Conexões</h1>
         </section>
         <section id="pref" class="section-config">
-            <h1>Preferências</h1>
+            <h1 data-i18n>Preferências</h1>
         </section>
     </main>
 

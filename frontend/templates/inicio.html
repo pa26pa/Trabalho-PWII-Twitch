@@ -34,7 +34,7 @@
             <!--DESLOGADO-->
             <div class="without-login">
                 <!-- MODAL DO LOGIN -->
-                <button class="open-modal" data-modal="modal-1" data-i18n>Entrar</button>
+                <button class="btn-open-modal open-modal" data-modal="modal-1" data-i18n>Entrar</button>
             </div>
             
             <!--LOGADO-->
@@ -51,14 +51,14 @@
                                 <!--frente da div de trocar card-->
                                 <div class="change-button1">
                                     <!--note que um elemento pode ter mais de um nome de class, apenas separe por um espaço-->
-                                    <button class="close-modal login-close-button" data-modal="modal-1">X</button>
+                                    <button class="close-modal btn-close-modal" data-modal="modal-1">X</button>
                                     <h6><span data-i18n>Entrar</span><span data-i18n>Cadastrar</span></h6>
                                     <input type="checkbox" class="checkbox" id="checkbox">
                                     <label for="checkbox"></label>
                                 </div>
                                 <!--costas da div de trocar card-->
                                 <div class="change-button2">
-                                    <button class="close-modal login-close-button" data-modal="modal-1">X</button>
+                                    <button class="close-modal btn-close-modal" data-modal="modal-1">X</button>
                                     <h6><span data-i18n>Entrar</span><span data-i18n>Cadastrar</span></h6>
                                     <input type="checkbox" class="checkbox" id="checkbox">
                                     <label for="checkbox"></label>
@@ -191,7 +191,7 @@
                         <!--LOGADO-->
                         <li class="with-login" id="dropdown-usuario">
                             <img src="{{url_for('static', filename='user.png')}}" alt="avatar" id="avatar-dropdown">
-                            <span id="nome-dropdown">Usuário</span>
+                            <span id="nome-dropdown">Usuário</span> <!--APARECER NOME DE USUÁRIO DA PESSOA-->
                         </li>
                         <hr class="with-login">
 
