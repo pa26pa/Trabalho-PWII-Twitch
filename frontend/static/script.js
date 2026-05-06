@@ -368,6 +368,10 @@ document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('.forms').forEach(form => {
         form.addEventListener('submit', function (validarForm) {
             validarForm.preventDefault();
+
+            const dialog = form.closest('dialog');
+            if (dialog && !dialog.open) return;
+
             let envio = true;
             if (!form.checkValidity()) envio = false;
             if (form.querySelector('#data-nascimento') && !validarIdade()) envio = false;
@@ -452,8 +456,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const closeButtons = document.querySelectorAll('.btn-close-modal');
     info_user();
-
-    const closeButtons = document.querySelectorAll('.close-modal');
     closeButtons.forEach(button => {
         button.addEventListener('click', () => {//=> : é uma função anônima, mais curta que function(){} e mantém o contexto de 'this'
             const modalId = button.getAttribute('data-modal');

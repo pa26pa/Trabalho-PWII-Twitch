@@ -89,58 +89,56 @@
     <main id="config-main">
         <section id="seg" class="section-config active">
             <h1 data-i18n>Segurança</h1>
-            <div class="seg-container">
-                <div class="seg-box">
-                    <p data-i18n>E-mail</p>
-                    <div id="show_email"></div>
-                </div> 
-                <div class="seg-box">
-                    <p data-i18n>Senha</p>
-                    <button class="btn-open-modal open-modal" data-modal="modal-2" data-i18n>Redefinir Senha</button>
-                    <dialog id="modal-2">
-                        <h1>Crie sua nova Senha</h1>
-                        <form action="#" method="post" class="form-new-password forms">
-                            <div class="caixa-input">
-                                <input type="password" class="password2" name="password" required>
-                                <label for="password" data-i18n>Senha Atual</label>
-                                <p class="erroSenha3" data-i18n>A senha não é a atual</p>
-                            </div>
-                            <div class="caixa-input password-box">
-                                <input type="password" class="password password1" name="password" required>
-                                <label for="password" data-i18n>Nova Senha</label>
-                                <p class="erroSenha" data-i18n>Senha Inválida (mínimo 5 caracteres)</p>
-                            </div><br>
-                            <div class="caixa-input">
-                                <input type="password" class="password2" name="password" required>
-                                <label for="password" data-i18n>Confirmar Senha</label>
-                                <p class="erroSenha2" data-i18n>A senha não é igual</p>
-                            </div>
-                            <div class="btn-modal-seg">
-                                <button class="cancel btn-close-modal"  data-modal="modal-2" data-i18n>Cancelar</button>
-                                <button class="delete" data-i18n>Criar</button>
-                            </div>
-                        </form>
-                    </dialog>
-                </div>
-                <div class="seg-box">
-                    <p>CPF</p>
-                    <div id="show_cpf"></div>
-                </div>
-                <div class="seg-box">
-                    <p data-i18n>Data de Nascimento</p>
-                    <div id="show_data"></div>
-                </div>
-                <div class="seg-box">
-                    <button class="btn-open-modal delete-account" data-modal="modal-3" data-i18n>Excluir Conta</button>
-                    <dialog id="modal-3">
-                        <h1 data-i18n>Deseja mesmo excluir sua conta?</h1>
-                        <p data-i18n>Excluir a conta permanentemente apagará todos os seus dados</p>
-                        <div class="btn-modal-seg">
-                            <button class="cancel btn-close-modal"  data-modal="modal-3" data-i18n>Cancelar</button>
-                            <button class="delete" data-i18n>Excluir</button>
+            <div class="seg-box">
+                <p data-i18n>E-mail</p> <br>
+                <div class="data-bd" id="show_email"></div>
+            </div> 
+            <div class="seg-box">
+                <p data-i18n>Senha</p> <br>
+                <button class="btn-open-modal" id="btn-new" data-modal="modal-2" data-i18n>Redefinir Senha</button>
+                <dialog id="modal-2">
+                    <h1>Crie sua nova Senha</h1>
+                    <form action="#" method="post" class="form-new-password forms" novalidate>
+                        <div class="caixa-input">
+                            <input type="password" class="password2" name="password" required>
+                            <label for="password" data-i18n>Senha Atual</label>
+                            <p class="erroSenha3" data-i18n>A senha não é a atual</p>
                         </div>
-                    </dialog>
-                </div>
+                        <div class="caixa-input password-box">
+                            <input type="password" class="password password1" name="password" required>
+                            <label for="password" data-i18n>Nova Senha</label>
+                            <p class="erroSenha" data-i18n>Senha Inválida (mínimo 5 caracteres)</p>
+                        </div><br>
+                        <div class="caixa-input">
+                            <input type="password" class="password2" name="password" required>
+                            <label for="password" data-i18n>Confirmar Senha</label>
+                            <p class="erroSenha2" data-i18n>A senha não é igual</p>
+                        </div>
+                        <div class="btn-modal-seg">
+                            <button class="cancel btn-close-modal"  data-modal="modal-2" data-i18n>Cancelar</button>
+                            <button id="btn-create-password" data-i18n>Criar</button>
+                        </div>
+                    </form>
+                </dialog>
+            </div>
+            <div class="seg-box">
+                <p>CPF</p> <br>
+                <div class="data-bd" id="show_cpf"></div>
+            </div>
+            <div class="seg-box">
+                <p data-i18n>Data de Nascimento</p> <br>
+                <div class="data-bd" id="show_data"></div>
+            </div>
+            <div class="seg-box">
+                <button class="btn-open-modal delete-account" data-modal="modal-3" data-i18n>Excluir Conta</button>
+                <dialog id="modal-3">
+                    <h1 data-i18n>Deseja mesmo excluir sua conta?</h1>
+                    <p data-i18n>Excluir a conta permanentemente apagará todos os seus dados</p>
+                    <div class="btn-modal-seg">
+                        <button class="cancel btn-close-modal"  data-modal="modal-3" data-i18n>Cancelar</button>
+                        <button class="btn-delete" data-i18n>Excluir</button>
+                    </div>
+                </dialog>
             </div>
         </section>
         <section id="priv" class="section-config">
