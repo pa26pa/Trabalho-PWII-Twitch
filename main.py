@@ -1,6 +1,6 @@
 from flask import Flask, render_template
 from flask_restful import Api, Resource
-from backend.resources.auth import signin, login, forgot, redefine_password, check_login ,search,translate, resend_code, check_codigo, google
+from backend.resources.auth import signin, login, forgot, redefine_password, check_login , dados_config, search,translate, resend_code, check_codigo, google
 from dotenv import load_dotenv
 from authlib.integrations.flask_client import OAuth
 import os
@@ -57,6 +57,7 @@ api.add_resource(redefine_password,'/redefine_password')
 api.add_resource(check_login, '/session')
 api.add_resource(search,'/search')
 api.add_resource(translate,'/traduzir')
+api.add_resource(dados_config, '/dados_config')
 
 # É só pra garantir que só se pode rodar ele pela main
 if __name__ == "__main__":

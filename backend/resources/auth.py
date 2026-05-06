@@ -169,22 +169,30 @@ class check_login(Resource):
             'mensagem':'não está logado'
         }, 200
     
-class email(Resource):
+class dados_config(Resource):
     def get(self):
         con = connection()
         cursor = con.cursor(pymysql.cursors.DictCursor)
 
-        email = """select email from usuarios where id_usuario = %s"""
+        id_ficticio = 1
+        
+        session['usuario_id'] = id_ficticio
+        
+        email = """select cpf, email, data_nascimento from usuarios where id_usuario = %s"""
         cursor.execute(email,(session['usuario_id'],))
-        email_usuario = cursor.fetchone()
+        info_usuario = cursor.fetchone()
 
+        data_formatada = info_usuario['data_nascimento'].strftime('%d/%m/%Y')
+        
         cursor.close()
         con.close()
 
         return {
             'status':'success',
             'mensagem':'Email encontrado',
-            'email': email_usuario
+            'email': info_usuario['email'],
+            'cpf': info_usuario['cpf'],
+            'data': data_formatada 
         }, 200
 
 class google(Resource):

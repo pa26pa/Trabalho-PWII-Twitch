@@ -323,6 +323,42 @@ document.addEventListener('DOMContentLoaded', function () {
         setTimeout(() => toast.className = '', 5000); 
     }
 
+    function info_user_CPF(cpf) {
+        const mostra = document.getElementById('show_cpf')
+        mostra.textContent = cpf 
+    }
+
+    function info_user_email(email) {
+        const mostra = document.getElementById('show_email')
+        mostra.textContent = email
+    }
+
+    function info_user_data(data) {
+        const mostra = document.getElementById('show_data')
+        mostra.textContent = data 
+    }
+
+    function mascara_CPF_config(cpf) {
+        return cpf.replace(/(\d{3})\.(\d{3})\.(\d{3})\-(\d{2})/, "$1.***.***-$4");
+    }
+
+    function info_user() {
+        fetch("http://127.0.0.1:5000/dados_config", {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        }) 
+        .then(res => res.json())
+        .then(data => {
+            console.log(data.email);
+
+            cpf = mascara_CPF_config(data.cpf);
+            info_user_CPF(cpf);
+            info_user_data(data.data);
+            info_user_email(data.email);
+        });
+    }
     // ENVIO DOS FORMS
     document.querySelectorAll('.forms').forEach(form => {
         form.addEventListener('submit', function (validarForm) {
@@ -409,7 +445,13 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
+<<<<<<< HEAD
     const closeButtons = document.querySelectorAll('.btn-close-modal');
+=======
+    info_user()
+
+    const closeButtons = document.querySelectorAll('.close-modal');
+>>>>>>> bb31337cfee640440913d32a4a9fdbb18a1228bc
     closeButtons.forEach(button => {
         button.addEventListener('click', () => {//=> : é uma função anônima, mais curta que function(){} e mantém o contexto de 'this'
             const modalId = button.getAttribute('data-modal');
