@@ -450,13 +450,10 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-<<<<<<< HEAD
-    const closeButtons = document.querySelectorAll('.btn-close-modal');
-=======
     info_user()
 
     const closeButtons = document.querySelectorAll('.close-modal');
->>>>>>> bb31337cfee640440913d32a4a9fdbb18a1228bc
+
     closeButtons.forEach(button => {
         button.addEventListener('click', () => {//=> : é uma função anônima, mais curta que function(){} e mantém o contexto de 'this'
             const modalId = button.getAttribute('data-modal');
