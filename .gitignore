@@ -5,3 +5,4 @@ api_travalho/
 tradução.json
 venv/
 .venv/
+__pycache__/
