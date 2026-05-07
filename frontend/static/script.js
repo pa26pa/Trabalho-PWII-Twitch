@@ -403,7 +403,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (data.status == 'error'){
                         mostrarToast(data.mensagem, data.status)
                     }
-                    
                 });
             }
 
@@ -450,9 +449,8 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    info_user()
-
-    const closeButtons = document.querySelectorAll('.close-modal');
+    const closeButtons = document.querySelectorAll('.btn-close-modal');
+    info_user();
 
     closeButtons.forEach(button => {
         button.addEventListener('click', () => {//=> : é uma função anônima, mais curta que function(){} e mantém o contexto de 'this'
