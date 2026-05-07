@@ -485,3 +485,57 @@ class translate(Resource):
             'traducoes': traducoes
         }, 200           
 
+class delete_Account(Resource):
+    def delete(self):
+        
+        con = connection()
+        cursor = con.cursor(pymysql.cursors.DictCursor)
+        
+        id = session['usuario_id']
+        
+        query = """delete from usuarios where id_usuario = %s """
+        cursor.execute(query, (id,))
+        
+        con.commit()
+        
+        session.clear()
+        
+        cursor.close()
+        con.close()
+        
+        return {
+            'status':'success',
+            'mensagem':'Conta excluida'
+        }, 200
+    
+class update_Password(Resource):
+    def put(self):
+        
+        data = request.get_json()
+        
+        con = connection()
+        cursor = con.cursor(pymysql.cursors.DictCursor)
+        
+        old = data.get('senha_antiga')
+        nova = data.get('senha_nova')
+        id = session['usuario_id']
+        
+        query = """select senha from usuarios where id_usuario = %s"""
+        cursor.execute(query, (id,))
+        senha = cursor.fetchone()
+        
+        if check_password_hash(senha, old):
+            a = """update usuarios set senha = %s where id_usuario = %s"""
+            cursor.execute(a,(nova,id))
+            con.commit()
+            
+            return {
+                'status':'success',
+                'mensagem':'Senha atualizada'
+            }, 200
+        
+        return {
+            'status':'error',
+            'mensagem':'senha incorreta'
+        }
+            

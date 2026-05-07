@@ -124,6 +124,22 @@ function pesquisa() {
        data.resultados.forEach(item => {
         const nome = item.user_name || item.titulo;
         div.innerHTML += `<p>${nome}</p>`;
-});
+        });
+    });
+};
+
+function deletar() {
+    fetch("http://127.0.0.1:5000/delete", {
+        method: "DELETE",
+        headers: {
+            "Content-Type": "application/json"
+        }
+    })
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById("resposta").innerText = JSON.stringify(data, null, 2);
+        const div = document.getElementById("resultados");
+        div.innerHTML = ""; // limpa resultados antigos
+    
     });
 }
