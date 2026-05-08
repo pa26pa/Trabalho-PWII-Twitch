@@ -43,9 +43,9 @@ class signin(Resource):
         
         email = valido
         
-
+       
         data_formatada = data_valida(data_nascimento)
-        
+       
 
         senha_hash = generate_password_hash(senha)
 
