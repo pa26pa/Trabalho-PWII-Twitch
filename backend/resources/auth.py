@@ -43,9 +43,9 @@ class signin(Resource):
         
         email = valido
         
-
+       
         data_formatada = data_valida(data_nascimento)
-        
+       
 
         senha_hash = generate_password_hash(senha)
 
@@ -178,10 +178,12 @@ class dados_config(Resource):
         
         session['usuario_id'] = id_ficticio
         
-        email = """select cpf, email, data_nascimento from usuarios where id_usuario = %s"""
+        email = """select cpf, email, user_name, data_nascimento from usuarios where id_usuario = %s"""
         cursor.execute(email,(session['usuario_id'],))
         info_usuario = cursor.fetchone()
 
+        print(info_usuario['user_name'])
+        
         data_formatada = info_usuario['data_nascimento'].strftime('%d/%m/%Y')
         
         cursor.close()
@@ -192,7 +194,8 @@ class dados_config(Resource):
             'mensagem':'Email encontrado',
             'email': info_usuario['email'],
             'cpf': info_usuario['cpf'],
-            'data': data_formatada 
+            'data': data_formatada,
+            'name':info_usuario['user_name'] 
         }, 200
 
 class google(Resource):
@@ -485,3 +488,57 @@ class translate(Resource):
             'traducoes': traducoes
         }, 200           
 
+class delete_Account(Resource):
+    def delete(self):
+        
+        con = connection()
+        cursor = con.cursor(pymysql.cursors.DictCursor)
+        
+        id = session['usuario_id']
+        
+        query = """delete from usuarios where id_usuario = %s """
+        cursor.execute(query, (id,))
+        
+        con.commit()
+        
+        session.clear()
+        
+        cursor.close()
+        con.close()
+        
+        return {
+            'status':'success',
+            'mensagem':'Conta excluida'
+        }, 200
+    
+class update_Password(Resource):
+    def put(self):
+        
+        data = request.get_json()
+        
+        con = connection()
+        cursor = con.cursor(pymysql.cursors.DictCursor)
+        
+        old = data.get('senha_antiga')
+        nova = data.get('senha_nova')
+        id = session['usuario_id']
+        
+        query = """select senha from usuarios where id_usuario = %s"""
+        cursor.execute(query, (id,))
+        senha = cursor.fetchone()
+        
+        if check_password_hash(senha, old):
+            a = """update usuarios set senha = %s where id_usuario = %s"""
+            cursor.execute(a,(nova,id))
+            con.commit()
+            
+            return {
+                'status':'success',
+                'mensagem':'Senha atualizada'
+            }, 200
+        
+        return {
+            'status':'error',
+            'mensagem':'senha incorreta'
+        }
+            

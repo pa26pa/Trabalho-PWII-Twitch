@@ -1,6 +1,6 @@
 from flask import Flask, render_template
 from flask_restful import Api, Resource
-from backend.resources.auth import signin, login, forgot, redefine_password, check_login , dados_config, search,translate, resend_code, check_codigo, google
+from backend.resources.auth import signin, login, forgot, redefine_password,delete_Account, check_login , dados_config, search,translate, resend_code, check_codigo, google
 from dotenv import load_dotenv
 from authlib.integrations.flask_client import OAuth
 import os
@@ -49,6 +49,7 @@ api.add_resource(signin,'/signin')
 api.add_resource(login,'/login')
 #api.add_resource(google,'/login/google')
 
+api.add_resource(delete_Account, '/delete')
 api.add_resource(forgot,'/forgot')
 api.add_resource(resend_code,'/resend')
 api.add_resource(check_codigo,'/check_codigo')
