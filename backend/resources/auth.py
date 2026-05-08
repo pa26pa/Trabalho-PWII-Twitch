@@ -43,9 +43,9 @@ class signin(Resource):
         
         email = valido
         
-       
+
         data_formatada = data_valida(data_nascimento)
-       
+
 
         senha_hash = generate_password_hash(senha)
 
@@ -157,26 +157,49 @@ class logout(Resource):
         
 class check_login(Resource):
     def get(self):
+        print(session)
         if 'usuario_id' in session:
-           
+            con = connection()
+            cursor = con.cursor(pymysql.cursors.DictCursor)
+
+            #id_ficticio = 1
+            
+            #session['usuario_id'] = id_ficticio
+            
+            email = """select cpf, email, user_name, data_nascimento from usuarios where id_usuario = %s"""
+            cursor.execute(email,(session['usuario_id'],))
+            info_usuario = cursor.fetchone()
+            
+            data_formatada = info_usuario['data_nascimento'].strftime('%d/%m/%Y')
+            
+            cursor.close()
+            con.close()
+
+            print(session['usuario_id'])
+            
             return {
                 'status':'success',
-                'mensagem':'logado'
+                'mensagem':'Logado',
+                'logado':'true',
+                'email': info_usuario['email'],
+                'cpf': info_usuario['cpf'],
+                'data': data_formatada,
+                'name':info_usuario['user_name'] 
             }, 200
-        
+
         return {
-            'status':'success',
+            'status':'error',
             'mensagem':'não está logado'
-        }, 200
+        }, 204
     
 class dados_config(Resource):
     def get(self):
         con = connection()
         cursor = con.cursor(pymysql.cursors.DictCursor)
 
-        id_ficticio = 1
+        #id_ficticio = 1
         
-        session['usuario_id'] = id_ficticio
+        #session['usuario_id'] = id_ficticio
         
         email = """select cpf, email, user_name, data_nascimento from usuarios where id_usuario = %s"""
         cursor.execute(email,(session['usuario_id'],))
@@ -284,8 +307,9 @@ class forgot(Resource):
         
         w = """select id_usuario from usuarios where email = %s"""
         cursor.execute(w,(email,))
-        id = cursor.fetchone()
+        resposta = cursor.fetchone()
         
+        id = resposta['id_usuario']
         # mandando código no email
         codigo = send_code(email)
         

@@ -19,10 +19,18 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // verifica sessão ao carregar
     async function verificarSessao() {
+
         try {
-            const res = await fetch('/session');
+            const res = await fetch("http://127.0.0.1:5000/session", {
+                method: "GET"
+            });
             const data = await res.json();
-            data.logado ? mostrarLogado(data.nome) : mostrarDeslogado();
+            if (data.logado) {
+                console.log('aaa')
+                mostrarLogado(data.nome)
+            } else{
+                mostrarDeslogado();
+            }
         } catch {
             mostrarDeslogado();
         }
@@ -56,7 +64,9 @@ document.addEventListener('DOMContentLoaded', function () {
     // MENU SUPERIOR SOME AO ROLAR
     const header = document.getElementById('header');
     if (header) {//usa o if para garantir que o código só tente acessar o header se ele existir, evitando erros em páginas sem header
-        window.addEventListener('scroll', function () {
+        window.addEventListener
+        
+        ('scroll', function () {
             if (window.scrollY > 80) {//scrollY: distância em pixels que o documento foi rolado verticalmente
                 header.classList.add('shrink'); //adiciona a classe 'shrink' ao header
             } else {
@@ -317,11 +327,20 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Toast é um aviso que desaparece rapidamente, não precisa apertar no X para sairrrr :)
     function mostrarToast(mensagem, tipo) {
-        const toast = document.getElementById('toast');
+    const toasts = document.querySelectorAll('.toast'); 
+    toasts.forEach(toast => {
         toast.textContent = mensagem;
-        toast.className = `show ${tipo}`;
-        setTimeout(() => toast.className = '', 5000); 
-    }
+        
+        
+        toast.classList.add('show');
+        toast.classList.add(tipo); 
+
+        setTimeout(() => {
+            toast.classList.remove('show');
+            toast.classList.remove(tipo);
+        }, 5000);
+    });
+}
 
     // Função para mostrar o cpf
     function info_user_CPF(cpf) {
@@ -330,20 +349,24 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function info_user_name(user_name) {
-        const mostra = document.getElementById('show_name')
-        mostra.textContent = user_name
+        const mostra = document.querySelectorAll('.show_name');
+        
+        mostra.forEach(mostra => {
+            mostra.textContent = user_name;
+        })
+        
     }
 
     // função para mostrar email
     function info_user_email(email) {
-        const mostra = document.getElementById('show_email')
-        mostra.textContent = email
+        const mostra = document.getElementById('show_email');
+        mostra.textContent = email;
     }
 
     // função para mostrar data de nascimento
     function info_user_data(data) {
-        const mostra = document.getElementById('show_data')
-        mostra.textContent = data 
+        const mostra = document.getElementById('show_data');
+        mostra.textContent = data ;
     }
 
     // função para mascara do cpf, assim ele fica protegito 
@@ -353,7 +376,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // função que pega as informações da api e relaciona com o htmls
     function info_user() {
-        fetch("http://127.0.0.1:5000/dados_config", {
+        fetch("http://127.0.0.1:5000/session", {
             method: "GET",
             headers: {
                 "Content-Type": "application/json"
@@ -450,7 +473,8 @@ document.addEventListener('DOMContentLoaded', function () {
                         mostrarToast(data.mensagem, data.status)
                     } else {
                         fecharModal(form);
-                    }q
+                        verificarSessao();
+                    }
                 });
             }
 
@@ -458,7 +482,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 const dados = {
                     email: document.getElementById('email_forgot').value
                 }
-                console.log('yeyyyyyyyyyy')
+                
                 fetch("http://127.0.0.1:5000/forgot", {
                 method: "POST",
                 headers: {
