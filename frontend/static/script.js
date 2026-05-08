@@ -362,7 +362,7 @@ document.addEventListener('DOMContentLoaded', function () {
         .then(res => res.json())
         .then(data => {
 
-            cpf = mascara_CPF_config(data.cpf);
+            let cpf = mascara_CPF_config(data.cpf);
             info_user_CPF(cpf);
             info_user_data(data.data);
             info_user_email(data.email);
@@ -450,7 +450,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         mostrarToast(data.mensagem, data.status)
                     } else {
                         fecharModal(form);
-                    }
+                    }q
                 });
             }
 
