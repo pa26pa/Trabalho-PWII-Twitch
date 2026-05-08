@@ -178,10 +178,12 @@ class dados_config(Resource):
         
         session['usuario_id'] = id_ficticio
         
-        email = """select cpf, email, data_nascimento from usuarios where id_usuario = %s"""
+        email = """select cpf, email, user_name, data_nascimento from usuarios where id_usuario = %s"""
         cursor.execute(email,(session['usuario_id'],))
         info_usuario = cursor.fetchone()
 
+        print(info_usuario['user_name'])
+        
         data_formatada = info_usuario['data_nascimento'].strftime('%d/%m/%Y')
         
         cursor.close()
@@ -192,7 +194,8 @@ class dados_config(Resource):
             'mensagem':'Email encontrado',
             'email': info_usuario['email'],
             'cpf': info_usuario['cpf'],
-            'data': data_formatada 
+            'data': data_formatada,
+            'name':info_usuario['user_name'] 
         }, 200
 
 class google(Resource):

@@ -329,6 +329,11 @@ document.addEventListener('DOMContentLoaded', function () {
         mostra.textContent = cpf 
     }
 
+    function info_user_name(user_name) {
+        const mostra = document.getElementById('show_name')
+        mostra.textContent = user_name
+    }
+
     // função para mostrar email
     function info_user_email(email) {
         const mostra = document.getElementById('show_email')
@@ -356,12 +361,12 @@ document.addEventListener('DOMContentLoaded', function () {
         }) 
         .then(res => res.json())
         .then(data => {
-            console.log(data.email);
 
             cpf = mascara_CPF_config(data.cpf);
             info_user_CPF(cpf);
             info_user_data(data.data);
             info_user_email(data.email);
+            info_user_name(data.name);
         });
     }
     // ENVIO DOS FORMS
