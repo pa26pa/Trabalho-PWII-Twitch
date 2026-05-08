@@ -362,13 +362,26 @@ document.addEventListener('DOMContentLoaded', function () {
         .then(res => res.json())
         .then(data => {
 
-            cpf = mascara_CPF_config(data.cpf);
+            let cpf = mascara_CPF_config(data.cpf);
             info_user_CPF(cpf);
             info_user_data(data.data);
             info_user_email(data.email);
             info_user_name(data.name);
         });
     }
+
+    function fecharModal(form) {
+
+        const dialog = form.closest('dialog');
+
+        if (dialog) {
+            dialog.close();
+            document.body.classList.remove('modal-open');
+        }
+
+        form.reset();
+    }
+
     // ENVIO DOS FORMS
     document.querySelectorAll('.forms').forEach(form => {
         form.addEventListener('submit', function (validarForm) {
@@ -388,6 +401,7 @@ document.addEventListener('DOMContentLoaded', function () {
             });
             if (!envio) {//se envio for false, ou seja, se alguma validação falhou, o formulário não será enviado e as mensagens de erro serão exibidas
                 form.reportValidity();
+                return;
             } 
             
             if (form.classList.contains('sign')) {
@@ -411,6 +425,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 .then(data => {
                     if (data.status == 'error'){
                         mostrarToast(data.mensagem, data.status)
+                    } else {
+                        fecharModal(form);
                     }
                 });
             }
@@ -432,7 +448,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 .then(data => {
                     if (data.status == 'error'){
                         mostrarToast(data.mensagem, data.status)
-                    }
+                    } else {
+                        fecharModal(form);
+                    }q
                 });
             }
 
