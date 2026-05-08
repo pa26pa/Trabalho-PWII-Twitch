@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const btnLogout = document.getElementById('btn-logout');
     if (btnLogout) {
         btnLogout.addEventListener('click', async () => {
-            await fetch('/logout');
+            await fetch('http://127.0.0.1:5000/logout');
             mostrarDeslogado();
             if (dropdownMenu) dropdownMenu.classList.remove('show');
         });

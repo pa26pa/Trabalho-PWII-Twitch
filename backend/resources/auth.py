@@ -142,14 +142,14 @@ class login(Resource):
         }, 405
 
 class logout(Resource):
-    def post(self):
+    def get(self):
         session.clear()
         return {
             "status":'success',
             'mensagem':'Você saiu da sua conta'
         }, 200
     
-    def get(self):
+    def post(self):
         return {
             'status':'error',
             'mensagem':'Esse metodo não é reconhecido'
