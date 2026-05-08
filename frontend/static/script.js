@@ -326,24 +326,24 @@ document.addEventListener('DOMContentLoaded', function () {
     // Função para mostrar o cpf
     function info_user_CPF(cpf) {
         const mostra = document.getElementById('show_cpf')
-        mostra.textContent = cpf 
+        mostra.textContent = cpf;
     }
 
     function info_user_name(user_name) {
         const mostra = document.getElementById('show_name')
-        mostra.textContent = user_name
+        mostra.textContent = user_name;
     }
 
     // função para mostrar email
     function info_user_email(email) {
         const mostra = document.getElementById('show_email')
-        mostra.textContent = email
+        mostra.textContent = email;
     }
 
     // função para mostrar data de nascimento
     function info_user_data(data) {
         const mostra = document.getElementById('show_data')
-        mostra.textContent = data 
+        mostra.textContent = data;
     }
 
     // função para mascara do cpf, assim ele fica protegito 
