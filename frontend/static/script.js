@@ -345,7 +345,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Função para mostrar o cpf
     function info_user_CPF(cpf) {
         const mostra = document.getElementById('show_cpf')
-        mostra.textContent = cpf 
+        mostra.textContent = cpf;
     }
 
     function info_user_name(user_name) {
@@ -354,9 +354,7 @@ document.addEventListener('DOMContentLoaded', function () {
         mostra.forEach(mostra => {
             mostra.textContent = user_name;
         })
-        
     }
-
     // função para mostrar email
     function info_user_email(email) {
         const mostra = document.getElementById('show_email');
