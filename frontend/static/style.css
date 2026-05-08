@@ -222,7 +222,7 @@ body.modal-open {
 }
 
 /*conteúdo do modal login/cadastro*/
-#wrap, #wrap-seg-password {
+#wrap, #wrap-seg-password, #wrap-seg-delete {
     position: fixed;
     display: flex;
     justify-content: center;
@@ -971,7 +971,16 @@ a {text-decoration: none;}
 }
 #modal-3 {
     width: 600px;
-    height: 400px;
+    height: 250px;
+    top: 20%;
+}
+#modal-3 h1 {font-size: 1.5em;}
+#modal-3 p {font-size: 1em;}
+#modal-3 button {width: 90; height: 45px; font-size: 1em;}
+#modal-3 .btn-modal-seg {padding: 0 50px;}
+#wrap-seg-delete {
+    height: 80%;
+    width: 80%;
 }
 
 /*RESPONSIVIDADE = não é adaptar para telas, é permitir que o layout se adapte sozinho*/
