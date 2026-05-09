@@ -983,6 +983,95 @@ a {text-decoration: none;}
     width: 80%;
 }
 
+/*ABA DE PRIVACIDADE*/
+.blocked-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    max-width: 700px;
+}
+/*input e botão*/
+.blocked-input {
+    display: flex;
+    gap: 8px;
+}
+.blocked-input input {flex: 1;}/*ocupa todo o espaço dado*/
+.blocked-input button {
+    white-space: nowrap; /*impede quebra de linha do texto do botão*/
+    padding: 0 18px;
+}
+/*mensagem de erro*/
+#block-feedback {
+    font-size: 0.8em;
+    color: red;
+    min-height: 16px;
+}
+/*botão do dropdown*/
+#toggle-blocked {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 16px;
+    background: #f0e9ff;
+    border: 1px solid #c7b2e7;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1em;
+}
+#toggle-icon {transition: transform 0.3s ease;} 
+#toggle-icon.rotated {transform: rotate(180deg);}
+
+/*Dropdown*/
+#blocked-list-wrap {
+    overflow: hidden;/*esconde o que passou do limite de altura*/
+    max-height: 0;
+    transition: max-height 0.3s ease;
+}
+#blocked-list-inner {
+    border: 1px solid #c7b2e7; 
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    overflow: hidden;
+}
+/*mensagem de quando a tabela estiver vazia*/
+#blocked-empty {
+    text-align: center;
+    padding: 20px;
+    color: #888;
+    font-size: 0.9em;
+}
+/*tabela de bloqueados*/
+#blocked-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;/*deixa as colunas com largura fixa*/
+}
+#blocked-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid #e0d4f7;
+    font-size: 0.9em;
+    vertical-align: middle;
+}
+#blocked-table tr:last-child td {border-bottom: none;}
+/*definição da largura das 3 colunas*/
+#blocked-table td:nth-child(1) {width: 45%; font-weight: bold;}
+#blocked-table td:nth-child(2) {width: 30%; color: #888;}
+#blocked-table td:nth-child(3) {width: 25%; text-align: right;}
+/*botão de desbloquar usuário*/
+.unblock-btn {
+    padding: 4px 12px;
+    background: transparent;
+    border: 1px solid #c0392b;
+    color: #c0392b;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.8em;
+    transition: background 0.2s;
+}
+.unblock-btn:hover {background: #fdecea;}
+
 /*RESPONSIVIDADE = não é adaptar para telas, é permitir que o layout se adapte sozinho*/
 /*@media = "if"*/
 @media (max-width: 768px) {/*desktop-first; min-width: 768px = mobile-first*/

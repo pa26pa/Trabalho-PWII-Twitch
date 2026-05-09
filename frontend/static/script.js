@@ -656,4 +656,128 @@ document.addEventListener('DOMContentLoaded', function () {
             })
         })
     }
+
+    //ABA DE PRIVACIDADE (USERS BLOQUEADOS)
+    const blockInput = document.getElementById('block-input');
+    const blockBtn = document.getElementById('block-btn');
+    const blockFeedback = document.getElementById('block-feedback');
+    const toggleBtn = document.getElementById('toggle-blocked');
+    const toggleIcon = document.getElementById('toggle-icon');
+    const listWrap = document.getElementById('blocked-list-wrap');
+    const listInner = document.getElementById('blocked-list-inner');
+    const blockedTable = document.getElementById('blocked-table');
+    const blockBody = document.getElementById('blocked-body');
+    const blockEmpty = document.getElementById('blocked-empty');
+
+    if (blockBtn) {
+        let isOpen = false; //controla pra saber se o dropdown tá aberto
+        let blockUsers = []; //array que vai guardar os usuários bloquados
+
+        //funçõ para montar a tabela dos users bloquados
+        function renderTable() {
+            blockBody.innerHTML = ''; //limpa linhas antigas
+
+            if (blockUsers.length === 0) {
+                //se não houver user bloquado, aparece mensagem
+                blockEmpty.style.display = 'block';
+                blockedTable.style.display = 'none';
+            } else {
+                blockEmpty.style.display = 'none';
+                blockedTable.style.display = 'table';
+
+                blockUsers.forEach((usuario, index) => {
+                    //cria uma linha na table pra cada user
+                    const tr = document.createElement('tr');
+                    //cria as 3 células da table (nome, data e botão para desbloquear)
+                    tr.innerHTML = `
+                        <td>${usuario.nome}</td>
+                        <td>${usuario.data}</td>
+                        <td>
+                            <button class="unblock-btn" data-index="${index}">Desbloquear</button>
+                        </td>
+                    `; 
+                    blockBody.appendChild(tr); //une a linha na table
+                });
+
+                //add um evento de desbloqueio em cada botão gerado
+                blockBody.querySelectorAll('.unblock-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const i = +btn.dataset.index; //pega o índice do array
+                        blockUsers.splice(i, 1);//remove do array
+                        renderTable();//reenderiza a table
+                        updateHeight();//ajusta tamanho do dropdown
+                    });
+                });
+            }
+        }
+
+        //função para ajustar altura do dropdown
+        function updateHeight() {
+            if (isOpen) {
+                listWrap.style.maxHeight = listInner.scrollHeight + 'px'; //scrollHeight é a altura real do content interno
+            } else {
+                listWrap.style.maxHeight = '0';
+            }
+        }
+
+        //botão de exibir table
+        toggleBtn.addEventListener('click', () => {
+            isOpen = !isOpen; //alterna entra aberto e fechado
+            //rotação da seta
+            toggleIcon.classList.toggle('rotated', isOpen);
+
+            if(isOpen) renderTable();
+            updateHeight();
+        });
+
+        //botão de bloquar
+        blockBtn.addEventListener('click', async () => {
+            const nome = blockInput.value.trim();
+            blockFeedback.textContent = '';
+            if (!nome) return;
+
+            //verifica se já está bloquado 
+            const alreadyExists = blockUsers.find(
+                u => u.nome.toLowerCase() === nome.toLowerCase()
+            );
+            if (alreadyExists) {
+                blockFeedback.textContent = 'Esse usuário já está bloqueado';
+                return;
+            }
+
+            blockBtn.disabled = true;
+            blockBtn.textContent = 'Verificando...';
+
+            try {
+                //chama back pra ver se user existe no BD
+                const res = await fetch(`/api/verificar-usuario?nome=${encodeURIComponent(nome)}`);
+                const data = await res.json();
+
+                if (data.exist) {
+                    //se user existe, add no array
+                    const today = new Date().toLocaleDateString('pt-BR');
+                    blockUsers.push({ nome, data: today });
+                    blockInput.value = '';
+
+                    //se o dropdown estiver aberto irá atualizar na hora
+                    if (isOpen) {
+                        renderTable();
+                        updateHeight();
+                    }
+                } else {
+                    blockFeedback.textContent = 'Usuário não encontrado';
+                }
+            } catch {
+                blockFeedback.textContent = 'Erro ao verificar. Tente novamente'
+            }
+
+            blockBtn.disabled = false;
+            blockBtn.textContent = 'Bloquear';
+        });
+
+        //permite usar Enter no input para bloquear
+        blockInput.addEventListener('keydown', e => {
+            if (e.key === 'Enter') blockBtn.click();
+        });
+    }
 });

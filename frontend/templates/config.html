@@ -146,7 +146,42 @@
             </div>
         </section>
         <section id="priv" class="section-config">
-            <h1 data-i18n>Privacidade</h1>
+            <div class="blocked-wrap">
+
+                <!--input e botão-->
+                <div class="blocked-input">
+                    <input type="text" id="block-input" placeholder="Digite um nome de usuário" data-i18n-placeholder>
+                    <button id="block-btn" data-i18n>Bloquear</button>
+                </div>
+                <!--mensagem de erro-->
+                <p id="block-feedback"></p>
+                <ul>
+                    <li data-i18n>Irá impedi-los de enviar mensagens privadas instantâneas para você</li>
+                    <li data-i18n>Irá impedi-los de hospedá-lo</li>
+                    <li data-i18n>Irá impedir que compre inscrições de presente para outros usuários no seu canal</li>
+                    <li data-i18n>Irá filtrar as mensagens fora dos chats que você não modera</li>
+                    <li data-i18n>Irá impedir que o usuário assista suas transmissões ao vivo</li>
+                </ul>
+
+                <!--botão para expandir lista de bloqueados-->
+                <button id="toggle-blocked">
+                    <span data-i18n>Exibir usuários bloqueados</span>
+                    <i class="fa-solid fa-chevron-down" id="toggle-icon"></i>
+                </button>
+
+                <!--parte de expansão e colapso-->
+                <div id="blocked-list-wrap">
+                    <div id="blocked-list-inner">
+                        <!--quando não houver bloquados (lista vazia)-->
+                        <p id="blocked-empty">Ninguém foi bloqueado ainda</p>
+
+                        <!--tabela que será preenchida pelo JS-->
+                        <table id="blocked-table">
+                            <tbody id="blocked-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </section>
         <section id="not" class="section-config">
             <h1 data-i18n>Notificações</h1>
