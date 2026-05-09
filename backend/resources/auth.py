@@ -592,7 +592,7 @@ class bloquear(Resource):
                 return {
                     'status':'error',
                     'mensagem':'Ele já está bloqueado'
-                }
+                },400
                 
             a = """insert into bloqueados(id_bloqueador, id_bloqueado) values(%s,%s);"""
             cursor.execute(a,(id_bloqueador,id_bloqueado))
