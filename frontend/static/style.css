@@ -1128,7 +1128,7 @@ a {text-decoration: none;}
 }
 
 /* OIEEE aqui é a leta, to fazendo os negocio do TOAST*/
-#toast {
+.toast {
     position: absolute;
     margin: 0 auto;
     /* top: 10px;
@@ -1143,14 +1143,14 @@ a {text-decoration: none;}
     max-width: 300px;
 }
 
-#toast.show {
+.toast.show {
     opacity: 1;
 }
 
-#toast.success {
+.toast.success {
     background-color: #2ecc71;
 }
 
-#toast.error {
+.toast.error {
     background-color: #e74c3c;
 }
