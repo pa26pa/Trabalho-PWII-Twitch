@@ -1,6 +1,6 @@
 from flask import Flask, render_template
 from flask_restful import Api, Resource
-from backend.resources.auth import signin, login, forgot, redefine_password,delete_Account, logout, check_login , dados_config, search,translate, resend_code, check_codigo, google
+from backend.resources.auth import signin, login, forgot, redefine_password,delete_Account,bloquear, logout, check_login , dados_config, search,translate, resend_code, check_codigo, google
 from dotenv import load_dotenv
 from authlib.integrations.flask_client import OAuth
 import os
@@ -48,6 +48,7 @@ def perfil():
 api.add_resource(signin,'/signin')
 api.add_resource(login,'/login')
 api.add_resource(logout, '/logout')
+api.add_resource(bloquear, '/bloquear')
 #api.add_resource(google,'/login/google')
 
 api.add_resource(delete_Account, '/delete')

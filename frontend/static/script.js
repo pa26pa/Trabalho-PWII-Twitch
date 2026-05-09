@@ -754,14 +754,18 @@ document.addEventListener('DOMContentLoaded', function () {
 
         //botão de bloquar
         blockBtn.addEventListener('click', async () => {
+
             const nome = blockInput.value.trim();
+
             blockFeedback.textContent = '';
+
             if (!nome) return;
 
-            //verifica se já está bloquado 
+            // verifica se já está bloqueado
             const alreadyExists = blockUsers.find(
                 u => u.nome.toLowerCase() === nome.toLowerCase()
             );
+
             if (alreadyExists) {
                 blockFeedback.textContent = 'Esse usuário já está bloqueado';
                 return;
@@ -771,35 +775,57 @@ document.addEventListener('DOMContentLoaded', function () {
             blockBtn.textContent = 'Verificando...';
 
             try {
-                //chama back pra ver se user existe no BD
-                const res = await fetch(`/api/verificar-usuario?nome=${encodeURIComponent(nome)}`);
+
+                const dados = {
+                    nome: nome
+                };
+
+                const res = await fetch("http://127.0.0.1:5000/bloquear", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(dados)
+                });
+
                 const data = await res.json();
 
-                if (data.exist) {
-                    //se user existe, add no array
+                console.log(data);
+
+                if (data.existe) {
+
                     const today = new Date().toLocaleDateString('pt-BR');
-                    blockUsers.push({ nome, data: today });
+
+                    blockUsers.push({
+                        nome: nome,
+                        data: today
+                    });
+
                     blockInput.value = '';
 
-                    //se o dropdown estiver aberto irá atualizar na hora
+                    // atualiza tabela
                     if (isOpen) {
                         renderTable();
                         updateHeight();
                     }
+
                 } else {
                     blockFeedback.textContent = 'Usuário não encontrado';
                 }
-            } catch {
-                blockFeedback.textContent = 'Erro ao verificar. Tente novamente'
+
+            } catch (erro) {
+
+                console.log(erro);
+
+                blockFeedback.textContent =
+                    'Erro ao verificar. Tente novamente';
+
+            } finally {
+
+                // SEMPRE executa
+                blockBtn.disabled = false;
+                blockBtn.textContent = 'Bloquear';
             }
-
-            blockBtn.disabled = false;
-            blockBtn.textContent = 'Bloquear';
-        });
-
-        //permite usar Enter no input para bloquear
-        blockInput.addEventListener('keydown', e => {
-            if (e.key === 'Enter') blockBtn.click();
         });
     }
 });

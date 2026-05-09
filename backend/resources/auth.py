@@ -563,4 +563,52 @@ class update_Password(Resource):
             'status':'error',
             'mensagem':'senha incorreta'
         }
+
+class bloquear(Resource):
+    def post(self):
+        data = request.get_json()
+        
+        con = connection()
+        cursor = con.cursor(pymysql.cursors.DictCursor)
+        
+        person = data.get('nome')
+
+        query = """select * from usuarios where user_name = %s"""
+        cursor.execute(query,(person,))
+        existe = cursor.fetchone()
+        
+        if existe:
+            b = """select id_usuario from usuarios where user_name = %s"""
+            cursor.execute(b,(person,))
+            resposta = cursor.fetchone()
+            id_bloqueado = resposta['id_usuario']
+            id_bloqueador = session['usuario_id']
+                    
+            aaa = """select id_bloqueador from bloqueados where id_bloqueador = %s and id_bloqueado = %s"""
+            cursor.execute(aaa,(id_bloqueador,id_bloqueado))
+            ja = cursor.fetchone()
+            
+            if ja:
+                return {
+                    'status':'error',
+                    'mensagem':'Ele já está bloqueado'
+                }
+                
+            a = """insert into bloqueados(id_bloqueador, id_bloqueado) values(%s,%s);"""
+            cursor.execute(a,(id_bloqueador,id_bloqueado))
+            con.commit()
+            
+            cursor.close()
+            con.close()
+            print('achei')
+            return {
+                'status':'success',
+                'mensagem':'usuario encontrado e bloquado',
+                'existe':True
+            },200
+
+        return {
+            'status':'error',
+            'mensagem':'Não foi possivel encontrar esse usuario'
+        }, 400
             
