@@ -174,8 +174,6 @@ class check_login(Resource):
             
             cursor.close()
             con.close()
-
-            print(session['usuario_id'])
             
             return {
                 'status':'success',
@@ -572,7 +570,10 @@ class bloquear(Resource):
         cursor = con.cursor(pymysql.cursors.DictCursor)
         
         person = data.get('nome')
+        date = data.get('data')
 
+        data_bloq = data_valida(date)
+        
         query = """select * from usuarios where user_name = %s"""
         cursor.execute(query,(person,))
         existe = cursor.fetchone()
@@ -594,13 +595,13 @@ class bloquear(Resource):
                     'mensagem':'Ele já está bloqueado'
                 },400
                 
-            a = """insert into bloqueados(id_bloqueador, id_bloqueado) values(%s,%s);"""
-            cursor.execute(a,(id_bloqueador,id_bloqueado))
+            a = """insert into bloqueados(id_bloqueador, id_bloqueado, data_bloq) values(%s,%s,%s);"""
+            cursor.execute(a,(id_bloqueador,id_bloqueado,data_bloq))
             con.commit()
             
             cursor.close()
             con.close()
-            print('achei')
+
             return {
                 'status':'success',
                 'mensagem':'usuario encontrado e bloquado',
@@ -611,4 +612,43 @@ class bloquear(Resource):
             'status':'error',
             'mensagem':'Não foi possivel encontrar esse usuario'
         }, 400
+
+class desbloquear(Resource):
+    def post(self):
+        data = request.get_json()
+        
+        con = connection()
+        cursor = con.cursor(pymysql.cursors.DictCursor)
+        
+        nome = data.get('nome')
+   
+        usuario = session['usuario_id']
+        
+        a = """select id_usuario from usuarios where user_name = %s"""
+        cursor.execute(a,(nome,))
+        resposta = cursor.fetchone()
+        id = resposta['id_usuario']
+        
+        try:
+            query = """delete from bloqueados where id_bloqueador = %s and id_bloqueado = %s"""
+            cursor.execute(query,(usuario,id))
+            con.commit()
+        
+            cursor.close()
+            con.close()
             
+            
+            
+            return {
+                'status':'success',
+                'mensagem':'Usuario desbloqueado com sucesso'
+            }
+        except pymysql.MySQLError as error:
+            
+            return {
+                'status':'error',
+                'mensagem':'não foi possivel desbloquear'
+            }
+        
+        
+        

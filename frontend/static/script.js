@@ -723,11 +723,33 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 //add um evento de desbloqueio em cada botão gerado
                 blockBody.querySelectorAll('.unblock-btn').forEach(btn => {
-                    btn.addEventListener('click', () => {
+                    btn.addEventListener('click', async () => {
                         const i = +btn.dataset.index; //pega o índice do array
-                        blockUsers.splice(i, 1);//remove do array
-                        renderTable();//reenderiza a table
-                        updateHeight();//ajusta tamanho do dropdown
+                        
+                        
+                        try {
+                            const usuario = blockUsers[i];
+                            const dados = {
+                                nome:usuario.nome
+                            };
+                            const res = await fetch("http://127.0.0.1:5000/desbloquear", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify(dados)
+                            }); 
+                            const data = await res.json();
+
+                            blockFeedback.textContent = data.mensagem;
+
+                            blockUsers.splice(i, 1);//remove do array
+                            renderTable();//reenderiza a table
+                            updateHeight();//ajusta tamanho do dropdown
+                        } catch {
+                            console.log(':(')
+                            blockFeedback.textContent = 'Erro ao desbloquear usuário';
+                        }       
                     });
                 });
             }
@@ -775,9 +797,10 @@ document.addEventListener('DOMContentLoaded', function () {
             blockBtn.textContent = 'Verificando...';
 
             try {
-
+                const today = new Date().toLocaleDateString('pt-BR');
                 const dados = {
-                    nome: nome
+                    nome: nome,
+                    data: today
                 };
 
                 const res = await fetch("http://127.0.0.1:5000/bloquear", {
@@ -794,7 +817,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 if (data.existe) {
 
-                    const today = new Date().toLocaleDateString('pt-BR');
 
                     blockUsers.push({
                         nome: nome,
