@@ -307,7 +307,7 @@ h2 {
     font-weight: bold;
 }
 /*MESAGEM DE ERRO*/
-#erroIdade, .erroSenha, .erroSenha2 {
+#erroIdade, .erroSenha, .erroSenha2, .erroSenha3 {
     display: none;
     color: #48237f;
     font-weight: bold;

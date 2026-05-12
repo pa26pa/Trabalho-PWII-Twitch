@@ -377,7 +377,7 @@ class check_codigo(Resource):
             'mensagem':'Codigo correto'
         }, 200
 class redefine_password(Resource):
-    def post(self):
+    def put(self):
         data = request.get_json()
         
         con = connection()
@@ -542,16 +542,18 @@ class update_Password(Resource):
         old = data.get('senha_antiga')
         nova = data.get('senha_nova')
         id = session['usuario_id']
-        
+        print(nova)
+        nova = generate_password_hash(nova)
         query = """select senha from usuarios where id_usuario = %s"""
         cursor.execute(query, (id,))
         senha = cursor.fetchone()
         
-        if check_password_hash(senha, old):
+        
+        if check_password_hash(senha['senha'], old):
             a = """update usuarios set senha = %s where id_usuario = %s"""
             cursor.execute(a,(nova,id))
             con.commit()
-            
+            print('deu BOM')
             return {
                 'status':'success',
                 'mensagem':'Senha atualizada'
@@ -560,7 +562,7 @@ class update_Password(Resource):
         return {
             'status':'error',
             'mensagem':'senha incorreta'
-        }
+        }, 400
 
 class bloquear(Resource):
     def post(self):

@@ -305,7 +305,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const erroSenha2 = document.querySelector('.erroSenha2');
 
     //função para validar se a senha de confirmação é igual à senha original, exibindo uma mensagem de erro e aplicando uma classe de erro ao input de confirmação se as senhas não coincidirem
-    function confirmarSenha() {
+    function confirmarSenha(senhaInput1,senhaInput2,erroSenha2) {
         if (!senhaInput1 || !senhaInput2 || !erroSenha2) return true;
         if (senhaInput2.value === '' || senhaInput1.value === senhaInput2.value) {
             erroSenha2.style.display = 'none';
@@ -317,13 +317,17 @@ document.addEventListener('DOMContentLoaded', function () {
         return false;
     }
 
-    if (senhaInput1 && senhaInput2 && erroSenha2) {
-        senhaInput2.addEventListener('blur', confirmarSenha);
-        senhaInput2.addEventListener('input', () => {
-            erroSenha2.style.display = 'none';
-            senhaInput2.classList.remove('input-erro');
-        });
+    function setupConfirmarSenha(senhaInput1,senhaInput2,erroSenha2) {
+        if (senhaInput1 && senhaInput2 && erroSenha2) {
+            senhaInput2.addEventListener('blur', confirmarSenha);
+            senhaInput2.addEventListener('input', () => {
+                erroSenha2.style.display = 'none';
+                senhaInput2.classList.remove('input-erro');
+            });
+            return true; 
+        }
     }
+    
 
     // Toast é um aviso que desaparece rapidamente, não precisa apertar no X para sairrrr :)
     function mostrarToast(mensagem, tipo) {
@@ -405,6 +409,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // ENVIO DOS FORMS
     document.querySelectorAll('.forms').forEach(form => {
+        const senha1 = form.querySelector('.password1');
+        const senha2 = form.querySelector('.password2');
+        const erro = form.querySelector('.erroSenha2');
+
+        setupConfirmarSenha(senha1,senha2,erro)
         form.addEventListener('submit', function (validarForm) {
             validarForm.preventDefault();
 
@@ -414,7 +423,13 @@ document.addEventListener('DOMContentLoaded', function () {
             let envio = true;
             if (!form.checkValidity()) envio = false;
             if (form.querySelector('#data-nascimento') && !validarIdade()) envio = false;
-            if (form.querySelector('.password2') && !confirmarSenha()) envio = false;
+            if (form.querySelector('.password2')) {
+                if (!confirmarSenha(senha1,senha2,erro)) {
+                envio = false;    
+                
+                }
+            } 
+
             form.querySelectorAll('.password-box').forEach(box => {
                 const senhaInput = box.querySelector('.password');
                 const erroSenha = box.querySelector('.erroSenha');
@@ -485,6 +500,28 @@ document.addEventListener('DOMContentLoaded', function () {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
+                },
+                body: JSON.stringify(dados)
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status == 'error'){
+                        mostrarToast(data.mensagem, data.status)
+                    }
+                });
+            }
+
+            if (form.classList.contains('form-new-password')) {
+                const dados = {
+                    senha_nova: form.querySelector('.password2').value,
+                    senha_antiga: form.querySelector('.password-atual').value
+                }
+                console.log(dados);
+                
+                fetch("http://127.0.0.1:5000/update", {
+                method:"PUT",
+                headers: {
+                    "Content-Type":"application/json"
                 },
                 body: JSON.stringify(dados)
                 })
