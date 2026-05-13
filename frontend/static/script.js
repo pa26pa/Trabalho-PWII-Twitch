@@ -529,7 +529,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 .then(data => {
                     if (data.status == 'error'){
                         mostrarToast(data.mensagem, data.status)
-                    }
+                        return 
+                    } 
+                    mostrarToast(data.mensagem, data.status)
+                    fecharModal(form)
                 });
             }
         });

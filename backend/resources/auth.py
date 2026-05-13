@@ -553,7 +553,7 @@ class update_Password(Resource):
             a = """update usuarios set senha = %s where id_usuario = %s"""
             cursor.execute(a,(nova,id))
             con.commit()
-            print('deu BOM')
+            print('deu BOM') 
             return {
                 'status':'success',
                 'mensagem':'Senha atualizada'
