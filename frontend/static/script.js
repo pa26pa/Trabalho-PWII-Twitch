@@ -462,6 +462,27 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (data.status == 'error'){
                         mostrarToast(data.mensagem, data.status)
                     } else {
+                        const dado = {
+                            username_email: dados['user_name'],
+                            senha: dados['senha']
+                        }
+
+                        fetch("http://127.0.0.1:5000/login", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(dado)
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.status == 'error'){
+                                mostrarToast(data.mensagem, data.status)
+                            } else {
+                                fecharModal(form);
+                                verificarSessao();
+                            }
+                        });
                         fecharModal(form);
                     }
                 });
