@@ -26,7 +26,7 @@ oauth = OAuth(app)
 #  é pra ficar mais fácil, porque e ele abre o site 
 @app.route("/")
 def home():  
-    return render_template("config.html")
+    return render_template("inicio.html")
 
 @app.route("/moon")
 def luna():
@@ -34,7 +34,7 @@ def luna():
 
 @app.route("/config")
 def config(): 
-    return render_template('inicio.html')
+    return render_template('config.html')
 
 @app.route("/ajuda")
 def ajuda():

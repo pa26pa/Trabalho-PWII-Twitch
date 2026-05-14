@@ -575,7 +575,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     } 
                     mostrarToast(data.mensagem, data.status)
                     //fecharModal(form)
-                    window.location.href = "/config";
+                    window.location.href = "/";
                     verificarSessao()
                 });
     })
