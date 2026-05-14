@@ -558,9 +558,9 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     });
-    const btn_delete = document.querySelector(".btn-delete");
-
-    btn_delete.addEventListener("click", function() {
+    const btnDelete = document.querySelector(".btn-delete");
+    if (btnDelete) {
+        btnDelete.addEventListener("click", function() {
         fetch("http://127.0.0.1:5000/delete", {
                 method:"DELETE",
                 headers: {
@@ -575,10 +575,12 @@ document.addEventListener('DOMContentLoaded', function () {
                     } 
                     mostrarToast(data.mensagem, data.status)
                     //fecharModal(form)
-                    window.location.href = "/";
                     verificarSessao()
+                    window.location.href = "/";
+                    
                 });
-    })
+        })
+    }
 
     const closeButtons = document.querySelectorAll('.btn-close-modal');
     info_user();
