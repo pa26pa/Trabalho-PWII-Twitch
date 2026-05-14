@@ -558,7 +558,27 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     });
+    const btn_delete = document.querySelector(".btn-delete");
 
+    btn_delete.addEventListener("click", function() {
+        fetch("http://127.0.0.1:5000/delete", {
+                method:"DELETE",
+                headers: {
+                    "Content-Type":"application/json"
+                }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status == 'error'){
+                        mostrarToast(data.mensagem, data.status)
+                        return 
+                    } 
+                    mostrarToast(data.mensagem, data.status)
+                    //fecharModal(form)
+                    window.location.href = "/config";
+                    verificarSessao()
+                });
+    })
 
     const closeButtons = document.querySelectorAll('.btn-close-modal');
     info_user();
