@@ -103,19 +103,6 @@ document.addEventListener('DOMContentLoaded', function () {
             btnreceberCodigo.disabled = !inputEmail.checkValidity();//checkValidity(): método nativo que verifica se o valor do input é válido de acordo com os atributos HTML (como type="email")
         });
         btnreceberCodigo.disabled = true;
-        btnreceberCodigo.addEventListener('click', function (troca) {
-            troca.preventDefault();
-            emailBox.style.display = 'none';
-            insertcodeBox.style.display = 'flex';
-
-            //resete dos inputs
-            emailBox.querySelectorAll('input').forEach(input => input.value = '');
-            btnreceberCodigo.disabled = true;
-        
-            inputs.forEach(input => input.value = '');//limpa os inputs de código para garantir que o usuário comece com campos vazios ao receber um novo código
-            if (continueBtn) continueBtn.disabled = true;
-            startTimer();//inicia o timer de reenvio do código assim que o usuário clica para receber o código
-        });
     }
 
     // REENVIO DO CÓDIGO COM TIMER
@@ -512,26 +499,43 @@ document.addEventListener('DOMContentLoaded', function () {
                 });
             }
 
-            if (form.classList.contains('email')) {
+            if (form.classList.contains('email-forgot-password')) {
+
                 const dados = {
                     email: document.getElementById('email_forgot').value
-                }
-                
+                };
+
                 fetch("http://127.0.0.1:5000/forgot", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(dados)
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(dados)
                 })
                 .then(res => res.json())
                 .then(data => {
-                    if (data.status == 'error'){
-                        mostrarToast(data.mensagem, data.status)
+
+                    mostrarToast(data.mensagem, data.status);
+
+                    if (data.status === 'success') {
+
+                        emailBox.style.display = 'none';
+                        insertcodeBox.style.display = 'flex';
+
+                        emailBox.querySelectorAll('input')
+                            .forEach(input => input.value = '');
+
+                        btnreceberCodigo.disabled = true;
+
+                        inputs.forEach(input => input.value = '');
+
+                        if (continueBtn) continueBtn.disabled = true;
+
+                        startTimer();
                     }
                 });
             }
-
+            if (form.classList.contains(''))
             if (form.classList.contains('form-new-password')) {
                 const dados = {
                     senha_nova: form.querySelector('.password2').value,

@@ -302,12 +302,12 @@ class forgot(Resource):
             }, 404
             
         email = email_forgot
-        
+        print("yey")
         w = """select id_usuario from usuarios where email = %s"""
         cursor.execute(w,(email,))
         resposta = cursor.fetchone()
-        
-        id = resposta['id_usuario']
+        print("yey")
+        id = resposta[0]
         # mandando código no email
         codigo = send_code(email)
         
