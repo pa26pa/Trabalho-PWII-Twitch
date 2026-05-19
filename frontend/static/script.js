@@ -663,6 +663,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const normalAside = document.querySelector('.normal-aside');
     const iconPageAside = document.querySelectorAll('.pages-icon-aside');
     const spanPageAside = document.querySelectorAll('.span-link-aside');
+    const asideContent = document.querySelectorAll('.aside-content');
     if (backAside && normalAside && iconPageAside && spanPageAside) {  // ← proteção (moon.html não tem aside)
         let asideOpen = true;
 
@@ -670,11 +671,13 @@ document.addEventListener('DOMContentLoaded', function () {
             if (asideOpen) {
                 normalAside.style.width = '5%';
                 spanPageAside.forEach(span => span.style.display = 'none');
+                asideContent.forEach(cont => cont.style.display = 'none');
                 iconPageAside.forEach(icon => icon.style.fontSize = '1.8em');
                 bA.style.transform = 'rotateY(180deg)';
             } else {
                 normalAside.style.width = '20%';
                 spanPageAside.forEach(span => span.style.display = 'flex');
+                asideContent.forEach(cont => cont.style.display = 'flex');
                 iconPageAside.forEach(icon => icon.style.fontSize = '1.4em');
                 bA.style.transform = 'rotateY(0deg)';
             }
