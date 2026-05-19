@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // verifica sessão ao carregar
-    async function verificarSessao() {
+    async function verificarSessao() { 
 
         try {
             const res = await fetch("http://127.0.0.1:5000/session", {
@@ -655,25 +655,27 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // MENU LATERAL
-    const backAside = document.getElementById('back-aside');
-    const aside = document.querySelector('aside');
-    if (backAside && aside) {  // ← proteção (moon.html não tem aside)
+    const backAside = document.querySelectorAll('.back-aside');
+    const normalAside = document.querySelector('.normal-aside');
+    const iconPageAside = document.querySelectorAll('.pages-icon-aside');
+    const spanPageAside = document.querySelectorAll('.span-link-aside');
+    if (backAside && normalAside && iconPageAside && spanPageAside) {  // ← proteção (moon.html não tem aside)
         let asideOpen = true;
-        aside.classList.add('open'); // ← começa aberto
 
-        backAside.addEventListener('click', () => {
+        backAside.forEach(bA => bA.addEventListener('click', () => {
             if (asideOpen) {
-                aside.style.width = '5%';
-                aside.classList.remove('open'); // ← remove classe quando fecha
-                // apenas vira instantaneamente, sem transição de rotação
-                backAside.style.transform = 'rotate(180deg)';
+                normalAside.style.width = '5%';
+                spanPageAside.forEach(span => span.style.display = 'none');
+                iconPageAside.forEach(icon => icon.style.fontSize = '1.8em');
+                bA.style.transform = 'rotateY(180deg)';
             } else {
-                aside.style.width = '20%';
-                aside.classList.add('open'); // ← adiciona classe quando abre
-                backAside.style.transform = 'rotate(0deg)';
+                normalAside.style.width = '20%';
+                spanPageAside.forEach(span => span.style.display = 'flex');
+                iconPageAside.forEach(icon => icon.style.fontSize = '1.4em');
+                bA.style.transform = 'rotateY(0deg)';
             }
-            asideOpen = !asideOpen;//alterna o estado do menu lateral entre aberto e fechado a cada clique
-        });
+            asideOpen = !asideOpen;//alterna o estado do menu lateral entre grande e pequeno a cada clique
+        }));
     }
 
     //MENU DROPDOWN

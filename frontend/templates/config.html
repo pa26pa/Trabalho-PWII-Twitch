@@ -9,7 +9,7 @@
     <link rel="icon" type="image/x-icon" href="{{url_for('static', filename='witch.png')}}">
 </head> 
 <body id="body-config"> 
-    <header id="header">
+    <header id="header"> 
         <div class="logo"><a href="{{url_for('home')}}"><img id="logo" src="{{url_for('static', filename='witch.png')}}" alt="logo"></a></div>
         <div class="header-center">
             <!--BARRA DE PESQUISA-->
@@ -197,9 +197,18 @@
     </main>
 
     <aside class="small-aside">
-        <a href="{{url_for('config')}}" class="aside-link" id="aside-config"><img src="{{url_for('static', filename='setting.png')}}" alt="icon-config"></a>
+        <div class="box-links-pages">
+            <!-- aparece só quando logado -->
+            <a href="{{url_for('config')}}" class="aside-pages">
+                <i class="fa-solid fa-gear pages-icon-aside"></i>
+            </a>
 
-        <a href="{{url_for('ajuda')}}" class="aside-link"><img src="{{url_for('static', filename='help.png')}}" alt="icon-help"></a>
+            <hr class="aside-hr">
+
+            <a href="{{url_for('ajuda')}}" class="aside-pages">
+                <i class="fa-regular fa-circle-question pages-icon-aside"></i> 
+            </a>
+        </div>
     </aside>
 
     <script src="{{url_for('static', filename='tradutor.js')}}"></script>

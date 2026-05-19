@@ -13,7 +13,7 @@
     padding-left: 20px;
 }
 #logo{width: 60px;}
-
+ 
 /*ALTERNÂNCIA ENTRE LOGADO E DESLOGADO*/
 .with-login  { display: none; } /* começa escondido */
 .without-login { display: flex; align-items: center; gap: 12px; }
@@ -536,14 +536,13 @@ textarea:-webkit-autofill {
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-direction: column;
 }
 /*botão para fechar e abrir o aside*/
-#back-aside {
+.back-aside {
     position: absolute;
     top: 15%; 
     left: 5%;
-    width: 40px;
-    height: 30px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -556,34 +555,68 @@ textarea:-webkit-autofill {
     transform: rotate(0deg);
     transition: transform 0.2s;
 }
-aside.open #back-aside:hover {
-    transform: translateX(10px);
-    transition: transform 0.2s;
-}
-/* pessoinha no dropdown button quando logado */
-#pessoa-icon { width: 28px; border-radius: 50%; }
+.back-aside:hover { color: #38294C; transform: translateX(10px);}
 
-/* links do aside */
-.aside-link {
+/*users ao vivo que segue*/
+.aside-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: auto;
+    margin: 0 auto;
+    flex-direction: column;
+    gap: 10px;
+    padding: 25px;
+}
+
+/*box de links para pags no aside*/
+.box-links-pages {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: auto;
+    padding: 5px;
+}
+.box-links-pages hr {
+    border-color: #4e3e65;
+    box-shadow: none;
+    width: 90%;
+}
+.pages-icon-aside {
+    font-size: 1.4em;
+    color: #48237F;
+}
+/* links para pags no aside */
+.aside-pages {
     display: flex;
     align-items: center;
     gap: 8px;
-    color: #000;
+    color: #48237F;
     font-weight: bold;
     text-decoration: none;
-    font-size: 1.5em;
-    padding: 8px 12px;
+    padding: 10px;
     border-radius: 8px;
-    width: 85%;
+    width: 100%;
     transition: background 0.2s;
     justify-content: center;
 }
-.aside-link:hover { background: #c7b2e7; }
+.aside-pages:hover { background: #c7b2e7; }
+.aside-pages span {
+    color: #48237F;
+    font-weight: bold;
+    font-size: 1.8em;
+}
 #aside-config {bottom: 80px;}
-.normal-aside img {width: 30px;}
+
 
 /*MENU DROPDOWN*/
+/* pessoinha no dropdown button quando logado */
+#pessoa-icon { width: 28px; border-radius: 50%; }
+
 .dropdown-menu-wrap {
     position: relative;
 }
@@ -867,7 +900,7 @@ a {text-decoration: none;}
     justify-content: center;
     align-items: center;
 }
-.small-aside img {width: 40px;}
+.small-aside .pages-icon-aside {font-size: 1.8em;}
 .aside-link:last-child { bottom: 30px; }
 
 .header-config {

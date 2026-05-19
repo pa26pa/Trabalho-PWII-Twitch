@@ -198,7 +198,7 @@
                         <!--LOGADO OU NÃO-->
                         <li id="language-item" class="submenu-item">
                             <span data-i18n>Idioma</span>
-                            <span class="arrow">></span>
+                            <span class="arrow"><i class="fa-solid fa-angle-up"></i></span>
 
                             <div id="language-submenu" class="submenu">
                                 <ul>
@@ -228,19 +228,61 @@
     <div class="toast"></div>
 
     <aside class="normal-aside">
-        <button type="button" id="back-aside">&#8658;</button><br><br>
-        <div class="lives-box">
-            <p class="lives-aside"><div class="aside-photo"></div>Pessoa 1.0 <div class="viewers-aside">1.3M</div><div class="red-circle"></div></p>
-            <p class="lives-aside"><div class="aside-photo"></div>Pessoa 2.0 <div class="viewers-aside">1.3M</div><div class="red-circle"></div></p>
-            <p class="lives-aside"><div class="aside-photo"></div>Pessoa 3.0 <div class="viewers-aside">1.3M</div><div class="red-circle"></div></p>
-            <p class="lives-aside"><div class="aside-photo"></div>Pessoa 4.0 <div class="viewers-aside">1.3M</div><div class="red-circle"></div></p>
+        <i class="fa-solid fa-angles-right back-aside"></i>
+        
+        <div class="aside-content">
+            <div class="lives-box">
+                <a href="#" class="lives-aside">
+                    <div class="aside-photo"></div>
+                    <span class="aside-name">Pessoa 1.0</span>
+                    <div class="aside-right">
+                        <span class="viewers-aside">1.3M</span>
+                        <div class="red-circle"></div>
+                    </div>
+                </a>
+                <a href="#" class="lives-aside">
+                    <div class="aside-photo"></div>
+                    <span class="aside-name">Pessoa 2.0</span>
+                    <div class="aside-right">
+                        <span class="viewers-aside">1.3M</span>
+                        <div class="red-circle"></div>
+                    </div>
+                </a>
+                <a href="#" class="lives-aside">
+                    <div class="aside-photo"></div>
+                    <span class="aside-name">Pessoa 3.0</span>
+                    <div class="aside-right">
+                        <span class="viewers-aside">1.3M</span>
+                        <div class="red-circle"></div>
+                    </div>
+                </a>
+                <a href="#" class="lives-aside">
+                    <div class="aside-photo"></div>
+                    <span class="aside-name">Pessoa 4.0</span>
+                    <div class="aside-right">
+                        <span class="viewers-aside">1.3M</span>
+                        <div class="red-circle"></div>
+                    </div>
+                </a>
+            </div>
+
+            <hr class="aside-hr">
         </div>
-        <!--CONFIGURAÇÕES APENAS QUANDO LOGADO-->
-        <hr>
-        <a href="{{url_for('config')}}" class="aside-link with-login" id="aside-config">Configurações</a>
-        <hr>
-        <a href="{{url_for('ajuda')}}" class="aside-link"><img src="{{url_for('static', filename='help.png')}}" alt="icon-help">Ajuda</a>
-        <hr>
+
+        <div class="box-links-pages">
+            <!-- aparece só quando logado -->
+            <a href="{{url_for('config')}}" class="aside-pages">
+                <i class="fa-solid fa-gear pages-icon-aside"></i>
+                <span class="with-login span-link-aside">Configurações</span>
+            </a>
+
+            <hr class="aside-hr">
+
+            <a href="{{url_for('ajuda')}}" class="aside-pages">
+                <i class="fa-regular fa-circle-question pages-icon-aside"></i> 
+                <span class="span-link-aside">Ajuda</span>
+            </a>
+        </div>
     </aside>
 
     <h1 id="texto">asdfghjklhhhh <br>
