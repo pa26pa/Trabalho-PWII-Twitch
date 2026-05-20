@@ -336,12 +336,13 @@ document.addEventListener('DOMContentLoaded', function () {
     // Função para mostrar o cpf
     function info_user_CPF(cpf) {
         const mostra = document.getElementById('show_cpf')
+        if (!cpf || !mostra) return ;
         mostra.textContent = cpf;
     }
 
     function info_user_name(user_name) {
         const mostra = document.querySelectorAll('.show_name');
-        
+        if (!user_name || !mostra) return ;
         mostra.forEach(mostra => {
             mostra.textContent = user_name;
         })
@@ -349,17 +350,20 @@ document.addEventListener('DOMContentLoaded', function () {
     // função para mostrar email
     function info_user_email(email) {
         const mostra = document.getElementById('show_email');
+        if (!email || !mostra) return ;
         mostra.textContent = email;
     }
 
     // função para mostrar data de nascimento
     function info_user_data(data) {
         const mostra = document.getElementById('show_data');
+        if (!data || !mostra) return ;
         mostra.textContent = data ;
     }
 
     // função para mascara do cpf, assim ele fica protegito 
     function mascara_CPF_config(cpf) {
+        if (!cpf) return ;
         return cpf.replace(/(\d{3})\.(\d{3})\.(\d{3})\-(\d{2})/, "$1.***.***-$4");
     }
 
@@ -535,7 +539,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                 });
             }
-            if (form.classList.contains(''))
+
             if (form.classList.contains('form-new-password')) {
                 const dados = {
                     senha_nova: form.querySelector('.password2').value,
