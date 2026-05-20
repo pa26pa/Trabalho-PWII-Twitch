@@ -568,20 +568,32 @@ textarea:-webkit-autofill {
     flex-direction: column;
     gap: 10px;
     padding: 25px;
-    border: 4px solid red;
 }
 .lives-aside {
+    position: relative;
     display: flex;
-    flex-direction: column;
+    align-items: center;
     width: 95%;
     height: auto;
-    border: 4px solid red;
 }
 .aside-photo {
-    width: 5%;
-    height: 5%;
-    background-color: purple;
+    font-size: 2.2em;
+    color: purple;
     border-radius: 50%;
+    margin-right: 5px;
+}
+.aside-right {
+    position: absolute;
+    right: 10px;
+    display: flex;
+    align-items: center;
+    width: 25%;
+    height: auto;
+    gap: 5px;
+}
+.red-circle {
+    font-size: 0.5em;
+    color: red;
 }
 
 /*box de links para pags no aside*/
@@ -595,7 +607,7 @@ textarea:-webkit-autofill {
     height: auto;
     padding: 5px;
 }
-.box-links-pages hr {
+.box-links-pages hr, .normal-aside hr {
     border-color: #4e3e65;
     box-shadow: none;
     width: 90%;
