@@ -690,7 +690,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 normalAside.style.width = '5%';
                 spanPageAside.forEach(span => span.style.display = 'none');
                 asideContent.forEach(cont => cont.style.display = 'none');
-                iconPageAside.forEach(icon => icon.style.fontSize = '1.8em');
+                iconPageAside.forEach(icon => icon.style.fontSize = '2.5em');
                 bA.style.transform = 'rotateY(180deg)';
             } else {
                 normalAside.style.width = '20%';
