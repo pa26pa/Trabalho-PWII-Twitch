@@ -185,16 +185,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // TROCA INSERIR CÓDIGO → REDEFINIR SENHA
     const newpasswordBox = document.getElementById('new-password');
-    if (insertcodeBox && newpasswordBox && continueBtn) {  // ← proteção
-        continueBtn.addEventListener('click', function (troca) {
-            troca.preventDefault();//preventDefault():evita que o formulário seja enviado ou que a página seja recarregada quando o botão de continuar for clicado
-            insertcodeBox.style.display = 'none';
-            newpasswordBox.style.display = 'flex';
-            // limpa os inputs do código ao sair
-            inputs.forEach(input => input.value = '');
-            if (continueBtn) continueBtn.disabled = true;
-        });
-    }
+    //if (insertcodeBox && newpasswordBox && continueBtn) {  // ← proteção
+    //    continueBtn.addEventListener('click', function (troca) {
+    //        troca.preventDefault();//preventDefault():evita que o formulário seja enviado ou que a página seja recarregada quando o botão de continuar for clicado
+    //        insertcodeBox.style.display = 'none';
+    //        newpasswordBox.style.display = 'flex';
+    //        // limpa os inputs do código ao sair
+    //        inputs.forEach(input => input.value = '');
+    //        if (continueBtn) continueBtn.disabled = true;
+    //    });
+    //}
 
     // MÁSCARA CPF
     const cpfInput = document.getElementById('cpf');
@@ -567,7 +567,42 @@ document.addEventListener('DOMContentLoaded', function () {
                         return 
                     } 
                     mostrarToast(data.mensagem, data.status)
+                    insertcodeBox.style.display = 'none';
+                    newpasswordBox.style.display = 'flex';
+                    // limpa os inputs do código ao sair
+                    inputs.forEach(input => input.value = '');
+                    if (continueBtn) continueBtn.disabled = true;
                 });
+            }
+
+            if (form.classList.contains('new-password')) {
+                const dados = {
+                    nova_senha: form.querySelector('.password2').value
+                }
+
+                fetch("http://127.0.0.1:5000/redefine_password", {
+                method:"PUT",
+                headers: {
+                    "Content-Type":"application/json"
+                },
+                body: JSON.stringify(dados)
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status == 'error'){
+                        mostrarToast(data.mensagem, data.status)
+                        return 
+                    } 
+                    mostrarToast(data.mensagem, data.status)
+                    mostrarToast(data.mensagem, data.status);
+
+                    newpasswordBox.style.display = 'none';
+                    loginBox.style.display = 'flex';
+                    changeButton.style.display = 'flex';
+                    newpasswordBox.querySelectorAll('input').forEach(input => input.value = '');
+                    fecharModal(form);
+                });
+
             }
             if (form.classList.contains('form-new-password')) {
                 const dados = {
@@ -662,34 +697,34 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // BOTÃO VOLTAR AO LOGIN — desabilitado até senhas válidas e iguais
-    const backLogin = document.getElementById('backLogin');
-    if (loginBox && changeButton && newpasswordBox && backLogin) {
-        if (backLogin) backLogin.disabled = true; // ← começa desabilitado
-
+    //const backLogin = document.getElementById('backLogin');
+    //if (loginBox && changeButton && newpasswordBox && backLogin) {
+    //    if (backLogin) backLogin.disabled = true; // ← começa desabilitado
+//
         // verifica se pode habilitar sempre que digitar
-        function checkNewPassword() {
-            if (!senhaInput1 || !senhaInput2) return;
-            const valid = senhaInput1.value.length >= 5
-                && senhaInput2.value.length >= 5
-                && senhaInput1.value === senhaInput2.value;
-            backLogin.disabled = !valid;
-        }
+//        function checkNewPassword() {
+  //          if (!senhaInput1 || !senhaInput2) return;
+    //        const valid = senhaInput1.value.length >= 5
+      //          && senhaInput2.value.length >= 5
+        //        && senhaInput1.value === senhaInput2.value;
+          //  backLogin.disabled = !valid;
+       // }
 
-        if (senhaInput1) senhaInput1.addEventListener('input', checkNewPassword);
-        if (senhaInput2) senhaInput2.addEventListener('input', checkNewPassword);
+       // if (senhaInput1) senhaInput1.addEventListener('input', checkNewPassword);
+       // if (senhaInput2) senhaInput2.addEventListener('input', checkNewPassword);
 
-        backLogin.addEventListener('click', function (troca) {
-            troca.preventDefault();
-            newpasswordBox.style.display = 'none';
-            loginBox.style.display = 'flex';
-            changeButton.style.display = 'flex';
+        //backLogin.addEventListener('click', function (troca) {
+      //      troca.preventDefault();
+    //        newpasswordBox.style.display = 'none';
+  //          loginBox.style.display = 'flex';
+//            changeButton.style.display = 'flex';
 
-            newpasswordBox.querySelectorAll('input').forEach(input => input.value = '');
-            newpasswordBox.querySelectorAll('.erroSenha, .erroSenha2').forEach(el => el.style.display = 'none');
-            newpasswordBox.querySelectorAll('.input-erro').forEach(el => el.classList.remove('input-erro'));
-            backLogin.disabled = true; // ← reseta para desabilitado ao voltar
-        });
-    }
+           // newpasswordBox.querySelectorAll('input').forEach(input => input.value = '');
+         //   newpasswordBox.querySelectorAll('.erroSenha, .erroSenha2').forEach(el => el.style.display = 'none');
+       //     newpasswordBox.querySelectorAll('.input-erro').forEach(el => el.classList.remove('input-erro'));
+     //       backLogin.disabled = true; // ← reseta para desabilitado ao voltar
+        //});
+   // }
 
     // MENU LATERAL
     const backAside = document.querySelectorAll('.back-aside');

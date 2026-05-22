@@ -393,9 +393,10 @@ class redefine_password(Resource):
         update = """ update usuarios set senha = %s where id_usuario = %s"""
         cursor.execute(update,(nova_senha_hash,session['id_provisorio']))
         con.commit()
+        id = session['id_provisorio']
         
         session['usuario_id'] = id
-        session.pop['id_provisorio']
+        session.pop('id_provisorio')
         cursor.close()
         con.close()
         
