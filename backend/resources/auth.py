@@ -312,7 +312,7 @@ class forgot(Resource):
         codigo = send_code(email)
         
         # guardando o id e o código na session
-        session['usuario_id'] = id
+        session['id_provisorio'] = id
         session['code'] = codigo 
         
         cursor.close()
@@ -335,7 +335,7 @@ class resend_code(Resource):
         
         # Usando a session para pegar o email so usuario
         query = """select email from usuarios where id_usuario = %s"""
-        cursor.execute(query,(session['usuario_id']))
+        cursor.execute(query,(session['id_provisorio']))
         email = cursor.fetchone()
         
         # enviando código
@@ -391,9 +391,11 @@ class redefine_password(Resource):
         
         # atualizando a senha
         update = """ update usuarios set senha = %s where id_usuario = %s"""
-        cursor.execute(update,(nova_senha_hash,session['usuario_id']))
+        cursor.execute(update,(nova_senha_hash,session['id_provisorio']))
         con.commit()
         
+        session['usuario_id'] = id
+        session.pop['id_provisorio']
         cursor.close()
         con.close()
         

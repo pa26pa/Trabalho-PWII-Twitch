@@ -553,6 +553,22 @@ document.addEventListener('DOMContentLoaded', function () {
                     codigo : codigoInserido()
                 }
                 console.log(dados);
+
+                fetch("http://127.0.0.1:5000/check_codigo", {
+                method:"POST",
+                headers: {
+                    "Content-Type":"application/json"
+                },
+                body: JSON.stringify(dados)
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status == 'error'){
+                        mostrarToast(data.mensagem, data.status)
+                        return 
+                    } 
+                    mostrarToast(data.mensagem, data.status)
+                });
             }
             if (form.classList.contains('form-new-password')) {
                 const dados = {
