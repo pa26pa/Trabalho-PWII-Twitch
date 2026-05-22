@@ -319,19 +319,19 @@ document.addEventListener('DOMContentLoaded', function () {
     // Toast é um aviso que desaparece rapidamente, não precisa apertar no X para sairrrr :)
     function mostrarToast(mensagem, tipo) {
     const toasts = document.querySelectorAll('.toast'); 
-    toasts.forEach(toast => {
-        toast.textContent = mensagem;
-        
-        
-        toast.classList.add('show');
-        toast.classList.add(tipo); 
+        toasts.forEach(toast => {
+            toast.textContent = mensagem;
+            
+            
+            toast.classList.add('show');
+            toast.classList.add(tipo); 
 
-        setTimeout(() => {
-            toast.classList.remove('show');
-            toast.classList.remove(tipo);
-        }, 4000);
-    });
-}
+            setTimeout(() => {
+                toast.classList.remove('show');
+                toast.classList.remove(tipo);
+            }, 4000);
+        });
+    }
 
     // Função para mostrar o cpf
     function info_user_CPF(cpf) {
@@ -399,7 +399,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function codigoInserido() {
-       
         const inputs = document.querySelectorAll('.otp-input');
         if (inputs.length === 0) return null;
         return Array.from(inputs).map(i => i.value).join('');
@@ -755,6 +754,115 @@ document.addEventListener('DOMContentLoaded', function () {
             languageSubmenu.classList.toggle('show');
         });
     }        
+
+    // Página Inicial - Em Alta (galeria de lives)
+    const carouselHome = document.querySelector('.carousel-wrap');
+    const trackHome    = document.getElementById('track-home');
+
+    if (carouselHome && trackHome) {
+        let currentHome = 0;
+        const totalHome = trackHome.children.length; // pega automático
+
+        function goToHome(i) {
+            currentHome = (i + totalHome) % totalHome;
+            const w = trackHome.children[0].offsetWidth;
+            trackHome.style.transform = `translateX(-${currentHome * w}px)`;
+        }
+
+        document.getElementById('prev').addEventListener('click', () => goToHome(currentHome - 1));
+        document.getElementById('next').addEventListener('click', () => goToHome(currentHome + 1));
+        window.addEventListener('resize', () => goToHome(currentHome));
+    }
+
+    //controles dos videos
+    const player    = document.getElementById('player');
+    const gifImg    = document.getElementById('gif-img');
+    const playBtn   = document.getElementById('play-btn');
+    const playIcon  = document.getElementById('play-icon');
+    const progFill  = document.getElementById('progress-fill');
+    const progWrap  = document.getElementById('progress-wrap');
+    const muteBtn   = document.getElementById('mute-btn');
+    const volIcon   = document.getElementById('vol-icon');
+    const volRange  = document.getElementById('vol-range');
+    const fsBtn     = document.getElementById('fs-btn');
+    const fsIcon    = document.getElementById('fs-icon');
+
+    if (player) {
+        let playing  = true;
+        let muted    = false;
+        let progress = 0;
+        let timer;
+
+        // ── PROGRESSO SIMULADO (GIF não tem timeupdate) ──
+        function startProgress() {
+            clearInterval(timer);
+            timer = setInterval(() => {
+                progress = (progress + 0.08) % 100; // loop de 0 a 100
+                progFill.style.width = progress + '%';
+            }, 100);
+        }
+        function stopProgress() { clearInterval(timer); }
+
+        // ── PLAY / PAUSE ──
+        function togglePlay() {
+            playing = !playing;
+            if (playing) {
+                player.classList.remove('paused');
+                playIcon.className = 'ti ti-player-pause'; // ícone de pause
+                gifImg.src = gifImg.src; // reinicia o GIF (truque para simular play)
+                startProgress();
+            } else {
+                player.classList.add('paused');
+                playIcon.className = 'ti ti-player-play';
+                stopProgress();
+            }
+        }
+
+        // clique no botão ou na área do vídeo
+        playBtn.addEventListener('click', e => { e.stopPropagation(); togglePlay(); });
+        player.addEventListener('click', togglePlay);
+
+        // ── BARRA DE PROGRESSO ──
+        progWrap.addEventListener('click', e => {
+            e.stopPropagation();
+            const rect = progWrap.getBoundingClientRect();
+            progress = ((e.clientX - rect.left) / rect.width) * 100;
+            progFill.style.width = progress + '%';
+        });
+
+        // ── MUTE ──
+        muteBtn.addEventListener('click', e => {
+            e.stopPropagation();
+            muted = !muted;
+            volIcon.className = muted ? 'ti ti-volume-off' : 'ti ti-volume';
+            volRange.value    = muted ? 0 : 80;
+        });
+
+        // ── VOLUME ──
+        volRange.addEventListener('input', e => {
+            e.stopPropagation();
+            muted = volRange.value == 0;
+            // ícone muda conforme o nível
+            if (muted)              volIcon.className = 'ti ti-volume-off';
+            else if (volRange.value < 50) volIcon.className = 'ti ti-volume-2';
+            else                    volIcon.className = 'ti ti-volume';
+        });
+
+        // ── TELA CHEIA ──
+        fsBtn.addEventListener('click', e => {
+            e.stopPropagation();
+            if (!document.fullscreenElement) {
+                player.requestFullscreen?.();
+                fsIcon.className = 'ti ti-arrows-minimize';
+            } else {
+                document.exitFullscreen?.();
+                fsIcon.className = 'ti ti-arrows-maximize';
+            }
+        });
+
+        // inicia o progresso simulado ao carregar
+        startProgress();
+    }
 
     //----------------MOON--------------------
     // CARROSSEL 
