@@ -291,5 +291,23 @@
 
         <script src=""></script>
         <script src="{{url_for('static', filename='script.js')}}"></script>
+        <!-- create table usuarios (
+                id_usuario int auto_increment primary key,
+                cpf varchar(14),
+                email varchar(50),
+                user_name varchar(50),
+                senha varchar(500),
+                data_nascimento date
+            );
+
+            create table bloqueados (
+                id int auto_increment primary key,
+                id_bloqueador int,
+                id_bloqueado int,
+                data_bloq date,
+                
+                foreign key (id_bloqueador) references usuarios(id_usuario),
+                foreign key (id_bloqueado) references usuarios(id_usuario)
+            );-->
     </body>
 </html>
