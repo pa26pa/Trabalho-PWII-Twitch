@@ -329,7 +329,7 @@ document.addEventListener('DOMContentLoaded', function () {
         setTimeout(() => {
             toast.classList.remove('show');
             toast.classList.remove(tipo);
-        }, 5000);
+        }, 4000);
     });
 }
 
@@ -396,6 +396,14 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         form.reset();
+    }
+
+    function codigoInserido() {
+       
+        const inputs = document.querySelectorAll('.otp-input');
+        if (inputs.length === 0) return null;
+        return Array.from(inputs).map(i => i.value).join('');
+        
     }
 
     // ENVIO DOS FORMS
@@ -540,6 +548,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 });
             }
 
+            if (form.classList.contains('insert-code')) {
+                const dados = {
+                    codigo : codigoInserido()
+                }
+                console.log(dados);
+            }
             if (form.classList.contains('form-new-password')) {
                 const dados = {
                     senha_nova: form.querySelector('.password2').value,
