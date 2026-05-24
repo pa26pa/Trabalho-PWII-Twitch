@@ -6,12 +6,19 @@ from flask import Flask, json
 from email_validator import EmailNotValidError, validate_email
 from datetime import datetime
 from dotenv import load_dotenv
+from supabase import create_client, Client
 import os
 
 load_dotenv()
 
+url = os.getenv("SUPABASE_URL")
+key = os.getenv("SUPABASE_KEY")
+supabase: Client = create_client(url,key)
+
 bd_password = os.getenv("DB_PASSWORD")
 email_password = os.getenv("EMAIL_PASSWORD")
+
+
 
 # Conectando com o Mysql :):)
 def connection():

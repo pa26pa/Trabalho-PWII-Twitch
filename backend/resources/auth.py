@@ -6,7 +6,7 @@ import random
 import smtplib
 from email.message import EmailMessage
 import mimetypes
-from backend.database.connection import connection, send_code, email_valido, data_valida, carregar, salvar, cache_traducoes, file
+from backend.database.connection import supabase, connection, send_code, email_valido, data_valida, carregar, salvar, cache_traducoes, file
 from datetime import date, datetime, timedelta
 from email_validator import validate_email, EmailNotValidError
 from deep_translator import GoogleTranslator
@@ -19,9 +19,6 @@ import time
 class signin(Resource):
     def post(self):
         data = request.get_json()
-
-        con = connection()
-        cursor = con.cursor()
         
         # retirando dados do js
         cpf = str(data.get('cpf'))
@@ -49,36 +46,35 @@ class signin(Resource):
 
         senha_hash = generate_password_hash(senha)
 
+        existe = supabase.table("usuarios") \
+            .select("*")\
+            .or_(f"cpf.eq.{cpf},email.eq.{email},user_name.eq.{user_name}")\
+            .execute()
         
-        query = """select * from usuarios where cpf = %s or email = %s or user_name = %s"""
-        cursor.execute(query,(cpf,email,user_name))
-        existe = cursor.fetchone()
-        
-        
-                
-        if existe:
-            cursor.close()
-            con.close()
-
+        print(existe.data)
+        if existe.data:
             return{
                 'status':'error',
                 'mensagem':'Já existe um usuário com este CPF, email ou nome de usuario'
             }, 406
             
         try:
-            insert = """insert into usuarios(cpf,email,user_name,senha,data_nascimento) values (%s,%s,%s,%s,%s)"""
-            cursor.execute(insert,(cpf,email,user_name,senha_hash,data_formatada))
-        
-        except pymysql.err.IntegrityError:
+            insert = supabase.table("usuarios")\
+                .insert({
+                    "cpf":cpf,
+                    "email":email,
+                    "user_name":user_name,
+                    "senha":senha_hash,
+                    "data_nascimento":data_formatada
+                }).execute()
+        except Exception as e:
+            print(e)
+            
             return {
             'status':'error',
             'mensagem':'Ouve um erro, informações duplicadas'
             }, 400
-        
-        con.commit()
-        
-        cursor.close()
-        con.close()
+
         return {
             'status':'success',
             'mensagem':'O cadastro foi feito com sucesso'
@@ -94,9 +90,6 @@ class signin(Resource):
 class login(Resource):
     def post(self):
         data = request.get_json()
-        
-        con = connection()
-        cursor = con.cursor(pymysql.cursors.DictCursor)
             
         #retirando dados do js
         username_email = data.get('username_email')
@@ -110,17 +103,19 @@ class login(Resource):
         else:
             coluna = 'email'
         
-        # vendo se realmente existe alguem com aquele email ou nome de usuario
-        query = f"""select id_usuario, senha from usuarios where {coluna} = %s"""
-        cursor.execute(query,(username_email,))
-        login_valido = cursor.fetchone()
+        query = supabase.table("usuarios")\
+            .select("id_usuario, senha")\
+            .or_(f"{coluna}.eq.{username_email}")\
+            .maybe_single()\
+            .execute()
+            
+        login_valido = query.data
         
         # Checkando se existe o email ou nome de usuario e se a senha em hash é correta
         if login_valido and check_password_hash(login_valido['senha'], senha):
             session['usuario_id'] = login_valido['id_usuario']
             
-            cursor.close()
-            con.close()
+    
             return {
                 'status':'success',
                 'mensagem':'Login feito com sucesso'
@@ -128,8 +123,6 @@ class login(Resource):
         
         else:
             
-            cursor.close()
-            con.close()
             return {
                 'status':'error',
                 'mensagem':'Email, nome de usuario ou senha incorretos'
@@ -159,21 +152,21 @@ class check_login(Resource):
     def get(self):
         print(session)
         if 'usuario_id' in session:
-            con = connection()
-            cursor = con.cursor(pymysql.cursors.DictCursor)
-
-            #id_ficticio = 1
+            id = session["usuario_id"]
             
-            #session['usuario_id'] = id_ficticio
+            query = supabase.table("usuarios")\
+                .select("cpf,email,user_name,data_nascimento")\
+                .or_(f"id_usuario.eq.{id}")\
+                .maybe_single()\
+                .execute()
             
-            email = """select cpf, email, user_name, data_nascimento from usuarios where id_usuario = %s"""
-            cursor.execute(email,(session['usuario_id'],))
-            info_usuario = cursor.fetchone()
+            info_usuario = query.data
             
-            data_formatada = info_usuario['data_nascimento'].strftime('%d/%m/%Y')
+            #email = """select cpf, email, user_name, data_nascimento from usuarios where id_usuario = %s"""
+            #cursor.execute(email,(session['usuario_id'],))
+            #info_usuario = cursor.fetchone()
             
-            cursor.close()
-            con.close()
+            data_formatada = datetime.strptime(info_usuario['data_nascimento'],'%Y-%m-%d').strftime('%d/%m/%Y')
             
             return {
                 'status':'success',
