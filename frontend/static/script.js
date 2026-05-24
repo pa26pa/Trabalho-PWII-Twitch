@@ -630,6 +630,21 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     });
+    const btnResend = document.getElementById("resendBtn");
+    if (btnResend) {
+        btnResend.addEventListener("click", function() {
+            fetch("http://127.0.0.1:5000/resend", {
+                method:"GET",
+                headers: {
+                    "Content-Type":"application/json"
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                mostrarToast(data.mensagem, data.status)
+            })
+        })
+    }
     const btnDelete = document.querySelector(".btn-delete");
     if (btnDelete) {
         btnDelete.addEventListener("click", function() {
