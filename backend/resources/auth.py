@@ -109,7 +109,13 @@ class login(Resource):
             .maybe_single()\
             .execute()
             
+        if query is None or not hasattr(query, 'data'):
+            return {"message": "Erro ao conectar com o banco ou consulta inválida"}, 500
+
         login_valido = query.data
+
+        if not login_valido:
+            return {"message": "Usuário não encontrado"}, 404
         
         # Checkando se existe o email ou nome de usuario e se a senha em hash é correta
         if login_valido and check_password_hash(login_valido['senha'], senha):
@@ -156,11 +162,17 @@ class check_login(Resource):
             
             query = supabase.table("usuarios")\
                 .select("cpf,email,user_name,data_nascimento")\
-                .or_(f"id_usuario.eq.{id}")\
+                .eq("id_usuario", id)\
                 .maybe_single()\
                 .execute()
             
+            if query is None or not hasattr(query, 'data'):
+                return {"message": "Erro ao conectar com o banco ou consulta inválida"}, 500
+
             info_usuario = query.data
+
+            if not info_usuario:
+                return {"message": "Usuário não encontrado"}, 404
             
             #email = """select cpf, email, user_name, data_nascimento from usuarios where id_usuario = %s"""
             #cursor.execute(email,(session['usuario_id'],))
@@ -183,32 +195,6 @@ class check_login(Resource):
             'mensagem':'não está logado'
         }, 204
     
-class dados_config(Resource):
-    def get(self):
-        con = connection()
-        cursor = con.cursor(pymysql.cursors.DictCursor)
-
-        #id_ficticio = 1
-        
-        #session['usuario_id'] = id_ficticio
-        
-        email = """select cpf, email, user_name, data_nascimento from usuarios where id_usuario = %s"""
-        cursor.execute(email,(session['usuario_id'],))
-        info_usuario = cursor.fetchone()
-        
-        data_formatada = info_usuario['data_nascimento'].strftime('%d/%m/%Y')
-        
-        cursor.close()
-        con.close()
-
-        return {
-            'status':'success',
-            'mensagem':'Email encontrado',
-            'email': info_usuario['email'],
-            'cpf': info_usuario['cpf'],
-            'data': data_formatada,
-            'name':info_usuario['user_name'] 
-        }, 200
 
 class google(Resource):
     def post(self):
@@ -278,38 +264,38 @@ class forgot(Resource):
                 'status':'error',
                 'mensagem':'esse email não é valido'
             }, 401
-            
-        # vendo se o email existe e está cadastrado
-        query = """select * from usuarios where email = %s"""
-        cursor.execute(query,(email_forgot,))
-        achou_email = cursor.fetchone()
         
+        query = supabase.table("usuarios")\
+            .select("*")\
+            .or_(f"email.eq.{email_forgot}")\
+            .execute()
         
+        achou_email = query.data
+
         if not achou_email:
-            cursor.close()
-            con.close()
-            
             return{
                 'status':'error',
                 'mensagem':'Este email ainda não está cadastrado'
             }, 404
             
         email = email_forgot
-        print("yey")
-        w = """select id_usuario from usuarios where email = %s"""
-        cursor.execute(w,(email,))
-        resposta = cursor.fetchone()
-        print("yey")
-        id = resposta[0]
+
+        id = supabase.table("usuarios")\
+            .select("id_usuario")\
+            .or_(f"email.eq.{email}")\
+            .maybe_single()\
+            .execute()
+            
+        resposta = id.data
+        id = resposta["id_usuario"]
+        
         # mandando código no email
         codigo = send_code(email)
         
         # guardando o id e o código na session
         session['id_provisorio'] = id
         session['code'] = codigo 
-        
-        cursor.close()
-        con.close()
+
         return {
             'status':'success',
             'mensagem':'O código foi enviado no seu email'
@@ -323,22 +309,23 @@ class forgot(Resource):
 
 class resend_code(Resource):
     def get(self):
-        con = connection()
-        cursor = con.cursor()
+        
+        id = session["id_provisorio"]
         
         # Usando a session para pegar o email so usuario
-        query = """select email from usuarios where id_usuario = %s"""
-        cursor.execute(query,(session['id_provisorio']))
-        email = cursor.fetchone()
-        
+        query = supabase.table("usuarios")\
+            .select("email")\
+            .or_(f"id_usuario.eq.{id}")\
+            .maybe_single()\
+            .execute
+            
+        a = query.data
+        email = a['email']
         # enviando código
         codigo = send_code(email)
         
         # atualizando a session
         session['code'] = codigo 
-        
-        cursor.close()
-        con.close()
         
         return {
             'status':'success',
@@ -348,9 +335,6 @@ class resend_code(Resource):
 class check_codigo(Resource):
     def post(self):
         data = request.get_json()
-        
-        con = connection()
-        cursor = con.cursor()
         
         # pegando o código do js
         codigo_inserido = data.get('codigo')
@@ -372,27 +356,24 @@ class check_codigo(Resource):
 class redefine_password(Resource):
     def put(self):
         data = request.get_json()
-        
-        con = connection()
-        cursor = con.cursor()
-        
+
         # pegando a nova senha do JS
         nova_senha = data.get('nova_senha')
         
         # tranformando ela em hash
         nova_senha_hash = generate_password_hash(nova_senha)
         
-        # atualizando a senha
-        update = """ update usuarios set senha = %s where id_usuario = %s"""
-        cursor.execute(update,(nova_senha_hash,session['id_provisorio']))
-        con.commit()
         id = session['id_provisorio']
+        update = supabase.table("usuarios")\
+            .update({
+                'senha': nova_senha_hash
+            }) \
+            .or_(f"id_usuario.eq.{id}")\
+            .execute()
         
         session['usuario_id'] = id
         session.pop('id_provisorio')
-        cursor.close()
-        con.close()
-        
+
         return {
             'status':'success',
             'mensagem':'senha modificada com sucesso'
@@ -506,22 +487,20 @@ class translate(Resource):
 
 class delete_Account(Resource):
     def delete(self):
-        
-        con = connection()
-        cursor = con.cursor(pymysql.cursors.DictCursor)
-        
         id = session['usuario_id']
         
-        query = """delete from usuarios where id_usuario = %s """
-        cursor.execute(query, (id,))
+        b = supabase.table("bloqueados")\
+            .delete()\
+            .or_(f"id_bloqueador.eq.{id},id_bloqueado.eq.{id}")\
+            .execute()
         
-        con.commit()
-        
+        query = supabase.table("usuarios")\
+            .delete()\
+            .eq("id_usuario",id)\
+            .execute() 
+
         session.clear()
-        
-        cursor.close()
-        con.close()
-        
+
         return {
             'status':'success',
             'mensagem':'Conta excluida'
@@ -532,24 +511,30 @@ class update_Password(Resource):
         
         data = request.get_json()
         
-        con = connection()
-        cursor = con.cursor(pymysql.cursors.DictCursor)
-        
         old = data.get('senha_antiga')
         nova = data.get('senha_nova')
         id = session['usuario_id']
-        print(nova)
-        nova = generate_password_hash(nova)
-        query = """select senha from usuarios where id_usuario = %s"""
-        cursor.execute(query, (id,))
-        senha = cursor.fetchone()
         
+
+        nova = generate_password_hash(nova)
+        
+        query = supabase.table("usuarios")\
+            .select("senha")\
+            .or_(f"id_usuario.eq.{id}")\
+            .maybe_single()\
+            .execute()
+        
+        senha = query.data
         
         if check_password_hash(senha['senha'], old):
-            a = """update usuarios set senha = %s where id_usuario = %s"""
-            cursor.execute(a,(nova,id))
-            con.commit()
-            print('deu BOM') 
+            a = supabase.table("usuarios")\
+                .update({
+                    'senha':nova
+                })\
+                .or_(f"id_usuario.eq.{id}")\
+                .execute()
+                
+
             return {
                 'status':'success',
                 'mensagem':'Senha atualizada'
@@ -564,41 +549,51 @@ class bloquear(Resource):
     def post(self):
         data = request.get_json()
         
-        con = connection()
-        cursor = con.cursor(pymysql.cursors.DictCursor)
-        
         person = data.get('nome')
         date = data.get('data')
 
         data_bloq = data_valida(date)
         
-        query = """select * from usuarios where user_name = %s"""
-        cursor.execute(query,(person,))
-        existe = cursor.fetchone()
+        query = supabase.table("usuarios")\
+            .select("*")\
+            .eq("user_name", person)\
+            .execute()
+        
+        existe = query.data
         
         if existe:
-            b = """select id_usuario from usuarios where user_name = %s"""
-            cursor.execute(b,(person,))
-            resposta = cursor.fetchone()
+            b = supabase.table("usuarios")\
+                .select("id_usuario")\
+                .eq("user_name", person)\
+                .maybe_single()\
+                .execute()
+                
+            resposta = b.data
+            
             id_bloqueado = resposta['id_usuario']
             id_bloqueador = session['usuario_id']
                     
-            aaa = """select id_bloqueador from bloqueados where id_bloqueador = %s and id_bloqueado = %s"""
-            cursor.execute(aaa,(id_bloqueador,id_bloqueado))
-            ja = cursor.fetchone()
+            aaa = supabase.table("bloqueados")\
+                .select("id_bloqueador")\
+                .eq("id_bloqueador", id_bloqueador)\
+                .eq("id_bloqueado",id_bloqueado)\
+                .execute()
+            
+            ja = aaa.data
             
             if ja:
                 return {
                     'status':'error',
                     'mensagem':'Ele já está bloqueado'
                 },400
-                
-            a = """insert into bloqueados(id_bloqueador, id_bloqueado, data_bloq) values(%s,%s,%s);"""
-            cursor.execute(a,(id_bloqueador,id_bloqueado,data_bloq))
-            con.commit()
             
-            cursor.close()
-            con.close()
+            a = supabase.table("bloqueados")\
+                .insert({
+                    'id_bloqueador':id_bloqueador,
+                    'id_bloqueado':id_bloqueado,
+                    'data_bloq':data_bloq
+                })\
+                .execute()
 
             return {
                 'status':'success',
@@ -615,34 +610,33 @@ class desbloquear(Resource):
     def post(self):
         data = request.get_json()
         
-        con = connection()
-        cursor = con.cursor(pymysql.cursors.DictCursor)
-        
         nome = data.get('nome')
-   
+
         usuario = session['usuario_id']
         
-        a = """select id_usuario from usuarios where user_name = %s"""
-        cursor.execute(a,(nome,))
-        resposta = cursor.fetchone()
+        a = supabase.table("usuarios")\
+            .select("id_usuario")\
+            .eq("user_name", nome)\
+            .maybe_single()\
+            .execute()
+        
+        resposta = a.data
+        
         id = resposta['id_usuario']
         
         try:
-            query = """delete from bloqueados where id_bloqueador = %s and id_bloqueado = %s"""
-            cursor.execute(query,(usuario,id))
-            con.commit()
-        
-            cursor.close()
-            con.close()
-            
-            
+            query = supabase.table("bloqueados")\
+                .delete()\
+                .eq('id_bloqueador', usuario)\
+                .eq('id_bloqueado',id)\
+                .execute()
             
             return {
                 'status':'success',
                 'mensagem':'Usuario desbloqueado com sucesso'
             }
-        except pymysql.MySQLError as error:
-            
+        except Exception as error:
+            print(error)
             return {
                 'status':'error',
                 'mensagem':'não foi possivel desbloquear'
