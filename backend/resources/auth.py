@@ -519,6 +519,10 @@ class delete_Account(Resource):
         
         id = session['usuario_id']
         
+        a = """delete from usuarios where id_usuario = %s"""
+        cursor.execute(a, (id,))
+        cursor.commit()
+        
         query = """delete from usuarios where id_usuario = %s """
         cursor.execute(query, (id,))
         
