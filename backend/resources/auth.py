@@ -519,7 +519,7 @@ class delete_Account(Resource):
         
         id = session['usuario_id']
         
-        a = """delete from usuarios where id_usuario = %s"""
+        a = """delete from bloqueados where id_bloqueador = %s or id_bloqueado"""
         cursor.execute(a, (id,))
         cursor.commit()
         
