@@ -53,7 +53,7 @@
                         
                         <li id="language-item" class="submenu-item">
                             <span data-i18n>Idioma</span>
-                            <span class="arrow">></span>
+                            <i class="fa-solid fa-angle-up arrow-language"></i>
 
                             <div id="language-submenu" class="submenu">
                                 <ul>
@@ -71,6 +71,8 @@
                                 <span class="slider"></span>
                             </label>
                         </li>
+                        <hr>
+                        <li id="btn-logout" class="with-login">Sair</li>
                     </ul>
                 </div>
             </div>
@@ -100,6 +102,10 @@
                 <button class="btn-open-modal open-modal" id="btn-new-password" data-modal="modal-2" data-i18n>Redefinir Senha</button>
                 <dialog id="modal-2">
                     <div id="wrap-seg-password">
+                        <div class="modal-buttons">
+                            <p> </p>
+                            <button class="btn-close-modal" data-modal="modal-2"><i class="fa-solid fa-x close-x"></i></button>
+                        </div>
                         <h1>Crie sua nova Senha</h1>
                         <form action="#" method="post" class="form-new-password forms" novalidate>
                             <div class="caixa-input">
@@ -118,8 +124,8 @@
                                 <p class="erroSenha2" data-i18n>A senha não é igual</p>
                             </div>
                             <div class="btn-modal-seg">
-                                <button class="btn-seg-red open-modal btn-close-modal"  data-modal="modal-2" data-i18n>Cancelar</button>
                                 <button type="submit" class="open-modal" id="btn-create-password" data-i18n>Criar</button>
+                                <button class="btn-seg-red open-modal btn-close-modal"  data-modal="modal-2" data-i18n>Cancelar</button>
                             </div>
                         </form>
                     </div>
@@ -137,11 +143,15 @@
                 <button class="btn-open-modal open-modal btn-seg-red" id="btn-delete-account" data-modal="modal-3" data-i18n>Excluir Conta</button>
                 <dialog id="modal-3">
                     <div id="wrap-seg-delete">
+                        <div class="modal-buttons">
+                            <p> </p>
+                            <button class="btn-close-modal" data-modal="modal-3"><i class="fa-solid fa-x close-x"></i></button>
+                        </div>
                         <h1 data-i18n>Deseja mesmo excluir sua conta?</h1>
                         <p data-i18n>Excluir a conta permanentemente apagará todos os seus dados</p><br>
                         <div class="btn-modal-seg">
-                            <button class="open-modal btn-close-modal" data-modal="modal-3" data-i18n>Cancelar</button>
-                            <button class="open-modal btn-delete btn-seg-red" data-i18n>Excluir</button>
+                            <button class="open-modal btn-delete" data-i18n>Excluir</button>
+                            <button class="btn-seg-red open-modal btn-close-modal" data-modal="modal-3" data-i18n>Cancelar</button>
                         </div>
                     </div>
                 </dialog>

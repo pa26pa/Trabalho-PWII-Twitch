@@ -51,15 +51,15 @@
                                     <!--frente da div de trocar card-->
                                     <div class="change-button1">
                                         <!--note que um elemento pode ter mais de um nome de class, apenas separe por um espaço-->
-                                        <button class="close-modal btn-close-modal" data-modal="modal-1">X</button>
-                                        <h6><span data-i18n>Entrar</span><span data-i18n>Cadastrar</span></h6>
+                                        <button class="close-modal btn-close-modal" data-modal="modal-1"><i class="fa-solid fa-x close-x"></i></button>
+                                        <h6><span class="bold" data-i18n>ENTRAR</span><span data-i18n>CADASTRAR</span></h6>
                                         <input type="checkbox" class="checkbox" id="checkbox">
                                         <label for="checkbox"></label>
                                     </div>
                                     <!--costas da div de trocar card-->
                                     <div class="change-button2">
-                                        <button class="close-modal btn-close-modal" data-modal="modal-1">X</button>
-                                        <h6><span data-i18n>Entrar</span><span data-i18n>Cadastrar</span></h6>
+                                        <button class="close-modal btn-close-modal" data-modal="modal-1"><i class="fa-solid fa-x close-x"></i></button>
+                                        <h6><span data-i18n>ENTRAR</span><span class="bold" data-i18n>CADASTRAR</span></h6>
                                         <input type="checkbox" class="checkbox" id="checkbox">
                                         <label for="checkbox"></label>
                                     </div>
@@ -83,7 +83,7 @@
                                         <div class="forgot-password">
                                             <a href="#" data-i18n>Esqueceu a senha?</a>
                                         </div>
-                                        <button type="submit" data-i18n>Entrar</button>
+                                        <button type="submit" class="btn-wrapper" data-i18n>Entrar</button>
                                     </form>
                                 </div>
 
@@ -91,13 +91,17 @@
                                 <div id="email-forgot-password">
                                     <div class="center-wrap">
                                         <form action="#" method="post" class="email-forgot-password forms">
+                                            <div class="modal-buttons">
+                                                <i class="fa-solid fa-circle-arrow-left back-arrow-modal"></i>
+                                                <button class="btn-close-modal" data-modal="modal-1"><i class="fa-solid fa-x close-x"></i></button>
+                                            </div>
                                             <h2 data-i18n>Coloque o Email</h2> <br>
                                             <p data-i18n>Por favor, insira o email associado à sua conta para receber o código de redefinição de senha.</p> <br><br><br><br><br>
                                             <div class="caixa-input">
                                                 <input type="email" id="email_forgot" class="email" name="email" required>
                                                 <label for="email" data-i18n>Email</label>
                                             </div> <br><br><br><br><br>
-                                            <button type="submit" id="receber-codigo" data-i18n>Receber Código</button>
+                                            <button type="submit" class="btn-wrapper" id="receber-codigo" data-i18n>Receber Código</button>
                                         </form>
                                     </div>
                                 </div>
@@ -106,6 +110,10 @@
                                 <div id="insert-code">
                                     <div class="center-wrap">
                                         <form action="#" method="post" class="insert-code forms">
+                                            <div class="modal-buttons">
+                                                <i class="fa-solid fa-circle-arrow-left back-arrow-modal"></i>
+                                                <button class="btn-close-modal" data-modal="modal-1"><i class="fa-solid fa-x close-x"></i></button>
+                                            </div>
                                             <h2 data-i18n>Insira o Código</h2> <br>
                                             <p data-i18n>Por favor, insira o código enviado para o seu email.</p> <br><br><br>
                                             <div class="otp-container">
@@ -116,8 +124,8 @@
                                                 <input type="text" maxlength="1" class="otp-input">
                                             </div> <br><br><br>
                                             <p id="timerText" data-i18n>Reenviar código em 60s</p>
-                                            <button id="resendBtn" disabled data-i18n>Reenviar Código</button>
-                                            <button type="submit" id="continueBtn" data-i18n>Continuar</button>
+                                            <button id="resendBtn" class="btn-wrapper" disabled data-i18n>Reenviar Código</button>
+                                            <button type="submit" class="btn-wrapper" id="continueBtn" data-i18n>Continuar</button>
                                         </form>
                                     </div>
                                 </div>
@@ -126,8 +134,12 @@
                                 <div id="new-password">
                                     <div class="center-wrap"> 
                                         <form action="#" method="post" class="new-password forms">
+                                            <div class="modal-buttons">
+                                                <i class="fa-solid fa-circle-arrow-left back-arrow-modal"></i>
+                                                <button class="btn-close-modal" data-modal="modal-1"><i class="fa-solid fa-x close-x"></i></button>
+                                            </div>
                                             <h2 data-i18n>Redefina sua Senha</h2> <br>
-                                            <p data-i18n>Por favor, insira uma nova senha para sua conta, .</p> <br><br><br>
+                                            <p data-i18n>Por favor, insira uma nova senha para sua conta.</p> <br><br><br>
                                             <div class="caixa-input password-box">
                                                 <input type="password" class="password password1" name="password" required>
                                                 <label for="password" data-i18n>Nova Senha</label>
@@ -138,7 +150,7 @@
                                                 <label for="password" data-i18n>Confirmar Senha</label>
                                                 <p class="erroSenha2" data-i18n>A senha não é igual</p>
                                             </div><br><br><br>
-                                            <button type="submit" id="backLogin" data-i18n>Voltar ao Login</button>
+                                            <button type="submit" class="btn-wrapper back-arrow-modal" id="backLogin" data-i18n>Voltar ao Login</button>
                                         </form>
                                     </div>
                                 </div>
@@ -169,7 +181,7 @@
                                             <label for="password" data-i18n>Senha</label>
                                             <p class="erroSenha" data-i18n>Senha Inválida (mínimo 5 caracteres)</p>
                                         </div>
-                                        <button type="submit" data-i18n>Cadastrar</button>
+                                        <button type="submit" class="btn-wrapper" data-i18n>Cadastrar</button>
                                     </form>
                                 </div>
                             </div>
@@ -198,7 +210,7 @@
                             <!--LOGADO OU NÃO-->
                             <li id="language-item" class="submenu-item">
                                 <span data-i18n>Idioma</span>
-                                <span class="arrow"><i class="fa-solid fa-angle-up"></i></span>
+                                <i class="fa-solid fa-angle-up arrow-language"></i>
 
                                 <div id="language-submenu" class="submenu">
                                     <ul>
@@ -215,6 +227,25 @@
                                     <input type="checkbox" id="dark-theme">
                                     <span class="slider"></span>
                                 </label>
+                            </li>
+                            <hr class="with-login">
+
+                            <hr class="aside-mobile-divider">
+                            <li class="aside-mobile-item lives-dropdown with-login" style="display: none;">
+                                <a href="#" class="lives-aside">
+                                    <i class="fa-solid fa-circle aside-photo"></i>
+                                    <span>Pessoa 1.0</span>
+                                    <div class="aside-right">
+                                        <span>1.3M</span>
+                                        <i class="fa-solid fa-circle red-circle"></i>
+                                    </div>
+                                </a>
+                            </li>
+                            <li class="aside-mobile-item lives-dropdown with-login">
+                                <i class="fa-solid fa-circle" style="color:purple; font-size:1.2em;"></i>
+                                <span>Pessoa 2.0</span>
+                                <span>980K</span>
+                                <i class="fa-solid fa-circle red-circle"></i>
                             </li>
 
                             <!--LOGADO-->

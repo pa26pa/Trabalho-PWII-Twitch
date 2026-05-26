@@ -41,6 +41,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (btnLogout) {
         btnLogout.addEventListener('click', async () => {
             await fetch('http://127.0.0.1:5000/logout');
+            window.location.href = "/";
             mostrarDeslogado();
             if (dropdownMenu) dropdownMenu.classList.remove('show');
         });
@@ -183,18 +184,22 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // TROCA INSERIR CÓDIGO → REDEFINIR SENHA
-    const newpasswordBox = document.getElementById('new-password');
-    //if (insertcodeBox && newpasswordBox && continueBtn) {  // ← proteção
-    //    continueBtn.addEventListener('click', function (troca) {
-    //        troca.preventDefault();//preventDefault():evita que o formulário seja enviado ou que a página seja recarregada quando o botão de continuar for clicado
-    //        insertcodeBox.style.display = 'none';
-    //        newpasswordBox.style.display = 'flex';
-    //        // limpa os inputs do código ao sair
-    //        inputs.forEach(input => input.value = '');
-    //        if (continueBtn) continueBtn.disabled = true;
-    //    });
-    //}
+    document.querySelectorAll('.back-arrow-modal').forEach(btn => {
+        btn.addEventListener('click', () => {
+            // se estiver na tela de nova senha, vai direto pro login
+            const newPwVisible = newpasswordBox && newpasswordBox.style.display === 'flex';
+            if (newPwVisible) {
+                telaAtual.historico = []; // limpa histórico
+                telaAtual.ir('login');
+                if (changeButton) changeButton.style.display = '';
+                return;
+            }
+            telaAtual.voltar();
+            if (telaAtual.historico.length === 0 && changeButton) {
+                changeButton.style.display = '';
+            }
+        });
+    });
 
     // MÁSCARA CPF
     const cpfInput = document.getElementById('cpf');
@@ -287,8 +292,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // CONFIRMAÇÃO DE SENHA
-    const senhaInput1 = document.querySelector('.password1');
-    const senhaInput2 = document.querySelector('.password2');
     const erroSenha2 = document.querySelector('.erroSenha2');
 
     //função para validar se a senha de confirmação é igual à senha original, exibindo uma mensagem de erro e aplicando uma classe de erro ao input de confirmação se as senhas não coincidirem
@@ -530,8 +533,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     if (data.status === 'success') {
 
-                        emailBox.style.display = 'none';
-                        insertcodeBox.style.display = 'flex';
+                        telaAtual.avancar('email', 'codigo');
 
                         emailBox.querySelectorAll('input')
                             .forEach(input => input.value = '');
@@ -566,9 +568,8 @@ document.addEventListener('DOMContentLoaded', function () {
                         mostrarToast(data.mensagem, data.status)
                         return 
                     } 
-                    mostrarToast(data.mensagem, data.status)
-                    insertcodeBox.style.display = 'none';
-                    newpasswordBox.style.display = 'flex';
+                    mostrarToast(data.mensagem, data.status);
+                    telaAtual.avancar('codigo', 'senha');
                     // limpa os inputs do código ao sair
                     inputs.forEach(input => input.value = '');
                     if (continueBtn) continueBtn.disabled = true;
@@ -669,6 +670,59 @@ document.addEventListener('DOMContentLoaded', function () {
         })
     }
 
+    //botão de voltar tela no modal Login
+    // NAVEGAÇÃO COM HISTÓRICO NOS MODAIS
+    const telaAtual = {
+        historico: [], // pilha de telas anteriores
+
+        // mapa de id → elemento
+        telas: {
+            'login': document.getElementById('login'),
+            'email': document.getElementById('email-forgot-password'),
+            'codigo': document.getElementById('insert-code'),
+            'senha': document.getElementById('new-password'),
+        },
+
+        ir(para) {
+            // esconde todas
+            Object.values(this.telas).forEach(t => { if (t) t.style.display = 'none'; });
+            // mostra a destino
+            if (this.telas[para]) this.telas[para].style.display = 'flex';
+        },
+
+        avancar(de, para) {
+            this.historico.push(de); // guarda de onde veio
+            this.ir(para);
+        },
+
+        voltar() {
+            const anterior = this.historico.pop();
+            if (anterior) this.ir(anterior);
+        }
+    };
+    // back arrows
+    document.querySelectorAll('.back-arrow-modal').forEach(btn => {
+        btn.addEventListener('click', () => {
+            telaAtual.voltar();
+            // se voltou pro login, mostra o changeButton de novo
+            if (telaAtual.historico.length === 0 && changeButton) {
+                changeButton.style.display = '';
+            }
+        });
+    });
+
+    // substitui os listeners de troca de tela que você já tem:
+    // esqueceu senha: login → email
+    if (forgotLink) {
+        forgotLink.addEventListener('click', e => {
+            e.preventDefault();
+            loginBox.querySelectorAll('input').forEach(i => i.value = '');
+            if (changeButton) changeButton.style.display = 'none';
+            telaAtual.avancar('login', 'email');
+        });
+    }
+
+    //botão para fechar os modais
     const closeButtons = document.querySelectorAll('.btn-close-modal');
     info_user();
     closeButtons.forEach(button => {
@@ -710,36 +764,6 @@ document.addEventListener('DOMContentLoaded', function () {
             document.querySelectorAll('.input-erro').forEach(el => el.classList.remove('input-erro'));
         });
     }
-
-    // BOTÃO VOLTAR AO LOGIN — desabilitado até senhas válidas e iguais
-    //const backLogin = document.getElementById('backLogin');
-    //if (loginBox && changeButton && newpasswordBox && backLogin) {
-    //    if (backLogin) backLogin.disabled = true; // ← começa desabilitado
-//
-        // verifica se pode habilitar sempre que digitar
-//        function checkNewPassword() {
-  //          if (!senhaInput1 || !senhaInput2) return;
-    //        const valid = senhaInput1.value.length >= 5
-      //          && senhaInput2.value.length >= 5
-        //        && senhaInput1.value === senhaInput2.value;
-          //  backLogin.disabled = !valid;
-       // }
-
-       // if (senhaInput1) senhaInput1.addEventListener('input', checkNewPassword);
-       // if (senhaInput2) senhaInput2.addEventListener('input', checkNewPassword);
-
-        //backLogin.addEventListener('click', function (troca) {
-      //      troca.preventDefault();
-    //        newpasswordBox.style.display = 'none';
-  //          loginBox.style.display = 'flex';
-//            changeButton.style.display = 'flex';
-
-           // newpasswordBox.querySelectorAll('input').forEach(input => input.value = '');
-         //   newpasswordBox.querySelectorAll('.erroSenha, .erroSenha2').forEach(el => el.style.display = 'none');
-       //     newpasswordBox.querySelectorAll('.input-erro').forEach(el => el.classList.remove('input-erro'));
-     //       backLogin.disabled = true; // ← reseta para desabilitado ao voltar
-        //});
-   // }
 
     // MENU LATERAL
     const backAside = document.querySelectorAll('.back-aside');
@@ -789,21 +813,37 @@ document.addEventListener('DOMContentLoaded', function () {
     //IDIOMAS - TRADUÇÕES
     const languageItem = document.getElementById('language-item');
     const languageSubmenu = document.getElementById('language-submenu');
+    const arrowLanguage = document.querySelectorAll('.arrow-language');
 
-    if (languageItem && languageSubmenu) {
+    // substitui o listener do language-item
+    if (languageItem && languageSubmenu && arrowLanguage) {
         languageItem.addEventListener('click', (e) => {
+
             if (e.target.closest('.language-option')) {
                 const btn = e.target.closest('.language-option');
-                console.log('idioma clicado:', btn.dataset.lang);
                 putLanguage(btn.dataset.lang);
                 languageSubmenu.classList.remove('show');
                 dropdownMenu.classList.remove('show');
+                // fecha → gira de volta
+                arrowLanguage.forEach(arrow => arrow.style.transform = 'rotate(0deg)');
                 return;
             }
+
             e.stopPropagation();
+            const abrindo = !languageSubmenu.classList.contains('show');
             languageSubmenu.classList.toggle('show');
+            // gira conforme estado
+            arrowLanguage.forEach(arrow => {
+                arrow.style.transform = abrindo ? 'rotate(180deg)' : 'rotate(0deg)';
+            });
         });
-    }        
+
+        // fecha também quando o dropdown fechar
+        document.addEventListener('click', () => {
+            languageSubmenu.classList.remove('show');
+            arrowLanguage.forEach(arrow => arrow.style.transform = 'rotate(0deg)');
+        });
+    }      
 
     // Página Inicial - Em Alta (galeria de lives)
     const carouselHome = document.querySelector('.carousel-wrap');

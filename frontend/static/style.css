@@ -2,8 +2,8 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Times New Roman', Times, serif;
-    font-size: 15px;
+    font-family: Roboto, sans-serif;
+    font-size: 14px;
     color: #3B2B4F;
 } 
 body {
@@ -148,12 +148,17 @@ body {
 .close-modal {
     position: absolute;
     left: 0;
-    top: 0;
+    top: 10%;
     background-color: transparent;
     border: none;
     color: #48237f;
-    font-size: 2.1em;
     cursor: pointer;
+    width: 30px;
+}
+.close-x {
+    font-size: 2.1em;
+    font-weight: bold;
+    color: #48237f;
 }
 
 /*ANIMAÇÃO PARA SUMIR MENU SUPERIOR*/
@@ -243,7 +248,7 @@ body.modal-open {
     justify-content: center;
     transform-style: preserve-3d;
     transition: all 0.6s ease-out;
-    background-color: #c7b2e7;
+    background-color: #fff;
     box-shadow: 0px 0px 15px 15px rgba(0,0,0,0.2);
     border-radius: 30px;
     border: 3px double #48237f;
@@ -334,7 +339,7 @@ h2 {
 }
 
 /*estilo do botão de login e cadastro*/
-#wrapper button {
+#wrapper .btn-wrapper {
     width: 300px;
     height: 40px;
     border-radius: 30px;
@@ -343,7 +348,7 @@ h2 {
     font-size: 1.4em;
     border: 2px solid #F4ECFF;
 }
-#wrapper button:hover {
+#wrapper .btn-wrapper:hover {
     background-color: #351b5d;
     color: #e1cdff;
 }
@@ -396,8 +401,6 @@ h2 {
 .change-button h6 span {
     font-size: 0.8em;
     padding: 0 15px;
-    text-transform: uppercase;
-    font-weight: bold;
 }
 /*para desaparecer a caixa do checkbox*/
 .change-button [type="checkbox"]:checked,
@@ -438,6 +441,8 @@ h2 {
 .checkbox:checked + label:before {
     transform: translateX(80px);
 }
+.change-button1 span:last-child {font-size: 1em;}
+.change-button2 span:first-child {font-size: 1em;}
 
 /*relaciona o checkbox com o wrapper, já que estão em divs diferentes mas dentro do dialog*/
 /*quando o checkbox estiver marcado, aplica a rotação ao wrapper e ao botão de alternância, criando o efeito de flip entre login e cadastro*/
@@ -473,6 +478,38 @@ com id "modal-1" apenas se ele contiver um elemento com id "checkbox" que esteja
 .center-wrap h2 {font-size: 2em;}
 .center-wrap .caixa-input {margin: 20px auto;}
 #email-forgot-password p {width: 320px;}
+
+.modal-buttons {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    height: auto;
+    padding: 15px 20px 0 15px;
+}
+.modal-buttons .back-arrow-modal {
+    background-color: transparent;
+    border: none;
+    color: #48237f;
+    font-size: 2.3em;
+    cursor: pointer;
+}
+.modal-buttons .close-x {
+    color: #48237f;
+    font-size: 2.1em;
+    cursor: pointer;
+    font-weight: bold;
+}
+.modal-buttons button {
+    background-color: transparent;
+    border: none;
+    width: 30px;
+    cursor: pointer;
+    font-weight: bold;
+}
 
 /*card de inserir o código*/
 .otp-container {
@@ -637,7 +674,7 @@ textarea:-webkit-autofill {
 .aside-pages span {
     color: #48237F;
     font-weight: bold;
-    font-size: 1.8em;
+    font-size: 1.4em;
 }
 #aside-config {bottom: 80px;}
 
@@ -747,6 +784,9 @@ a {text-decoration: none;}
 .switch input:checked + .slider::before {transform: translateX(28px); background: #F4ECFF;}
 
 /*SUBMENU DO IDIOMA*/
+/* adiciona transition na setinha */
+.arrow-language {transition: transform 0.3s ease;}
+
 .submenu-item {position: relative;}
 .submenu {
     position: absolute;
@@ -763,6 +803,13 @@ a {text-decoration: none;}
     transform: translateX(8px);
     transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s;
 }
+/*botão de sair da conta*/
+#btn-logout {
+    justify-content: center;
+    background: #F23B44;
+    color: #fff;
+}
+#btn-logout:hover {background: rgb(208, 16, 16);}
 
 /*Página Inicial - Em Alta (galeria de lives)*/
 .inicio-main {
@@ -1154,7 +1201,7 @@ a {text-decoration: none;}
     justify-content: center;
     align-items: center;
 }
-.small-aside .pages-icon-aside {font-size: 1.8em;}
+.small-aside .pages-icon-aside {font-size: 2.5em;}
 .aside-link:last-child { bottom: 30px; }
 
 .header-config {
@@ -1235,7 +1282,7 @@ a {text-decoration: none;}
 #wrap-seg-password, #wrap-seg-delete {
     position: absolute;
     flex-direction: column;
-    background: #c7b2e7;
+    background: #fff;
     border: 3px double #48237f;
     border-radius: 30px;
     box-shadow: 0px 0px 15px 15px rgba(0,0,0,0.2);
@@ -1307,6 +1354,7 @@ a {text-decoration: none;}
     min-height: 16px;
 }
 #block-effects {margin-left: 5%;}
+
 /*botão do dropdown*/
 #toggle-blocked {
     width: 100%;
@@ -1374,57 +1422,249 @@ a {text-decoration: none;}
 
 /*RESPONSIVIDADE = não é adaptar para telas, é permitir que o layout se adapte sozinho*/
 /*@media = "if"*/
-@media (max-width: 768px) {/*desktop-first; min-width: 768px = mobile-first*/
+
+/* ============================================================
+   RESPONSIVIDADE
+   ============================================================ */
+
+/* TELAS GRANDES (acima de 1400px) */
+@media (min-width: 1400px) {
+    .search-bar { width: 600px; }
+    .normal-aside { width: 16%; }
+    .inicio-main { padding: 40px 60px; }
+    .section-config.active { width: 35%; }
+}
+
+/* NOTEBOOK PADRÃO (até 1280px) */
+@media (max-width: 1280px) {
+    .search-bar { width: 360px; }
+    .normal-aside { width: 22%; }
+    .inicio-main { padding: 24px; margin-right: 22%; }
+    .moon-main { gap: 20px; }
+    #context p { font-size: 1.2em; }
+    .section-config.active { width: 48%; }
+    .nav-config { width: 72%; }
+    .header-config { padding: 5px 15px; }
+}
+
+/* NOTEBOOK PEQUENO / TABLET GRANDE (até 1024px) */
+@media (max-width: 1024px) {
+    /* header */
+    #header { grid-template-columns: 160px 1fr 180px; }
+    .search-bar { width: 260px; }
+
+    /* aside some — conteúdo expande */
+    .normal-aside { display: none; }
+    .inicio-main { margin-right: 0; padding: 20px; }
+
+    /* configurações — nav não quebra */
+    .header-config { padding: 5px 12px; gap: 8px; }
+    .nav-config { width: auto; flex: 1; justify-content: flex-end; }
+    .nav-config a { font-size: 0.95em; padding: 0 3%; }
+    .section-config.active { width: 70%; }
+
+    /* moon */
+    .moon-main { flex-direction: column; height: auto; min-height: 100vh; padding: 40px 20px; }
+    #context, #catalog { width: 80%; }
+    #context p { width: 80%; margin: 0 auto; }
+
+    /* aside pequeno das configs some também */
+    .small-aside { display: none; }
+    #config-main { padding-right: 0; }
+}
+
+/* TABLET (até 768px) */
+@media (max-width: 768px) {
+
+    /* ── HEADER ── */
     #header {
-        grid-template-columns: 100px 1fr 100px;
-        gap: 10px;
-        transition: all 0.8s ease;
+        grid-template-columns: 70px 1fr 130px;
+        height: 58px;
+        gap: 6px;
     }
-    #header.shrink {transition: all 0.8s ease;}
-    .search-bar {
-        width: 150px;
-        transition: all 0.8s ease;
+    #header.shrink { height: 44px; }
+    #logo { width: 42px; }
+    #header.shrink #logo { width: 34px; }
+
+    /* logo nunca some */
+    .logo { width: auto; padding-left: 10px; min-width: 54px; }
+
+    .top-menu { display: none; } /* esconde nav em tablet */
+    .header-center { justify-content: center; }
+    .search-bar { width: 100%; max-width: 340px; }
+    #header.shrink .search-bar { max-width: 220px; }
+
+    .menu-modals {
+        gap: 6px;
+        margin-right: 8px;
+        flex-shrink: 0; /* nunca encolhe */
     }
-    #header.shrink .search-bar {
-        width: 150px;
-        transition: all 0.8s ease;
+    .open-modal { width: 58px; height: 32px; font-size: 0.82em; }
+    #header.shrink .open-modal { height: 28px; }
+    #btn-dropdown { width: 36px; padding: 2px; }
+    #luna { width: 22px; }
+    #btn-turbo { width: 34px; height: 34px; }
+
+    /* ── MODAL — ocupa quase a tela toda ── */
+    #modal-1 { width: 96vw; height: 92vh; perspective: none; }
+    #modal-2 { width: 94vw; height: auto; max-height: 90vh; }
+    #modal-3 { width: 88vw; height: auto; top: 8%; }
+
+    #wrap { width: 96%; height: 96%; }
+    #wrapper { width: 96%; height: 96%; border-radius: 18px; }
+
+    #login, #cadastro {
+        height: 94%;
+        overflow-y: auto; /* scroll se o form não couber */
     }
-    .top-menu {
-        gap: 15px;
-        transition: all 0.8s ease;
-    }
-    .menu-nav {
-        font-size: 1em;
-        transition: all 0.8s ease;
-    }
-    #logo {
-        width: 50px;
-        transition: all 0.8s ease;
-    }
-    #header.shrink #logo {
-        width: 30px;
-        transition: all 0.8s ease;
-    }
-    #header.shrink .menu-modals, .menu-modals {
-        gap: 10px;
-        margin-right: 2px;
-    }
-    .open-modal {
+
+    .caixa-input { width: 88%; margin: 16px 0; }
+    #wrapper .btn-wrapper { width: 88%; height: 38px; font-size: 1.2em; }
+
+    h2 { font-size: 1.6em; }
+    .center-wrap h2 { font-size: 1.5em; }
+
+    .otp-input { width: 44px; height: 54px; font-size: 1.3em; }
+    .otp-container { gap: 6px; }
+
+    #wrap-seg-password, #wrap-seg-delete { width: 90%; border-radius: 18px; }
+
+    /* ── CONFIGURAÇÕES ── */
+    .header-config {
+        flex-direction: row;
+        flex-wrap: wrap;
         align-items: center;
-        justify-content: center;
-        width: 70px;
-        height: 35px;
-        border-radius: 10px;
-        background-color: #9147FF;
-        color: #251738;
-        font-size: 0.9em;
-        font-weight: bold;
-        border: none;
-        cursor: pointer;
+        gap: 6px;
+        padding: 8px 12px;
     }
-    #moon {
-        width: 25px;
+    .header-config h1 { font-size: 1.8em; flex-shrink: 0; }
+    .nav-config {
+        width: 100%;
+        flex-wrap: wrap;
+        gap: 2px;
+        justify-content: flex-start;
     }
+    .nav-config a { font-size: 0.85em; padding: 4px 2%; border-right: none; }
+    .nav-config a:not(:last-child)::after {
+        content: '|';
+        margin-left: 4%;
+        color: #aaa;
+    }
+    .section-config.active { width: 92%; padding: 16px; }
+    .small-aside { display: none; }
+    #config-main { padding: 16px; display: flex; justify-content: center; }
+
+    /* ── SUBMENU IDIOMA — não cobre o menu ── */
+    .submenu {
+        right: auto;
+        left: 0;           /* abre para a direita */
+        top: calc(100% + 4px); /* abre para baixo */
+        transform: translateY(-6px);
+        min-width: 150px;
+        z-index: 9999;
+    }
+    .submenu.show { transform: translateY(0); }
+
+    /* ── VÍDEOS / INÍCIO ── */
+    .inicio-main {
+        margin-right: 0;
+        padding: 16px;
+        /* garante que fique abaixo do header sticky */
+        padding-top: 16px;
+    }
+    .video-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    /* carrossel não cobre setas */
+    .carousel-wrap { max-width: 100%; overflow: visible; }
+    .carousel-wrap .carousel-track { overflow: hidden; border-radius: 12px; }
+    .arrow-btn { width: 40px; height: 40px; }
+    .arrow-prev { left: -20px; } /* setas ficam fora do vídeo */
+    .arrow-next { right: -20px; }
+
+    /* ── MOON ── */
+    #context, #catalog { width: 92%; }
+    #context p { font-size: 1em; width: 90%; }
+    #context h2, #catalog h2 { font-size: 1.8em; }
+}
+
+/* MOBILE GRANDE (até 600px) */
+@media (max-width: 600px) {
+    #header { grid-template-columns: 54px 1fr 110px; height: 54px; }
+    #header.shrink { height: 40px; }
+    #logo { width: 36px; }
+    .logo { padding-left: 6px; min-width: 44px; }
+
+    .search-bar { max-width: 200px; height: 26px; }
+    .search-bar input { font-size: 0.8em; }
+    #header.shrink .search-bar { max-width: 150px; }
+
+    .menu-modals { gap: 4px; margin-right: 4px; }
+    .open-modal { width: 50px; height: 28px; font-size: 0.78em; }
+    #btn-dropdown { width: 30px; }
+    #btn-turbo { width: 28px; height: 28px; }
+    #luna { width: 18px; }
+
+    /* modal ocupa tela inteira */
+    #modal-1 { width: 100vw; height: 100vh; }
+    #wrapper { border-radius: 0; width: 100%; height: 98%; }
+    #wrap { width: 100%; height: 98%; }
+    .caixa-input { width: 90%; }
+
+    /* grid */
+    .video-grid { grid-template-columns: 1fr; }
+
+    /* setas do carrossel voltam para dentro em mobile */
+    .arrow-prev { left: 8px; }
+    .arrow-next { right: 8px; }
+    .arrow-btn { width: 36px; height: 36px; background: rgba(0,0,0,0.5); }
+    .carousel-wrap { overflow: hidden; } /* esconde setas em mobile */
+
+    /* configurações */
+    .header-config { padding: 6px 10px; }
+    .header-config h1 { font-size: 1.5em; }
+    .nav-config a { font-size: 0.78em; padding: 3px 1.5%; }
+    .section-config.active { width: 96%; padding: 12px; border-radius: 8px; }
+    .seg-box { padding: 8px 10px; }
+    .btn-modal-seg { flex-direction: column; gap: 8px; align-items: center; }
+    .btn-modal-seg button { width: 80%; }
+
+    /* otp */
+    .otp-input { width: 38px; height: 48px; font-size: 1.1em; }
+    .otp-container { gap: 4px; }
+
+    /* moon */
+    .moon-main { padding: 20px 10px; gap: 28px; }
+    #context, #catalog { width: 98%; }
+    #moon-header h1 { font-size: 1.8em; }
+}
+
+/* MOBILE PEQUENO (até 400px) */
+@media (max-width: 400px) {
+    #header { grid-template-columns: 46px 1fr 96px; height: 50px; }
+    #logo { width: 32px; }
+    .open-modal { width: 44px; height: 26px; font-size: 0.74em; }
+    #btn-dropdown { width: 26px; }
+    #btn-turbo { width: 26px; height: 26px; }
+    #luna { display: none; } /* coroa some em tela muito pequena */
+
+    .search-bar { max-width: 160px; }
+
+    .otp-input { width: 32px; height: 42px; font-size: 1em; }
+    .nav-config a { font-size: 0.72em; }
+    .header-config h1 { font-size: 1.3em; }
+
+    #context h2, #catalog h2 { font-size: 1.4em; }
+    #context p { font-size: 0.9em; }
+}
+/* aside dentro do dropdown — só aparece em mobile */
+.aside-mobile-divider,
+.aside-mobile-item { display: none; }
+
+@media (max-width: 400px) {
+    .aside-mobile-divider { display: block; border-color: #4e3e65; }
+    .aside-mobile-item { display: flex; gap: 8px; align-items: center; font-size: 1.4em;}
+    .lives-dropdown { padding: 6px 15px; cursor: pointer; }
+    .lives-dropdown:hover { background: #b68cf5; }
 }
 
 /* OIEEE aqui é a leta, to fazendo os negocio do TOAST*/
