@@ -7,6 +7,7 @@ import smtplib
 from email.message import EmailMessage
 import mimetypes
 from backend.database.connection import connection, send_code, email_valido, data_valida, carregar, salvar, cache_traducoes, file
+from backend.validate.org import cpf_math_validate, cpf_real_or_not
 from datetime import date, datetime, timedelta
 from email_validator import validate_email, EmailNotValidError
 from deep_translator import GoogleTranslator
@@ -28,6 +29,8 @@ class signin(Resource):
         
 
         cpf = cpf.strip()
+        cpf_limpo = cpf.replace(".","").replace("-","")
+        
         email = data.get('email')
         user_name = data.get('user_name')
         data_nascimento = data.get('data_nascimento')
