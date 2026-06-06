@@ -8,6 +8,8 @@
 } 
 body {
     background-color: #F9F5FF;
+    overflow-x: hidden;
+    max-width: 100%;
 }
 .logo {
     width: 250px; 
@@ -29,6 +31,7 @@ body {
     grid-template-columns: 250px 1fr 250px; /*define as colunas da grade: 90px logo, 1fr menu, 150px barra de pesquisa*/
     place-items: center; /*alinha os itens da grade ao centro horizontalmente e verticalmente*/
     width: 100%;
+    max-width: 100vw;
     height: 10%;
     background-color: #DEC7FF;
     transition: all 0.1s ease; /*transição suave para as mudanças de estilo, como ao encolher o header*/
@@ -240,6 +243,7 @@ body.modal-open {
     height: 90%;
     border: none;
     background: transparent;
+    border: 4px solid red;
 }
 #wrapper {
     position: absolute;
@@ -253,6 +257,7 @@ body.modal-open {
     border-radius: 30px;
     border: 3px double #48237f;
     transform-origin: center; /*define o ponto de origem para as transformações*/
+    border: 4px solid green;
 }
 #login, #cadastro {
     position: absolute;
@@ -265,11 +270,11 @@ body.modal-open {
     display: flex;
     align-items: center;
     justify-content: center;
-    border: none;
     backdrop-filter: blur(10px); /*aplica um efeito de desfoque ao fundo do modal*/
     backface-visibility: hidden; /*oculta o lado oposto do elemento quando ele é rotacionado, evitando que o conteúdo seja visível durante a rotação*/
     -webkit-backface-visibility: hidden; /*suporte para navegadores baseados em WebKit, como Safari e Chrome, garantindo que o backface-visibility funcione corretamente nesses navegadores*/
     transform-style: preserve-3d;
+    border: 4px solid blue;
 }
 #login {
     transform: rotateY(0deg); /*mantém o elemento na posição original, sem rotação, começa com ele*/
@@ -685,9 +690,28 @@ textarea:-webkit-autofill {
 
 .dropdown-menu-wrap {
     position: relative;
+    overflow: visible;
 }
-#btn-dropdown {width: 45px; padding: 3px;}
-#menu-icon {width: 25px;}
+#btn-dropdown {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #9147FF;
+    border: 2px solid #7029db;
+    cursor: pointer;
+    overflow: hidden; 
+}
+#btn-dropdown .menu-icon {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+    display: block;
+    margin: auto;
+}
 .dropdown-menu {
     position: absolute;
     top: calc(100% + 8px);
@@ -696,7 +720,7 @@ textarea:-webkit-autofill {
     border: 1px solid #251738;
     border-radius: 8px;
     min-width: 200px;
-    z-index: 999;
+    z-index: 9999;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
     opacity: 0;
     visibility: hidden;
@@ -814,8 +838,9 @@ a {text-decoration: none;}
 /*Página Inicial - Em Alta (galeria de lives)*/
 .inicio-main {
     padding: 30px;
-    width: 100vw;
+    width: 100%;
     min-height: 100vh;
+    overflow-x: hidden;
 }
 .section-home {margin-bottom: 40px;}
 /*titulos*/
@@ -1038,11 +1063,12 @@ a {text-decoration: none;}
 /*---------------- MOON ---------------------*/
 #moon-header {
     display: flex;
-    justify-content: flex-start;
-    text-align: center;
-    width: 100vw;
+    align-items: center;
+    width: 100%;
     height: 10%;
     background-color: #180F2C;
+    padding-left: 20px;
+    box-sizing: border-box;
 }
 #moon-header h1 {
     font-size: 3em;
@@ -1054,7 +1080,7 @@ a {text-decoration: none;}
     flex-direction: row;
     justify-content: center;
     align-items: center;
-    width: 100vw;
+    width: 100%;
     height: 100vh;
     background-color: #521da2;
     gap: 30px;
@@ -1208,7 +1234,8 @@ a {text-decoration: none;}
     display: flex;
     justify-content: space-between;
     align-items: center;
-    width: 100vw;
+    width: 100%;
+    max-width: calc(100% - 5%); /*ajusta a largura para não ultrapassar o aside*/
     height: auto;
     padding: 5px 30px;
 } 
@@ -1443,8 +1470,8 @@ a {text-decoration: none;}
     .moon-main { gap: 20px; }
     #context p { font-size: 1.2em; }
     .section-config.active { width: 48%; }
-    .nav-config { width: 72%; }
-    .header-config { padding: 5px 15px; }
+    .nav-config { width: 72%; justify-content: flex-end; }
+    .header-config {width: 100%; padding: 5px 15px; }
 }
 
 /* NOTEBOOK PEQUENO / TABLET GRANDE (até 1024px) */
@@ -1452,14 +1479,15 @@ a {text-decoration: none;}
     /* header */
     #header { grid-template-columns: 160px 1fr 180px; }
     .search-bar { width: 260px; }
+    .logo { width: auto; padding-left: 8px; min-width: 52px; overflow: visible;}
 
     /* aside some — conteúdo expande */
     .normal-aside { display: none; }
     .inicio-main { margin-right: 0; padding: 20px; }
 
     /* configurações — nav não quebra */
-    .header-config { padding: 5px 12px; gap: 8px; }
-    .nav-config { width: auto; flex: 1; justify-content: flex-end; }
+    .header-config {max-width: 100%; padding: 5px 12px; gap: 8px; }
+    .nav-config { flex: 1; justify-content: flex-end; }
     .nav-config a { font-size: 0.95em; padding: 0 3%; }
     .section-config.active { width: 70%; }
 
@@ -1477,17 +1505,13 @@ a {text-decoration: none;}
 @media (max-width: 768px) {
 
     /* ── HEADER ── */
-    #header {
-        grid-template-columns: 70px 1fr 130px;
-        height: 58px;
-        gap: 6px;
-    }
+    #header {grid-template-columns: 60px 1fr 140px; height: 58px; gap: 4px;}
     #header.shrink { height: 44px; }
-    #logo { width: 42px; }
+    #logo { width: 40px; }
     #header.shrink #logo { width: 34px; }
 
     /* logo nunca some */
-    .logo { width: auto; padding-left: 10px; min-width: 54px; }
+    .logo { width: auto; padding-left: 8px; min-width: 52px; overflow: visible;}
 
     .top-menu { display: none; } /* esconde nav em tablet */
     .header-center { justify-content: center; }
@@ -1501,28 +1525,10 @@ a {text-decoration: none;}
     }
     .open-modal { width: 58px; height: 32px; font-size: 0.82em; }
     #header.shrink .open-modal { height: 28px; }
-    #btn-dropdown { width: 36px; padding: 2px; }
+    #btn-dropdown { width: 36px; height: 36px; padding: 2px;}
+    #btn-dropdown .menu-icon {width: 20px; height: 20px;}
     #luna { width: 22px; }
     #btn-turbo { width: 34px; height: 34px; }
-
-    /* ── MODAL — ocupa quase a tela toda ── */
-    #modal-1 { width: 96vw; height: 92vh; perspective: none; }
-    #modal-2 { width: 94vw; height: auto; max-height: 90vh; }
-    #modal-3 { width: 88vw; height: auto; top: 8%; }
-
-    #wrap { width: 96%; height: 96%; }
-    #wrapper { width: 96%; height: 96%; border-radius: 18px; }
-
-    #login, #cadastro {
-        height: 94%;
-        overflow-y: auto; /* scroll se o form não couber */
-    }
-
-    .caixa-input { width: 88%; margin: 16px 0; }
-    #wrapper .btn-wrapper { width: 88%; height: 38px; font-size: 1.2em; }
-
-    h2 { font-size: 1.6em; }
-    .center-wrap h2 { font-size: 1.5em; }
 
     .otp-input { width: 44px; height: 54px; font-size: 1.3em; }
     .otp-container { gap: 6px; }
@@ -1542,14 +1548,9 @@ a {text-decoration: none;}
         width: 100%;
         flex-wrap: wrap;
         gap: 2px;
-        justify-content: flex-start;
     }
-    .nav-config a { font-size: 0.85em; padding: 4px 2%; border-right: none; }
-    .nav-config a:not(:last-child)::after {
-        content: '|';
-        margin-left: 4%;
-        color: #aaa;
-    }
+    .nav-config a { font-size: 0.85em; padding: 4px 2%;}
+    
     .section-config.active { width: 92%; padding: 16px; }
     .small-aside { display: none; }
     #config-main { padding: 16px; display: flex; justify-content: center; }
@@ -1588,8 +1589,8 @@ a {text-decoration: none;}
 }
 
 /* MOBILE GRANDE (até 600px) */
-@media (max-width: 600px) {
-    #header { grid-template-columns: 54px 1fr 110px; height: 54px; }
+@media (max-width: 600px) { 
+    #header { grid-template-columns: 52px 1fr 120px; height: 54px; }
     #header.shrink { height: 40px; }
     #logo { width: 36px; }
     .logo { padding-left: 6px; min-width: 44px; }
@@ -1600,15 +1601,10 @@ a {text-decoration: none;}
 
     .menu-modals { gap: 4px; margin-right: 4px; }
     .open-modal { width: 50px; height: 28px; font-size: 0.78em; }
-    #btn-dropdown { width: 30px; }
+    #btn-dropdown {width: 30px; height: 30px; }
+    #btn-dropdown .menu-icon { width: 17px; height: 17px; }
     #btn-turbo { width: 28px; height: 28px; }
     #luna { width: 18px; }
-
-    /* modal ocupa tela inteira */
-    #modal-1 { width: 100vw; height: 100vh; }
-    #wrapper { border-radius: 0; width: 100%; height: 98%; }
-    #wrap { width: 100%; height: 98%; }
-    .caixa-input { width: 90%; }
 
     /* grid */
     .video-grid { grid-template-columns: 1fr; }
@@ -1640,10 +1636,12 @@ a {text-decoration: none;}
 
 /* MOBILE PEQUENO (até 400px) */
 @media (max-width: 400px) {
-    #header { grid-template-columns: 46px 1fr 96px; height: 50px; }
+    #header { grid-template-columns: 46px 1fr 100px; height: 50px; }
     #logo { width: 32px; }
+    .logo { padding-left: 4px; min-width: 38px; }
     .open-modal { width: 44px; height: 26px; font-size: 0.74em; }
-    #btn-dropdown { width: 26px; }
+    #btn-dropdown {width: 26px; height: 26px;}
+    #btn-dropdown .menu-icon { width: 14px; height: 14px; }
     #btn-turbo { width: 26px; height: 26px; }
     #luna { display: none; } /* coroa some em tela muito pequena */
 
