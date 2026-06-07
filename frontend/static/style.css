@@ -198,9 +198,6 @@ ficar cada elemento após a rolagem, no .shrink*/
     font-size: 1em; 
     transition: all 0.5s ease;
 }
-#header.shrink .open-modal:first-child {
-    width: 45px;
-}
 
 /*MODALS DO HEADER*/
 /*modal de login/cadastro*/
@@ -1523,12 +1520,9 @@ a {text-decoration: none;}
         margin-right: 8px;
         flex-shrink: 0; /* nunca encolhe */
     }
-    .open-modal { width: 58px; height: 32px; font-size: 0.82em; }
     #header.shrink .open-modal { height: 28px; }
-    #btn-dropdown { width: 36px; height: 36px; padding: 2px;}
-    #btn-dropdown .menu-icon {width: 20px; height: 20px;}
-    #luna { width: 22px; }
-    #btn-turbo { width: 34px; height: 34px; }
+    #btn-dropdown, #btn-turbo { width: 36px; height: 36px; padding: 2px;}
+    #btn-dropdown .menu-icon, #btn-turbo #charge-icon, #luna {width: 20px; height: 20px;}
 
     .otp-input { width: 44px; height: 54px; font-size: 1.3em; }
     .otp-container { gap: 6px; }
@@ -1600,11 +1594,8 @@ a {text-decoration: none;}
     #header.shrink .search-bar { max-width: 150px; }
 
     .menu-modals { gap: 4px; margin-right: 4px; }
-    .open-modal { width: 50px; height: 28px; font-size: 0.78em; }
-    #btn-dropdown {width: 30px; height: 30px; }
-    #btn-dropdown .menu-icon { width: 17px; height: 17px; }
-    #btn-turbo { width: 28px; height: 28px; }
-    #luna { width: 18px; }
+    #btn-dropdown, #btn-turbo {width: 30px; height: 30px; }
+    #btn-dropdown .menu-icon, #btn-turbo #charge-icon, #luna  { width: 17px; height: 17px; }
 
     /* grid */
     .video-grid { grid-template-columns: 1fr; }
@@ -1640,9 +1631,8 @@ a {text-decoration: none;}
     #logo { width: 32px; }
     .logo { padding-left: 4px; min-width: 38px; }
     .open-modal { width: 44px; height: 26px; font-size: 0.74em; }
-    #btn-dropdown {width: 26px; height: 26px;}
-    #btn-dropdown .menu-icon { width: 14px; height: 14px; }
-    #btn-turbo { width: 26px; height: 26px; }
+    #btn-dropdown, #btn-turbo {width: 26px; height: 26px;}
+    #btn-dropdown .menu-icon, #btn-turbo #charge-icon  { width: 14px; height: 14px; }
     #luna { display: none; } /* coroa some em tela muito pequena */
 
     .search-bar { max-width: 160px; }
