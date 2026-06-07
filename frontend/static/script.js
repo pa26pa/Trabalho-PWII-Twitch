@@ -184,6 +184,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    const newpasswordBox = document.getElementById('new-password');
     document.querySelectorAll('.back-arrow-modal').forEach(btn => {
         btn.addEventListener('click', () => {
             // se estiver na tela de nova senha, vai direto pro login
@@ -741,7 +742,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (btnreceberCodigo) btnreceberCodigo.disabled = true;
 
                 // <- volta sempre para o lado do login ao fechar o modal
-                const wrapper = document.getElementById('wrapper');
                 if (loginBox) {loginBox.style.display = ''};
                 if (emailBox) {emailBox.style.display = 'none'};
                 if (insertcodeBox) {insertcodeBox.style.display = 'none' };
@@ -865,21 +865,21 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     //controles dos videos
-    const player    = document.getElementById('player');
-    const gifImg    = document.getElementById('gif-img');
-    const playBtn   = document.getElementById('play-btn');
-    const playIcon  = document.getElementById('play-icon');
-    const progFill  = document.getElementById('progress-fill');
-    const progWrap  = document.getElementById('progress-wrap');
-    const muteBtn   = document.getElementById('mute-btn');
-    const volIcon   = document.getElementById('vol-icon');
-    const volRange  = document.getElementById('vol-range');
-    const fsBtn     = document.getElementById('fs-btn');
-    const fsIcon    = document.getElementById('fs-icon');
+    const player = document.getElementById('player');
+    const gifImg = document.getElementById('gif-img');
+    const playBtn = document.getElementById('play-btn');
+    const playIcon = document.getElementById('play-icon');
+    const progFill = document.getElementById('progress-fill');
+    const progWrap = document.getElementById('progress-wrap');
+    const muteBtn = document.getElementById('mute-btn');
+    const volIcon = document.getElementById('vol-icon');
+    const volRange = document.getElementById('vol-range');
+    const fsBtn = document.getElementById('fs-btn');
+    const fsIcon = document.getElementById('fs-icon');
 
     if (player) {
-        let playing  = true;
-        let muted    = false;
+        let playing = true;
+        let muted = false;
         let progress = 0;
         let timer;
 
@@ -999,8 +999,26 @@ document.addEventListener('DOMContentLoaded', function () {
                 //adiciona active no link clicado e na section correspondente
                 link.classList.add('active');
                 document.getElementById(link.dataset.target).classList.add('active');
-            })
-        })
+            });
+        });
+    }
+
+    const btnDeleteCode = document.querySelector('.btn-delete-code');
+    const wrapperDelete = document.getElementById('wrapper-delete');
+    if (btnDeleteCode && wrapperDelete && insertcodeBox) {
+        btnDeleteCode.addEventListener('click', () => {
+            wrapperDelete.style.display = 'none';
+            insertcodeBox.style.display = 'flex';
+        });
+    }
+
+    const btnBackDelete = document.querySelector('.back-modal-delete');
+    if (btnBackDelete) {
+        btnBackDelete.addEventListener('click', () => {
+            console.log("clicado");
+            insertcodeBox.style.display = 'none';
+            wrapperDelete.style.display = 'flex';
+        });
     }
 
     //ABA DE PRIVACIDADE (USERS BLOQUEADOS)

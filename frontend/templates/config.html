@@ -142,16 +142,41 @@
             <div class="seg-box">
                 <button class="btn-open-modal open-modal btn-seg-red" id="btn-delete-account" data-modal="modal-3" data-i18n>Excluir Conta</button>
                 <dialog id="modal-3">
-                    <div id="wrap-seg-delete">
-                        <div class="modal-buttons">
-                            <p> </p>
-                            <button class="btn-close-modal" data-modal="modal-3"><i class="fa-solid fa-x close-x"></i></button>
+                    <div id="wrap-seg-delete" class="wrapper">
+                        <div id="wrapper-delete">
+                            <div class="modal-buttons">
+                                <p> </p>
+                                <button class="btn-close-modal" data-modal="modal-3"><i class="fa-solid fa-x close-x"></i></button>
+                            </div>
+                            <h2 data-i18n>Deseja mesmo excluir sua conta?</h2>
+                            <p data-i18n>Excluir a conta permanentemente apagará todos os seus dados</p><br>
+                            <div class="btn-modal-seg">
+                                <button class="open-modal btn-delete-code" data-i18n>Excluir</button>
+                                <button class="btn-seg-red open-modal btn-close-modal" data-modal="modal-3" data-i18n>Cancelar</button>
+                            </div>
                         </div>
-                        <h1 data-i18n>Deseja mesmo excluir sua conta?</h1>
-                        <p data-i18n>Excluir a conta permanentemente apagará todos os seus dados</p><br>
-                        <div class="btn-modal-seg">
-                            <button class="open-modal btn-delete" data-i18n>Excluir</button>
-                            <button class="btn-seg-red open-modal btn-close-modal" data-modal="modal-3" data-i18n>Cancelar</button>
+
+                        <div id="insert-code">
+                            <div class="center-wrap">
+                                <form action="#" method="post" class="insert-code forms">
+                                    <div class="modal-buttons">
+                                        <i class="fa-solid fa-circle-arrow-left back-modal-delete"></i>
+                                        <button class="btn-close-modal" data-modal="modal-3"><i class="fa-solid fa-x close-x"></i></button>
+                                    </div>
+                                    <h2 data-i18n>Insira o Código</h2> <br>
+                                    <p data-i18n>Por favor, insira o código enviado para o seu email.</p> <br><br><br>
+                                    <div class="otp-container">
+                                        <input type="text" maxlength="1" class="otp-input">
+                                        <input type="text" maxlength="1" class="otp-input">
+                                        <input type="text" maxlength="1" class="otp-input">
+                                        <input type="text" maxlength="1" class="otp-input">
+                                        <input type="text" maxlength="1" class="otp-input">
+                                    </div> <br><br><br>
+                                    <p id="timerText" data-i18n>Reenviar código em 60s</p>
+                                    <button id="resendBtn" class="resendBtn btn-wrapper" disabled data-i18n>Reenviar Código</button>
+                                    <button type="submit" class="btn-wrapper btn-seg-red btn-delete continueBtn" id="continueBtn" data-i18n>Excluir Conta</button>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </dialog>

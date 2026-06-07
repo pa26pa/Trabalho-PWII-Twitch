@@ -120,7 +120,8 @@ body {
     transition: all 0.3s ease;
 }
 /*quando estiver logado troca "Entrar" pelo "Turbo"*/
-#btn-turbo {
+/*botões da moon, turbo e menu*/
+#btn-turbo, #btn-dropdown, #btn-moon {
     width: 42px;
     height: 42px;
     border-radius: 50%;
@@ -131,9 +132,9 @@ body {
     align-items: center;
     justify-content: center;
     transition: background 0.2s;
+    overflow: hidden; 
 }
-#btn-turbo:hover { background: #7029db; }
-#turbo-icon { width: 22px; }
+#btn-turbo:hover, #btn-dropdown:hover, #btn-moon:hover { background: #7029db; }
 
 /*div do X e do checkbox*/
 .form-header {
@@ -242,7 +243,7 @@ body.modal-open {
     background: transparent;
     border: 4px solid red;
 }
-#wrapper {
+.wrapper {
     position: absolute;
     width: 90%;
     height: 90%;
@@ -341,7 +342,7 @@ h2 {
 }
 
 /*estilo do botão de login e cadastro*/
-#wrapper .btn-wrapper {
+.wrapper .btn-wrapper {
     width: 300px;
     height: 40px;
     border-radius: 30px;
@@ -350,7 +351,7 @@ h2 {
     font-size: 1.4em;
     border: 2px solid #F4ECFF;
 }
-#wrapper .btn-wrapper:hover {
+.wrapper .btn-wrapper:hover {
     background-color: #351b5d;
     color: #e1cdff;
 }
@@ -451,7 +452,7 @@ h2 {
 /*:has é um seletor CSS que permite selecionar um elemento com base em seus 
 descendentes. No caso, #modal-1:has(#checkbox:checked) seleciona o elemento 
 com id "modal-1" apenas se ele contiver um elemento com id "checkbox" que esteja marcado (checked)*/
-#modal-1:has(#checkbox:checked) #wrapper {
+#modal-1:has(#checkbox:checked) .wrapper {
     transform: rotateY(180deg);
 }
 #modal-1:has(#checkbox:checked) .change-button {
@@ -492,7 +493,7 @@ com id "modal-1" apenas se ele contiver um elemento com id "checkbox" que esteja
     height: auto;
     padding: 15px 20px 0 15px;
 }
-.modal-buttons .back-arrow-modal {
+.modal-buttons .back-arrow-modal, .back-modal-delete {
     background-color: transparent;
     border: none;
     color: #48237f;
@@ -688,26 +689,6 @@ textarea:-webkit-autofill {
 .dropdown-menu-wrap {
     position: relative;
     overflow: visible;
-}
-#btn-dropdown {
-    width: 42px;
-    height: 42px;
-    border-radius: 50%;
-    padding: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #9147FF;
-    border: 2px solid #7029db;
-    cursor: pointer;
-    overflow: hidden; 
-}
-#btn-dropdown .menu-icon {
-    width: 24px;
-    height: 24px;
-    object-fit: contain;
-    display: block;
-    margin: auto;
 }
 .dropdown-menu {
     position: absolute;
@@ -1299,9 +1280,10 @@ a {text-decoration: none;}
 .btn-seg-red:hover {background-color: rgb(208, 16, 16);}
 
 /*modal de redefinir senha*/
-#modal-2 {
+#modal-2, #modal-3 {
     width: 500px;
     height: 600px;
+    border: 4px solid red;
 }
 #wrap-seg-password, #wrap-seg-delete {
     position: absolute;
@@ -1311,6 +1293,7 @@ a {text-decoration: none;}
     border-radius: 30px;
     box-shadow: 0px 0px 15px 15px rgba(0,0,0,0.2);
     align-items: center;
+    border: 4px solid red;
 }
 .btn-modal-seg {
     display: flex;
@@ -1327,11 +1310,22 @@ a {text-decoration: none;}
 .form-new-password {
     justify-items: center;
 }
-#modal-3 {
-    width: 600px;
-    height: 250px;
-    top: 20%;
+/*modal de deletar conta*/
+#wrapper-delete {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5%;
 }
+#wrapper-delete h2 {margin-bottom: 10%;}
+#wrapper-delete p {
+    text-align: center;
+    width: 75%;
+    height: auto;
+    margin-bottom: 10%;
+}
+#wrapper-delete .btn-modal-seg {width: 70%;}
+/*
 #modal-3 h1 {font-size: 1.5em;}
 #modal-3 p {font-size: 1em;}
 #modal-3 button {width: 90; height: 45px; font-size: 1em;}
@@ -1521,8 +1515,8 @@ a {text-decoration: none;}
         flex-shrink: 0; /* nunca encolhe */
     }
     #header.shrink .open-modal { height: 28px; }
-    #btn-dropdown, #btn-turbo { width: 36px; height: 36px; padding: 2px;}
-    #btn-dropdown .menu-icon, #btn-turbo #charge-icon, #luna {width: 20px; height: 20px;}
+    #btn-dropdown, #btn-turbo, #btn-moon { width: 36px; height: 36px; padding: 2px;}
+    #btn-dropdown .menu-icon, #btn-turbo #charge-icon, #btn-moon #moon {width: 20px; height: 20px;}
 
     .otp-input { width: 44px; height: 54px; font-size: 1.3em; }
     .otp-container { gap: 6px; }
@@ -1594,8 +1588,8 @@ a {text-decoration: none;}
     #header.shrink .search-bar { max-width: 150px; }
 
     .menu-modals { gap: 4px; margin-right: 4px; }
-    #btn-dropdown, #btn-turbo {width: 30px; height: 30px; }
-    #btn-dropdown .menu-icon, #btn-turbo #charge-icon, #luna  { width: 17px; height: 17px; }
+    #btn-dropdown, #btn-turbo, #btn-moon {width: 30px; height: 30px; }
+    #btn-dropdown .menu-icon, #btn-turbo #charge-icon, #btn-moon #moon  { width: 17px; height: 17px; }
 
     /* grid */
     .video-grid { grid-template-columns: 1fr; }
@@ -1631,9 +1625,8 @@ a {text-decoration: none;}
     #logo { width: 32px; }
     .logo { padding-left: 4px; min-width: 38px; }
     .open-modal { width: 44px; height: 26px; font-size: 0.74em; }
-    #btn-dropdown, #btn-turbo {width: 26px; height: 26px;}
-    #btn-dropdown .menu-icon, #btn-turbo #charge-icon  { width: 14px; height: 14px; }
-    #luna { display: none; } /* coroa some em tela muito pequena */
+    #btn-dropdown, #btn-turbo, #btn-moon {width: 26px; height: 26px;}
+    #btn-dropdown .menu-icon, #btn-turbo #charge-icon, #btn-moon #moon  { width: 14px; height: 14px; }
 
     .search-bar { max-width: 160px; }
 

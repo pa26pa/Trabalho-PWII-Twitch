@@ -30,7 +30,11 @@
             </div>
 
             <div class="menu-modals">
-                <a href="{{url_for('luna')}}" target="_blank" aria-placeholder="Luna"><img src="{{url_for('static', filename='coroa.png')}}" id="luna" alt="coroa"></a>
+                <a href="{{url_for('luna')}}" target="_blank" aria-placeholder="Luna">
+                    <button id="btn-moon">
+                        <img src="{{url_for('static', filename='coroa.png')}}" id="moon" alt="coroa">
+                    </button>
+                </a>
                 <!--DESLOGADO-->
                 <div class="without-login">
                     <!-- MODAL DO LOGIN -->
@@ -39,7 +43,9 @@
                 
                 <!--LOGADO-->
                 <div class="with-login">
-                    <button id="btn-turbo" title="Turbo"><img id="charge-icon" src="{{url_for('static', filename='bateria.png')}}" alt=""></button>
+                    <button id="btn-turbo" title="Turbo">
+                        <img id="charge-icon" src="{{url_for('static', filename='bateria.png')}}" alt="">
+                    </button>
                 </div>
 
                 <!--dialog = modal-->
@@ -67,7 +73,7 @@
                             </div>
 
                             <!--card do login-->
-                            <div id="wrapper">
+                            <div class="wrapper">
                                 <div id="login">
                                     <form action="#" method="post" class="login forms">
                                         <h2 data-i18n>Entrar</h2>
@@ -150,7 +156,7 @@
                                                 <label for="password" data-i18n>Confirmar Senha</label>
                                                 <p class="erroSenha2" data-i18n>A senha não é igual</p>
                                             </div><br><br><br>
-                                            <button type="submit" class="btn-wrapper back-arrow-modal" id="backLogin" data-i18n>Voltar ao Login</button>
+                                            <button type="submit" class="btn-wrapper back-arrow-modal" id="backLogin" data-i18n>Redefinir Senha</button>
                                         </form>
                                     </div>
                                 </div>
@@ -191,7 +197,7 @@
 
                 <!--DROPDOWN MENU-->
                 <div class="dropdown-menu-wrap">
-                    <button class="open-modal" id="btn-dropdown">
+                    <button id="btn-dropdown">
                         <!--DESLOGADO = HAMBURGUER-->
                         <img src="{{url_for('static', filename='menu.png')}}" alt="menu" class="menu-icon without-login">
                         <!--LOGADO = PESSOINHA-->
