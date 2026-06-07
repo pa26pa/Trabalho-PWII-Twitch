@@ -7,7 +7,7 @@ import smtplib
 from email.message import EmailMessage
 import mimetypes
 from backend.database.connection import connection, send_code, email_valido, data_valida, carregar, salvar, cache_traducoes, file
-from backend.validate.org import cpf_math_validate, cpf_real_or_not
+from backend.resources.cpf import cpf_math_validate, cpf_real_or_not
 from datetime import date, datetime, timedelta
 from email_validator import validate_email, EmailNotValidError
 from deep_translator import GoogleTranslator
@@ -305,14 +305,15 @@ class forgot(Resource):
             }, 404
             
         email = email_forgot
-        print("yey")
+
         w = """select id_usuario from usuarios where email = %s"""
         cursor.execute(w,(email,))
         resposta = cursor.fetchone()
-        print("yey")
+
         id = resposta[0]
         # mandando código no email
-        codigo = send_code(email)
+        
+        codigo = send_code(email,'forgot_password')
         
         # guardando o id e o código na session
         session['id_provisorio'] = id
