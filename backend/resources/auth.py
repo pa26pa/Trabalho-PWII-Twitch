@@ -305,14 +305,15 @@ class forgot(Resource):
             }, 404
             
         email = email_forgot
-        print("yey")
+
         w = """select id_usuario from usuarios where email = %s"""
         cursor.execute(w,(email,))
         resposta = cursor.fetchone()
-        print("yey")
+
         id = resposta[0]
         # mandando código no email
-        codigo = send_code(email)
+        
+        codigo = send_code(email,'forgot_password')
         
         # guardando o id e o código na session
         session['id_provisorio'] = id

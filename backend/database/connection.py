@@ -22,23 +22,31 @@ def connection():
         database='twitch',
         cursorclass=pymysql.cursors.Cursor
     )
-
+   
 # enviando email com um código novo 
-def send_code(email_forgot):
+def send_code(email_forgot,tipo):
     # criação do código aleatórioooo 
     codigo = random.randint(10000,99999)
-
+    
     de = 'witch.auth@gmail.com'
     to = email_forgot
     password = email_password
 
-    info = 'Witch | Código redefinir senha'
+    if tipo == 'forgot_password':
+        texto = 'Olá! Recebemos uma solicitação para redefinir a senha da sua conta. Use o código de verificação abaixo para prosseguir:'
+    elif tipo == 'delete_account':
+        texto = 'Olá! Recebemos uma solicitação para excluir sua conta. Utilize este código para prosseguir:'
+    else:
+        texto = 'Olá! Recebemos uma solicitação. Utilize este código de verificação:'
+        
+    info = 'Witch' 
 
     msg = EmailMessage()
     msg['From'] = de
     msg['To'] = to
     msg['Subject'] = info
     #msg.set_content(f'Olá, este é o seu código --> {codigo}')
+
     html_template = f"""
     <html>
       <body style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f0f0f5; padding: 40px 20px; margin: 0;">
@@ -51,7 +59,7 @@ def send_code(email_forgot):
           <div style="padding: 30px; color: #1f1f23;">
             <h3 style="margin-top: 0; font-size: 18px; color: #000000;">Verifique sua conta</h3>
             <p style="font-size: 14px; line-height: 1.6; color: #53535f;">
-              Olá! Recebemos uma solicitação para redefinir a senha da sua conta. Use o código de verificação abaixo para prosseguir:
+              {texto}
             </p>
             
             
@@ -74,7 +82,6 @@ def send_code(email_forgot):
       </body>
     </html>
     """
-
     # Define o conteúdo como HTML
     msg.add_alternative(html_template, subtype='html')
     
