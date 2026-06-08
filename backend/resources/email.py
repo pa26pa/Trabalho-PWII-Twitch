@@ -1,3 +1,17 @@
+import smtplib
+from email.message import EmailMessage
+import pymysql
+import random
+from flask import Flask, json
+from email_validator import EmailNotValidError, validate_email
+from datetime import datetime
+from dotenv import load_dotenv
+import os
+load_dotenv()
+
+bd_password = os.getenv("DB_PASSWORD")
+email_password = os.getenv("EMAIL_PASSWORD")
+
 # enviando email com um código novo 
 def send_code(email_forgot,tipo):
     # criação do código aleatórioooo 
