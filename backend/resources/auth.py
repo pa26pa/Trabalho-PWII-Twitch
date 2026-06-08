@@ -8,7 +8,7 @@ from email.message import EmailMessage
 import mimetypes
 from backend.database.connection import connection, email_valido, data_valida, carregar, salvar, cache_traducoes, file
 from backend.resources.cpf import cpf_math_validate, cpf_real_or_not
-from backend.resources.email import send_code
+from backend.resources.email_code import send_code
 from datetime import date, datetime, timedelta
 from email_validator import validate_email, EmailNotValidError
 from deep_translator import GoogleTranslator

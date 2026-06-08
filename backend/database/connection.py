@@ -18,7 +18,7 @@ def connection():
     return pymysql.connect (
         host='localhost',
         user='root',
-        #password=bd_password,
+        password=bd_password,
         database='twitch',
         cursorclass=pymysql.cursors.Cursor
     )
