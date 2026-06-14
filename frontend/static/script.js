@@ -26,7 +26,6 @@ document.addEventListener('DOMContentLoaded', function () {
             });
             const data = await res.json();
             if (data.logado) {
-                console.log('aaa')
                 mostrarLogado(data.nome)
             } else{
                 mostrarDeslogado();
@@ -517,7 +516,8 @@ document.addEventListener('DOMContentLoaded', function () {
             if (form.classList.contains('email-forgot-password')) {
 
                 const dados = {
-                    email: document.getElementById('email_forgot').value
+                    email: document.getElementById('email_forgot').value,
+                    who: 'forgot_password'
                 };
 
                 fetch("http://127.0.0.1:5000/forgot", {
@@ -630,7 +630,10 @@ document.addEventListener('DOMContentLoaded', function () {
                     fecharModal(form)
                 });
             }
-        });
+            if (form.classList) {
+
+            }
+        })
     });
     const btnResend = document.getElementById("resendBtn");
     if (btnResend) {
@@ -645,6 +648,43 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(data => {
                 mostrarToast(data.mensagem, data.status)
             })
+        })
+    }
+    const btnDeleteAccount = document.querySelector(".btn-delete-code");
+    if (btnDeleteAccount) {
+        btnDeleteAccount.addEventListener("click", function() {
+            dados = {
+                email: document.getElementById("show_email").textContent,
+                who: 'delete_account'
+            };
+    
+            fetch("http://127.0.0.1:5000/forgot", {
+                method:"POST",
+                headers: {
+                    "Content-Type":"application/json"
+                },
+                body: JSON.stringify(dados)
+            })
+                .then(res => res.json())
+                .then(data=> {
+                    mostrarToast(data.mensagem, data.status);
+
+                    if (data.status === 'success') {
+
+                        telaAtual.avancar('email', 'codigo');
+
+                        emailBox.querySelectorAll('input')
+                            .forEach(input => input.value = '');
+
+                        btnreceberCodigo.disabled = true;
+
+                        inputs.forEach(input => input.value = '');
+
+                        if (continueBtn) continueBtn.disabled = true;
+
+                        startTimer();
+                    }
+                });        
         })
     }
     const btnDelete = document.querySelector(".btn-delete");

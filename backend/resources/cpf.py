@@ -41,5 +41,3 @@ def cpf_real_or_not(cpf, data_nascimento):
             'status':'error',
             'mensagem':'Erro ao conectar à internet'
         }
-if cpf_real_or_not('54383637817','09/09/2009'):
-    print('yey')

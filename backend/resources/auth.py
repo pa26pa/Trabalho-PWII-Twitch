@@ -279,6 +279,7 @@ class forgot(Resource):
         
         # pegando email do js
         email_forgot = str(data.get('email'))
+        who = str(data.get('who'))
         
         print(email_forgot)
 
@@ -314,7 +315,7 @@ class forgot(Resource):
         id = resposta[0]
         # mandando código no email
         
-        codigo = send_code(email,'forgot_password')
+        codigo = send_code(email,who)
         
         # guardando o id e o código na session
         session['id_provisorio'] = id
@@ -524,9 +525,9 @@ class delete_Account(Resource):
         
         id = session['usuario_id']
         
-        a = """delete from bloqueados where id_bloqueador = %s or id_bloqueado"""
-        cursor.execute(a, (id,))
-        cursor.commit()
+        a = """delete from bloqueados where id_bloqueador = %s or id_bloqueado = %s"""
+        cursor.execute(a, (id,id))
+        con.commit()
         
         query = """delete from usuarios where id_usuario = %s """
         cursor.execute(query, (id,))
