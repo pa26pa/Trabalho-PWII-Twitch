@@ -197,6 +197,54 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    // BOTÃO REDEFINIR SENHA — desabilitado até senhas válidas e iguais
+    const btnRedefinir = document.getElementById('backLogin');
+    const newPwInput1  = document.querySelector('#new-password .password1');
+    const newPwInput2  = document.querySelector('#new-password .password2');
+    const newPwErro1   = document.querySelector('#new-password .erroSenha');
+    const newPwErro2   = document.querySelector('#new-password .erroSenha2');
+
+    if (btnRedefinir && newPwInput1 && newPwInput2) {
+        btnRedefinir.disabled = true; // começa desabilitado
+
+        function checkRedefinir() {
+            const senha1ok = newPwInput1.value.length >= 5;
+            const senha2ok = newPwInput2.value.length >= 5;
+            const iguais   = newPwInput1.value === newPwInput2.value;
+            btnRedefinir.disabled = !(senha1ok && senha2ok && iguais);
+        }
+
+        newPwInput1.addEventListener('input', () => {
+            // esconde erro enquanto digita
+            if (newPwErro1) newPwErro1.style.display = 'none';
+            newPwInput1.classList.remove('input-erro');
+            checkRedefinir();
+        });
+
+        newPwInput2.addEventListener('input', () => {
+            // esconde erro enquanto digita
+            if (newPwErro2) newPwErro2.style.display = 'none';
+            newPwInput2.classList.remove('input-erro');
+            checkRedefinir();
+        });
+
+        newPwInput1.addEventListener('blur', () => {
+            if (newPwInput1.value.length > 0 && newPwInput1.value.length < 5) {
+                if (newPwErro1) newPwErro1.style.display = 'block';
+                newPwInput1.classList.add('input-erro');
+            }
+            checkRedefinir();
+        });
+
+        newPwInput2.addEventListener('blur', () => {
+            if (newPwInput2.value && newPwInput1.value !== newPwInput2.value) {
+                if (newPwErro2) newPwErro2.style.display = 'block';
+                newPwInput2.classList.add('input-erro');
+            }
+            checkRedefinir();
+        });
+    }
+
     //evento para permitir que o usuário cole um código completo, preenchendo os inputs automaticamente
     document.addEventListener('paste', (e) => {//paste: detecta quando o usuário cola algo, permitindo processar o conteúdo colado
         const paste = e.clipboardData.getData('text').replace(/[^0-9]/g, '');
@@ -765,6 +813,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 // limpa todos os inputs do modal ao fechar
                 modal.querySelectorAll('input').forEach(input => input.value = '');
+                if (btnRedefinir) {btnRedefinir.disabled = true;} // reseta ao fechar}
                 modal.querySelectorAll('.erroSenha, .erroSenha2, #erroIdade').forEach(el => el.style.display = 'none');
                 modal.querySelectorAll('.input-erro').forEach(el => el.classList.remove('input-erro'));
                 if (continueBtn) continueBtn.disabled = true;
