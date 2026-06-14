@@ -320,6 +320,7 @@ class forgot(Resource):
         # guardando o id e o código na session
         session['id_provisorio'] = id
         session['code'] = codigo 
+        session['who'] = who
         
         cursor.close()
         con.close()
@@ -344,8 +345,9 @@ class resend_code(Resource):
         cursor.execute(query,(session['id_provisorio']))
         email = cursor.fetchone()
         
+        tipo = session['who']
         # enviando código
-        codigo = send_code(email)
+        codigo = send_code(email,tipo)
         
         # atualizando a session
         session['code'] = codigo 
