@@ -105,83 +105,107 @@ document.addEventListener('DOMContentLoaded', function () {
         btnreceberCodigo.disabled = true;
     }
 
-    // REENVIO DO CÓDIGO COM TIMER
-    const resendBtn = document.getElementById('resendBtn');
-    const timerText = document.getElementById('timerText');
-    let timeLeft = 60;//tempo em segundos para o próximo reenvio
-    let interval;//variável para armazenar o intervalo do timer, permitindo limpar o intervalo quando necessário
+    // ── FUNÇÃO GENÉRICA DE OTP ──
+    function setupOTP(container) {
+        if (!container) return;
 
-    function startTimer() {
-        if (!resendBtn || !timerText) return;// ← proteção para garantir que os elementos existam antes de tentar acessá-los
-        resendBtn.disabled = true;//desabilita o botão de reenvio enquanto o timer estiver ativo
-        timeLeft = 60;
-        clearInterval(interval);//limpa qualquer intervalo anterior para evitar múltiplos timers rodando ao mesmo tempo
-        timerText.textContent = `Reenviar código em ${timeLeft}s`;//exibe o tempo restante para o próximo reenvio
-        interval = setInterval(() => {//inicia um intervalo que roda a cada segundo (1000ms)
-            timeLeft--;//decrementa o tempo restante a cada segundo
-            timerText.textContent = `Reenviar código em ${timeLeft}s`;
-            if (timeLeft <= 0) {
-                clearInterval(interval);
-                timerText.textContent = '';
-                resendBtn.disabled = false;
-            }
-        }, 1000);//tempo em milissegundos (1000ms = 1s)
-    }
+        const inputs      = container.querySelectorAll('.otp-input');
+        const continueBtn = container.querySelector('#continueBtn, .continueBtn');
+        const resendBtn   = container.querySelector('#resendBtn, .resendBtn');
+        const timerText   = container.querySelector('#timerText');
 
-    //evento de clique para o botão de reenvio, que reinicia o timer e simula o reenvio do código
-    if (resendBtn) {
-        resendBtn.addEventListener('click', () => {
-            console.log('Código reenviado');
-            startTimer();
-        });
-    }
+        if (!inputs.length) return;
 
-    // INSERINDO CÓDIGO DE VERIFICAÇÃO
-    const inputs = document.querySelectorAll('.otp-input');
-    const continueBtn = document.getElementById('continueBtn');
+        if (continueBtn) continueBtn.disabled = true;
 
-    if (continueBtn) continueBtn.disabled = true;//desabilita o botão de continuar inicialmente, garantindo que o usuário só possa avançar após inserir um código válido
+        function checkCode() {
+            if (!continueBtn) return;
+            const code = Array.from(inputs).map(i => i.value).join('');
+            continueBtn.disabled = code.length !== 5;
+        }
 
-    //função para verificar se o código inserido tem 5 dígitos e habilitar/desabilitar o botão de continuar
-    function checkCode() {
-        if (!continueBtn) return;
-        const code = Array.from(inputs).map(input => input.value).join('');//concatena os valores dos inputs em uma única string
-        //array.from() é usado para converter a NodeList retornada por querySelectorAll em um array, permitindo o uso de métodos como map()
-        //map() é usado para iterar sobre cada input, extrair seu valor e criar um array de valores, que é então unido em uma string usando join('')
-        //join('') é usado para unir os valores dos inputs sem nenhum separador, formando o código completo inserido pelo usuário
-        continueBtn.disabled = code.length !== 5;//habilita o botão de continuar apenas se o código tiver exatamente 5 dígitos, caso contrário, mantém o botão desabilitado
-    }
-
-    if (inputs.length > 0) {  // ← proteção
         inputs.forEach((input, index) => {
             input.addEventListener('input', (e) => {
-                input.value = e.target.value.replace(/[^0-9]/g, '');//remove qualquer caractere que não seja um dígito, garantindo que apenas números sejam inseridos
-                //target é a referência ao elemento que disparou o evento
-                // value é o valor atual do input
-                // replace() é usado para substituir qualquer caractere que não seja um dígito
-                if (input.value && index < inputs.length - 1) {
-                    inputs[index + 1].focus();//move o foco para o próximo input automaticamente quando um dígito é inserido
-                }
-                checkCode();//verifica o código a cada alteração para habilitar/desabilitar o botão de continuar
+                input.value = e.target.value.replace(/[^0-9]/g, '');
+                if (input.value && index < inputs.length - 1) inputs[index + 1].focus();
+                checkCode();
             });
-            //evento para permitir que o usuário use a tecla Backspace para voltar ao input anterior
-            input.addEventListener('keydown', (e) => {//keydown: detecta quando uma tecla é pressionada, permitindo uso do teclado
-                if (e.key === 'Backspace' && !input.value && index > 0) {//verifica se a tecla pressionada é Backspace, se o input atual está vazio e se não é o primeiro input
-                    inputs[index - 1].focus();
-                }
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace' && !input.value && index > 0) inputs[index - 1].focus();
             });
         });
 
-        //evento para permitir que o usuário cole um código completo, preenchendo os inputs automaticamente
-        document.addEventListener('paste', (e) => {//paste: detecta quando o usuário cola algo, permitindo processar o conteúdo colado
+        container.addEventListener('paste', (e) => {
             const paste = e.clipboardData.getData('text').replace(/[^0-9]/g, '');
-            //clipboardData.getData('text') é usado para obter o texto que o usuário colou
-            inputs.forEach((input, i) => {
-                input.value = paste[i] || '';//preenche cada input com o dígito correspondente do código colado, ou deixa vazio se não houver mais dígitos
-            });
-            checkCode();//verifica o código após colar para habilitar/desabilitar o botão de continuar
+            inputs.forEach((input, i) => { input.value = paste[i] || ''; });
+            checkCode();
+        });
+
+        let timeLeft = 60;
+        let interval;
+
+        function startTimer() {
+            if (!resendBtn || !timerText) return;
+            resendBtn.disabled = true;
+            timeLeft = 60;
+            clearInterval(interval);
+            timerText.textContent = `Reenviar código em ${timeLeft}s`;
+            interval = setInterval(() => {
+                timeLeft--;
+                timerText.textContent = `Reenviar código em ${timeLeft}s`;
+                if (timeLeft <= 0) {
+                    clearInterval(interval);
+                    timerText.textContent = '';
+                    resendBtn.disabled = false;
+                }
+            }, 1000);
+        }
+
+        return {
+            inputs, continueBtn, resendBtn, startTimer,
+            getCode: () => Array.from(inputs).map(i => i.value).join(''),
+            reset: () => {
+                inputs.forEach(i => i.value = '');
+                if (continueBtn) continueBtn.disabled = true;
+                clearInterval(interval);
+                if (timerText) timerText.textContent = '';
+            }
+        };
+    }
+
+    // inicializa um OTP para cada contexto
+    const insertCodeModal = document.querySelector('#modal-1 #insert-code') 
+        || document.querySelector('#insert-code:not(#modal-3 #insert-code)');
+    const otpLogin = insertCodeModal ? setupOTP(insertCodeModal) : null;
+
+    const modal3 = document.getElementById('modal-3');
+    const otpDelete = modal3 ? setupOTP(modal3) : null;
+
+    // reenvio — login
+    if (otpLogin?.resendBtn) {
+        otpLogin.resendBtn.addEventListener('click', () => {
+            fetch('http://127.0.0.1:5000/resend', { method: 'GET', headers: { 'Content-Type': 'application/json' } })
+            .then(r => r.json()).then(data => mostrarToast(data.mensagem, data.status));
         });
     }
+
+    // reenvio — excluir conta
+    if (otpDelete?.resendBtn) {
+        otpDelete.resendBtn.addEventListener('click', () => {
+            fetch('http://127.0.0.1:5000/resend', { method: 'GET', headers: { 'Content-Type': 'application/json' } })
+            .then(r => r.json()).then(data => mostrarToast(data.mensagem, data.status));
+        });
+    }
+
+    //evento para permitir que o usuário cole um código completo, preenchendo os inputs automaticamente
+    document.addEventListener('paste', (e) => {//paste: detecta quando o usuário cola algo, permitindo processar o conteúdo colado
+        const paste = e.clipboardData.getData('text').replace(/[^0-9]/g, '');
+        //clipboardData.getData('text') é usado para obter o texto que o usuário colou
+        inputs.forEach((input, i) => {
+            input.value = paste[i] || '';//preenche cada input com o dígito correspondente do código colado, ou deixa vazio se não houver mais dígitos
+        });
+        checkCode();//verifica o código após colar para habilitar/desabilitar o botão de continuar
+    });
 
     const newpasswordBox = document.getElementById('new-password');
     document.querySelectorAll('.back-arrow-modal').forEach(btn => {
@@ -514,7 +538,6 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
             if (form.classList.contains('email-forgot-password')) {
-
                 const dados = {
                     email: document.getElementById('email_forgot').value,
                     who: 'forgot_password'
@@ -522,58 +545,52 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 fetch("http://127.0.0.1:5000/forgot", {
                     method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
+                    headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(dados)
                 })
                 .then(res => res.json())
                 .then(data => {
-
                     mostrarToast(data.mensagem, data.status);
 
                     if (data.status === 'success') {
-
                         telaAtual.avancar('email', 'codigo');
-
-                        emailBox.querySelectorAll('input')
-                            .forEach(input => input.value = '');
-
+                        emailBox.querySelectorAll('input').forEach(input => input.value = '');
                         btnreceberCodigo.disabled = true;
-
-                        inputs.forEach(input => input.value = '');
-
-                        if (continueBtn) continueBtn.disabled = true;
-
-                        startTimer();
+                        if (otpLogin) { otpLogin.reset(); otpLogin.startTimer(); } // ← só isso
                     }
                 });
             }
 
             if (form.classList.contains('insert-code')) {
-                const dados = {
-                    codigo : codigoInserido()
-                }
-                console.log(dados);
+                const otp = form.closest('#modal-3') ? otpDelete : otpLogin;
+                const codigo = otp ? otp.getCode() : '';
 
-                fetch("http://127.0.0.1:5000/check_codigo", {
-                method:"POST",
-                headers: {
-                    "Content-Type":"application/json"
-                },
-                body: JSON.stringify(dados)
+                fetch('http://127.0.0.1:5000/check_codigo', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ codigo })
                 })
-                .then(res => res.json())
+                .then(r => r.json())
                 .then(data => {
-                    if (data.status == 'error'){
-                        mostrarToast(data.mensagem, data.status)
-                        return 
-                    } 
+                    if (data.status === 'error') { mostrarToast(data.mensagem, data.status); return; }
                     mostrarToast(data.mensagem, data.status);
-                    telaAtual.avancar('codigo', 'senha');
-                    // limpa os inputs do código ao sair
-                    inputs.forEach(input => input.value = '');
-                    if (continueBtn) continueBtn.disabled = true;
+
+                    if (form.closest('#modal-3')) {
+                        // fluxo de excluir conta: valida código e deleta
+                        fetch('http://127.0.0.1:5000/delete', {
+                            method: 'DELETE',
+                            headers: { 'Content-Type': 'application/json' }
+                        })
+                        .then(r => r.json())
+                        .then(data => {
+                            mostrarToast(data.mensagem, data.status);
+                            if (data.status !== 'error') { verificarSessao(); window.location.href = '/'; }
+                        });
+                    } else {
+                        // fluxo de redefinir senha: avança para nova senha
+                        telaAtual.avancar('codigo', 'senha');
+                        if (otp) otp.reset();
+                    }
                 });
             }
 
@@ -630,63 +647,35 @@ document.addEventListener('DOMContentLoaded', function () {
                     fecharModal(form)
                 });
             }
-            if (form.classList) {
-
-            }
-        })
+        });
     });
-    const btnResend = document.getElementById("resendBtn");
-    if (btnResend) {
-        btnResend.addEventListener("click", function() {
-            fetch("http://127.0.0.1:5000/resend", {
-                method:"GET",
-                headers: {
-                    "Content-Type":"application/json"
-                }
-            })
-            .then(res => res.json())
-            .then(data => {
-                mostrarToast(data.mensagem, data.status)
-            })
-        })
-    }
     const btnDeleteAccount = document.querySelector(".btn-delete-code");
     if (btnDeleteAccount) {
         btnDeleteAccount.addEventListener("click", function() {
-            dados = {
+            const dados = {
                 email: document.getElementById("show_email").textContent,
                 who: 'delete_account'
             };
-    
+
             fetch("http://127.0.0.1:5000/forgot", {
-                method:"POST",
-                headers: {
-                    "Content-Type":"application/json"
-                },
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(dados)
             })
-                .then(res => res.json())
-                .then(data=> {
-                    mostrarToast(data.mensagem, data.status);
+            .then(res => res.json())
+            .then(data => {
+                mostrarToast(data.mensagem, data.status);
 
-                    if (data.status === 'success') {
-
-                        telaAtual.avancar('email', 'codigo');
-
-                        emailBox.querySelectorAll('input')
-                            .forEach(input => input.value = '');
-
-                        btnreceberCodigo.disabled = true;
-
-                        inputs.forEach(input => input.value = '');
-
-                        if (continueBtn) continueBtn.disabled = true;
-
-                        startTimer();
-                    }
-                });        
-        })
+                if (data.status === 'success') {
+                    wrapperDelete.style.display = 'none';
+                    const insertCodeDelete = modal3 ? modal3.querySelector('#insert-code') : null;
+                    if (insertCodeDelete) insertCodeDelete.style.display = 'flex';
+                    if (otpDelete) { otpDelete.reset(); otpDelete.startTimer(); }
+                }
+            });
+        });
     }
+
     const btnDelete = document.querySelector(".btn-delete");
     if (btnDelete) {
         btnDelete.addEventListener("click", function() {
@@ -1045,10 +1034,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const btnDeleteCode = document.querySelector('.btn-delete-code');
     const wrapperDelete = document.getElementById('wrapper-delete');
-    if (btnDeleteCode && wrapperDelete && insertcodeBox) {
+    if (btnDeleteCode && wrapperDelete) {
         btnDeleteCode.addEventListener('click', () => {
             wrapperDelete.style.display = 'none';
-            insertcodeBox.style.display = 'flex';
+            const insertCodeDelete = modal3 ? modal3.querySelector('#insert-code') : null;
+            if (insertCodeDelete) insertCodeDelete.style.display = 'flex';
+            if (otpDelete) { otpDelete.reset(); otpDelete.startTimer(); }
         });
     }
 
