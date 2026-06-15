@@ -1326,15 +1326,6 @@ a {text-decoration: none;}
     margin-bottom: 10%;
 }
 #wrapper-delete .btn-modal-seg {width: 70%;}
-/*
-#modal-3 h1 {font-size: 1.5em;}
-#modal-3 p {font-size: 1em;}
-#modal-3 button {width: 90; height: 45px; font-size: 1em;}
-#modal-3 .btn-modal-seg {padding: 0 50px;}
-#wrap-seg-delete {
-    height: 80%;
-    width: 80%;
-}
 
 /*ABA DE PRIVACIDADE*/
 .blocked-wrap {
@@ -1438,6 +1429,70 @@ a {text-decoration: none;}
     transition: background 0.2s;
 }
 .unblock-btn:hover {background: #fdecea;}
+
+/* ------ MEU CANAL -----------*/
+.container-perfil {
+    margin: 0 auto;
+    height: auto;
+    width: 60%;
+    padding: 5px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    border: 4px solid red;
+}
+.container-perfil h1 {
+    font-size: 2em;
+    width: 100%;
+    text-align: left;
+    padding: 10px;
+    color: #48237F;
+    border-bottom: 2px solid #48237F;
+}
+.box-perfil {
+    width: 100%;
+    height: auto;
+    background-color: #F4ECFF;
+    border: 4px double #DEC7FF;
+    border-radius: 20px;
+    padding: 10px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.box-main {
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.mini-box-perfil {
+    width: 100%;
+    height: auto;
+    display: flex;
+    gap: 10px;
+    justify-content: space-between;
+}
+.box-social-perfil {
+    display: flex;
+    gap: 10px;
+}
+.social-perfil {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.box-buttons-perfil {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.box-buttons-perfil button {
+    width: 100px;
+    background-color: #DEC7FF;
+    border: 2px solid #9147FF;
+}
 
 /*RESPONSIVIDADE = não é adaptar para telas, é permitir que o layout se adapte sozinho*/
 /*@media = "if"*/

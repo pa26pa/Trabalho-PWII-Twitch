@@ -45,7 +45,7 @@
                         <hr>
 
                         <a href="{{url_for('perfil')}}">
-                            <li><span data-i18n>Seu Canal</span></li>
+                            <li><span data-i18n>Meu Canal</span></li>
                         </a>
                         <hr>
                         
@@ -55,9 +55,9 @@
 
                             <div id="language-submenu" class="submenu">
                                 <ul>
-                                    <li class="language-option" data-lang="pt">🇧🇷 Português</li>
-                                    <li class="language-option" data-lang="en">🇺🇸 English</li>
-                                    <li class="language-option" data-lang="es">🇪🇸 Español</li>
+                                    <li class="language-option" data-lang="pt" data-i18n>🇧🇷 Português</li>
+                                    <li class="language-option" data-lang="en" data-i18n>🇺🇸 English</li>
+                                    <li class="language-option" data-lang="es" data-i18n>🇪🇸 Español</li>
                                 </ul>
                             </div>
                         </li>
@@ -70,7 +70,7 @@
                             </label>
                         </li>
                         <hr>
-                        <li id="btn-logout" class="with-login">Sair</li>
+                        <li id="btn-logout" class="with-login" data-i18n>Sair</li>
                     </ul>
                 </div>
             </div>
@@ -104,7 +104,7 @@
                             <p></p>
                             <button class="btn-close-modal" data-modal="modal-2"><i class="fa-solid fa-x close-x"></i></button>
                         </div>
-                        <h1>Crie sua nova Senha</h1>
+                        <h1 data-i18n>Crie sua nova Senha</h1>
                         <form action="#" method="post" class="form-new-password forms" novalidate>
                             <div class="caixa-input">
                                 <input type="password" class="password-atual" name="password" required>
@@ -130,7 +130,7 @@
                 </dialog>
             </div>
             <div class="seg-box">
-                <p>CPF</p> <br>
+                <p data-i18n>CPF</p> <br>
                 <div class="data-bd" id="show_cpf"></div>
             </div>
             <div class="seg-box">
@@ -207,7 +207,7 @@
                 <!--parte de expansão e colapso-->
                 <div id="blocked-list-wrap">
                     <div id="blocked-list-inner">
-                        <!--quando não houver bloquados (lista vazia)-->
+                        <!--quando não houver bloqueados (lista vazia)-->
                         <p id="blocked-empty" data-i18n>Ninguém foi bloqueado ainda</p>
 
                         <!--tabela que será preenchida pelo JS-->

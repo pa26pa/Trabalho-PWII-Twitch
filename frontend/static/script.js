@@ -845,22 +845,23 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // MENU LATERAL
     const backAside = document.querySelectorAll('.back-aside');
-    const normalAside = document.querySelector('.normal-aside');
+    const normalAside = document.querySelectorAll('.normal-aside');
     const iconPageAside = document.querySelectorAll('.pages-icon-aside');
     const spanPageAside = document.querySelectorAll('.span-link-aside');
     const asideContent = document.querySelectorAll('.aside-content');
-    if (backAside && normalAside && iconPageAside && spanPageAside && asideContent) {  // ← proteção (moon.html não tem aside)
+    if (backAside && normalAside && iconPageAside && spanPageAside) {  // ← proteção (moon.html não tem aside)
         let asideOpen = true;
 
         backAside.forEach(bA => bA.addEventListener('click', () => {
+            console.log("clicado");
             if (asideOpen) {
-                normalAside.style.width = '5%';
+                normalAside.forEach(aside => aside.style.width = '5%');
                 spanPageAside.forEach(span => span.style.display = 'none');
                 asideContent.forEach(cont => cont.style.display = 'none');
                 iconPageAside.forEach(icon => icon.style.fontSize = '2.5em');
                 bA.style.transform = 'rotateY(180deg)';
             } else {
-                normalAside.style.width = '20%';
+                normalAside.forEach(aside => aside.style.width = '20%');
                 spanPageAside.forEach(span => span.style.display = 'flex');
                 asideContent.forEach(cont => cont.style.display = 'flex');
                 iconPageAside.forEach(icon => icon.style.fontSize = '1.4em');
