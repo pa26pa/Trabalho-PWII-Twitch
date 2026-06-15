@@ -1,11 +1,139 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Witch | Seu Canal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+    <link rel="stylesheet" href="{{url_for('static', filename='style.css')}}">
+    <link rel="icon" type="image/x-icon" href="{{url_for('static', filename='witch.png')}}">
 </head>
 <body>
-    
+    <header id="header"> 
+        <div class="logo"><a href="{{url_for('home')}}"><img id="logo" src="{{url_for('static', filename='witch.png')}}" alt="logo"></a></div>
+        <div class="header-center">
+            <!--BARRA DE PESQUISA-->
+            <div class="bottom-menu">
+                <div class="search-bar">
+                    <div class="search-icon">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </div>
+                    <input type="text" id="search" placeholder="Pesquise aqui" data-i18n-placeholder>
+                </div>
+            </div>
+        </div>
+
+        <div class="toast"></div>
+
+        <div class="menu-modals">
+            <a href="{{url_for('luna')}}" target="_blank" aria-placeholder="Luna"><img src="{{url_for('static', filename='coroa.png')}}" id="luna" alt="coroa"></a>
+            
+            <button id="btn-turbo" title="Turbo"><img src="{{url_for('static', filename='bateria.png')}}" alt=""></button>
+            
+            <!--DROPDOWN MENU-->
+            <div class="dropdown-menu-wrap">
+                <button class="open-modal" id="btn-dropdown">
+                    <img src="{{url_for('static', filename='user.png')}}" alt="menu" id="menu-icon">
+                </button>
+
+                <div id="dropdown-menu" class="dropdown-menu">
+                    <ul>
+                        <li id="dropdown-usuario">
+                            <img src="{{url_for('static', filename='user.png')}}" alt="avatar" id="avatar-dropdown">
+                            <div class="show_name"></div>
+                        </li>
+                        <hr>
+
+                        <a href="{{url_for('perfil')}}">
+                            <li>
+                                <span>Perfil</span>
+                            </li>
+                        </a>
+                        <hr>
+                        
+                        <li id="language-item" class="submenu-item">
+                            <span data-i18n>Idioma</span>
+                            <i class="fa-solid fa-angle-up arrow-language"></i>
+
+                            <div id="language-submenu" class="submenu">
+                                <ul>
+                                    <li class="language-option" data-lang="pt">🇧🇷 Português</li>
+                                    <li class="language-option" data-lang="en">🇺🇸 English</li>
+                                    <li class="language-option" data-lang="es">🇪🇸 Español</li>
+                                </ul>
+                            </div>
+                        </li>
+                        <hr>
+                        <li class="toggle-item">
+                            <span data-i18n>Tema Escuro</span>
+                            <label class="switch">
+                                <input type="checkbox" id="dark-theme">
+                                <span class="slider"></span>
+                            </label>
+                        </li>
+                        <hr>
+                        <li id="btn-logout">Sair</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <aside class="normal-aside">
+        <i class="fa-solid fa-angles-right back-aside"></i>
+        
+        <div class="aside-content">
+            <a href="#" class="lives-aside">
+                <i class="fa-solid fa-circle aside-photo"></i>
+                <span>Pessoa 1.0</span>
+                <div class="aside-right">
+                    <span>1.3M</span>
+                    <i class="fa-solid fa-circle red-circle"></i>
+                </div>
+            </a>
+            <hr>
+            <a href="#" class="lives-aside">
+                <i class="fa-solid fa-circle aside-photo"></i>
+                <span>Pessoa 2.0</span>
+                <div class="aside-right">
+                    <span>1.3M</span>
+                    <i class="fa-solid fa-circle red-circle"></i>
+                </div>
+            </a>
+            <hr>
+            <a href="#" class="lives-aside">
+                <i class="fa-solid fa-circle aside-photo"></i>
+                <span>Pessoa 3.0</span>
+                <div class="aside-right">
+                    <span>1.3M</span>
+                    <i class="fa-solid fa-circle red-circle"></i>
+                </div>
+            </a>
+            <hr>
+            <a href="#" class="lives-aside">
+                <i class="fa-solid fa-circle aside-photo"></i>
+                <span>Pessoa 4.0</span>
+                <div class="aside-right">
+                    <span>1.3M</span>
+                    <i class="fa-solid fa-circle red-circle"></i>
+                </div>
+            </a>
+        </div>
+
+        <div class="box-links-pages">
+            <!-- aparece só quando logado -->
+            <a href="{{url_for('config')}}" class="aside-pages">
+                <i class="fa-solid fa-gear pages-icon-aside"></i>
+                <span class="span-link-aside">Configurações</span>
+            </a>
+
+            <hr class="aside-hr">
+
+            <a href="{{url_for('ajuda')}}" class="aside-pages">
+                <i class="fa-regular fa-circle-question pages-icon-aside"></i> 
+                <span class="span-link-aside">Ajuda</span>
+            </a>
+        </div>
+    </aside>
 </body>
 </html>

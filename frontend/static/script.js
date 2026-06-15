@@ -849,7 +849,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const iconPageAside = document.querySelectorAll('.pages-icon-aside');
     const spanPageAside = document.querySelectorAll('.span-link-aside');
     const asideContent = document.querySelectorAll('.aside-content');
-    if (backAside && normalAside && iconPageAside && spanPageAside) {  // ← proteção (moon.html não tem aside)
+    if (backAside && normalAside && iconPageAside && spanPageAside && asideContent) {  // ← proteção (moon.html não tem aside)
         let asideOpen = true;
 
         backAside.forEach(bA => bA.addEventListener('click', () => {
