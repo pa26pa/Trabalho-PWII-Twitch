@@ -442,23 +442,36 @@
 
         <script src=""></script>
         <script src="{{url_for('static', filename='script.js')}}"></script>
-        <!-- create table usuarios (
-                id_usuario int auto_increment primary key,
-                cpf varchar(14),
-                email varchar(50),
-                user_name varchar(50),
-                senha varchar(500),
-                data_nascimento date
-            );
+        <!-- 
+create table streams(
+	id_stream int auto_increment primary key,
+    categoria varchar(100),
+    titulo text,
+    descrisao text,
+    data_updoad datetime,
+    id_streamer int,
+    
+    foreign key (id_streamer) references usuarios(id_usuario) 
+);
 
-            create table bloqueados (
-                id int auto_increment primary key,
-                id_bloqueador int,
-                id_bloqueado int,
-                data_bloq date,
-                
-                foreign key (id_bloqueador) references usuarios(id_usuario),
-                foreign key (id_bloqueado) references usuarios(id_usuario)
-            );-->
+create table usuarios (
+       id_usuario int auto_increment primary key,
+       cpf varchar(14) not null,
+       email varchar(50) not null,
+       user_name varchar(50) not null,
+       senha varchar(500) not null,
+       data_nascimento date not null,
+       foto_url text
+);
+
+create table bloqueados (
+	id int auto_increment primary key,
+    id_bloqueador int,
+    id_bloqueado int,
+    data_bloq date,
+    
+    foreign key (id_bloqueador) references usuarios(id_usuario),
+    foreign key (id_bloqueado) references usuarios(id_usuario)
+);-->
     </body>
 </html>

@@ -6,14 +6,15 @@ import random
 import smtplib
 from email.message import EmailMessage
 import mimetypes
-from backend.database.connection import connection, email_valido, data_valida, carregar, salvar, cache_traducoes, file
+from backend.database.connection import connection, supabase, email_valido, data_valida, carregar, salvar, cache_traducoes, file
 from backend.resources.cpf import cpf_math_validate, cpf_real_or_not
 from backend.resources.email_code import send_code
 from datetime import date, datetime, timedelta
 from email_validator import validate_email, EmailNotValidError
 from deep_translator import GoogleTranslator
 import time
-
+from uuid import uuid4
+from datetime import date
 
 #from main import app, google, User
 # criação do signin
@@ -667,5 +668,74 @@ class desbloquear(Resource):
                 'mensagem':'não foi possivel desbloquear'
             }
         
+class upload(Resource):
+    def post(self):
+        con = connection()
+        cursor = con.cursor(pymysql.cursors.DictCursor)
         
         
+        arquivo = request.files.get('arquivo')
+        tipo = request.form.get('tipo')
+        
+        print("FILES:", request.files)
+        print("FORM:", request.form)
+        print("TIPO:", tipo)
+        print("ARQUIVO:", arquivo)
+        bucket = 'photos'
+        if tipo == 'video':
+            titulo = request.form.get('titulo')
+            categoria = request.form.get('categoria')
+            descrisao = request.form.get('descrisao')
+            
+            bucket = 'videos'
+        
+        if not arquivo or not tipo:
+            return {
+                'status':'error',
+                'mensagem':'Arquivo não foi enviado' 
+            }, 400
+        
+        nome = f"{uuid4()}_{arquivo.filename}"
+        
+        supabase.storage\
+        .from_(bucket)\
+        .upload(
+            nome,
+            arquivo.read(),
+            {
+                "content-type": arquivo.content_type
+            }    
+        )
+        
+        url = supabase.storage\
+        .from_(bucket)\
+        .get_public_url(nome)
+        
+        if not url:
+            return {
+                'status':'error',
+                'mensagem':'Não foi possivel encontrar URL'
+            }, 500
+        
+        hoje = date.today()
+        
+        session['id_usuario'] = 1
+        id = session['id_usuario']
+        
+        
+        if tipo == 'foto':
+            query_foto = """UPDATE usuarios set foto_url = %s where id_usuario = %s"""
+            cursor.execute(query_foto,(url,id))
+            con.commit()
+        else:    
+            query_video = """insert into streams (categoria,titulo,descrisao,data_upload,id_streamer) values(%s,%s,%s,%s,%s)"""
+            cursor.execute(query_video,(categoria,titulo,descrisao,hoje,id))
+            con.commit()
+        
+        cursor.close()
+        con.close()
+        
+        return {
+            'status':'success',
+            'mensagem':'arquivo salvo com sucesso'
+        }, 200

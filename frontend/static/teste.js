@@ -143,3 +143,61 @@ function deletar() {
     
     });
 }
+
+function enviar_foto() {
+
+    const foto = document.getElementById('foto').files[0];
+
+    if (!foto) {
+        alert("Selecione uma foto");
+        return;
+    }
+
+    const formData = new FormData();
+
+    formData.append("arquivo", foto);
+    formData.append("tipo", "foto");
+
+    fetch("http://127.0.0.1:5000/upload", {
+        method: "POST",
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        console.log(data);
+    })
+    .catch(err => console.error(err));
+
+}
+
+function enviar_video() {
+
+    const video = document.getElementById('video').files[0];
+    const titulo = document.getElementById('titulo').value;
+    const descrisao = document.getElementById('descrisao').value;
+    const categoria = document.getElementById('categoria').value;
+
+    if (!video) {
+        alert("Selecione um vídeo");
+        return;
+    }
+
+    const formData = new FormData();
+
+    formData.append("arquivo", video);
+    formData.append("tipo", "video");
+    formData.append("titulo", titulo);
+    formData.append("descrisao", descrisao);
+    formData.append("categoria", categoria);
+
+    fetch("http://127.0.0.1:5000/upload", {
+        method: "POST",
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        console.log(data);
+    })
+    .catch(err => console.error(err));
+
+}
