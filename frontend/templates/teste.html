@@ -60,6 +60,33 @@
 
 <button onclick="deletar()">Deletar</button>
 
+<hr>
+<form id="form-profile">
+    <input
+        type="file"
+        id="foto"
+        accept="image/*"
+    >
+
+    <button type="button" onclick="enviar_foto()">
+        Salvar Foto
+    </button>
+</form>
+<hr>
+<form id="form-video">
+    <input type="text" id="titulo" placeholder="Titulo"><br>
+    <input type="text" id="descrisao" placeholder="Descrição"><br>
+    <input type="text" id="categoria" placeholder="Categoria"><br>
+
+    <input 
+        type="file"
+        id="video"
+        accept="video/*"
+    >
+    <button type="button" onclick="enviar_video()">
+        Salvar Foto
+    </button>
+</form>   
 <h2>Resposta da API:</h2>
 <pre id="resposta"></pre>
 
