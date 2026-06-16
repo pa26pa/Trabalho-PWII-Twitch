@@ -1,11 +1,228 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Witch | Meu Canal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+    <link rel="stylesheet" href="{{url_for('static', filename='style.css')}}">
+    <link rel="icon" type="image/x-icon" href="{{url_for('static', filename='witch.png')}}">
 </head>
-<body>
-    
+<body id="body-perfil">
+    <header id="header"> 
+        <div class="logo"><a href="{{url_for('home')}}"><img id="logo" src="{{url_for('static', filename='witch.png')}}" alt="logo"></a></div>
+        <div class="header-center">
+            <!--BARRA DE PESQUISA-->
+            <div class="bottom-menu">
+                <div class="search-bar">
+                    <div class="search-icon">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </div>
+                    <input type="text" id="search" placeholder="Pesquise aqui" data-i18n-placeholder>
+                </div>
+            </div>
+        </div>
+
+        <div class="toast"></div>
+
+        <div class="menu-modals">
+            <a href="{{url_for('luna')}}" target="_blank" aria-placeholder="Luna">
+                <button id="btn-moon">
+                    <i class="fa-solid fa-crown moon-crown" style="color: rgb(255, 212, 59);"></i>
+                </button>
+            </a>
+            
+            <button id="btn-turbo" title="Turbo">
+                <i class="fa-solid fa-battery-half charge-icon" style="color: rgb(255, 255, 255);"></i>
+            </button>
+            
+            <!--DROPDOWN MENU-->
+            <div class="dropdown-menu-wrap">
+                <button class="open-modal" id="btn-dropdown">
+                    <i class="fa-solid fa-user menu-icon" style="color: rgb(255, 255, 255);"></i>
+                </button>
+
+                <div id="dropdown-menu" class="dropdown-menu">
+                    <ul>
+                        <li id="dropdown-usuario">
+                            <div class="background-avatar">
+                                <i class="fa-solid fa-user avatar-dropdown" style="color: rgb(255, 255, 255);"></i>
+                            </div>
+                            <div class="show_name"></div>
+                        </li>
+                        <hr>
+
+                        <a href="{{url_for('perfil')}}">
+                            <li>
+                                <span data-i18n>Meu Canal</span>
+                            </li>
+                        </a>
+                        <hr>
+                        
+                        <li id="language-item" class="submenu-item">
+                            <span data-i18n>Idioma</span>
+                            <i class="fa-solid fa-angle-up arrow-language"></i>
+
+                            <div id="language-submenu" class="submenu">
+                                <ul>
+                                    <li class="language-option" data-lang="pt" data-i18n>🇧🇷 Português</li>
+                                    <li class="language-option" data-lang="en" data-i18n>🇺🇸 English</li>
+                                    <li class="language-option" data-lang="es" data-i18n>🇪🇸 Español</li>
+                                </ul>
+                            </div>
+                        </li>
+                        <hr>
+                        <li class="toggle-item">
+                            <span data-i18n>Tema Escuro</span>
+                            <label class="switch">
+                                <input type="checkbox" id="dark-theme">
+                                <span class="slider"></span>
+                            </label>
+                        </li>
+                        <hr>
+                        <li id="btn-logout" data-i18n>Sair</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <aside class="normal-aside">        
+        <div class="aside-content">
+            <a href="#" class="lives-aside">
+                <i class="fa-solid fa-circle aside-photo"></i>
+                <span>Pessoa 1.0</span>
+                <div class="aside-right">
+                    <span data-i18n>1.3M</span>
+                    <i class="fa-solid fa-circle red-circle"></i>
+                </div>
+            </a>
+            <hr>
+            <a href="#" class="lives-aside">
+                <i class="fa-solid fa-circle aside-photo"></i>
+                <span>Pessoa 2.0</span>
+                <div class="aside-right">
+                    <span data-i18n>1.3M</span>
+                    <i class="fa-solid fa-circle red-circle"></i>
+                </div>
+            </a>
+            <hr>
+            <a href="#" class="lives-aside">
+                <i class="fa-solid fa-circle aside-photo"></i>
+                <span>Pessoa 3.0</span>
+                <div class="aside-right">
+                    <span data-i18n>1.3M</span>
+                    <i class="fa-solid fa-circle red-circle"></i>
+                </div>
+            </a>
+            <hr>
+            <a href="#" class="lives-aside">
+                <i class="fa-solid fa-circle aside-photo"></i>
+                <span>Pessoa 4.0</span>
+                <div class="aside-right">
+                    <span data-i18n>1.3M</span>
+                    <i class="fa-solid fa-circle red-circle"></i>
+                </div>
+            </a>
+        </div>
+
+        <div class="box-links-pages">
+            <!-- aparece só quando logado -->
+            <a href="{{url_for('config')}}" class="aside-pages">
+                <i class="fa-solid fa-gear pages-icon-aside"></i>
+                <span class="span-link-aside" data-i18n>Configurações</span>
+            </a>
+
+            <hr class="aside-hr">
+
+            <a href="{{url_for('ajuda')}}" class="aside-pages">
+                <i class="fa-regular fa-circle-question pages-icon-aside"></i> 
+                <span class="span-link-aside" data-i18n>Ajuda</span>
+            </a>
+        </div>
+    </aside>
+
+    <div class="container-perfil">
+        <h1 data-i18n>Meu Canal</h1>
+        <section class="box-perfil">
+            <div class="photo"><img class="photo-user" src="{{url_for('static', filename='user.png')}}" alt=""></div>
+
+            <div class="box-main">
+                <div class="mini-box-perfil">
+                    <div class="show_name" id="nome-usuario"></div>
+
+                    <div class="box-social-perfil">
+                        <div class="social-perfil">
+                            <span data-i18n> 11 </span>
+                            <span data-i18n>Seguidores</span>
+                        </div>
+                        <div class="social-perfil">
+                            <span data-i18n> 11 </span>
+                            <span data-i18n>Seguindo</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mini-box-perfil">
+                    <p id="bio-usuario" data-i18n></p>
+                </div>
+            </div>
+
+            <div class="box-buttons-perfil">
+                <button class="btn-open-modal btn-perfil" id="btn-editar" data-modal="modal-4" data-i18n>Editar Perfil</button>
+                <dialog id="modal-4">
+                    <div class="modal-buttons">
+                        <p> </p>
+                        <button class="btn-close-modal" data-modal="modal-4"><i class="fa-solid fa-x close-x"></i></button>
+                    </div>
+
+                    <form action="" method="post" class="form-perfil">
+                        <div class="upload-foto-wrap">
+                            <input type="file" id="upload-foto" accept="image/*" style="display: none;">
+                            <img src="{{url_for('static', filename='user.png')}}" id="preview-foto" alt="Foto de perfil" class="preview-foto">
+                            <span class="upload-hint" data-i18n>Clique na foto para alterar</span>
+                        </div>
+
+                        <label class="label-perfil" for="name" data-i18n>Nome do Canal</label>
+                        <input type="text" id="name-user" name="name"> <br><br>
+                        <label class="label-perfil" for="bio" data-i18n>Sua Bio</label>
+                        <textarea rows="4" cols="20" id="bio-user"></textarea> <br>
+
+                        <div class="box-btn-modal-perfil">
+                            <button type="button" class="btn-perfil" id="btn-salvar-perfil" data-i18n>Salvar</button>
+                            <button type="button" class="btn-close-modal btn-red open-modal" data-i18n>Cancelar</button>
+                        </div>
+                    </form>
+                </dialog>
+                <button class="btn-perfil" id="btn-start-live" data-i18n>Começar Live</button>
+            </div>
+        </section>
+
+        <section class="box-about-channel">
+            <p id="description-channel" data-i18n></p>
+        </section>
+
+        <section class="box-schedule">
+            <table class="table-schedule">
+                <tr>
+                    <th></th>
+                    <th data-i18n>Domingo</th>
+                    <th data-i18n>Segunda</th>
+                    <th data-i18n>Terça</th>
+                    <th data-i18n>Quarta</th>
+                    <th data-i18n>Quinta</th>
+                    <th data-i18n>Sexta</th>
+                    <th data-i18n>Sábado</th>
+                </tr>
+            </table>
+        </section>
+
+        <section class="box-videos-clips">
+            <h2 data-i18n>Lives e Clipes</h2>
+        </section>
+    </div>
+
+    <script src="{{url_for('static', filename='tradutor.js')}}"></script>
+    <script src="{{url_for('static', filename='script.js')}}"></script>
 </body>
 </html>

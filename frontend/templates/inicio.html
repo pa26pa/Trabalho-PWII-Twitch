@@ -32,7 +32,7 @@
             <div class="menu-modals">
                 <a href="{{url_for('luna')}}" target="_blank" aria-placeholder="Luna">
                     <button id="btn-moon">
-                        <img src="{{url_for('static', filename='coroa.png')}}" id="moon" alt="coroa">
+                        <i class="fa-solid fa-crown moon-crown" style="color: rgb(255, 212, 59);"></i>
                     </button>
                 </a>
                 <!--DESLOGADO-->
@@ -44,7 +44,7 @@
                 <!--LOGADO-->
                 <div class="with-login">
                     <button id="btn-turbo" title="Turbo">
-                        <img id="charge-icon" src="{{url_for('static', filename='bateria.png')}}" alt="">
+                        <i class="fa-solid fa-battery-half charge-icon" style="color: rgb(255, 255, 255);"></i>
                     </button>
                 </div>
 
@@ -90,6 +90,25 @@
                                             <a href="#" data-i18n>Esqueceu a senha?</a>
                                         </div>
                                         <button type="submit" class="btn-wrapper" data-i18n>Entrar</button>
+                                        <br><br>
+                                        <div class="another-login">
+                                            <div class="bar"> </div>
+                                            <span data-i18n>OU</span>
+                                            <div class="bar"> </div>
+                                        </div>
+                                        <br>
+                                        <div class="box-btn-login">
+                                            <button class="logins" id="login-google">
+                                                <img src="{{url_for('static', filename='google.png')}}" alt="google" id="icon-google">
+                                                Entrar com Google
+                                                <p> </p>
+                                            </button>
+                                            <button class="logins" id="login-amazon">
+                                                <img src="{{url_for('static', filename='amazon.png')}}" alt="amazon" id="icon-amazon">
+                                                Entrar com Amazon
+                                                <p> </p>
+                                            </button>
+                                        </div>
                                     </form>
                                 </div>
 
@@ -187,6 +206,10 @@
                                             <label for="password" data-i18n>Senha</label>
                                             <p class="erroSenha" data-i18n>Senha Inválida (mínimo 5 caracteres)</p>
                                         </div>
+                                        <div class="box-terms">
+                                            <input type="checkbox" id="checkbox-accept" name="check"> <br>
+                                            <label for="check" id="label-terms">Concordo com os <a href="{{url_for('static', filename='termos.pdf')}}" target="_blank">Termos de Política e Privacidade</a></label>
+                                        </div>
                                         <button type="submit" class="btn-wrapper" data-i18n>Cadastrar</button>
                                     </form>
                                 </div>
@@ -199,18 +222,25 @@
                 <div class="dropdown-menu-wrap">
                     <button id="btn-dropdown">
                         <!--DESLOGADO = HAMBURGUER-->
-                        <img src="{{url_for('static', filename='menu.png')}}" alt="menu" class="menu-icon without-login">
+                        <i class="fa-solid fa-bars menu-icon without-login" style="color: rgb(255, 255, 255);"></i>
                         <!--LOGADO = PESSOINHA-->
-                        <img src="{{url_for('static', filename='user.png')}}" alt="pessoinha" class="menu-icon with-login">
+                        <i class="fa-solid fa-user with-login menu-icon" style="color: rgb(255, 255, 255);"></i>
                     </button> 
 
                     <div id="dropdown-menu" class="dropdown-menu">
                         <ul>
                             <!--LOGADO-->
                             <li class="with-login" id="dropdown-usuario">
-                                <img src="{{url_for('static', filename='user.png')}}" alt="avatar" id="avatar-dropdown">
+                                <div class="background-avatar">
+                                    <i class="fa-solid fa-user avatar-dropdown" style="color: rgb(255, 255, 255);"></i>
+                                </div>
                                 <div class="show_name"></div>
                             </li>
+                            <hr class="with-login">
+
+                            <a href="{{url_for('perfil')}}">
+                                <li class="with-login"><span data-i18n>Meu Canal</span></li>
+                            </a>
                             <hr class="with-login">
 
                             <!--LOGADO OU NÃO-->
@@ -242,7 +272,7 @@
                                     <i class="fa-solid fa-circle aside-photo"></i>
                                     <span>Pessoa 1.0</span>
                                     <div class="aside-right">
-                                        <span>1.3M</span>
+                                        <span data-i18n>1.3M</span>
                                         <i class="fa-solid fa-circle red-circle"></i>
                                     </div>
                                 </a>
@@ -250,12 +280,12 @@
                             <li class="aside-mobile-item lives-dropdown with-login">
                                 <i class="fa-solid fa-circle" style="color:purple; font-size:1.2em;"></i>
                                 <span>Pessoa 2.0</span>
-                                <span>980K</span>
+                                <span data-i18n>980K</span>
                                 <i class="fa-solid fa-circle red-circle"></i>
                             </li>
 
                             <!--LOGADO-->
-                            <li id="btn-logout" class="with-login">Sair</li>
+                            <li id="btn-logout" class="with-login" data-i18n>Sair</li>
                         </ul>
                     </div>
                 </div>
@@ -272,7 +302,7 @@
                     <i class="fa-solid fa-circle aside-photo"></i>
                     <span>Pessoa 1.0</span>
                     <div class="aside-right">
-                        <span>1.3M</span>
+                        <span data-i18n>1.3M</span>
                         <i class="fa-solid fa-circle red-circle"></i>
                     </div>
                 </a>
@@ -281,7 +311,7 @@
                     <i class="fa-solid fa-circle aside-photo"></i>
                     <span>Pessoa 2.0</span>
                     <div class="aside-right">
-                        <span>1.3M</span>
+                        <span data-i18n>1.3M</span>
                         <i class="fa-solid fa-circle red-circle"></i>
                     </div>
                 </a>
@@ -290,7 +320,7 @@
                     <i class="fa-solid fa-circle aside-photo"></i>
                     <span>Pessoa 3.0</span>
                     <div class="aside-right">
-                        <span>1.3M</span>
+                        <span data-i18n>1.3M</span>
                         <i class="fa-solid fa-circle red-circle"></i>
                     </div>
                 </a>
@@ -299,7 +329,7 @@
                     <i class="fa-solid fa-circle aside-photo"></i>
                     <span>Pessoa 4.0</span>
                     <div class="aside-right">
-                        <span>1.3M</span>
+                        <span data-i18n>1.3M</span>
                         <i class="fa-solid fa-circle red-circle"></i>
                     </div>
                 </a>
@@ -309,14 +339,14 @@
                 <!-- aparece só quando logado -->
                 <a href="{{url_for('config')}}" class="aside-pages with-login">
                     <i class="fa-solid fa-gear pages-icon-aside"></i>
-                    <span class="span-link-aside">Configurações</span>
+                    <span class="span-link-aside" data-i18n>Configurações</span>
                 </a>
 
                 <hr class="aside-hr with-login">
 
                 <a href="{{url_for('ajuda')}}" class="aside-pages">
                     <i class="fa-regular fa-circle-question pages-icon-aside"></i> 
-                    <span class="span-link-aside">Ajuda</span>
+                    <span class="span-link-aside" data-i18n>Ajuda</span>
                 </a>
             </div>
         </aside>
@@ -325,7 +355,7 @@
 
             <!-- ── EM ALTA ── -->
             <section class="section-home">
-                <h2 class="section-title" id="first-title">Em alta</h2>
+                <h2 class="section-title" id="first-title" data-i18n>Em alta</h2>
 
                 <div class="carousel-wrap">
                     <div class="carousel-track" id="track-home">
@@ -334,15 +364,15 @@
                             <div class="player-wrap" id="player">
                                 <img id="gif-img" src="{{url_for('static', filename='gif1.gif')}}" alt="live" draggable="false">
                                 <i class="fa-solid fa-pause pause-icon"></i>
-                                <span class="badge-live">AO VIVO</span>
-                                <span class="thumb-views">1.3M visualizações</span>
+                                <span class="badge-live" data-i18n>AO VIVO</span>
+                                <span class="thumb-views" data-i18n>1.3M visualizações</span>
 
                                 <div class="controls">
                                     <button class="ctrl-btn" id="play-btn">▶/⏸</button>
                                     <div class="progress-wrap" id="progress-wrap">
                                         <div class="progress-fill" id="progress-fill"></div>
                                     </div>
-                                    <span class="time-label">AO VIVO</span>
+                                    <span class="time-label" data-i18n>AO VIVO</span>
                                     <button class="ctrl-btn" id="mute-btn">🔊</button>
                                     <input type="range" id="vol-range" min="0" max="100" value="80">
                                     <button class="ctrl-btn" id="fs-btn">⛶</button>
@@ -352,9 +382,9 @@
 
                         <div class="carousel-slide">
                             <div class="video-thumb">
-                                <span class="badge-live">AO VIVO</span>
+                                <span class="badge-live" data-i18n>AO VIVO</span>
                                 <video src="" poster="" preload="metadata"></video>
-                                <span class="thumb-views">980K views</span>
+                                <span class="thumb-views" data-i18n>980K views</span>
                             </div>
                             <p class="thumb-title">Nome da Live</p>
                             <p class="thumb-user">Streamer 2</p>
@@ -362,9 +392,9 @@
 
                         <div class="carousel-slide">
                             <div class="video-thumb">
-                                <span class="badge-live">AO VIVO</span>
+                                <span class="badge-live" data-i18n>AO VIVO</span>
                                 <video src="" poster="" preload="metadata"></video>
-                                <span class="thumb-views">500K views</span>
+                                <span class="thumb-views" data-i18n>500K views</span>
                             </div>
                             <p class="thumb-title">Nome da Live</p>
                             <p class="thumb-user">Streamer 3</p>
@@ -390,31 +420,31 @@
 
             <!-- ── GRADE DE VÍDEOS POR CATEGORIA ── -->
             <section class="section-home">
-                <h2 class="section-title">Jogos</h2>
+                <h2 class="section-title" data-i18n>Jogos</h2>
                 <div class="video-grid">
                     <div class="video-card">
                         <div class="video-thumb">
-                            <span class="badge-live">AO VIVO</span>
+                            <span class="badge-live" data-i18n>AO VIVO</span>
                             <video src="" poster="" preload="metadata"></video>
-                            <span class="thumb-views">1.3M views</span>
+                            <span class="thumb-views" data-i18n>1.3M views</span>
                         </div>
                         <p class="thumb-title">Título do Vídeo</p>
                         <p class="thumb-user">Streamer</p>
                     </div>
                     <div class="video-card">
                         <div class="video-thumb">
-                            <span class="badge-live">AO VIVO</span>
+                            <span class="badge-live" data-i18n>AO VIVO</span>
                             <video src="" poster="" preload="metadata"></video>
-                            <span class="thumb-views">800K views</span>
+                            <span class="thumb-views" data-i18n>800K views</span>
                         </div>
                         <p class="thumb-title">Título do Vídeo</p>
                         <p class="thumb-user">Streamer</p>
                     </div>
                     <div class="video-card">
                         <div class="video-thumb">
-                            <span class="badge-live">AO VIVO</span>
+                            <span class="badge-live" data-i18n>AO VIVO</span>
                             <video src="" poster="" preload="metadata"></video>
-                            <span class="thumb-views">600K views</span>
+                            <span class="thumb-views" data-i18n>600K views</span>
                         </div>
                         <p class="thumb-title">Título do Vídeo</p>
                         <p class="thumb-user">Streamer</p>
@@ -423,7 +453,7 @@
             </section>
 
             <section class="section-home">
-                <h2 class="section-title">Entretenimento</h2>
+                <h2 class="section-title" data-i18n>Entretenimento</h2>
                 <div class="video-grid">
                     <!-- mesma estrutura de video-card -->
                 </div>
@@ -435,7 +465,7 @@
             sssssssssssssssss<br>ssssssssssssssssssssss<br>
         <br><br><br><br><br><br><br><br><br><br>ssssssssssssssss<br><br><br><br><br><br><br><br><br><br><br><br><br><br>sssssssssss</h1>
 
-        <script src=""></script>
+        <script src="{{url_for('static', filename='tradutor.js')}}"></script>
         <script src="{{url_for('static', filename='script.js')}}"></script>
         <!-- 
 create table streams(

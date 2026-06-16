@@ -131,12 +131,22 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+    justify-items: center;
     transition: background 0.2s;
     overflow: hidden; 
     color: white;
 }
 #btn-turbo:hover, #btn-dropdown:hover, #btn-moon:hover { background: #7029db; }
-
+.menu-icon {
+    font-size: 2em;
+    width: 25px;
+}
+.charge-icon {
+    font-size: 1.5em;
+}
+.moon-crown {
+    font-size: 1.8em;
+}
 /*div do X e do checkbox*/
 .form-header {
     position: absolute;
@@ -448,6 +458,56 @@ h2 {
 .change-button1 span:last-child {font-size: 1em;}
 .change-button2 span:first-child {font-size: 1em;}
 
+/*outras opções de logar*/
+.another-login {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.another-login span {font-size: 0.7em;}
+.bar {
+    width: 42%;
+    height: 1px;
+    border: 1px solid #48237F;
+}
+.box-btn-login {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    align-items: center;
+}
+.logins {
+    width: 100%;
+    height: 30px;
+    border-radius: 10px;
+    background-color: white;
+    border: 1px solid black;
+    padding: 5px 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: background 0.3s ease;
+}
+.logins:hover {background-color: rgb(212, 212, 212);}
+#icon-google {width: 20px; height: 20px; margin-right: 10px;}
+#icon-amazon {width: 35px; height: 15px; margin-right: 10px;}
+
+/*termos de politica no cadastro*/
+.box-terms {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    margin-bottom: 10px;
+}
+.box-terms #checkbox-accept {
+    width: 15px;
+    height: 15px;
+}
+.box-terms #label-terms, .box-terms a {font-size: 0.9em;}
+.box-terms a {
+    text-decoration: underline;
+}
+
 /*relaciona o checkbox com o wrapper, já que estão em divs diferentes mas dentro do dialog*/
 /*quando o checkbox estiver marcado, aplica a rotação ao wrapper e ao botão de alternância, criando o efeito de flip entre login e cadastro*/
 /*:has é um seletor CSS que permite selecionar um elemento com base em seus 
@@ -748,14 +808,17 @@ a {text-decoration: none;}
     cursor: default;
 }
 #dropdown-usuario:hover { background: transparent; color: #38294C;}
-#avatar-dropdown {
-    width: 36px;
-    height: 36px;
+.background-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 45px;
+    height: 45px;
+    padding: 3px;
+    background-color: #9147FF;
     border-radius: 50%;
-    object-fit: cover;
-    background: #9147FF;
-    padding: 5px;
 }
+.avatar-dropdown {font-size: 1.8em;}
 
 /*TOGGLE SWITCH (DARK THEME)*/
 .switch {
@@ -1277,8 +1340,8 @@ a {text-decoration: none;}
     width: 180px;
     padding: 5px;
 }
-.btn-seg-red {background-color: rgba(245, 34, 34, 0.849);border: 2px solid rgb(208, 16, 16);}
-.btn-seg-red:hover {background-color: rgb(208, 16, 16);}
+.btn-red {background-color: rgba(245, 34, 34, 0.849);border: 2px solid rgb(208, 16, 16);}
+.btn-red:hover {background-color: rgb(208, 16, 16);}
 
 /*modal de redefinir senha*/
 #modal-2, #modal-3 {
@@ -1326,15 +1389,6 @@ a {text-decoration: none;}
     margin-bottom: 10%;
 }
 #wrapper-delete .btn-modal-seg {width: 70%;}
-/*
-#modal-3 h1 {font-size: 1.5em;}
-#modal-3 p {font-size: 1em;}
-#modal-3 button {width: 90; height: 45px; font-size: 1em;}
-#modal-3 .btn-modal-seg {padding: 0 50px;}
-#wrap-seg-delete {
-    height: 80%;
-    width: 80%;
-}
 
 /*ABA DE PRIVACIDADE*/
 .blocked-wrap {
@@ -1439,6 +1493,176 @@ a {text-decoration: none;}
 }
 .unblock-btn:hover {background: #fdecea;}
 
+/* ------ MEU CANAL -----------*/
+.container-perfil {
+    margin: 0 auto;
+    height: auto;
+    width: 60%;
+    padding: 5px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    border: 4px solid red;
+}
+.container-perfil h1 {
+    font-size: 2em;
+    width: 100%;
+    text-align: left;
+    padding: 10px;
+    color: #48237F;
+    border-bottom: 2px solid #48237F;
+}
+.box-perfil {
+    width: 100%;
+    height: auto;
+    background-color: #F4ECFF;
+    border: 4px double #DEC7FF;
+    border-radius: 20px;
+    padding: 10px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.box-main {
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.mini-box-perfil {
+    width: 100%;
+    height: auto;
+    display: flex;
+    gap: 10px;
+    justify-content: space-between;
+}
+.box-social-perfil {
+    display: flex;
+    gap: 10px;
+}
+.social-perfil {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.box-buttons-perfil {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.btn-perfil {
+    width: 130px;
+    height: 35px;
+    padding: 5px;
+    background-color: #DEC7FF;
+    border: 2px solid #9147FF;
+    color: #48237F;
+    border-radius: 8px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+.btn-perfil:hover {
+    color: #F4ECFF;
+    background-color: #9147FF;
+}
+/*modal de editar perfil*/
+#modal-4 {
+    margin: 10% auto;
+    display: none;
+    width: 25%;
+    height: auto;
+    padding: 10px;
+    border-radius: 20px;
+    background-color: white;
+}
+#modal-4[open] {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.form-perfil {
+    border: 4px solid red;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    color: #48237F;
+}
+.form-perfil button {width: 130px; height: 35px;}
+.form-perfil input, .form-perfil textarea {
+    width: 90%;
+    height: 40px;
+    border: 3px solid #DEC7FF;
+    border-radius: 10px;
+    padding: 5px;
+}
+.form-perfil textarea {height: 80px;}
+.form-perfil .label-perfil {align-items: left; margin-left: 5px;}
+.box-btn-modal-perfil {
+    display: flex;
+    justify-content: space-between;
+    width: 80%;
+    height: auto;
+    border: 4px solid green;
+}
+/* foto de perfil na página do canal */
+.photo-user {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover; /* corta sem distorcer */
+    border: 3px solid #9147FF;
+    background-color: #9147FF;
+    padding: 6px;
+    flex-shrink: 0; /* não encolhe no flex */
+}
+
+/* quando tiver foto real de usuário, remove o padding */
+.photo-user.tem-foto {
+    padding: 0;
+    background-color: transparent;
+}
+
+.photo {
+    flex-shrink: 0; /* garante que não espreme no flex */
+}
+/* upload de foto no modal de perfil */
+.upload-foto-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 16px;
+}
+.preview-foto {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #9147FF;
+    cursor: pointer;
+    transition: opacity 0.2s, border-color 0.2s;
+    background-color: #9147FF;
+    padding: 6px;
+}
+.preview-foto:hover {
+    opacity: 0.75;
+    border-color: #7029db;
+}
+/* quando tiver foto real, remove o padding */
+.preview-foto.tem-foto {
+    padding: 0;
+    background-color: transparent;
+}
+.upload-hint {
+    font-size: 0.78em;
+    color: #888;
+}
+
 /*RESPONSIVIDADE = não é adaptar para telas, é permitir que o layout se adapte sozinho*/
 /*@media = "if"*/
 
@@ -1517,7 +1741,10 @@ a {text-decoration: none;}
     }
     #header.shrink .open-modal { height: 28px; }
     #btn-dropdown, #btn-turbo, #btn-moon { width: 36px; height: 36px; padding: 2px;}
-    #btn-dropdown .menu-icon, #btn-turbo #charge-icon, #btn-moon #moon {width: 20px; height: 20px;}
+    #btn-dropdown .menu-icon, #btn-moon .moon-crown {width: 20px; height: 20px;}
+    .menu-icon {font-size: 1.5em;}
+    .charge-icon {font-size: 1em;}
+    .moon-crown {font-size: 1.3em;}
 
     .otp-input { width: 44px; height: 54px; font-size: 1.3em; }
     .otp-container { gap: 6px; }
@@ -1590,7 +1817,9 @@ a {text-decoration: none;}
 
     .menu-modals { gap: 4px; margin-right: 4px; }
     #btn-dropdown, #btn-turbo, #btn-moon {width: 30px; height: 30px; }
-    #btn-dropdown .menu-icon, #btn-turbo #charge-icon, #btn-moon #moon  { width: 17px; height: 17px; }
+    #btn-dropdown .menu-icon, #btn-moon .moon-crown  { width: 17px; height: 17px; }
+    .menu-icon {font-size: 1.25em;} 
+    .moon-crown {font-size: 1.1em;}
 
     /* grid */
     .video-grid { grid-template-columns: 1fr; }
@@ -1627,7 +1856,7 @@ a {text-decoration: none;}
     .logo { padding-left: 4px; min-width: 38px; }
     .open-modal { width: 44px; height: 26px; font-size: 0.74em; }
     #btn-dropdown, #btn-turbo, #btn-moon {width: 26px; height: 26px;}
-    #btn-dropdown .menu-icon, #btn-turbo #charge-icon, #btn-moon #moon  { width: 14px; height: 14px; }
+    #btn-dropdown .menu-icon, #btn-turbo .charge-icon, #btn-moon #moon  { width: 14px; height: 14px; }
 
     .search-bar { max-width: 160px; }
 
