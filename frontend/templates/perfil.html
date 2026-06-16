@@ -32,9 +32,70 @@
                 </button>
             </a>
             
-            <button id="btn-turbo" title="Turbo">
+            <button id="btn-turbo" class="btn-open-modal" title="Turbo" data-modal="modal-5">
                 <i class="fa-solid fa-battery-half charge-icon" style="color: rgb(255, 255, 255);"></i>
             </button>
+
+            <dialog id="modal-5">
+                <div class="turbo-modal">
+                    <div class="modal-buttons">
+                        <p> </p>
+                        <button class="btn-close-modal" data-modal="modal-5"><i class="fa-solid fa-x close-x"></i></button>
+                    </div>
+
+                    <!-- banner roxo/pink degradê -->
+                    <div class="turbo-banner">
+                        <h1 class="turbo-logo">Witch <span>TURBO</span></h1>
+                    </div>
+
+                    <div class="turbo-body">
+                        <p class="turbo-price">
+                            <s>R$ 26,99/mês</s> <strong>R$ 18,89/mês</strong> no primeiro mês
+                        </p>
+                        <p class="turbo-sub">Renova automaticamente por R$ 26,99/mês depois disso.</p>
+                        <p class="turbo-headline">Apoie streamers sem interrupções.</p>
+
+                        <div class="turbo-features">
+                            <div class="turbo-feature">
+                                <i class="fa-solid fa-tv"></i>
+                                <div>
+                                    <strong>Assista sem anúncios</strong>
+                                    <p>Assista seus streamers favoritos sem anúncios em vídeo ou banners.</p>
+                                </div>
+                            </div>
+                            <div class="turbo-feature">
+                                <i class="fa-solid fa-hard-drive"></i>
+                                <div>
+                                    <strong>Armazenamento expandido (60 dias)</strong>
+                                    <p>Armazene seus VODs por até 60 dias em vez de 14.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="turbo-extras">
+                            <div class="turbo-extra">
+                                <i class="fa-solid fa-comment"></i>
+                                <span>Distintivo de chat exclusivo</span>
+                            </div>
+                            <div class="turbo-extra">
+                                <i class="fa-solid fa-face-smile"></i>
+                                <span>Dois conjuntos de emotes adicionais</span>
+                            </div>
+                            <div class="turbo-extra">
+                                <i class="fa-solid fa-palette"></i>
+                                <span>Cores personalizadas para nomes no chat</span>
+                            </div>
+                        </div>
+
+                        <br><br>
+                        <p class="turbo-disclaimer">Cobrança mensal • Cancele a qualquer momento</p>                         
+                        <div class="turbo-btns">
+                            <button class="btn-turbo-gift">Presentear Turbo</button>
+                            <button class="btn-turbo-sub">Inscrever-se</button>
+                        </div>
+                    </div>
+                </div>
+            </dialog>
             
             <!--DROPDOWN MENU-->
             <div class="dropdown-menu-wrap">

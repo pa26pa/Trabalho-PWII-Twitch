@@ -499,7 +499,6 @@ document.addEventListener('DOMContentLoaded', function () {
             if (form.querySelector('.password2')) {
                 if (!confirmarSenha(senha1,senha2,erro)) {
                 envio = false;    
-                
                 }
             } 
 
@@ -841,6 +840,38 @@ document.addEventListener('DOMContentLoaded', function () {
             document.querySelectorAll('.erroSenha, .erroSenha2, #erroIdade').forEach(el => el.style.display = 'none');
             document.querySelectorAll('.input-erro').forEach(el => el.classList.remove('input-erro'));
         });
+    }
+
+    // BOTÃO CADASTRAR — desabilitado até tudo preenchido e checkbox marcado
+    const formSign = document.querySelector('.sign');
+    if (formSign) {
+        const btnCadastrar = formSign.querySelector('.btn-wrapper');
+        const checkTermos = document.getElementById('checkbox-accept');
+        const camposSign = formSign.querySelectorAll('input[required]');
+
+        btnCadastrar.disabled = true;
+
+        function checkCadastro() {
+            const todoPreenchido = Array.from(camposSign).every(i => i.value.trim() !== '');
+            btnCadastrar.disabled = !(todoPreenchido && checkTermos?.checked);
+        }
+
+        camposSign.forEach(i => i.addEventListener('input', checkCadastro));
+        if (checkTermos) checkTermos.addEventListener('change', checkCadastro);
+    }
+
+    // BOTÃO ENTRAR — desabilitado até usuário e senha preenchidos
+    const formLogin = document.querySelector('.login.forms');
+    if (formLogin) {
+        const btnEntrar = formLogin.querySelector('.btn-wrapper');
+        const camposLogin = formLogin.querySelectorAll('input[required]');
+
+        btnEntrar.disabled = true;
+
+        function checkLogin() {
+            btnEntrar.disabled = !Array.from(camposLogin).every(i => i.value.trim() !== '');
+        }
+        camposLogin.forEach(i => i.addEventListener('input', checkLogin));
     }
 
     // MENU LATERAL
