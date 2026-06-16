@@ -1280,135 +1280,82 @@ document.addEventListener('DOMContentLoaded', function () {
     const previewFoto  = document.getElementById('preview-foto');
     const fotoPerfilPag = document.querySelector('.photo-user'); // foto grande na página do canal
 
-    if (uploadFoto && previewFoto) {
-        // clique na imagem abre o seletor de arquivo
-        previewFoto.addEventListener('click', () => uploadFoto.click());
+    // ao abrir o modal-4, pré-preenche com os dados atuais
+    const btnEditar = document.getElementById('btn-editar');
+    if (btnEditar) {
+        btnEditar.addEventListener('click', () => {
+            // pré-preenche nome
+            const inputNome = document.getElementById('name-user');
+            const nomeSalvo = localStorage.getItem('nomeCanal') || '';
+            if (inputNome) inputNome.value = nomeSalvo;
 
+            // pré-preenche bio
+            const inputBio = document.getElementById('bio-user');
+            const bioSalva = localStorage.getItem('bioCanal') || '';
+            if (inputBio) inputBio.value = bioSalva;
+
+            // pré-preenche foto no preview
+            const fotoSalva = localStorage.getItem('fotoPerfil');
+            const previewFoto = document.getElementById('preview-foto');
+            if (fotoSalva && previewFoto) {
+                previewFoto.src = fotoSalva;
+                previewFoto.classList.add('tem-foto');
+            }
+        });
+    }
+
+    // o upload guarda em variável temporária, NÃO salva ainda
+    let fotoTemp = null;
+    if (uploadFoto && previewFoto) {
+        previewFoto.addEventListener('click', () => uploadFoto.click());
         uploadFoto.addEventListener('change', (e) => {
             const arquivo = e.target.files[0];
-            if (!arquivo) return;
-
-            // só aceita imagens
-            if (!arquivo.type.startsWith('image/')) {
-                mostrarToast('Selecione uma imagem válida.', 'error');
-                return;
-            }
-
+            if (!arquivo || !arquivo.type.startsWith('image/')) return;
             const reader = new FileReader();
             reader.onload = (ev) => {
-                const src = ev.target.result; // base64 da imagem
-
-                // atualiza o preview no modal
-                previewFoto.src = src;
-                previewFoto.classList.add('tem-foto'); // remove padding/background
-
-                // atualiza a foto grande na página do canal
-                if (fotoPerfilPag) fotoPerfilPag.src = src;
-
-                // atualiza o ícone do dropdown menu
-                // substitui o ícone <i> por <img> se ainda for ícone
-                const avatarDropdown = document.getElementById('dropdown-usuario');
-                if (avatarDropdown) {
-                    const bgAvatar = avatarDropdown.querySelector('.background-avatar');
-                    if (bgAvatar) {
-                        bgAvatar.innerHTML = `<img src="${src}" 
-                            style="width:38px;height:38px;border-radius:50%;object-fit:cover;" 
-                            alt="avatar">`;
-                    }
-                }
-
-                // salva no localStorage para persistir entre páginas
-                localStorage.setItem('fotoPerfil', src);
-
-                if (fotoPerfilPag) {
-                    fotoPerfilPag.src = src;
-                    fotoPerfilPag.classList.add('tem-foto'); // ← adiciona isso
-                }
+                fotoTemp = ev.target.result; // ← só na variável temp
+                previewFoto.src = fotoTemp;
+                previewFoto.classList.add('tem-foto');
             };
             reader.readAsDataURL(arquivo);
         });
     }
 
-    // ao carregar a página, aplica a foto salva se existir
-    const fotoSalva = localStorage.getItem('fotoPerfil');
-    if (fotoSalva) {
-        if (previewFoto) {
-            previewFoto.src = fotoSalva;
-            previewFoto.classList.add('tem-foto');
-        }
-        if (fotoPerfilPag) fotoPerfilPag.src = fotoSalva;
-
-        const bgAvatar = document.querySelector('#dropdown-usuario .background-avatar');
-        if (bgAvatar) {
-            bgAvatar.innerHTML = `<img src="${fotoSalva}" 
-                style="width:38px;height:38px;border-radius:50%;object-fit:cover;" 
-                alt="avatar">`;
-        }
-
-        if (fotoPerfilPag) {
-            fotoPerfilPag.src = fotoSalva;
-            fotoPerfilPag.classList.add('tem-foto'); // ← adiciona isso
-        }
-    }
-
-    // SALVAR EDIÇÃO DE PERFIL
+    // só ao salvar aplica tudo
     const btnSalvarPerfil = document.getElementById('btn-salvar-perfil');
     if (btnSalvarPerfil) {
         btnSalvarPerfil.addEventListener('click', () => {
             const novoNome = document.getElementById('name-user')?.value.trim();
             const novaBio  = document.getElementById('bio-user')?.value.trim();
 
-            if (!novoNome) {
-                mostrarToast('O nome não pode ficar vazio!', 'error');
-                return;
-            }
+            if (!novoNome) { mostrarToast('O nome não pode ficar vazio!', 'error'); return; }
 
-            // atualiza nome na página
-            document.querySelectorAll('.show_name, #nome-usuario').forEach(el => {
-                el.textContent = novoNome;
-            });
+            // atualiza nome
+            document.querySelectorAll('.show_name, #nome-usuario').forEach(el => el.textContent = novoNome);
+            localStorage.setItem('nomeCanal', novoNome);
 
-            // atualiza bio — só mostra se não estiver vazia
+            // atualiza bio
             const bioPag  = document.getElementById('bio-usuario');
             const bioDesc = document.getElementById('description-channel');
             if (bioPag)  bioPag.textContent  = novaBio || '';
             if (bioDesc) bioDesc.textContent = novaBio || '';
+            localStorage.setItem('bioCanal', novaBio || '');
 
-            // salva no localStorage para persistir
-            localStorage.setItem('nomeCanal', novoNome);
-            localStorage.setItem('bioCanal',  novaBio || '');
+            // SÓ AGORA aplica a foto se o usuário tiver selecionado uma
+            if (fotoTemp) {
+                const fotoPerfilPag = document.querySelector('.photo-user');
+                if (fotoPerfilPag) { fotoPerfilPag.src = fotoTemp; fotoPerfilPag.classList.add('tem-foto'); }
 
-            // fecha o modal
-            const modal4 = document.getElementById('modal-4');
-            if (modal4) {
-                modal4.close();
-                document.body.classList.remove('modal-open');
+                const bgAvatar = document.querySelector('#dropdown-usuario .background-avatar');
+                if (bgAvatar) bgAvatar.innerHTML = `<img src="${fotoTemp}" style="width:38px;height:38px;border-radius:50%;object-fit:cover;" alt="avatar">`;
+
+                localStorage.setItem('fotoPerfil', fotoTemp);
+                fotoTemp = null; // limpa temp
             }
 
+            const modal4 = document.getElementById('modal-4');
+            if (modal4) { modal4.close(); document.body.classList.remove('modal-open'); }
             mostrarToast('Perfil atualizado!', 'success');
         });
-    }
-
-    // ao carregar a página, aplica nome e bio salvos
-    const nomeSalvo = localStorage.getItem('nomeCanal');
-    const bioSalva  = localStorage.getItem('bioCanal');
-
-    if (nomeSalvo) {
-        document.querySelectorAll('.show_name, #nome-usuario').forEach(el => {
-            el.textContent = nomeSalvo;
-        });
-        // pré-preenche o input do modal
-        const inputNome = document.getElementById('name-user');
-        if (inputNome) inputNome.value = nomeSalvo;
-    }
-
-    if (bioSalva) {
-        const bioPag  = document.getElementById('bio-usuario');
-        const bioDesc = document.getElementById('description-channel');
-        if (bioPag)  bioPag.textContent  = bioSalva;
-        if (bioDesc) bioDesc.textContent = bioSalva;
-        // pré-preenche o textarea do modal
-        const inputBio = document.getElementById('bio-user');
-        if (inputBio) inputBio.value = bioSalva;
     }
 });
