@@ -7,6 +7,7 @@ from email_validator import EmailNotValidError, validate_email
 from datetime import datetime
 from dotenv import load_dotenv
 from supabase import create_client, Client
+from urllib.parse import urlparse
 import os
 
 load_dotenv()
@@ -59,5 +60,33 @@ def carregar():
 def salvar(cache):
     with open(file, 'w', encoding='utf-8') as f:
         json.dump(cache, f, ensure_ascii=False, indent=2)
+
+# def url(url):
+#     path = urlparse(url).path
+    
+#     tirar = "/storage/v1/object/public/"
+#     path_bonito = path.replace(tirar,'',1)
+    
+#     bucket, arquivo = path_bonito.split('/')
+    
+#     return {
+#         'bucket':bucket,
+#         'url':arquivo
+#     }
+    
+# def pegar_arquivo(url,bucket):
+    
+#     arquivo = supabase.storage\
+#         .from_(bucket)\
+#         .list(
+#             path=url
+#         )
+    
+#     if not arquivo.data:
+#         return {'mensagem':'não foi possivel encontrar'}
+    
+#     return {
+#         'arquivo':arquivo.data
+#     }
 
 cache_traducoes = carregar()

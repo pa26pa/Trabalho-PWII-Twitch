@@ -15,7 +15,7 @@ from deep_translator import GoogleTranslator
 import time
 from uuid import uuid4
 from datetime import date
-
+from urllib.parse import urlparse 
 #from main import app, google, User
 # criação do signin
 
@@ -690,13 +690,15 @@ class upload(Resource):
             bucket = 'videos'
         
         if not arquivo or not tipo:
+            print('antes do not arquivo')
             return {
                 'status':'error',
                 'mensagem':'Arquivo não foi enviado' 
             }, 400
-        
+        print("antes no uuid4 nome")
         nome = f"{uuid4()}_{arquivo.filename}"
         
+        print('antes do upload')
         supabase.storage\
         .from_(bucket)\
         .upload(
@@ -706,7 +708,7 @@ class upload(Resource):
                 "content-type": arquivo.content_type
             }    
         )
-        
+        print('antes do url')
         url = supabase.storage\
         .from_(bucket)\
         .get_public_url(nome)
@@ -728,8 +730,8 @@ class upload(Resource):
             cursor.execute(query_foto,(url,id))
             con.commit()
         else:    
-            query_video = """insert into streams (categoria,titulo,descrisao,data_upload,id_streamer) values(%s,%s,%s,%s,%s)"""
-            cursor.execute(query_video,(categoria,titulo,descrisao,hoje,id))
+            query_video = """insert into streams (categoria,titulo,descrisao,video_url,data_upload,id_streamer) values(%s,%s,%s,%s,%s,%s)"""
+            cursor.execute(query_video,(categoria,titulo,descrisao,url,hoje,id))
             con.commit()
         
         cursor.close()
@@ -738,4 +740,56 @@ class upload(Resource):
         return {
             'status':'success',
             'mensagem':'arquivo salvo com sucesso'
+        }, 200
+class foto(Resource):
+    def post(self):
+        data = request.get_json()
+        con = connection()
+        cursor = con.cursor(pymysql.cursors.DictCursor)
+        
+        user_name = data.get('user_name')
+        
+        query = """select foto_url from usuarios where user_name = %s"""
+        cursor.execute(query,(user_name,))
+        foto_url = cursor.fetchone()
+        
+        cursor.close()
+        con.close()
+        return {
+            'status':'success',
+            'foto':foto_url['foto_url']
+        }, 200
+
+class videos(Resource): 
+    def post(self):    
+        data = request.get_json()
+        con = connection()
+        cursor = con.cursor(pymysql.cursors.DictCursor)
+        
+        user_name = data.get('user_name')
+        
+        query = """select id_usuario from usuarios where user_name = %s"""
+        cursor.execute(query,(user_name,))
+        id = cursor.fetchone()
+        
+        if not id:
+            cursor.close()
+            con.close()
+            return {
+                'status':'error',
+                'mensagem':'usuario não encontrado'
+            }, 400
+        
+        id = id['id_usuario']
+        
+        q = """select video_url from streams where id_streamer = %s"""
+        cursor.execute(q,(id,))
+        videos = cursor.fetchall()
+        
+        cursor.close()
+        con.close()
+        
+        return {
+            'status':'success',
+            'videos': videos
         }, 200
