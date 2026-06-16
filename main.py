@@ -67,4 +67,5 @@ api.add_resource(dados_config, '/dados_config')
 
 # É só pra garantir que só se pode rodar ele pela main
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
