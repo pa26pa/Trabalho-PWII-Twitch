@@ -1197,7 +1197,7 @@ document.addEventListener('DOMContentLoaded', function () {
             updateHeight();
         });
 
-        //botão de bloquar
+        //botão de bloquear
         blockBtn.addEventListener('click', async () => {
 
             const nome = blockInput.value.trim();
@@ -1272,5 +1272,143 @@ document.addEventListener('DOMContentLoaded', function () {
                 blockBtn.textContent = 'Bloquear';
             }
         });
+    }
+
+    //--------------perfil.html (meu canal)-------------------
+    // UPLOAD DE FOTO DE PERFIL
+    const uploadFoto   = document.getElementById('upload-foto');
+    const previewFoto  = document.getElementById('preview-foto');
+    const fotoPerfilPag = document.querySelector('.photo-user'); // foto grande na página do canal
+
+    if (uploadFoto && previewFoto) {
+        // clique na imagem abre o seletor de arquivo
+        previewFoto.addEventListener('click', () => uploadFoto.click());
+
+        uploadFoto.addEventListener('change', (e) => {
+            const arquivo = e.target.files[0];
+            if (!arquivo) return;
+
+            // só aceita imagens
+            if (!arquivo.type.startsWith('image/')) {
+                mostrarToast('Selecione uma imagem válida.', 'error');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                const src = ev.target.result; // base64 da imagem
+
+                // atualiza o preview no modal
+                previewFoto.src = src;
+                previewFoto.classList.add('tem-foto'); // remove padding/background
+
+                // atualiza a foto grande na página do canal
+                if (fotoPerfilPag) fotoPerfilPag.src = src;
+
+                // atualiza o ícone do dropdown menu
+                // substitui o ícone <i> por <img> se ainda for ícone
+                const avatarDropdown = document.getElementById('dropdown-usuario');
+                if (avatarDropdown) {
+                    const bgAvatar = avatarDropdown.querySelector('.background-avatar');
+                    if (bgAvatar) {
+                        bgAvatar.innerHTML = `<img src="${src}" 
+                            style="width:38px;height:38px;border-radius:50%;object-fit:cover;" 
+                            alt="avatar">`;
+                    }
+                }
+
+                // salva no localStorage para persistir entre páginas
+                localStorage.setItem('fotoPerfil', src);
+
+                if (fotoPerfilPag) {
+                    fotoPerfilPag.src = src;
+                    fotoPerfilPag.classList.add('tem-foto'); // ← adiciona isso
+                }
+            };
+            reader.readAsDataURL(arquivo);
+        });
+    }
+
+    // ao carregar a página, aplica a foto salva se existir
+    const fotoSalva = localStorage.getItem('fotoPerfil');
+    if (fotoSalva) {
+        if (previewFoto) {
+            previewFoto.src = fotoSalva;
+            previewFoto.classList.add('tem-foto');
+        }
+        if (fotoPerfilPag) fotoPerfilPag.src = fotoSalva;
+
+        const bgAvatar = document.querySelector('#dropdown-usuario .background-avatar');
+        if (bgAvatar) {
+            bgAvatar.innerHTML = `<img src="${fotoSalva}" 
+                style="width:38px;height:38px;border-radius:50%;object-fit:cover;" 
+                alt="avatar">`;
+        }
+
+        if (fotoPerfilPag) {
+            fotoPerfilPag.src = fotoSalva;
+            fotoPerfilPag.classList.add('tem-foto'); // ← adiciona isso
+        }
+    }
+
+    // SALVAR EDIÇÃO DE PERFIL
+    const btnSalvarPerfil = document.getElementById('btn-salvar-perfil');
+    if (btnSalvarPerfil) {
+        btnSalvarPerfil.addEventListener('click', () => {
+            const novoNome = document.getElementById('name-user')?.value.trim();
+            const novaBio  = document.getElementById('bio-user')?.value.trim();
+
+            if (!novoNome) {
+                mostrarToast('O nome não pode ficar vazio!', 'error');
+                return;
+            }
+
+            // atualiza nome na página
+            document.querySelectorAll('.show_name, #nome-usuario').forEach(el => {
+                el.textContent = novoNome;
+            });
+
+            // atualiza bio — só mostra se não estiver vazia
+            const bioPag  = document.getElementById('bio-usuario');
+            const bioDesc = document.getElementById('description-channel');
+            if (bioPag)  bioPag.textContent  = novaBio || '';
+            if (bioDesc) bioDesc.textContent = novaBio || '';
+
+            // salva no localStorage para persistir
+            localStorage.setItem('nomeCanal', novoNome);
+            localStorage.setItem('bioCanal',  novaBio || '');
+
+            // fecha o modal
+            const modal4 = document.getElementById('modal-4');
+            if (modal4) {
+                modal4.close();
+                document.body.classList.remove('modal-open');
+            }
+
+            mostrarToast('Perfil atualizado!', 'success');
+        });
+    }
+
+    // ao carregar a página, aplica nome e bio salvos
+    const nomeSalvo = localStorage.getItem('nomeCanal');
+    const bioSalva  = localStorage.getItem('bioCanal');
+
+    if (nomeSalvo) {
+        document.querySelectorAll('.show_name, #nome-usuario').forEach(el => {
+            el.textContent = nomeSalvo;
+        });
+        // pré-preenche o input do modal
+        const inputNome = document.getElementById('name-user');
+        if (inputNome) inputNome.value = nomeSalvo;
+    }
+
+    if (bioSalva) {
+        const bioPag  = document.getElementById('bio-usuario');
+        const bioDesc = document.getElementById('description-channel');
+        if (bioPag)  bioPag.textContent  = bioSalva;
+        if (bioDesc) bioDesc.textContent = bioSalva;
+        // pré-preenche o textarea do modal
+        const inputBio = document.getElementById('bio-user');
+        if (inputBio) inputBio.value = bioSalva;
     }
 });

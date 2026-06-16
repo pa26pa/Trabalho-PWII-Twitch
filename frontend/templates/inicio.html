@@ -32,7 +32,7 @@
             <div class="menu-modals">
                 <a href="{{url_for('luna')}}" target="_blank" aria-placeholder="Luna">
                     <button id="btn-moon">
-                        <img src="{{url_for('static', filename='coroa.png')}}" id="moon" alt="coroa">
+                        <i class="fa-solid fa-crown moon-crown" style="color: rgb(255, 212, 59);"></i>
                     </button>
                 </a>
                 <!--DESLOGADO-->
@@ -44,7 +44,7 @@
                 <!--LOGADO-->
                 <div class="with-login">
                     <button id="btn-turbo" title="Turbo">
-                        <img id="charge-icon" src="{{url_for('static', filename='bateria.png')}}" alt="">
+                        <i class="fa-solid fa-battery-half charge-icon" style="color: rgb(255, 255, 255);"></i>
                     </button>
                 </div>
 
@@ -90,6 +90,25 @@
                                             <a href="#" data-i18n>Esqueceu a senha?</a>
                                         </div>
                                         <button type="submit" class="btn-wrapper" data-i18n>Entrar</button>
+                                        <br><br>
+                                        <div class="another-login">
+                                            <div class="bar"> </div>
+                                            <span data-i18n>OU</span>
+                                            <div class="bar"> </div>
+                                        </div>
+                                        <br>
+                                        <div class="box-btn-login">
+                                            <button class="logins" id="login-google">
+                                                <img src="{{url_for('static', filename='google.png')}}" alt="google" id="icon-google">
+                                                Entrar com Google
+                                                <p> </p>
+                                            </button>
+                                            <button class="logins" id="login-amazon">
+                                                <img src="{{url_for('static', filename='amazon.png')}}" alt="amazon" id="icon-amazon">
+                                                Entrar com Amazon
+                                                <p> </p>
+                                            </button>
+                                        </div>
                                     </form>
                                 </div>
 
@@ -187,6 +206,10 @@
                                             <label for="password" data-i18n>Senha</label>
                                             <p class="erroSenha" data-i18n>Senha Inválida (mínimo 5 caracteres)</p>
                                         </div>
+                                        <div class="box-terms">
+                                            <input type="checkbox" id="checkbox-accept" name="check"> <br>
+                                            <label for="check" id="label-terms">Concordo com os <a href="{{url_for('static', filename='termos.pdf')}}" target="_blank">Termos de Política e Privacidade</a></label>
+                                        </div>
                                         <button type="submit" class="btn-wrapper" data-i18n>Cadastrar</button>
                                     </form>
                                 </div>
@@ -199,16 +222,18 @@
                 <div class="dropdown-menu-wrap">
                     <button id="btn-dropdown">
                         <!--DESLOGADO = HAMBURGUER-->
-                        <img src="{{url_for('static', filename='menu.png')}}" alt="menu" class="menu-icon without-login">
+                        <i class="fa-solid fa-bars menu-icon without-login" style="color: rgb(255, 255, 255);"></i>
                         <!--LOGADO = PESSOINHA-->
-                        <img src="{{url_for('static', filename='user.png')}}" alt="pessoinha" class="menu-icon with-login">
+                        <i class="fa-solid fa-user with-login menu-icon" style="color: rgb(255, 255, 255);"></i>
                     </button> 
 
                     <div id="dropdown-menu" class="dropdown-menu">
                         <ul>
                             <!--LOGADO-->
                             <li class="with-login" id="dropdown-usuario">
-                                <img src="{{url_for('static', filename='user.png')}}" alt="avatar" id="avatar-dropdown">
+                                <div class="background-avatar">
+                                    <i class="fa-solid fa-user avatar-dropdown" style="color: rgb(255, 255, 255);"></i>
+                                </div>
                                 <div class="show_name"></div>
                             </li>
                             <hr class="with-login">
@@ -440,7 +465,7 @@
             sssssssssssssssss<br>ssssssssssssssssssssss<br>
         <br><br><br><br><br><br><br><br><br><br>ssssssssssssssss<br><br><br><br><br><br><br><br><br><br><br><br><br><br>sssssssssss</h1>
 
-        <script src=""></script>
+        <script src="{{url_for('static', filename='tradutor.js')}}"></script>
         <script src="{{url_for('static', filename='script.js')}}"></script>
         <!-- 
 create table streams(

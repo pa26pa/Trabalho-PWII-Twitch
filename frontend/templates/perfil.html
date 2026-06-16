@@ -26,20 +26,28 @@
         <div class="toast"></div>
 
         <div class="menu-modals">
-            <a href="{{url_for('luna')}}" target="_blank" aria-placeholder="Luna"><img src="{{url_for('static', filename='coroa.png')}}" id="luna" alt="coroa"></a>
+            <a href="{{url_for('luna')}}" target="_blank" aria-placeholder="Luna">
+                <button id="btn-moon">
+                    <i class="fa-solid fa-crown moon-crown" style="color: rgb(255, 212, 59);"></i>
+                </button>
+            </a>
             
-            <button id="btn-turbo" title="Turbo"><img src="{{url_for('static', filename='bateria.png')}}" alt=""></button>
+            <button id="btn-turbo" title="Turbo">
+                <i class="fa-solid fa-battery-half charge-icon" style="color: rgb(255, 255, 255);"></i>
+            </button>
             
             <!--DROPDOWN MENU-->
             <div class="dropdown-menu-wrap">
                 <button class="open-modal" id="btn-dropdown">
-                    <img src="{{url_for('static', filename='user.png')}}" alt="menu" id="menu-icon">
+                    <i class="fa-solid fa-user menu-icon" style="color: rgb(255, 255, 255);"></i>
                 </button>
 
                 <div id="dropdown-menu" class="dropdown-menu">
                     <ul>
                         <li id="dropdown-usuario">
-                            <img src="{{url_for('static', filename='user.png')}}" alt="avatar" id="avatar-dropdown">
+                            <div class="background-avatar">
+                                <i class="fa-solid fa-user avatar-dropdown" style="color: rgb(255, 255, 255);"></i>
+                            </div>
                             <div class="show_name"></div>
                         </li>
                         <hr>
@@ -79,9 +87,7 @@
         </div>
     </header>
 
-    <aside class="normal-aside">
-        <i class="fa-solid fa-angles-right back-aside"></i>
-        
+    <aside class="normal-aside">        
         <div class="aside-content">
             <a href="#" class="lives-aside">
                 <i class="fa-solid fa-circle aside-photo"></i>
@@ -143,7 +149,7 @@
 
             <div class="box-main">
                 <div class="mini-box-perfil">
-                    <div class="show_name"></div>
+                    <div class="show_name" id="nome-usuario"></div>
 
                     <div class="box-social-perfil">
                         <div class="social-perfil">
@@ -158,21 +164,42 @@
                 </div>
 
                 <div class="mini-box-perfil">
-                    <p data-i18n>aaaaaaaaaaaaaaaaaaaaaa</p>
+                    <p id="bio-usuario" data-i18n></p>
                 </div>
             </div>
 
             <div class="box-buttons-perfil">
-                <button class="open-modal" id="btn-editar" data-modal="modal-4" data-i18n>Editar Perfil</button>
+                <button class="btn-open-modal btn-perfil" id="btn-editar" data-modal="modal-4" data-i18n>Editar Perfil</button>
                 <dialog id="modal-4">
-                    
+                    <div class="modal-buttons">
+                        <p> </p>
+                        <button class="btn-close-modal" data-modal="modal-4"><i class="fa-solid fa-x close-x"></i></button>
+                    </div>
+
+                    <form action="" method="post" class="form-perfil">
+                        <div class="upload-foto-wrap">
+                            <input type="file" id="upload-foto" accept="image/*" style="display: none;">
+                            <img src="{{url_for('static', filename='user.png')}}" id="preview-foto" alt="Foto de perfil" class="preview-foto">
+                            <span class="upload-hint" data-i18n>Clique na foto para alterar</span>
+                        </div>
+
+                        <label class="label-perfil" for="name" data-i18n>Nome do Canal</label>
+                        <input type="text" id="name-user" name="name"> <br><br>
+                        <label class="label-perfil" for="bio" data-i18n>Sua Bio</label>
+                        <textarea rows="4" cols="20" id="bio-user"></textarea> <br>
+
+                        <div class="box-btn-modal-perfil">
+                            <button type="button" class="btn-perfil" id="btn-salvar-perfil" data-i18n>Salvar</button>
+                            <button type="button" class="btn-close-modal btn-red open-modal" data-i18n>Cancelar</button>
+                        </div>
+                    </form>
                 </dialog>
-                <button class="open-modal" id="btn-start-live" data-i18n>Começar Live</button>
+                <button class="btn-perfil" id="btn-start-live" data-i18n>Começar Live</button>
             </div>
         </section>
 
         <section class="box-about-channel">
-            <p data-i18n>aaaaaaaaaaaaaaaaaaaaaaaa</p>
+            <p id="description-channel" data-i18n></p>
         </section>
 
         <section class="box-schedule">
@@ -194,5 +221,8 @@
             <h2 data-i18n>Lives e Clipes</h2>
         </section>
     </div>
+
+    <script src="{{url_for('static', filename='tradutor.js')}}"></script>
+    <script src="{{url_for('static', filename='script.js')}}"></script>
 </body>
 </html>

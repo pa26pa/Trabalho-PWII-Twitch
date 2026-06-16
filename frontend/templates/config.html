@@ -26,20 +26,28 @@
         <div class="toast"></div>
 
         <div class="menu-modals">
-            <a href="{{url_for('luna')}}" target="_blank" aria-placeholder="Luna"><img src="{{url_for('static', filename='coroa.png')}}" id="luna" alt="coroa"></a>
+            <a href="{{url_for('luna')}}" target="_blank" aria-placeholder="Luna">
+                <button id="btn-moon">
+                    <i class="fa-solid fa-crown moon-crown" style="color: rgb(255, 212, 59);"></i>
+                </button>
+            </a>
             
-            <button id="btn-turbo" title="Turbo"><img src="{{url_for('static', filename='bateria.png')}}" alt=""></button>
+            <button id="btn-turbo" title="Turbo">
+                <i class="fa-solid fa-battery-half charge-icon" style="color: rgb(255, 255, 255);"></i>
+            </button>
             
             <!--DROPDOWN MENU-->
             <div class="dropdown-menu-wrap">
                 <button class="open-modal" id="btn-dropdown">
-                    <img src="{{url_for('static', filename='user.png')}}" alt="menu" id="menu-icon">
+                    <i class="fa-solid fa-user menu-icon" style="color: rgb(255, 255, 255);"></i>
                 </button>
 
                 <div id="dropdown-menu" class="dropdown-menu">
                     <ul>
                         <li id="dropdown-usuario">
-                            <img src="{{url_for('static', filename='user.png')}}" alt="avatar" id="avatar-dropdown">
+                            <div class="background-avatar">
+                                <i class="fa-solid fa-user avatar-dropdown" style="color: rgb(255, 255, 255);"></i>
+                            </div>
                             <div class="show_name"></div>
                         </li>
                         <hr>
@@ -123,7 +131,7 @@
                             </div>
                             <div class="btn-modal-seg">
                                 <button type="submit" class="open-modal" id="btn-create-password" data-i18n>Criar</button>
-                                <button class="btn-seg-red open-modal btn-close-modal"  data-modal="modal-2" data-i18n>Cancelar</button>
+                                <button class="btn-red open-modal btn-close-modal"  data-modal="modal-2" data-i18n>Cancelar</button>
                             </div>
                         </form>
                     </div>
@@ -138,7 +146,7 @@
                 <div class="data-bd" id="show_data"></div>
             </div>
             <div class="seg-box">
-                <button class="btn-open-modal open-modal btn-seg-red" id="btn-delete-account" data-modal="modal-3" data-i18n>Excluir Conta</button>
+                <button class="btn-open-modal open-modal btn-red" id="btn-delete-account" data-modal="modal-3" data-i18n>Excluir Conta</button>
                 <dialog id="modal-3">
                     <div id="wrap-seg-delete" class="wrapper">
                         <div id="wrapper-delete">
@@ -150,7 +158,7 @@
                             <p data-i18n>Excluir a conta permanentemente apagará todos os seus dados</p><br>
                             <div class="btn-modal-seg">
                                 <button class="open-modal btn-delete-code" data-i18n>Excluir</button>
-                                <button class="btn-seg-red open-modal btn-close-modal" data-modal="modal-3" data-i18n>Cancelar</button>
+                                <button class="btn-red open-modal btn-close-modal" data-modal="modal-3" data-i18n>Cancelar</button>
                             </div>
                         </div>
 
@@ -172,7 +180,7 @@
                                     </div> <br><br><br>
                                     <p id="timerText" data-i18n>Reenviar código em 60s</p>
                                     <button id="resendBtn" class="resendBtn btn-wrapper" disabled data-i18n>Reenviar Código</button>
-                                    <button type="submit" class="btn-wrapper btn-seg-red btn-delete continueBtn" id="continueBtn" data-i18n>Excluir Conta</button>
+                                    <button type="submit" class="btn-wrapper btn-red btn-delete continueBtn" id="continueBtn" data-i18n>Excluir Conta</button>
                                 </form>
                             </div>
                         </div>
