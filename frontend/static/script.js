@@ -1398,7 +1398,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     
     function info_user() {
-        fetch("http://127.0.0.1:5000/session", { method: "GET" })
+        fetch("/session", { method: "GET" })
         .then(res => res.json())
         .then(data => {
             info_user_name(data.name);
@@ -1412,11 +1412,11 @@ document.addEventListener('DOMContentLoaded', function () {
             if (bioPag && data.bio)  bioPag.textContent  = data.bio;
             if (bioDesc && data.bio) bioDesc.textContent = data.bio;
 
-            if (data.foto_url) {
+            if (data.foto) {
                 const fotoPerfilPag = document.querySelector('.photo-user');
-                if (fotoPerfilPag) { fotoPerfilPag.src = data.foto_url; fotoPerfilPag.classList.add('tem-foto'); }
+                if (fotoPerfilPag) { fotoPerfilPag.src = data.foto; fotoPerfilPag.classList.add('tem-foto'); }
                 const bgAvatar = document.querySelector('#dropdown-usuario .background-avatar');
-                if (bgAvatar) bgAvatar.innerHTML = `<img src="${data.foto_url}" style="width:38px;height:38px;border-radius:50%;object-fit:cover;" alt="avatar">`;
+                if (bgAvatar) bgAvatar.innerHTML = `<img src="${data.foto}" style="width:38px;height:38px;border-radius:50%;object-fit:cover;" alt="avatar">`;
             }
         });
     }
