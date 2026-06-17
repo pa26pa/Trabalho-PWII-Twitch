@@ -22,7 +22,7 @@ email_password = os.getenv("EMAIL_PASSWORD")
 # Conectando com o Mysql :):)
 def connection():
     return pymysql.connect (
-        port='3306',
+        port=3306,
         host='mysql.railway.internal',
         user='root',
         password=bd_password,
