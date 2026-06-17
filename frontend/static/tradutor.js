@@ -2,11 +2,7 @@ const translationCache = {};
 
 // detecta idioma do dispositivo se não houver preferência salva
 function detectarIdioma() {
-    const salvo = localStorage.getItem('idioma');
-    if (salvo) return salvo;
-    const nav = navigator.language || navigator.userLanguage || 'pt';
-    const lang = nav.slice(0, 2).toLowerCase();
-    return ['pt', 'en', 'es'].includes(lang) ? lang : 'pt';
+    return localStorage.getItem('idioma') || 'pt'; // ← padrão sempre pt
 }
 
 let currentLanguage = detectarIdioma();

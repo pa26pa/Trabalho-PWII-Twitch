@@ -1352,41 +1352,72 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // só ao salvar aplica tudo
+    // SALVAR PERFIL — envia para o backend
     const btnSalvarPerfil = document.getElementById('btn-salvar-perfil');
     if (btnSalvarPerfil) {
-        btnSalvarPerfil.addEventListener('click', () => {
+        btnSalvarPerfil.addEventListener('click', async () => {
             const novoNome = document.getElementById('name-user')?.value.trim();
             const novaBio  = document.getElementById('bio-user')?.value.trim();
-
             if (!novoNome) { mostrarToast('O nome não pode ficar vazio!', 'error'); return; }
 
-            // atualiza nome
-            document.querySelectorAll('.show_name, #nome-usuario').forEach(el => el.textContent = novoNome);
-            localStorage.setItem('nomeCanal', novoNome);
+            const formData = new FormData();
+            formData.append('nome', novoNome);
+            formData.append('bio', novaBio || '');
+            if (fotoTemp) formData.append('foto', fotoTemp); // base64
 
-            // atualiza bio
+            try {
+                const res = await fetch('http://127.0.0.1:5000/update_perfil', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+
+                if (data.status === 'error') { mostrarToast(data.mensagem, 'error'); return; }
+
+                // atualiza na tela
+                document.querySelectorAll('.show_name, #nome-usuario').forEach(el => el.textContent = novoNome);
+                const bioPag  = document.getElementById('bio-usuario');
+                const bioDesc = document.getElementById('description-channel');
+                if (bioPag)  bioPag.textContent  = novaBio || '';
+                if (bioDesc) bioDesc.textContent = novaBio || '';
+
+                if (fotoTemp) {
+                    const fotoPerfilPag = document.querySelector('.photo-user');
+                    if (fotoPerfilPag) { fotoPerfilPag.src = fotoTemp; fotoPerfilPag.classList.add('tem-foto'); }
+                    const bgAvatar = document.querySelector('#dropdown-usuario .background-avatar');
+                    if (bgAvatar) bgAvatar.innerHTML = `<img src="${fotoTemp}" style="width:38px;height:38px;border-radius:50%;object-fit:cover;" alt="avatar">`;
+                    fotoTemp = null;
+                }
+
+                const modal4 = document.getElementById('modal-4');
+                if (modal4) { modal4.close(); document.body.classList.remove('modal-open'); }
+                mostrarToast('Perfil atualizado!', 'success');
+
+            } catch { mostrarToast('Erro ao salvar perfil.', 'error'); }
+        });
+    }
+    
+    function info_user() {
+        fetch("http://127.0.0.1:5000/session", { method: "GET" })
+        .then(res => res.json())
+        .then(data => {
+            info_user_name(data.name);
+            info_user_email(data.email);
+            info_user_CPF(mascara_CPF_config(data.cpf));
+            info_user_data(data.data);
+
+            // ← adiciona isso:
             const bioPag  = document.getElementById('bio-usuario');
             const bioDesc = document.getElementById('description-channel');
-            if (bioPag)  bioPag.textContent  = novaBio || '';
-            if (bioDesc) bioDesc.textContent = novaBio || '';
-            localStorage.setItem('bioCanal', novaBio || '');
+            if (bioPag && data.bio)  bioPag.textContent  = data.bio;
+            if (bioDesc && data.bio) bioDesc.textContent = data.bio;
 
-            // SÓ AGORA aplica a foto se o usuário tiver selecionado uma
-            if (fotoTemp) {
+            if (data.foto_url) {
                 const fotoPerfilPag = document.querySelector('.photo-user');
-                if (fotoPerfilPag) { fotoPerfilPag.src = fotoTemp; fotoPerfilPag.classList.add('tem-foto'); }
-
+                if (fotoPerfilPag) { fotoPerfilPag.src = data.foto_url; fotoPerfilPag.classList.add('tem-foto'); }
                 const bgAvatar = document.querySelector('#dropdown-usuario .background-avatar');
-                if (bgAvatar) bgAvatar.innerHTML = `<img src="${fotoTemp}" style="width:38px;height:38px;border-radius:50%;object-fit:cover;" alt="avatar">`;
-
-                localStorage.setItem('fotoPerfil', fotoTemp);
-                fotoTemp = null; // limpa temp
+                if (bgAvatar) bgAvatar.innerHTML = `<img src="${data.foto_url}" style="width:38px;height:38px;border-radius:50%;object-fit:cover;" alt="avatar">`;
             }
-
-            const modal4 = document.getElementById('modal-4');
-            if (modal4) { modal4.close(); document.body.classList.remove('modal-open'); }
-            mostrarToast('Perfil atualizado!', 'success');
         });
     }
 });
