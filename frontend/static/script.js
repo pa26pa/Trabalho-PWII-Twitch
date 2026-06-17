@@ -580,6 +580,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     } else {
                         fecharModal(form);
                         verificarSessao();
+                        window.location.href = '/';
                     }
                 });
             }
