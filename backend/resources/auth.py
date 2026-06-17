@@ -180,6 +180,8 @@ class check_login(Resource):
             cursor.close()
             con.close()
             
+            print('yey')
+            
             return {
                 'status':'success',
                 'mensagem':'Logado',
