@@ -579,8 +579,9 @@ document.addEventListener('DOMContentLoaded', function () {
                         mostrarToast(data.mensagem, data.status)
                     } else {
                         fecharModal(form);
-                        verificarSessao();
                         window.location.href = '/';
+                        verificarSessao();
+                        
                     }
                 });
             }
