@@ -1,16 +1,17 @@
-import smtplib
-from email.message import EmailMessage
-import pymysql
 import random
 from flask import Flask, json
 from email_validator import EmailNotValidError, validate_email
 from datetime import datetime
 from dotenv import load_dotenv
 import os
+import requests
+
+
 load_dotenv()
 
 bd_password = os.getenv("DB_PASSWORD")
 email_password = os.getenv("EMAIL_PASSWORD")
+BREVO_API = os.getenv("BREVO_API")
 
 # enviando email com um código novo 
 def send_code(email_forgot,tipo):
@@ -28,12 +29,12 @@ def send_code(email_forgot,tipo):
     else:
         texto = 'Olá! Recebemos uma solicitação. Utilize este código de verificação:'
         
-    info = 'Witch' 
+    #info = 'Witch' 
 
-    msg = EmailMessage()
-    msg['From'] = de
-    msg['To'] = to
-    msg['Subject'] = info
+    #msg = EmailMessage()
+    #msg['From'] = de
+    # msg['To'] = to
+    # msg['Subject'] = info
     #msg.set_content(f'Olá, este é o seu código --> {codigo}')
 
     html_template = f"""
@@ -71,17 +72,52 @@ def send_code(email_forgot,tipo):
       </body>
     </html>
     """
-    # Define o conteúdo como HTML
-    msg.add_alternative(html_template, subtype='html')
     
-    with smtplib.SMTP("smtp.gmail.com", 587, timeout=10) as email:
-        print("3 - Conectou")
-        email.starttls()
-        print("4 - TLS OK")
-        email.login(de, password)
-        print("5 - Login OK")
-        email.send_message(msg)
-        print("6 - Email enviado")
+    headers = {
+      "accept":"application/json",
+      "api-key":BREVO_API,
+      "content-type":"application/json"
+    }
+    
+    payload = {
+      "sender": {
+        "name":"Witch - Auth",
+        "email":"witch.auth@gmail.com"
+      },
+      "to": [
+        {
+          "email": email_forgot
+        }      
+      ],
+      "subject":"Witch",
+      "htmlContent":html_template
+    }
+    
+    response = requests.post(
+      "https://api.brevo.com/v3/smtp/email",
+      headers=headers,
+      json=payload,
+      timeout=30
+    )
+    
+    print(f'Status: {response.status_code}')
+    
+    if response.status_code not in [200, 201]:
+      raise Exception(
+        f"Erro ao enviar email pelo Brevo: {response.text}"
+      )
+      
+    # Define o conteúdo como HTML
+    #msg.add_alternative(html_template, subtype='html')
+    
+    # with smtplib.SMTP("smtp.gmail.com", 587, timeout=10) as email:
+    #     print("3 - Conectou")
+    #     email.starttls()
+    #     print("4 - TLS OK")
+    #     email.login(de, password)
+    #     print("5 - Login OK")
+    #     email.send_message(msg)
+    #     print("6 - Email enviado")
     
     # retorna o código para salvar na session
     return(codigo)
