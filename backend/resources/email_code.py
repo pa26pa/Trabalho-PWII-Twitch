@@ -11,7 +11,7 @@ load_dotenv()
 
 bd_password = os.getenv("DB_PASSWORD")
 email_password = os.getenv("EMAIL_PASSWORD")
-BREVO_API = os.getenv("BREVO_API")
+brevo_api = os.getenv("BREVO_API")
 
 # enviando email com um código novo 
 def send_code(email_forgot,tipo):
@@ -72,10 +72,12 @@ def send_code(email_forgot,tipo):
       </body>
     </html>
     """
+    print(brevo_api)
+    
     
     headers = {
       "accept":"application/json",
-      "api-key":BREVO_API,
+      "api-key":brevo_api,
       "content-type":"application/json"
     }
     
