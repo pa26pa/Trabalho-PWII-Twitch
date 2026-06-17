@@ -74,9 +74,10 @@ def send_code(email_forgot,tipo):
     # Define o conteúdo como HTML
     msg.add_alternative(html_template, subtype='html')
     
-    with smtplib.SMTP_SSL("smtp.gmail.com",465) as email:
-        email.login(de,password)
-        email.send_message(msg)
+    with smtplib.SMTP("smtp.gmail.com",587) as email:
+      email.starttls()
+      email.login(de,password)
+      email.send_message(msg)
     
     # retorna o código para salvar na session
     return(codigo)
