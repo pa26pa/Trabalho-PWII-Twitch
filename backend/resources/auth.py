@@ -216,7 +216,7 @@ class dados_config(Resource):
         
         cursor.close()
         con.close()
-        print('yey')
+        
         return {
             'status':'success',
             'mensagem':'Email encontrado',
