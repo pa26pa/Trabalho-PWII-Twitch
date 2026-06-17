@@ -1,6 +1,6 @@
 from flask import Flask, render_template
 from flask_restful import Api, Resource
-from backend.resources.auth import update_Password, signin, login, forgot, upload,redefine_password,delete_Account,bloquear, logout,desbloquear, check_login , dados_config, search,translate, resend_code, check_codigo, google
+from backend.resources.auth import update_Password, signin, login, editar_bio, editar_nome, forgot, upload,redefine_password,delete_Account,bloquear, logout,desbloquear, check_login , dados_config, search,translate, resend_code, check_codigo, google
 from dotenv import load_dotenv
 from authlib.integrations.flask_client import OAuth
 import os
@@ -54,6 +54,8 @@ api.add_resource(update_Password, '/update')
 api.add_resource(upload,'/upload')
 #api.add_resource(google,'/login/google')
 
+api.add_resource(editar_bio,'/editar_bio')
+api.add_resource(editar_nome,'/editar_bio')
 api.add_resource(delete_Account, '/delete')
 api.add_resource(forgot,'/forgot')
 api.add_resource(resend_code,'/resend')
@@ -67,4 +69,5 @@ api.add_resource(dados_config, '/dados_config')
 
 # É só pra garantir que só se pode rodar ele pela main
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)

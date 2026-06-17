@@ -171,7 +171,7 @@ class check_login(Resource):
             
             #session['usuario_id'] = id_ficticio
             
-            email = """select cpf, email, user_name, data_nascimento from usuarios where id_usuario = %s"""
+            email = """select cpf, email, user_name, data_nascimento,foto_url,bio from usuarios where id_usuario = %s"""
             cursor.execute(email,(session['usuario_id'],))
             info_usuario = cursor.fetchone()
             
@@ -184,6 +184,8 @@ class check_login(Resource):
                 'status':'success',
                 'mensagem':'Logado',
                 'logado':'true',
+                'foto':info_usuario['foto_url'],
+                'bio':info_usuario['bio'],
                 'email': info_usuario['email'],
                 'cpf': info_usuario['cpf'],
                 'data': data_formatada,
@@ -792,4 +794,47 @@ class videos(Resource):
         return {
             'status':'success',
             'videos': videos
+        }, 200
+
+class editar_bio(Resource):
+    def post(self):
+        data = request.get_json()
+        con = connection()
+        cursor = con.cursor(pymysql.cursors.DictCursor)
+        
+        id = session['id_usuario']
+        
+        bio = data.get('bio')
+        
+        query = """update usuarios set bio = %s where id_usuario = %s"""
+        cursor.execute(query,(bio,id))
+        
+        con.commit()
+        cursor.close()
+        con.close()
+        
+        return {
+            'status':'success',
+            'mensagem':'bio mudada com sucesso'
+        }, 200
+class editar_nome(Resource):
+    def post(self):
+        data = request.get_json()
+        con = connection()
+        cursor = con.cursor(pymysql.cursors.DictCursor)
+        
+        id = session['id_usuario']
+        
+        bio = data.get('nome')
+        
+        query = """update usuarios set user_name = %s where id_usuario = %s"""
+        cursor.execute(query,(bio,id))
+        
+        con.commit()
+        cursor.close()
+        con.close()
+        
+        return {
+            'status':'success',
+            'mensagem':'bio mudada com sucesso'
         }, 200
