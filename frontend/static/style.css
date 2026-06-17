@@ -1688,6 +1688,11 @@ a {text-decoration: none;}
     display: flex;
     flex-direction: column;
 }
+
+#modal-5::backdrop { background: rgba(0,0,0,0.6); }
+/* remove altura mínima padrão do dialog */
+#modal-5 { min-height: unset; }
+
 .turbo-modal { position: relative; }
 
 .turbo-banner {
@@ -1809,6 +1814,7 @@ a {text-decoration: none;}
     .section-config.active { width: 48%; }
     .nav-config { width: 72%; justify-content: flex-end; }
     .header-config {width: 100%; padding: 5px 15px; }
+    .container-perfil { width: 75%; }
 }
 
 /* NOTEBOOK PEQUENO / TABLET GRANDE (até 1024px) */
@@ -1836,6 +1842,11 @@ a {text-decoration: none;}
     /* aside pequeno das configs some também */
     .small-aside { display: none; }
     #config-main { padding-right: 0; }
+
+    /*box do perfil*/
+    .container-perfil { width: 88%; }
+    .box-perfil { flex-wrap: wrap; gap: 16px; }
+    .box-main { width: 100%; }
 }
 
 /* TABLET (até 768px) */
@@ -1923,7 +1934,22 @@ a {text-decoration: none;}
     #context, #catalog { width: 92%; }
     #context p { font-size: 1em; width: 90%; }
     #context h2, #catalog h2 { font-size: 1.8em; }
-}
+
+    /*-----Perfil-------*/
+    .container-perfil { width: 95%; padding: 5px 10px; }
+    .box-perfil {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 16px;
+    }
+    .box-main { width: 100%; align-items: center; }
+    .mini-box-perfil { justify-content: center; flex-wrap: wrap; }
+    .box-buttons-perfil { flex-direction: row; flex-wrap: wrap; justify-content: center; }
+    .btn-perfil { width: 120px; }
+    #modal-4 { width: 90vw; margin: 5% auto; }
+    .box-social-perfil { gap: 20px; }
+    }
 
 /* MOBILE GRANDE (até 600px) */
 @media (max-width: 600px) { 
@@ -1987,6 +2013,24 @@ a {text-decoration: none;}
 
     #context h2, #catalog h2 { font-size: 1.4em; }
     #context p { font-size: 0.9em; }
+
+    /*modal do turbo*/
+    #modal-turbo { width: 96vw; max-height: 85vh; border-radius: 12px; }
+    .turbo-banner { padding: 20px 16px; }
+    .turbo-logo { font-size: 1.4em; }
+    .turbo-body { padding: 14px 16px; gap: 10px; }
+    .turbo-extras { gap: 6px; }
+    .turbo-extra { width: 28%; }
+    .turbo-btns { flex-direction: column; align-items: center; }
+    .btn-turbo-gift, .btn-turbo-sub { width: 80%; }
+
+    /*----- PERFIL --------*/
+    .container-perfil { width: 100%; padding: 5px 8px; }
+    .photo-user { width: 90px; height: 90px; }
+    .container-perfil h1 { font-size: 1.5em; }
+    .box-buttons-perfil { gap: 8px; }
+    .btn-perfil { width: 100px; height: 32px; font-size: 0.85em; }
+    #modal-4 { width: 95vw; }
 }
 /* aside dentro do dropdown — só aparece em mobile */
 .aside-mobile-divider,
