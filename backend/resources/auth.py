@@ -595,7 +595,7 @@ class bloquear(Resource):
         date = data.get('data')
 
         data_bloq = data_valida(date)
-        
+        print(data_bloq)
         query = """select * from usuarios where user_name = %s"""
         cursor.execute(query,(person,))
         existe = cursor.fetchone()
