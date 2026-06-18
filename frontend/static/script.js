@@ -1149,7 +1149,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     if (blockBtn) {
         let isOpen = false; //controla pra saber se o dropdown tá aberto
-        let blockUsers = []; //array que vai guardar os usuários bloquados
+        let blockUsers = []; //array que vai guardar os usuários bloqueados
 
         //funçõ para montar a tabela dos users bloquados
         function renderTable() {
