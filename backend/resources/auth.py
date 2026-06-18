@@ -541,6 +541,23 @@ class delete_Account(Resource):
         
         con.commit()
         
+        ab = """delete from streams where id_streamer = %s"""
+        cursor.execute(ab, (id,))
+
+        con.commit()
+
+        ac = """delete from subs where id_usuario = %s or id_streamer = %s"""
+        cursor.execute(ac, (id,))
+        con.commit()
+
+        ad = """delete from tipo_sub where id_criador = %s"""
+        cursor.execute(ad, (id,))
+        con.commit()
+
+        ae = """delete from seguidores where id_seguido = %s or id_seguidor = %s"""
+        cursor.execute(ae, (id,))
+        con.commit()
+        
         session.clear()
         
         cursor.close()
