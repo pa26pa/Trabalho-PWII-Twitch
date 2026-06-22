@@ -901,8 +901,8 @@ class salvar_foto(Resource):
         cursor = con.cursor(pymysql.cursors.DictCursor)
         
         foto = data.get('foto')
-        
-        id = session['id_usuario']
+        id = 1
+        #id = session['id_usuario']
         print("aaaaaa")
         try:
             resposta = cloudinary.uploader.upload(foto)
