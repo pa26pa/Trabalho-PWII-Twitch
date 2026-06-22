@@ -808,6 +808,7 @@ document.addEventListener('DOMContentLoaded', function () {
         button.addEventListener('click', () => {//=> : é uma função anônima, mais curta que function(){} e mantém o contexto de 'this'
             const modalId = button.getAttribute('data-modal');
             const modal = document.getElementById(modalId);
+            const continueBtn = document.getElementById('continueBtn');
             if (modal) {  // ← proteção
                 modal.close();
                 document.body.classList.remove('modal-open');
@@ -1156,7 +1157,7 @@ document.addEventListener('DOMContentLoaded', function () {
             blockBody.innerHTML = ''; //limpa linhas antigas
 
             if (blockUsers.length === 0) {
-                //se não houver user bloquado, aparece mensagem
+                //se não houver user bloqueado, aparece mensagem
                 blockEmpty.style.display = 'block';
                 blockedTable.style.display = 'none';
             } else {
@@ -1365,7 +1366,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const formData = new FormData();
             formData.append('nome', novoNome);
             formData.append('bio', novaBio || '');
-            if (fotoTemp) formData.append('foto', fotoTemp); // base64
+            if (fotoTemp) formData.append('foto', fotoTemp);
 
             try {
                 const res = await fetch('http://127.0.0.1:5000/update_perfil', {
