@@ -8,7 +8,7 @@ function cadastrar() {
         senha: document.getElementById("senha_cadastro").value
     };
 
-    fetch("http://127.0.0.1:5000/signin", {
+    fetch("/signin", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -27,7 +27,7 @@ function login() {
         senha: document.getElementById("senha_login").value
     };
 
-    fetch("http://127.0.0.1:5000/login", {
+    fetch("/login", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -45,7 +45,7 @@ function forgot() {
         email_forgot: document.getElementById("email_forgot").value
     };
 
-    fetch("http://127.0.0.1:5000/forgot", {
+    fetch("/forgot", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -63,7 +63,7 @@ function check_codigo() {
         codigo: document.getElementById("codigo_check_codigo").value
     };
 
-    fetch("http://127.0.0.1:5000/check_codigo", {
+    fetch("/check_codigo", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -78,7 +78,7 @@ function check_codigo() {
 
 function resend_code() {
 
-    fetch("http://127.0.0.1:5000/resend")
+    fetch("/resend")
     .then(res => res.json())
     .then(data => {
         document.getElementById("resposta").innerText = JSON.stringify(data, null, 2);
@@ -90,7 +90,7 @@ function redefine_password() {
         nova_senha: document.getElementById("nova_senha_redefine_password").value
     };
 
-    fetch("http://127.0.0.1:5000/redefine_password", {
+    fetch("/redefine_password", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -108,7 +108,7 @@ function pesquisa() {
         pesquisa: document.getElementById("pesquisa").value,
     };
 
-    fetch("http://127.0.0.1:5000/search", {
+    fetch("/search", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -129,7 +129,7 @@ function pesquisa() {
 };
 
 function deletar() {
-    fetch("http://127.0.0.1:5000/delete", {
+    fetch("/delete", {
         method: "DELETE",
         headers: {
             "Content-Type": "application/json"
@@ -158,7 +158,7 @@ function enviar_foto() {
     formData.append("foto", foto);
     formData.append("tipo", "foto");
 
-    fetch("http://127.0.0.1:5000/salvar_foto", {
+    fetch("/salvar_foto", {
         method: "POST",
         body: formData
     })
@@ -190,7 +190,7 @@ function enviar_video() {
     formData.append("descrisao", descrisao);
     formData.append("categoria", categoria);
 
-    fetch("http://127.0.0.1:5000/salvar_video", {
+    fetch("/salvar_video", {
         method: "POST",
         body: formData
     })
