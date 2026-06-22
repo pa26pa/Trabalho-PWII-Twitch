@@ -900,7 +900,7 @@ class salvar_foto(Resource):
         con = connection()
         cursor = con.cursor(pymysql.cursors.DictCursor)
         
-        foto = data.get('foto')
+        foto = request.files["foto"]
         id = 1
         #id = session['id_usuario']
         print("aaaaaa")
