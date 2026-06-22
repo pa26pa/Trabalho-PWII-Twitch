@@ -896,7 +896,6 @@ class salvar_video(Resource):
     
 class salvar_foto(Resource):
     def post(self):
-        data = request.get_json()
         con = connection()
         cursor = con.cursor(pymysql.cursors.DictCursor)
         
