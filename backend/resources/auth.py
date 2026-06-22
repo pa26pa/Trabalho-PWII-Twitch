@@ -864,11 +864,10 @@ class editar_nome(Resource):
         
 class salvar_video(Resource):
     def post(self):
-        data = request.get_json()
         con = connection()
         cursor = con.cursor(pymysql.cursors.DictCursor)
         
-        video = data.get('video')
+        video = request.files["video"]
         
         id = session['id_usuario']
         
@@ -900,9 +899,9 @@ class salvar_foto(Resource):
         cursor = con.cursor(pymysql.cursors.DictCursor)
         
         foto = request.files["foto"]
-        id = 1
-        #id = session['id_usuario']
-        print("aaaaaa")
+   
+        id = session['id_usuario']
+        
         try:
             resposta = cloudinary.uploader.upload(foto)
             
@@ -914,7 +913,7 @@ class salvar_foto(Resource):
                 "status":"error",
                 "mensagem":"Não foi possivel salvar a imagem no cloudinary"
             },400 
-        print("yey")
+        
         query = """update usuarios set foto_url = %s where id_usuario = %s"""
         cursor.execute(query,(url,id))
         con.commit()
@@ -923,5 +922,5 @@ class salvar_foto(Resource):
         
         return {
             "status":"success",
-            "mensagem":"video foi salvo com sucesso"
+            "mensagem":"foto foi salva com sucesso"
         }, 200        
