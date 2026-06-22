@@ -6,7 +6,7 @@ import random
 import smtplib
 from email.message import EmailMessage
 import mimetypes
-from backend.database.connection import connection, supabase, email_valido, data_valida, carregar, salvar, cache_traducoes, file
+from backend.database.connection import connection, supabase, acorda_cloudinary, email_valido, data_valida, carregar, salvar, cache_traducoes, file
 from backend.resources.cpf import cpf_math_validate, cpf_real_or_not
 from backend.resources.email_code import send_code
 from datetime import date, datetime, timedelta
@@ -16,9 +16,13 @@ import time
 from uuid import uuid4
 from datetime import date
 from urllib.parse import urlparse 
+import cloudinary
+import cloudinary.uploader
+
 #from main import app, google, User
 # criação do signin
 
+acorda_cloudinary()
 class signin(Resource):
     def post(self):
         data = request.get_json()
@@ -857,3 +861,67 @@ class editar_nome(Resource):
             'status':'success',
             'mensagem':'bio mudada com sucesso'
         }, 200
+        
+class salvar_video(Resource):
+    def post(self):
+        data = request.get_json()
+        con = connection()
+        cursor = con.cursor(pymysql.cursors.DictCursor)
+        
+        video = data.get('video')
+        
+        id = session['id_usuario']
+        
+        try:
+            resposta = cloudinary.uploader.upload(video,
+                resource_type = "video")
+            url = resposta["secure_url"]
+        
+        except Exception as e:
+            return {
+                "status":"error",
+                "mensagem":"Não foi possivel salvar o video no cloudinary"
+            },400 
+        
+        query = """update usuarios set video_url = %s where id_usuario = %s"""
+        cursor.execute(query,(url,id))
+        con.commit()
+        cursor.close()
+        con.close()
+        
+        return {
+            "status":"success",
+            "mensagem":"video foi salvo com sucesso"
+        }, 200
+    
+class salvar_foto(Resource):
+    def post(self):
+        data = request.get_json()
+        con = connection()
+        cursor = con.cursor(pymysql.cursors.DictCursor)
+        
+        foto = data.get('foto')
+        
+        id = session['id_usuario']
+        
+        try:
+            resposta = cloudinary.uploader.upload(foto)
+            
+            url = resposta["secure_url"]
+        
+        except Exception as e:
+            return {
+                "status":"error",
+                "mensagem":"Não foi possivel salvar a imagem no cloudinary"
+            },400 
+        
+        query = """update usuarios set foto_url = %s where id_usuario = %s"""
+        cursor.execute(query,(url,id))
+        con.commit()
+        cursor.close()
+        con.close()
+        
+        return {
+            "status":"success",
+            "mensagem":"video foi salvo com sucesso"
+        }, 200        

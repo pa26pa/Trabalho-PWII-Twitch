@@ -1,6 +1,6 @@
 from flask import Flask, render_template
 from flask_restful import Api, Resource
-from backend.resources.auth import update_Password, signin, login, editar_bio, editar_nome, forgot, upload,redefine_password,delete_Account,bloquear, logout,desbloquear, check_login , dados_config, search,translate, resend_code, check_codigo, google
+from backend.resources.auth import update_Password, signin, login, salvar_foto, salvar_video, editar_bio, editar_nome, forgot, upload,redefine_password,delete_Account,bloquear, logout,desbloquear, check_login , dados_config, search,translate, resend_code, check_codigo, google
 from dotenv import load_dotenv
 from authlib.integrations.flask_client import OAuth
 import os
@@ -52,6 +52,9 @@ api.add_resource(bloquear, '/bloquear')
 api.add_resource(desbloquear, '/desbloquear')
 api.add_resource(update_Password, '/update')
 api.add_resource(upload,'/upload')
+api.add_resource(salvar_video, '/salvar_video')
+api.add_resource(salvar_foto, '/salvar_foto')
+
 #api.add_resource(google,'/login/google')
 
 api.add_resource(editar_bio,'/editar_bio')

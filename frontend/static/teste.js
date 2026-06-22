@@ -155,10 +155,10 @@ function enviar_foto() {
 
     const formData = new FormData();
 
-    formData.append("arquivo", foto);
+    formData.append("foto", foto);
     formData.append("tipo", "foto");
 
-    fetch("http://127.0.0.1:5000/upload", {
+    fetch("http://127.0.0.1:5000/salvar_foto", {
         method: "POST",
         body: formData
     })
@@ -190,7 +190,7 @@ function enviar_video() {
     formData.append("descrisao", descrisao);
     formData.append("categoria", categoria);
 
-    fetch("http://127.0.0.1:5000/upload", {
+    fetch("http://127.0.0.1:5000/salvar_video", {
         method: "POST",
         body: formData
     })

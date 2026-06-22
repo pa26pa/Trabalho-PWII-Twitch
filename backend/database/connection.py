@@ -9,16 +9,26 @@ from dotenv import load_dotenv
 from supabase import create_client, Client
 from urllib.parse import urlparse
 import os
+import cloudinary 
 
 load_dotenv()
 
 url = os.getenv("SUPABASE_URL")
 key = os.getenv("SUPABASE_KEY")
+
 supabase: Client = create_client(url,key)
 
 bd_password = os.getenv("DB_PASSWORD")
 email_password = os.getenv("EMAIL_PASSWORD")
 
+def acorda_cloudinary ():
+    cloudinary.config(
+        cloud_name= os.getenv("CLOUD_NAME"),
+        api_key= os.getenv("CLOUDINARY_KEY"),
+        api_secret = os.getenv("CLOUDINARY_SECRET"),
+        secure = True
+    )
+        
 # Conectando com o Mysql :):)
 def connection():
     return pymysql.connect (
