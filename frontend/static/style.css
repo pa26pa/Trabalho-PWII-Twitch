@@ -1669,6 +1669,50 @@ a {text-decoration: none;}
     color: #888;
 }
 
+/*modal de iniciar live*/
+/* SELECT DA LIVE */
+#categoria-live {
+    width: 90%;
+    border: 3px solid #DEC7FF;
+    border-radius: 10px;
+    padding: 5px;
+    background-color: #fff;
+    color: #48237F;
+    font-size: 1em;
+    outline: none;
+    margin-bottom: 10px;
+    cursor: pointer;
+}
+
+#categoria-live:focus {
+    border-color: #9147FF;
+    box-shadow: 0 0 0 2px rgba(145, 71, 255, 0.2);
+}
+
+#categoria-live option {
+    padding: 6px 8px;
+    color: #48237F;
+}
+
+#categoria-live option:checked {
+    background-color: #DEC7FF;
+    color: #48237F;
+}
+
+#categoria-live optgroup {
+    font-weight: bold;
+    color: #9147FF;
+}
+
+.label-perfil[for="categoria-live"],
+label[for="categoria-live"] {
+    align-self: flex-start;
+    margin-left: 5%;
+    font-weight: bold;
+    color: #48237F;
+    margin-bottom: 4px;
+}
+
 /*---------MODAL DO TURBO --------------*/
 
 #modal-5 {
