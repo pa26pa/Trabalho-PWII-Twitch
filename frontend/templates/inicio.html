@@ -7,6 +7,9 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
         <link rel="stylesheet" href="{{url_for('static', filename='style.css')}}">
         <link rel="icon" type="image/x-icon" href="{{url_for('static', filename='witch.png')}}">
+        <!--
+        Esse link de baixo serve pra que ele carregue o botão do captcha (sorry larii)
+        -->
         <script src="https://www.google.com/recaptcha/api.js?hl=pt-BR" async defer></script>
     </head> 
     <body>
@@ -272,7 +275,9 @@
                                             <input type="checkbox" id="checkbox-accept" name="check"> <br>
                                             <label for="check" id="label-terms">Concordo com os <a href="{{url_for('static', filename='termos.pdf')}}" target="_blank">Termos de Política e Privacidade</a></label>
                                         </div>
-                                        
+                                        <!--
+                                        Essa div aqui em vaixo é a do captcha, é ela que faz aquele negocio de 'não sou um robô'
+                                        -->
                                         <div class="g-recaptcha" data-sitekey="6LemWTAtAAAAAM2v-HHAGkaNtjG8vm-Huju47Nvs"></div>
 
                                         <button type="submit" class="btn-wrapper" data-i18n>Cadastrar</button>

@@ -516,7 +516,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 const captcha = grecaptcha.getResponse();
 
                 if (captcha.length === 0) {
-                    mostrarToast('Por favor, marque a caixa "Não sou um robê"', 'error')
+                    mostrarToast('Por favor, marque a caixa "Não sou um robô"', 'error')
                     return;
                 }
                 
