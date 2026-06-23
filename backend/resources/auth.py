@@ -864,11 +864,14 @@ class editar_nome(Resource):
         
 class salvar_video(Resource):
     def post(self):
+        
         con = connection()
         cursor = con.cursor(pymysql.cursors.DictCursor)
         
         video = request.files["video"]
-        
+        categoria = request.files["categoria"]
+        titulo = request.files["titulo"]
+        descrisao = request.files["descrisao"]
         id = session['id_usuario']
         
         try:
@@ -882,7 +885,7 @@ class salvar_video(Resource):
                 "mensagem":"Não foi possivel salvar o video no cloudinary"
             },400 
         
-        query = """update usuarios set video_url = %s where id_usuario = %s"""
+        query = """insert into streams (categoria, titulo, descrisao, video_url, data_upload, id_streamer) values (%s,%s,%s,%s,%s,%s);"""
         cursor.execute(query,(url,id))
         con.commit()
         cursor.close()

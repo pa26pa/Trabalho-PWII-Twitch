@@ -58,7 +58,7 @@ api.add_resource(salvar_foto, '/salvar_foto')
 #api.add_resource(google,'/login/google')
 
 api.add_resource(editar_bio,'/editar_bio')
-api.add_resource(editar_nome,'/editar_bio')
+api.add_resource(editar_nome,'/editar_nome')
 api.add_resource(delete_Account, '/delete')
 api.add_resource(forgot,'/forgot')
 api.add_resource(resend_code,'/resend')
