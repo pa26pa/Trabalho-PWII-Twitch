@@ -1369,13 +1369,47 @@ document.addEventListener('DOMContentLoaded', function () {
             if (fotoTemp) formData.append('foto', fotoTemp);
 
             try {
-                const res = await fetch('http://127.0.0.1:5000/update_perfil', {
+                // O da foto
+                const res = await fetch('/salvar_foto', {
                     method: 'POST',
                     body: formData
                 });
-                const data = await res.json();
+                const data_foto = await res.json();
 
-                if (data.status === 'error') { mostrarToast(data.mensagem, 'error'); return; }
+                if (data_foto.status === 'error') { mostrarToast(data_foto.mensagem, 'error'); return; }
+                
+                // O do nome
+                const dados = {
+                    nome: novoNome
+                };
+
+                const res_ = await fetch('/editar_nome', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(dados)
+                });
+                const data_nome = await res_.json();
+
+                if (data_nome.status === 'error') { mostrarToast(data_nome.mensagem, 'error'); return; }
+                
+                // O da BIO
+                const dados_ = {
+                    bio: novaBio
+                };
+
+                const resp = await fetch('/editar_bio', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(dados_)
+                    
+                });
+                const data_bio = await resp.json();
+
+                if (data_bio.status === 'error') { mostrarToast(data_bio.mensagem, 'error'); return; }
 
                 // atualiza na tela
                 document.querySelectorAll('.show_name, #nome-usuario').forEach(el => el.textContent = novoNome);
