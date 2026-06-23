@@ -38,7 +38,7 @@ class signin(Resource):
         cpf_limpo = cpf.replace(".","").replace("-","")
         
         email = data.get('email')
-        user_name = data.get('user_name')
+        user_name = data.get('user_name').lower().strip()
         data_nascimento = data.get('data_nascimento')
         senha = data.get('senha')
         
@@ -116,8 +116,10 @@ class login(Resource):
 
         if vendo == False:
             coluna = 'user_name'
+            username_email = username_email.lower()
         else:
             coluna = 'email'
+            username_email = username_email.lower()
         
         # vendo se realmente existe alguem com aquele email ou nome de usuario
         query = f"""select id_usuario, senha from usuarios where {coluna} = %s"""
