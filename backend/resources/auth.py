@@ -38,7 +38,7 @@ class signin(Resource):
         cpf_limpo = cpf.replace(".","").replace("-","")
         
         email = data.get('email')
-        user_name = data.get('user_name').lower().strip()
+        user_name = data.get('user_name')
         data_nascimento = data.get('data_nascimento')
         senha = data.get('senha')
         
@@ -59,7 +59,7 @@ class signin(Resource):
         senha_hash = generate_password_hash(senha)
 
         
-        query = """select * from usuarios where cpf = %s or email = %s or user_name = %s"""
+        query = """select * from usuarios where cpf = %s or email = %s or BINARY user_name = %s"""
         cursor.execute(query,(cpf,email,user_name))
         existe = cursor.fetchone()
         
@@ -116,13 +116,11 @@ class login(Resource):
 
         if vendo == False:
             coluna = 'user_name'
-            username_email = username_email.lower()
         else:
             coluna = 'email'
-            username_email = username_email.lower()
         
         # vendo se realmente existe alguem com aquele email ou nome de usuario
-        query = f"""select id_usuario, senha from usuarios where {coluna} = %s"""
+        query = f"""select id_usuario, senha from usuarios where BINARY {coluna} = %s"""
         cursor.execute(query,(username_email,))
         login_valido = cursor.fetchone()
         
@@ -619,12 +617,12 @@ class bloquear(Resource):
 
         data_bloq = data_valida(date)
         print(data_bloq)
-        query = """select * from usuarios where user_name = %s"""
+        query = """select * from usuarios where BINARY user_name = %s"""
         cursor.execute(query,(person,))
         existe = cursor.fetchone()
         
         if existe:
-            b = """select id_usuario from usuarios where user_name = %s"""
+            b = """select id_usuario from usuarios where BINARY user_name = %s"""
             cursor.execute(b,(person,))
             resposta = cursor.fetchone()
             id_bloqueado = resposta['id_usuario']
@@ -669,7 +667,7 @@ class desbloquear(Resource):
    
         usuario = session['usuario_id']
         
-        a = """select id_usuario from usuarios where user_name = %s"""
+        a = """select id_usuario from usuarios where BINARY user_name = %s"""
         cursor.execute(a,(nome,))
         resposta = cursor.fetchone()
         id = resposta['id_usuario']
@@ -776,7 +774,7 @@ class foto(Resource):
         
         user_name = data.get('user_name')
         
-        query = """select foto_url from usuarios where user_name = %s"""
+        query = """select foto_url from usuarios where BINARY user_name = %s"""
         cursor.execute(query,(user_name,))
         foto_url = cursor.fetchone()
         
@@ -919,7 +917,7 @@ class salvar_foto(Resource):
                 "status":"error",
                 "mensagem":"Não foi possivel salvar a imagem no cloudinary"
             },400 
-        print("deu bom")
+        
         query = """update usuarios set foto_url = %s where id_usuario = %s"""
         cursor.execute(query,(url,id))
         con.commit()
