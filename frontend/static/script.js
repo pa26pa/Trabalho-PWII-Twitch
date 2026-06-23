@@ -1485,4 +1485,66 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
+
+    //MODAL INICIAR LIVE 
+    // SELECT CUSTOMIZADO DE CATEGORIAS
+    const btnSelectCat = document.getElementById('btn-select-cat');
+    const selectDropdown = document.getElementById('select-dropdown');
+    const selectedTags = document.getElementById('selected-tags');
+    const placeholder = document.getElementById('select-placeholder');
+
+    if (btnSelectCat && selectDropdown) {
+        // abre/fecha
+        btnSelectCat.addEventListener('click', (e) => {
+            e.stopPropagation();
+            btnSelectCat.classList.toggle('open');
+            selectDropdown.classList.toggle('open');
+        });
+
+        // fecha ao clicar fora
+        document.addEventListener('click', (e) => {
+            if (!document.getElementById('select-categorias').contains(e.target)) {
+                btnSelectCat.classList.remove('open');
+                selectDropdown.classList.remove('open');
+            }
+        });
+
+        // atualiza tags ao marcar/desmarcar
+        selectDropdown.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+            cb.addEventListener('change', () => updateTags());
+        });
+
+        function updateTags() {
+            selectedTags.innerHTML = '';
+            const checked = selectDropdown.querySelectorAll('input[type="checkbox"]:checked');
+
+            if (checked.length === 0) {
+                placeholder.textContent = 'Selecione categorias...';
+                return;
+            }
+
+            placeholder.textContent = `${checked.length} selecionada${checked.length > 1 ? 's' : ''}`;
+
+            checked.forEach(cb => {
+                const label = cb.closest('label').textContent.trim();
+                const tag = document.createElement('div');
+                tag.className = 'tag';
+                tag.innerHTML = `
+                    <span>${label}</span>
+                    <button type="button" title="Remover">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                `;
+                // botão X da tag desmarca o checkbox
+                tag.querySelector('button').addEventListener('click', () => {
+                    cb.checked = false;
+                    updateTags();
+                });
+                selectedTags.appendChild(tag);
+            });
+        }
+
+        // para pegar os valores selecionados no envio:
+        // const categorias = [...selectDropdown.querySelectorAll('input:checked')].map(cb => cb.value);
+    }
 });
