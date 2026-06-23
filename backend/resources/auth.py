@@ -850,15 +850,13 @@ class editar_nome(Resource):
         
         nome = data.get('nome')
         
-        a = """select user_name from usuarios where BINARY user_name = %s"""
+        a = """select id_usuario, user_name from usuarios where BINARY user_name = %s"""
         cursor.execute(a,(nome,))
         resposta = cursor.fetchone()
-        if resposta['user_name']:
-            aaa = """select user_name from usuarios where id_usuario = %s"""
-            cursor.execute(aaa,(id,))
-            resposta_2 = cursor.fetchone()
+        
+        if resposta is not None:
             
-            if not resposta_2['user_name']:
+            if resposta['id_usuario'] != id :
                 return {
                     'status':'error',
                     'mensagem':'esse nome de usuario já está sendo utilizado'
