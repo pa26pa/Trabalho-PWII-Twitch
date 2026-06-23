@@ -300,7 +300,7 @@ h2 {
 .caixa-input {
     position: relative;
     width: 310px;
-    margin: 25px 0;
+    margin: 20px 0;
     border-bottom: 1px solid #48237f;
 }
 .caixa-input label {
@@ -492,6 +492,12 @@ h2 {
 .logins:hover {background-color: rgb(212, 212, 212);}
 #icon-google {width: 20px; height: 20px; margin-right: 10px;}
 #icon-amazon {width: 35px; height: 15px; margin-right: 10px;}
+
+/*CAPTCHA no cadastro*/
+.g-recaptcha {
+    height: 50px;
+    margin-bottom: 10px;
+}
 
 /*termos de politica no cadastro*/
 .box-terms {
@@ -1614,7 +1620,6 @@ a {text-decoration: none;}
     justify-content: space-between;
     width: 80%;
     height: auto;
-    border: 4px solid green;
 }
 /* foto de perfil na página do canal */
 .photo-user {
