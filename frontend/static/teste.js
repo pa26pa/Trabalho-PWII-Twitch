@@ -185,7 +185,6 @@ function enviar_video() {
     const formData = new FormData();
 
     formData.append("arquivo", video);
-    formData.append("tipo", "video");
     formData.append("titulo", titulo);
     formData.append("descrisao", descrisao);
     formData.append("categoria", categoria);
