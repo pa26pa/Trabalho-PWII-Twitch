@@ -259,10 +259,27 @@
                 <dialog id="modal-6">
                     <div class="modal-buttons">
                         <p> </p>
-                        <button class="btn-close-modal" data-modal="modal-4"><i class="fa-solid fa-x close-x"></i></button>
+                        <button class="btn-close-modal" data-modal="modal-6"><i class="fa-solid fa-x close-x"></i></button>
                     </div>
 
-                    
+                    <form action="" method="post" class="form-live">
+                        <label class="label-perfil" for="nome-live" data-i18n>Nome do Canal</label>
+                        <input type="text" id="nome-live" name="nome-live"> <br><br>
+                        <label class="label-perfil" for="descricao-live" data-i18n>Sua Bio</label>
+                        <textarea rows="4" cols="20" id="descricao-live"></textarea> <br>
+
+                        <label for="categoria-live">Escolha a Categoria:</label>
+                        <input type="radio" id="cat-jogos" name="cat-jogos">
+                        <label for="cat-jogos">Jogos</label> <br>
+                        <input type="radio" id="cat-entret" name="cat-entret">
+                        <label for="cat-entret">Jogos</label>
+
+                        <div class="box-btn-modal-perfil">
+                            <button type="button" class="btn-perfil" id="btn-iniciar-live" data-i18n>Iniciar Live</button>
+                            <button type="button" class="btn-close-modal btn-red open-modal" data-modal="modal-6" data-i18n>Cancelar</button>
+                        </div>
+                    </form>
+
                 </dialog>
             </div>
         </section>
