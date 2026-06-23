@@ -1345,6 +1345,7 @@ document.addEventListener('DOMContentLoaded', function () {
         uploadFoto.addEventListener('change', (e) => {
             const arquivo = e.target.files[0];
             if (!arquivo || !arquivo.type.startsWith('image/')) return;
+            fotoFile = arquivo;
             const reader = new FileReader();
             reader.onload = (ev) => {
                 fotoTemp = ev.target.result; // ← só na variável temp
@@ -1366,7 +1367,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const formData = new FormData();
             formData.append('nome', novoNome);
             formData.append('bio', novaBio || '');
-            if (fotoTemp) formData.append('foto', fotoTemp);
+            if (fotoTemp) formData.append('foto', fotoFile);
 
             try {
                 console.log(fotoTemp);
