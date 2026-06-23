@@ -1574,7 +1574,7 @@ a {text-decoration: none;}
 
 
 /*modal de editar perfil*/
-#modal-4 {
+#modal-4, #modal-6 {
     margin: 10% auto;
     display: none;
     width: 25%;
@@ -1583,7 +1583,7 @@ a {text-decoration: none;}
     border-radius: 20px;
     background-color: white;
 }
-#modal-4[open] {
+#modal-4[open], #modal-6[open] {
     display: flex;
     flex-direction: column;
     justify-content: center;
