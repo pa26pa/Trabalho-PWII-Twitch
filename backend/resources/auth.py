@@ -825,7 +825,7 @@ class editar_bio(Resource):
         con = connection()
         cursor = con.cursor(pymysql.cursors.DictCursor)
         
-        id = session['id_usuario']
+        id = session['usuario_id']
         
         bio = data.get('bio')
         
@@ -846,7 +846,7 @@ class editar_nome(Resource):
         con = connection()
         cursor = con.cursor(pymysql.cursors.DictCursor)
         
-        id = session['id_usuario']
+        id = session['usuario_id']
         
         bio = data.get('nome')
         
@@ -872,7 +872,7 @@ class salvar_video(Resource):
         categoria = request.files["categoria"]
         titulo = request.files["titulo"]
         descrisao = request.files["descrisao"]
-        id = session['id_usuario']
+        id = session['usuario_id']
         
         try:
             resposta = cloudinary.uploader.upload(video,
@@ -903,7 +903,7 @@ class salvar_foto(Resource):
         
         foto = request.files["foto"]
    
-        id = session['id_usuario']
+        id = session['usuario_id']
         
         try:
             resposta = cloudinary.uploader.upload(foto)
