@@ -1369,6 +1369,17 @@ document.addEventListener('DOMContentLoaded', function () {
             if (fotoTemp) formData.append('foto', fotoTemp);
 
             try {
+                if (fotoTemp != null) {
+                    const res = await fetch('/salvar_foto', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const data_foto = await res.json();
+
+                    if (data_foto.status === 'error') { mostrarToast(data_foto.mensagem, 'error'); return; }
+                        
+                }
+                
                 // O da foto
                 const res = await fetch('/salvar_foto', {
                     method: 'POST',
