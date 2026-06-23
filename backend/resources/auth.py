@@ -23,6 +23,9 @@ import os
 from dotenv import load_dotenv
 
 
+load_dotenv()
+
+secret = os.getenv("CAPTCHA_SECRET")
 
 #from main import app, google, User
 # criação do signin
@@ -35,7 +38,25 @@ class signin(Resource):
         con = connection()
         cursor = con.cursor()
         
-        # retirando dados do js
+        captcha = data.get('captcha')
+        
+        verifica = 'https://www.google.com/recaptcha/api/siteverify'
+        
+        info = {
+            'secret': secret,
+            'response': captcha
+        }
+        
+        envia = requests.post(verifica, data=info)
+        resultado = envia.json()
+        
+        if not resultado.get('success'):
+            
+            return {
+                'status':'error',
+                'mensagem':'captcha inválido'
+            }, 403
+            
         cpf = str(data.get('cpf'))
         
 

@@ -513,12 +513,20 @@ document.addEventListener('DOMContentLoaded', function () {
             } 
             
             if (form.classList.contains('sign')) {
+                const captcha = grecaptcha.getResponse();
+
+                if (captcha.length === 0) {
+                    mostrarToast('Por favor, marque a caixa "Não sou um robê"', 'error')
+                    return;
+                }
+                
                 const dados = {
                     cpf: document.getElementById("cpf").value,
                     email: document.getElementById("email").value,
                     user_name: document.getElementById("user-cadastro").value,
                     data_nascimento: document.getElementById("data-nascimento").value,
-                    senha: document.getElementById("senha").value
+                    senha: document.getElementById("senha").value,
+                    captcha: captcha
                 };
                 
                 
