@@ -904,19 +904,20 @@ class salvar_foto(Resource):
         foto = request.files["foto"]
    
         id = session['usuario_id']
-        
+        print("----")
         try:
+            print("antes da resposta")
             resposta = cloudinary.uploader.upload(foto)
-            
+            print("depois resposta")
             url = resposta["secure_url"]
-        
+            print("depois url")
         except Exception as e:
             print(e)
             return {
                 "status":"error",
                 "mensagem":"Não foi possivel salvar a imagem no cloudinary"
             },400 
-        
+        print("deu bom")
         query = """update usuarios set foto_url = %s where id_usuario = %s"""
         cursor.execute(query,(url,id))
         con.commit()
