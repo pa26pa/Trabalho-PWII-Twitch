@@ -18,6 +18,11 @@ from datetime import date
 from urllib.parse import urlparse 
 import cloudinary
 import cloudinary.uploader
+import requests
+import os
+from dotenv import load_dotenv
+
+
 
 #from main import app, google, User
 # criação do signin
@@ -941,3 +946,35 @@ class salvar_foto(Resource):
             "status":"success",
             "mensagem":"foto foi salva com sucesso"
         }, 200        
+    
+class validar_captcha(Resource):
+    def post(self):
+        data = request.get_json()
+        
+        captcha = data.get('captcha')
+        
+        verifica = 'https://www.google.com/recaptcha/api/siteverify'
+        
+        load_dotenv()
+
+        secret = os.getenv("CAPTCHA_SECRET")
+        
+        info = {
+            'secret': secret,
+            'response': captcha
+        }
+        
+        envia = requests.post(verifica, data=info)
+        resultado = envia.json()
+        
+        if resultado.get('success'):
+            return {
+                'status':'success',
+                'mensagem':'Captcha válido'
+            }, 200
+    
+        return {
+                'status':'error',
+                'mensagem':'captcha inválido'
+            }, 403
+        

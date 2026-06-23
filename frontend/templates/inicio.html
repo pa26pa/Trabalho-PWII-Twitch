@@ -7,6 +7,7 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
         <link rel="stylesheet" href="{{url_for('static', filename='style.css')}}">
         <link rel="icon" type="image/x-icon" href="{{url_for('static', filename='witch.png')}}">
+        <script src="https://www.google.com/recaptcha/api.js?hl=pt-BR" async defer></script>
     </head> 
     <body>
         <header id="header">
@@ -271,6 +272,9 @@
                                             <input type="checkbox" id="checkbox-accept" name="check"> <br>
                                             <label for="check" id="label-terms">Concordo com os <a href="{{url_for('static', filename='termos.pdf')}}" target="_blank">Termos de Política e Privacidade</a></label>
                                         </div>
+                                        
+                                        <div class="g-recaptcha" data-sitekey="6LemWTAtAAAAAM2v-HHAGkaNtjG8vm-Huju47Nvs"></div>
+
                                         <button type="submit" class="btn-wrapper" data-i18n>Cadastrar</button>
                                     </form>
                                 </div>
