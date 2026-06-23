@@ -808,6 +808,7 @@ document.addEventListener('DOMContentLoaded', function () {
         button.addEventListener('click', () => {//=> : é uma função anônima, mais curta que function(){} e mantém o contexto de 'this'
             const modalId = button.getAttribute('data-modal');
             const modal = document.getElementById(modalId);
+            const continueBtn = document.getElementById('continueBtn');
             if (modal) {  // ← proteção
                 modal.close();
                 document.body.classList.remove('modal-open');
@@ -1156,7 +1157,7 @@ document.addEventListener('DOMContentLoaded', function () {
             blockBody.innerHTML = ''; //limpa linhas antigas
 
             if (blockUsers.length === 0) {
-                //se não houver user bloquado, aparece mensagem
+                //se não houver user bloqueado, aparece mensagem
                 blockEmpty.style.display = 'block';
                 blockedTable.style.display = 'none';
             } else {
@@ -1309,35 +1310,35 @@ document.addEventListener('DOMContentLoaded', function () {
 
     //--------------perfil.html (meu canal)-------------------
     // UPLOAD DE FOTO DE PERFIL
-    const uploadFoto   = document.getElementById('upload-foto');
-    const previewFoto  = document.getElementById('preview-foto');
-    const fotoPerfilPag = document.querySelector('.photo-user'); // foto grande na página do canal
+    const uploadFoto = document.getElementById('upload-foto');
+    const previewFoto = document.getElementById('preview-foto');
+    const fotoPerfilPag = document.querySelector('.photo-user');
 
-    // ao abrir o modal-4, pré-preenche com os dados atuais
     const btnEditar = document.getElementById('btn-editar');
     if (btnEditar) {
         btnEditar.addEventListener('click', () => {
-            // pré-preenche nome
-            const inputNome = document.getElementById('name-user');
-            const nomeSalvo = localStorage.getItem('nomeCanal') || '';
-            if (inputNome) inputNome.value = nomeSalvo;
+            // Busca dados SEMPRE da sessão atual, nunca do localStorage
+            fetch("/session", { method: "GET" })
+            .then(res => res.json())
+            .then(data => {
+                const inputNome = document.getElementById('name-user');
+                const inputBio  = document.getElementById('bio-user');
+                const previewFoto = document.getElementById('preview-foto');
 
-            // pré-preenche bio
-            const inputBio = document.getElementById('bio-user');
-            const bioSalva = localStorage.getItem('bioCanal') || '';
-            if (inputBio) inputBio.value = bioSalva;
+                if (inputNome) inputNome.value = data.name || '';
+                if (inputBio)  inputBio.value  = data.bio  || '';
 
-            // pré-preenche foto no preview
-            const fotoSalva = localStorage.getItem('fotoPerfil');
-            const previewFoto = document.getElementById('preview-foto');
-            if (fotoSalva && previewFoto) {
-                previewFoto.src = fotoSalva;
-                previewFoto.classList.add('tem-foto');
-            }
+                if (data.foto && previewFoto) {
+                    previewFoto.src = data.foto;
+                    previewFoto.classList.add('tem-foto');
+                } else if (previewFoto) {
+                    previewFoto.src = '/static/user.png';
+                    previewFoto.classList.remove('tem-foto');
+                }
+            });
         });
     }
 
-    // o upload guarda em variável temporária, NÃO salva ainda
     let fotoTemp = null;
     if (uploadFoto && previewFoto) {
         previewFoto.addEventListener('click', () => uploadFoto.click());
@@ -1354,7 +1355,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // SALVAR PERFIL — envia para o backend
+    // SALVAR PERFIL
     const btnSalvarPerfil = document.getElementById('btn-salvar-perfil');
     if (btnSalvarPerfil) {
         btnSalvarPerfil.addEventListener('click', async () => {
@@ -1365,7 +1366,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const formData = new FormData();
             formData.append('nome', novoNome);
             formData.append('bio', novaBio || '');
-            if (fotoTemp) formData.append('foto', fotoTemp); // base64
+            if (fotoTemp) formData.append('foto', fotoTemp);
 
             try {
                 const res = await fetch('http://127.0.0.1:5000/update_perfil', {
@@ -1384,10 +1385,21 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (bioDesc) bioDesc.textContent = novaBio || '';
 
                 if (fotoTemp) {
+                    // Atualiza foto grande da página do canal
                     const fotoPerfilPag = document.querySelector('.photo-user');
-                    if (fotoPerfilPag) { fotoPerfilPag.src = fotoTemp; fotoPerfilPag.classList.add('tem-foto'); }
+                    if (fotoPerfilPag) {
+                        fotoPerfilPag.src = fotoTemp;
+                        fotoPerfilPag.classList.add('tem-foto');
+                    }
+
+                    // Atualiza avatar no dropdown
                     const bgAvatar = document.querySelector('#dropdown-usuario .background-avatar');
-                    if (bgAvatar) bgAvatar.innerHTML = `<img src="${fotoTemp}" style="width:38px;height:38px;border-radius:50%;object-fit:cover;" alt="avatar">`;
+                    if (bgAvatar) {
+                        bgAvatar.innerHTML = `<img src="${fotoTemp}" 
+                            style="width:38px;height:38px;border-radius:50%;object-fit:cover;" 
+                            alt="avatar">`;
+                    }
+
                     fotoTemp = null;
                 }
 
@@ -1408,7 +1420,6 @@ document.addEventListener('DOMContentLoaded', function () {
             info_user_CPF(mascara_CPF_config(data.cpf));
             info_user_data(data.data);
 
-            // ← adiciona isso:
             const bioPag  = document.getElementById('bio-usuario');
             const bioDesc = document.getElementById('description-channel');
             if (bioPag && data.bio)  bioPag.textContent  = data.bio;
