@@ -848,10 +848,25 @@ class editar_nome(Resource):
         
         id = session['usuario_id']
         
-        bio = data.get('nome')
+        nome = data.get('nome')
         
+        a = """select user_name from usuarios where BINARY user_name = %s"""
+        cursor.execute(a,(nome,))
+        resposta = cursor.fetchone()
+        if resposta['user_name']:
+            aaa = """select user_name from usuarios where id_usuario = %s"""
+            cursor.execute(aaa,(id,))
+            resposta_2 = cursor.fetchone()
+            
+            if not resposta_2['user_name']:
+                return {
+                    'status':'error',
+                    'mensagem':'esse nome de usuario já está sendo utilizado'
+                }, 200
+            
+            
         query = """update usuarios set user_name = %s where id_usuario = %s"""
-        cursor.execute(query,(bio,id))
+        cursor.execute(query,(nome,id))
         
         con.commit()
         cursor.close()
