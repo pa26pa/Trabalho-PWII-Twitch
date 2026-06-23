@@ -269,10 +269,20 @@
                         <textarea rows="4" cols="20" id="descricao-live"></textarea> <br>
 
                         <label for="categoria-live">Escolha a Categoria:</label> <br>
-                        <input type="radio" id="cat-jogos" name="cat-jogos">
-                        <label for="cat-jogos">Jogos</label> <br>
-                        <input type="radio" id="cat-entret" name="cat-entret">
-                        <label for="cat-entret">Jogos</label>
+                        <select name="categoria-live" id="categoria-live" required size="10" multiple>
+                            <optgroup label="Jogos">
+                                <option value="acao-aventura">Ação e Aventura</option>
+                                <option value="corrida">Corrida</option>
+                                <option value="esporte">Esportes</option>
+                                <option value="e-sports">E-sports</option>
+                                <option value="estrategia">Estratégia</option>
+                                <option value="fps-tiro">FPS e Tiro</option>
+                                <option value="luta">Luta</option>
+                                <option value="rpg">RPG</option>
+                                <option value="terror">Terror</option>
+                            </optgroup>
+                            <option value="nao-jogo">Outro</option>
+                        </select>
 
                         <div class="box-btn-modal-perfil">
                             <button type="button" class="btn-perfil" id="btn-iniciar-live" data-i18n>Iniciar Live</button>
