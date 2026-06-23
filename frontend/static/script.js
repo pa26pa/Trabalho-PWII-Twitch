@@ -686,8 +686,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     senha_nova: form.querySelector('.password2').value,
                     senha_antiga: form.querySelector('.password-atual').value
                 }
-                console.log(dados);
-                
+            
                 fetch("/update", {
                 method:"PUT",
                 headers: {
@@ -896,7 +895,7 @@ document.addEventListener('DOMContentLoaded', function () {
         let asideOpen = true;
 
         backAside.forEach(bA => bA.addEventListener('click', () => {
-            console.log("clicado");
+      
             if (asideOpen) {
                 normalAside.forEach(aside => aside.style.width = '5%');
                 spanPageAside.forEach(span => span.style.display = 'none');
@@ -1139,7 +1138,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const btnBackDelete = document.querySelector('.back-modal-delete');
     if (btnBackDelete) {
         btnBackDelete.addEventListener('click', () => {
-            console.log("clicado");
             insertcodeBox.style.display = 'none';
             wrapperDelete.style.display = 'flex';
         });
@@ -1213,7 +1211,6 @@ document.addEventListener('DOMContentLoaded', function () {
                             renderTable();//reenderiza a table
                             updateHeight();//ajusta tamanho do dropdown
                         } catch {
-                            console.log(':(')
                             blockFeedback.textContent = 'Erro ao desbloquear usuário';
                         }       
                     });
@@ -1279,7 +1276,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 const data = await res.json();
 
-                console.log(data);
+                
 
                 if (data.existe) {
 
@@ -1303,7 +1300,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             } catch (erro) {
 
-                console.log(erro);
+                
 
                 blockFeedback.textContent =
                     'Erro ao verificar. Tente novamente';
@@ -1379,8 +1376,6 @@ document.addEventListener('DOMContentLoaded', function () {
             if (fotoTemp) formData.append('foto', fotoFile);
 
             try {
-                console.log(fotoTemp);
-                console.log(typeof fotoTemp);
                 if (fotoTemp != null) {
                     const res = await fetch('/salvar_foto', {
                         method: 'POST',
