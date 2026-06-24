@@ -1,5 +1,12 @@
 import requests
 from validate_docbr import CPF 
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+secret = os.getenv("CAPTCHA_SECRET")
+token = os.getenv("token_hub")
 
 cpf_api = CPF()
 
@@ -18,7 +25,7 @@ def cpf_real_or_not(cpf, data_nascimento):
     parametros_obrigatorios = {
         "cpf": cpf,
         "data": data_nascimento,
-        "token": "208382980qpnWZIDwHB376229152"
+        "token": token
     }
 
     try:
@@ -41,3 +48,25 @@ def cpf_real_or_not(cpf, data_nascimento):
             'status':'error',
             'mensagem':'Erro ao conectar à internet'
         }
+
+def captcha(captcha):
+    
+    verifica = 'https://www.google.com/recaptcha/api/siteverify'
+        
+    info = {
+        'secret': secret,
+        'response': captcha
+    }
+    
+    envia = requests.post(verifica, data=info)
+    resultado = envia.json()
+    
+    if not resultado.get('success'):
+        return {
+            'status':'error',
+            'mensagem':'captcha inválido'
+        }
+    return {
+        'status':'success',
+        'mensagem':'captcha válido'
+    }

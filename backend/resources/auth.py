@@ -1,5 +1,7 @@
 from flask import Flask, Blueprint,render_template, request, flash, redirect, url_for, session, make_response
 from flask_restful import Api, Resource
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 from werkzeug.security import generate_password_hash, check_password_hash 
 import pymysql
 import random
@@ -7,7 +9,7 @@ import smtplib
 from email.message import EmailMessage
 import mimetypes
 from backend.database.connection import connection, supabase, acorda_cloudinary, email_valido, data_valida, carregar, salvar, cache_traducoes, file
-from backend.resources.cpf import cpf_math_validate, cpf_real_or_not
+from backend.resources.seguranca import cpf_math_validate, cpf_real_or_not, captcha
 from backend.resources.email_code import send_code
 from datetime import date, datetime, timedelta
 from email_validator import validate_email, EmailNotValidError
@@ -21,12 +23,13 @@ import cloudinary.uploader
 import requests
 import os
 from dotenv import load_dotenv
-
+from main import limiter
 
 load_dotenv()
 
 secret = os.getenv("CAPTCHA_SECRET")
 
+extensoes_permitidas = {'jpg','jpeg','png','gif','mp4','webm'}
 #from main import app, google, User
 # criação do signin
 
@@ -38,20 +41,11 @@ class signin(Resource):
         con = connection()
         cursor = con.cursor()
         
-        captcha = data.get('captcha')
+        captcha_enviado = data.get('captcha')
         
-        verifica = 'https://www.google.com/recaptcha/api/siteverify'
+        captcha_valido = captcha(captcha_enviado)
         
-        info = {
-            'secret': secret,
-            'response': captcha
-        }
-        
-        envia = requests.post(verifica, data=info)
-        resultado = envia.json()
-        
-        if not resultado.get('success'):
-            
+        if captcha_valido.status == 'error':
             return {
                 'status':'error',
                 'mensagem':'captcha inválido'
@@ -127,7 +121,9 @@ class signin(Resource):
         }, 405
 
 class login(Resource):
+    decarators = [limiter.limit("10 per minute")]
     def post(self):
+        
         data = request.get_json()
         
         con = connection()
@@ -719,131 +715,6 @@ class desbloquear(Resource):
                 'mensagem':'não foi possivel desbloquear'
             }
         
-class upload(Resource):
-    def post(self):
-        con = connection()
-        cursor = con.cursor(pymysql.cursors.DictCursor)
-        
-        
-        arquivo = request.files.get('arquivo')
-        tipo = request.form.get('tipo')
-        
-        print("FILES:", request.files)
-        print("FORM:", request.form)
-        print("TIPO:", tipo)
-        print("ARQUIVO:", arquivo)
-        bucket = 'photos'
-        if tipo == 'video':
-            titulo = request.form.get('titulo')
-            categoria = request.form.get('categoria')
-            descrisao = request.form.get('descrisao')
-            
-            bucket = 'videos'
-        
-        if not arquivo or not tipo:
-            print('antes do not arquivo')
-            return {
-                'status':'error',
-                'mensagem':'Arquivo não foi enviado' 
-            }, 400
-        print("antes no uuid4 nome")
-        nome = f"{uuid4()}_{arquivo.filename}"
-        
-        print('antes do upload')
-        supabase.storage\
-        .from_(bucket)\
-        .upload(
-            nome,
-            arquivo.read(),
-            {
-                "content-type": arquivo.content_type
-            }    
-        )
-        print('antes do url')
-        url = supabase.storage\
-        .from_(bucket)\
-        .get_public_url(nome)
-        
-        if not url:
-            return {
-                'status':'error',
-                'mensagem':'Não foi possivel encontrar URL'
-            }, 500
-        
-        hoje = date.today()
-        
-        session['id_usuario'] = 1
-        id = session['id_usuario']
-        
-        
-        if tipo == 'foto':
-            query_foto = """UPDATE usuarios set foto_url = %s where id_usuario = %s"""
-            cursor.execute(query_foto,(url,id))
-            con.commit()
-        else:    
-            query_video = """insert into streams (categoria,titulo,descrisao,video_url,data_upload,id_streamer) values(%s,%s,%s,%s,%s,%s)"""
-            cursor.execute(query_video,(categoria,titulo,descrisao,url,hoje,id))
-            con.commit()
-        
-        cursor.close()
-        con.close()
-        
-        return {
-            'status':'success',
-            'mensagem':'arquivo salvo com sucesso'
-        }, 200
-class foto(Resource):
-    def post(self):
-        data = request.get_json()
-        con = connection()
-        cursor = con.cursor(pymysql.cursors.DictCursor)
-        
-        user_name = data.get('user_name')
-        
-        query = """select foto_url from usuarios where BINARY user_name = %s"""
-        cursor.execute(query,(user_name,))
-        foto_url = cursor.fetchone()
-        
-        cursor.close()
-        con.close()
-        return {
-            'status':'success',
-            'foto':foto_url['foto_url']
-        }, 200
-
-class videos(Resource): 
-    def post(self):    
-        data = request.get_json()
-        con = connection()
-        cursor = con.cursor(pymysql.cursors.DictCursor)
-        
-        user_name = data.get('user_name')
-        
-        query = """select id_usuario from usuarios where user_name = %s"""
-        cursor.execute(query,(user_name,))
-        id = cursor.fetchone()
-        
-        if not id:
-            cursor.close()
-            con.close()
-            return {
-                'status':'error',
-                'mensagem':'usuario não encontrado'
-            }, 400
-        
-        id = id['id_usuario']
-        
-        q = """select video_url from streams where id_streamer = %s"""
-        cursor.execute(q,(id,))
-        videos = cursor.fetchall()
-        
-        cursor.close()
-        con.close()
-        
-        return {
-            'status':'success',
-            'videos': videos
-        }, 200
 
 class editar_bio(Resource):
     def post(self):
@@ -913,9 +784,26 @@ class salvar_video(Resource):
         descrisao = request.files["descrisao"]
         id = session['usuario_id']
         
+        if not video:
+            return {
+                'status':'error',
+                'mensagem':'Nenhum arquivo foi enviado'
+            }, 400
+        
+        ext = video.filename.rsplit('.', 1)[-1].lower()
+        
+        if ext not in extensoes_permitidas:
+            return {
+                'status':'error',
+                'mensagem':'esse formato não é permitido'
+            }, 400
+        
+        nome = f'{uuid4()}.{ext}'
+        
         try:
             resposta = cloudinary.uploader.upload(video,
-                resource_type = "video")
+                resource_type = "video",
+                public_id=nome)
             url = resposta["secure_url"]
         
         except Exception as e:
@@ -941,15 +829,30 @@ class salvar_foto(Resource):
         cursor = con.cursor(pymysql.cursors.DictCursor)
         
         foto = request.files["foto"]
-   
+
+        if not foto:
+            return {
+                'status':'success',
+                'mensagem':'Nenhum arquivo foi enviado'
+            }, 400
+            
+        ext = foto.filename.rsplit('.',1)[-1].lower()
+        
+        if ext not in extensoes_permitidas:
+            return {
+                'status':'error',
+                'mensagem':'Esse tipo de arquivo não é suportado'
+            }, 400
+        
+        nome = f'{uuid4()}.{ext}'
+        
         id = session['usuario_id']
-        print("----")
+        #session['usuario_id'] = usuario['id']
+        #session.permanent = True
+        
         try:
-            print("antes da resposta")
-            resposta = cloudinary.uploader.upload(foto)
-            print("depois resposta")
+            resposta = cloudinary.uploader.upload(foto, public_id=nome)
             url = resposta["secure_url"]
-            print("depois url")
         except Exception as e:
             print(e)
             return {

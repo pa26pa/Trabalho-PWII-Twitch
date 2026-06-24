@@ -4,6 +4,10 @@ from backend.resources.auth import update_Password, signin, login, salvar_foto, 
 from dotenv import load_dotenv
 from authlib.integrations.flask_client import OAuth
 import os
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+from flask_wtf.csrf import CSRFProtect
+from datetime import timedelta
 
 # aqui eu to carregando o .env pra que eu possa pegar asn senhas dele
 load_dotenv()
@@ -14,6 +18,15 @@ api = Api(app)
 app.secret_key = os.getenv("SECRET_KEY")
 
 oauth = OAuth(app)
+
+limiter = Limiter(app, key_func=get_remote_address)
+
+csrf = CSRFProtect(app)
+
+app.config['SESSION_COOKIE_HTTPONLY'] = True   
+app.config['SESSION_COOKIE_SECURE'] = True     
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax' 
+#app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=7)
 
 #google = oauth.register(
 #    name='google',
