@@ -9,7 +9,7 @@ import smtplib
 from email.message import EmailMessage
 import mimetypes
 from backend.database.connection import connection, supabase, acorda_cloudinary, email_valido, data_valida, carregar, salvar, cache_traducoes, file
-from backend.resources.seguranca import cpf_math_validate, cpf_real_or_not, captcha
+from backend.resources.seguranca import cpf_math_validate, cpf_real_or_not, captcha, check_csrf
 from backend.resources.email_code import send_code
 from datetime import date, datetime, timedelta
 from email_validator import validate_email, EmailNotValidError
@@ -123,7 +123,14 @@ class signin(Resource):
 class login(Resource):
     decorators = [limiter.limit("10 per minute")]
     def post(self):
-        print("aaaaaaaa")
+        
+        token = request.headers.get("X-CSRFToken")
+        
+        check = check_csrf(token)
+        
+        if check.status == 'error':
+            return {check.mensagem}
+        
         data = request.get_json()
         
         con = connection()

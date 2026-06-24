@@ -1,6 +1,14 @@
 //DOMContentLoaded garante que o script só rode depois de todo o HTML estar carregado
 document.addEventListener('DOMContentLoaded', function () {
 
+    let csrfToken = "";
+
+    fetch("/csrf-token")
+        .then(res => res.json())
+        .then(data => {
+            csrfToken = data.csrf_token;
+        });
+
     // CONTROLE DE ESTADO LOGADO/DESLOGADO
     function mostrarLogado(nome) {
         // esconde elementos de deslogado, mostra de logado
@@ -578,7 +586,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 fetch("/login", {
                 method: "POST",
                 headers: {
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/json",
+                    "X-CSRFToken":csrfToken
                 },
                 body: JSON.stringify(dados)
                 })

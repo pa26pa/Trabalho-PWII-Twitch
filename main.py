@@ -6,7 +6,7 @@ from authlib.integrations.flask_client import OAuth
 import os
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
-from flask_wtf.csrf import CSRFProtect
+from flask_wtf.csrf import CSRFProtect, generate_csrf
 from datetime import timedelta
 from backend.database.connection import limiter
 
@@ -41,6 +41,10 @@ app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 @app.route("/")
 def home():  
     return render_template("inicio.html")
+
+@app.route("/csrf-token")
+def csrf_token():
+    return {"csrf_token":generate_csrf}
 
 @app.route("/moon")
 def luna():

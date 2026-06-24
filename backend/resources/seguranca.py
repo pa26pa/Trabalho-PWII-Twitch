@@ -2,6 +2,8 @@ import requests
 from validate_docbr import CPF 
 import os
 from dotenv import load_dotenv
+from flask_wtf.csrf import validate_csrf
+from flask import request
 
 load_dotenv()
 
@@ -70,3 +72,12 @@ def captcha(captcha):
         'status':'success',
         'mensagem':'captcha válido'
     }
+    
+def check_csrf(token):
+    try:
+        validate_csrf(token)
+    except Exception:
+        return {
+            'status':'error',
+            'mensagem':'token incorreto'
+        }
