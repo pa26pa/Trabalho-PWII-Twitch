@@ -123,7 +123,7 @@ class signin(Resource):
 class login(Resource):
     decorators = [limiter.limit("10 per minute")]
     def post(self):
-        
+        print("aaaaaaaa")
         data = request.get_json()
         
         con = connection()
