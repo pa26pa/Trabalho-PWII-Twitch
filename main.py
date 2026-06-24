@@ -8,6 +8,7 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from flask_wtf.csrf import CSRFProtect
 from datetime import timedelta
+from backend.database.connection import limiter
 
 # aqui eu to carregando o .env pra que eu possa pegar asn senhas dele
 load_dotenv()
@@ -19,7 +20,7 @@ app.secret_key = os.getenv("SECRET_KEY")
 
 oauth = OAuth(app)
 
-limiter = Limiter(app, key_func=get_remote_address)
+limiter.init_app(app)
 
 csrf = CSRFProtect(app)
 

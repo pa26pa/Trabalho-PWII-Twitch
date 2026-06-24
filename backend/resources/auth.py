@@ -23,7 +23,7 @@ import cloudinary.uploader
 import requests
 import os
 from dotenv import load_dotenv
-from main import limiter
+from backend.database.connection import limiter
 
 load_dotenv()
 
@@ -121,7 +121,7 @@ class signin(Resource):
         }, 405
 
 class login(Resource):
-    decarators = [limiter.limit("10 per minute")]
+    decorators = [limiter.limit("10 per minute")]
     def post(self):
         
         data = request.get_json()

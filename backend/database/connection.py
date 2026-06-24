@@ -10,6 +10,12 @@ from supabase import create_client, Client
 from urllib.parse import urlparse
 import os
 import cloudinary 
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+
+limiter = Limiter(
+    key_func=get_remote_address
+)
 
 load_dotenv()
 
