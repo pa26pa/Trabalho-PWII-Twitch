@@ -30,8 +30,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
         try {
             const res = await fetch("/session", {
-                method: "GET"
-            });
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken":csrfToken
+            }});
             const data = await res.json();
             if (data.logado) {
                 mostrarLogado(data.nome)
