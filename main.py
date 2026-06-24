@@ -44,7 +44,7 @@ def home():
 
 @app.route("/csrf-token")
 def csrf_token():
-    return {"csrf_token":generate_csrf}
+    return {"csrf_token":generate_csrf()}
 
 @app.route("/moon")
 def luna():
