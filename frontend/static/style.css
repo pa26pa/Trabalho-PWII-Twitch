@@ -253,7 +253,6 @@ body.modal-open {
     height: 90%;
     border: none;
     background: transparent;
-    border: 4px solid red;
 }
 .wrapper {
     position: absolute;
@@ -267,12 +266,11 @@ body.modal-open {
     border-radius: 30px;
     border: 3px double #48237f;
     transform-origin: center; /*define o ponto de origem para as transformações*/
-    border: 4px solid green;
 }
 #login, #cadastro {
     position: absolute;
     width: 100%;
-    height: 90%;
+    height: 92%;
     bottom: 0;
     background-color: transparent;
     border: none;
@@ -284,7 +282,6 @@ body.modal-open {
     backface-visibility: hidden; /*oculta o lado oposto do elemento quando ele é rotacionado, evitando que o conteúdo seja visível durante a rotação*/
     -webkit-backface-visibility: hidden; /*suporte para navegadores baseados em WebKit, como Safari e Chrome, garantindo que o backface-visibility funcione corretamente nesses navegadores*/
     transform-style: preserve-3d;
-    border: 4px solid blue;
 }
 #login {
     transform: rotateY(0deg); /*mantém o elemento na posição original, sem rotação, começa com ele*/
@@ -300,7 +297,7 @@ h2 {
 .caixa-input {
     position: relative;
     width: 310px;
-    margin: 25px 0;
+    margin: 15px 0;
     border-bottom: 1px solid #48237f;
 }
 .caixa-input label {
@@ -493,12 +490,17 @@ h2 {
 #icon-google {width: 20px; height: 20px; margin-right: 10px;}
 #icon-amazon {width: 35px; height: 15px; margin-right: 10px;}
 
+/*CAPTCHA no cadastro*/
+.g-recaptcha {
+    margin-bottom: 10px;
+}
+
 /*termos de politica no cadastro*/
 .box-terms {
     display: flex;
     align-items: center;
     gap: 2px;
-    margin-bottom: 10px;
+    margin: 10px 0;
 }
 .box-terms #checkbox-accept {
     width: 15px;
@@ -1299,7 +1301,7 @@ a {text-decoration: none;}
 
 /*SEÇOES DAS CONFIGURAÇÕES*/
 .section-config {display: none;}
-.nav-config a.active {text-decoration: underline; font-weight: bold;}
+.nav-config a.active {text-decoration: underline; font-weight: 100;}
 
 .section-config.active {
     margin: 0 auto;
@@ -1348,7 +1350,6 @@ a {text-decoration: none;}
 #modal-2, #modal-3 {
     width: 500px;
     height: 600px;
-    border: 4px solid red;
 }
 #wrap-seg-password, #wrap-seg-delete {
     position: absolute;
@@ -1358,7 +1359,6 @@ a {text-decoration: none;}
     border-radius: 30px;
     box-shadow: 0px 0px 15px 15px rgba(0,0,0,0.2);
     align-items: center;
-    border: 4px solid red;
 }
 .btn-modal-seg {
     display: flex;
@@ -1614,7 +1614,6 @@ a {text-decoration: none;}
     justify-content: space-between;
     width: 80%;
     height: auto;
-    border: 4px solid green;
 }
 /* foto de perfil na página do canal */
 .photo-user {
@@ -1669,6 +1668,130 @@ a {text-decoration: none;}
     font-size: 0.78em;
     color: #888;
 }
+
+/*modal de iniciar live*/
+/* SELECT CUSTOMIZADO */
+.select-custom {
+    position: relative;
+    width: 90%;
+    margin-bottom: 8px;
+}
+
+.select-trigger {
+    width: 100%;
+    padding: 10px 12px;
+    border: 3px solid #DEC7FF;
+    border-radius: 10px;
+    background-color: #fff;
+    color: #48237F;
+    font-size: 1em;
+    text-align: left;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: border-color 0.2s;
+}
+
+.select-trigger:focus,
+.select-trigger.open {
+    border-color: #9147FF;
+    box-shadow: 0 0 0 2px rgba(145, 71, 255, 0.2);
+    outline: none;
+}
+
+.select-arrow {
+    transition: transform 0.2s;
+    color: #9147FF;
+}
+.select-trigger.open .select-arrow { transform: rotate(180deg); }
+
+.select-dropdown {
+    display: none;
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    width: 100%;
+    background: #fff;
+    border: 3px solid #DEC7FF;
+    border-radius: 10px;
+    padding: 6px 0;
+    z-index: 100;
+    max-height: 200px;
+    overflow-y: auto;
+    box-shadow: 0 4px 12px rgba(72, 35, 127, 0.15);
+}
+.select-dropdown.open { display: block; }
+
+.select-group-label {
+    padding: 6px 14px 2px;
+    font-weight: bold;
+    color: #9147FF;
+    font-size: 0.85em;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.select-divider {
+    border-top: 1px solid #DEC7FF;
+    margin: 4px 0;
+}
+
+.select-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 14px;
+    cursor: pointer;
+    color: #48237F;
+    font-size: 1em;
+    transition: background 0.15s;
+}
+.select-option:hover { background: #F4ECFF; }
+.select-option input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: #9147FF;
+    cursor: pointer;
+    flex-shrink: 0;
+    border: none;
+}
+
+/* TAGS DAS CATEGORIAS SELECIONADAS */
+.selected-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    width: 90%;
+    min-height: 10px;
+    margin-bottom: 10px;
+}
+
+.tag {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background: #DEC7FF;
+    color: #48237F;
+    border: 1px solid #9147FF;
+    border-radius: 20px;
+    padding: 3px 10px;
+    font-size: 0.82em;
+    font-weight: bold;
+}
+
+.tag button {
+    background: none;
+    border: none;
+    color: #9147FF;
+    cursor: pointer;
+    font-size: 0.9em;
+    padding: 0;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+}
+.tag button:hover { color: #e74c3c; }
 
 /*---------MODAL DO TURBO --------------*/
 
