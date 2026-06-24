@@ -129,7 +129,7 @@ class login(Resource):
         check = check_csrf(token)
         
         if not check or check.get("status") == "error":
-            return {check.mensagem}
+            return {check.get("mensagem")}
         
         data = request.get_json()
         
