@@ -81,3 +81,7 @@ def check_csrf(token):
             'status':'error',
             'mensagem':'token incorreto'
         }
+    return {
+        'status':'success',
+        'mensagem':'Token válido'
+    }
