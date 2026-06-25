@@ -41,6 +41,13 @@ class signin(Resource):
         con = connection()
         cursor = con.cursor()
         
+        token = request.headers.get("X-CSRFToken")
+        
+        check = check_csrf(token)
+        
+        if not check or check.get("status") == "error":
+            return {check.get("mensagem")}
+        
         captcha_enviado = data.get('captcha')
         
         captcha_valido = captcha(captcha_enviado)
@@ -181,6 +188,13 @@ class login(Resource):
 
 class logout(Resource):
     def get(self):
+        token = request.headers.get("X-CSRFToken")
+        
+        check = check_csrf(token)
+        
+        if not check or check.get("status") == "error":
+            return {check.get("mensagem")}
+        
         session.clear()
         return {
             "status":'success',
@@ -195,7 +209,13 @@ class logout(Resource):
         
 class check_login(Resource):
     def get(self):
-        print(session)
+        token = request.headers.get("X-CSRFToken")
+        
+        check = check_csrf(token)
+        
+        if not check or check.get("status") == "error":
+            return {check.get("mensagem")}
+        
         if 'usuario_id' in session:
             con = connection()
             cursor = con.cursor(pymysql.cursors.DictCursor)
@@ -310,6 +330,13 @@ class auth_google(Resource):
         
 class forgot(Resource):
     def post(self):
+        token = request.headers.get("X-CSRFToken")
+        
+        check = check_csrf(token)
+        
+        if not check or check.get("status") == "error":
+            return {check.get("mensagem")}
+        
         data = request.get_json()
         
         con = connection()
@@ -375,6 +402,13 @@ class forgot(Resource):
 
 class resend_code(Resource):
     def get(self):
+        token = request.headers.get("X-CSRFToken")
+        
+        check = check_csrf(token)
+        
+        if not check or check.get("status") == "error":
+            return {check.get("mensagem")}
+        
         con = connection()
         cursor = con.cursor()
         
@@ -400,6 +434,13 @@ class resend_code(Resource):
     
 class check_codigo(Resource):
     def post(self):
+        token = request.headers.get("X-CSRFToken")
+        
+        check = check_csrf(token)
+        
+        if not check or check.get("status") == "error":
+            return {check.get("mensagem")}
+        
         data = request.get_json()
         
         con = connection()
@@ -424,6 +465,13 @@ class check_codigo(Resource):
         }, 200
 class redefine_password(Resource):
     def put(self):
+        token = request.headers.get("X-CSRFToken")
+        
+        check = check_csrf(token)
+        
+        if not check or check.get("status") == "error":
+            return {check.get("mensagem")}
+        
         data = request.get_json()
         
         con = connection()
@@ -459,6 +507,13 @@ class redefine_password(Resource):
 
 class subscribe(Resource):
     def post(self):
+        token = request.headers.get("X-CSRFToken")
+        
+        check = check_csrf(token)
+        
+        if not check or check.get("status") == "error":
+            return {check.get("mensagem")}
+        
         data = request.get_json()
         
         con = connection()
@@ -485,6 +540,13 @@ class subscribe(Resource):
         
 class search(Resource):
     def post(self):
+        token = request.headers.get("X-CSRFToken")
+        
+        check = check_csrf(token)
+        
+        if not check or check.get("status") == "error":
+            return {check.get("mensagem")}
+        
         data = request.get_json()
         
         con = connection()
@@ -512,6 +574,13 @@ class search(Resource):
 
 class block_code(Resource):
     def get(self):
+        token = request.headers.get("X-CSRFToken")
+        
+        check = check_csrf(token)
+        
+        if not check or check.get("status") == "error":
+            return {check.get("mensagem")}
+        
         session.pop('code', None)
         
         return {
@@ -521,7 +590,13 @@ class block_code(Resource):
         
 class translate(Resource):
     def post(self):
-    
+        token = request.headers.get("X-CSRFToken")
+        
+        check = check_csrf(token)
+        
+        if not check or check.get("status") == "error":
+            return {check.get("mensagem")}
+        
         data = request.json
         lingua = data['lang']
         textos = data['textos']
@@ -559,6 +634,12 @@ class translate(Resource):
 
 class delete_Account(Resource):
     def delete(self):
+        token = request.headers.get("X-CSRFToken")
+        
+        check = check_csrf(token)
+        
+        if not check or check.get("status") == "error":
+            return {check.get("mensagem")}
         
         con = connection()
         cursor = con.cursor(pymysql.cursors.DictCursor)
@@ -603,6 +684,12 @@ class delete_Account(Resource):
     
 class update_Password(Resource):
     def put(self):
+        token = request.headers.get("X-CSRFToken")
+        
+        check = check_csrf(token)
+        
+        if not check or check.get("status") == "error":
+            return {check.get("mensagem")}
         
         data = request.get_json()
         
@@ -636,6 +723,13 @@ class update_Password(Resource):
 
 class bloquear(Resource):
     def post(self):
+        token = request.headers.get("X-CSRFToken")
+        
+        check = check_csrf(token)
+        
+        if not check or check.get("status") == "error":
+            return {check.get("mensagem")}
+        
         data = request.get_json()
         
         con = connection()
@@ -687,6 +781,13 @@ class bloquear(Resource):
 
 class desbloquear(Resource):
     def post(self):
+        token = request.headers.get("X-CSRFToken")
+        
+        check = check_csrf(token)
+        
+        if not check or check.get("status") == "error":
+            return {check.get("mensagem")}
+        
         data = request.get_json()
         
         con = connection()
@@ -725,6 +826,13 @@ class desbloquear(Resource):
 
 class editar_bio(Resource):
     def post(self):
+        token = request.headers.get("X-CSRFToken")
+        
+        check = check_csrf(token)
+        
+        if not check or check.get("status") == "error":
+            return {check.get("mensagem")}
+        
         data = request.get_json()
         con = connection()
         cursor = con.cursor(pymysql.cursors.DictCursor)
@@ -746,6 +854,13 @@ class editar_bio(Resource):
         }, 200
 class editar_nome(Resource):
     def post(self):
+        token = request.headers.get("X-CSRFToken")
+        
+        check = check_csrf(token)
+        
+        if not check or check.get("status") == "error":
+            return {check.get("mensagem")}
+        
         data = request.get_json()
         con = connection()
         cursor = con.cursor(pymysql.cursors.DictCursor)
@@ -781,6 +896,12 @@ class editar_nome(Resource):
         
 class salvar_video(Resource):
     def post(self):
+        token = request.headers.get("X-CSRFToken")
+        
+        check = check_csrf(token)
+        
+        if not check or check.get("status") == "error":
+            return {check.get("mensagem")}
         
         con = connection()
         cursor = con.cursor(pymysql.cursors.DictCursor)
@@ -832,6 +953,13 @@ class salvar_video(Resource):
     
 class salvar_foto(Resource):
     def post(self):
+        token = request.headers.get("X-CSRFToken")
+        
+        check = check_csrf(token)
+        
+        if not check or check.get("status") == "error":
+            return {check.get("mensagem")}
+        
         con = connection()
         cursor = con.cursor(pymysql.cursors.DictCursor)
         
@@ -880,6 +1008,13 @@ class salvar_foto(Resource):
     
 class validar_captcha(Resource):
     def post(self):
+        token = request.headers.get("X-CSRFToken")
+        
+        check = check_csrf(token)
+        
+        if not check or check.get("status") == "error":
+            return {check.get("mensagem")}
+        
         data = request.get_json()
         
         captcha = data.get('captcha')

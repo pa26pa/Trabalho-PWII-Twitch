@@ -50,7 +50,17 @@ document.addEventListener('DOMContentLoaded', function () {
     const btnLogout = document.getElementById('btn-logout');
     if (btnLogout) {
         btnLogout.addEventListener('click', async () => {
-            await fetch('/logout');
+            const res = await fetch("/session", {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken":csrfToken
+            }});
+            const data = await res.json();
+            if (data.status == 'error') {
+                mostrarToast(data.mensagem, data.status)
+                return;
+            } 
             window.location.href = "/";
             mostrarDeslogado();
             if (dropdownMenu) dropdownMenu.classList.remove('show');
@@ -195,7 +205,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // reenvio — login
     if (otpLogin?.resendBtn) {
         otpLogin.resendBtn.addEventListener('click', () => {
-            fetch('/resend', { method: 'GET', headers: { 'Content-Type': 'application/json' } })
+            fetch('/resend', { method: 'GET', headers: { 'Content-Type': 'application/json', "X-CSRFToken":csrfToken } })
             .then(r => r.json()).then(data => mostrarToast(data.mensagem, data.status));
         });
     }
@@ -458,7 +468,8 @@ document.addEventListener('DOMContentLoaded', function () {
         fetch("/session", {
             method: "GET",
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                "X-CSRFToken":csrfToken
             }
         }) 
         .then(res => res.json())
@@ -544,7 +555,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 fetch("/signin", {
                 method: "POST",
                 headers: {
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/json",
+                    "X-CSRFToken":csrfToken
                 },
                 body: JSON.stringify(dados)
                 })
@@ -561,7 +573,8 @@ document.addEventListener('DOMContentLoaded', function () {
                         fetch("/login", {
                         method: "POST",
                         headers: {
-                            "Content-Type": "application/json"
+                            "Content-Type": "application/json",
+                            "X-CSRFToken":csrfToken
                         },
                         body: JSON.stringify(dado)
                         })
@@ -615,7 +628,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 fetch("/forgot", {
                     method: "POST",
-                    headers: { "Content-Type": "application/json" },
+                    headers: { "Content-Type": "application/json", "X-CSRFToken":csrfToken },
                     body: JSON.stringify(dados)
                 })
                 .then(res => res.json())
@@ -637,7 +650,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 fetch('/check_codigo', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 'Content-Type': 'application/json', "X-CSRFToken":csrfToken},
                     body: JSON.stringify({ codigo })
                 })
                 .then(r => r.json())
@@ -672,7 +685,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 fetch("/redefine_password", {
                 method:"PUT",
                 headers: {
-                    "Content-Type":"application/json"
+                    "Content-Type":"application/json",
+                    "X-CSRFToken":csrfToken
                 },
                 body: JSON.stringify(dados)
                 })
@@ -702,7 +716,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 fetch("/update", {
                 method:"PUT",
                 headers: {
-                    "Content-Type":"application/json"
+                    "Content-Type":"application/json",
+                    "X-CSRFToken":csrfToken
                 },
                 body: JSON.stringify(dados)
                 })
@@ -728,7 +743,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             fetch("/forgot", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: { "Content-Type": "application/json", "X-CSRFToken":csrfToken },
                 body: JSON.stringify(dados)
             })
             .then(res => res.json())
@@ -751,7 +766,8 @@ document.addEventListener('DOMContentLoaded', function () {
         fetch("/delete", {
                 method:"DELETE",
                 headers: {
-                    "Content-Type":"application/json"
+                    "Content-Type":"application/json",
+                    "X-CSRFToken":csrfToken
                 }
                 })
                 .then(res => res.json())
@@ -1211,7 +1227,8 @@ document.addEventListener('DOMContentLoaded', function () {
                             const res = await fetch("/desbloquear", {
                             method: "POST",
                             headers: {
-                                "Content-Type": "application/json"
+                                "Content-Type": "application/json",
+                                "X-CSRFToken":csrfToken
                             },
                             body: JSON.stringify(dados)
                             }); 
@@ -1281,7 +1298,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 const res = await fetch("/bloquear", {
                     method: "POST",
                     headers: {
-                        "Content-Type": "application/json"
+                        "Content-Type": "application/json",
+                        "X-CSRFToken":csrfToken
                     },
                     body: JSON.stringify(dados)
                 });
@@ -1336,7 +1354,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (btnEditar) {
         btnEditar.addEventListener('click', () => {
             // Busca dados SEMPRE da sessão atual, nunca do localStorage
-            fetch("/session", { method: "GET" })
+            fetch("/session", { method: "GET", headers : {"Content-Type": "application/json", "X-CSRFToken":csrfToken } })
             .then(res => res.json())
             .then(data => {
                 const inputNome = document.getElementById('name-user');
@@ -1391,6 +1409,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (fotoTemp != null) {
                     const res = await fetch('/salvar_foto', {
                         method: 'POST',
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRFToken":csrfToken
+                        },
                         body: formData
                     });
                     const data_foto = await res.json();
@@ -1416,7 +1438,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 const res_ = await fetch('/editar_nome', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        "X-CSRFToken":csrfToken
                     },
                     body: JSON.stringify(dados)
                 });
@@ -1432,7 +1455,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 const resp = await fetch('/editar_bio', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        "X-CSRFToken":csrfToken
                     },
                     body: JSON.stringify(dados_)
                     
@@ -1476,7 +1500,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     
     function info_user() {
-        fetch("/session", { method: "GET" })
+        fetch("/session", { method: "GET", headers: {'Content-Type': 'application/json',"X-CSRFToken":csrfToken } })
         .then(res => res.json())
         .then(data => {
             info_user_name(data.name);

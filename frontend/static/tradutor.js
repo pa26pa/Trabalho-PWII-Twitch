@@ -1,5 +1,13 @@
 const translationCache = {};
 
+let csrfToken = "";
+
+    fetch("/csrf-token")
+        .then(res => res.json())
+        .then(data => {
+            csrfToken = data.csrf_token;
+        });
+
 // detecta idioma do dispositivo se não houver preferência salva
 function detectarIdioma() {
     return localStorage.getItem('idioma') || 'pt'; // ← padrão sempre pt
@@ -16,7 +24,7 @@ async function translateAll(texts, targetLanguage) {
         try {
             const res = await fetch('/traduzir', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/json', "X-CSRFToken":csrfToken },
                 body: JSON.stringify({ textos: toTranslate, lang: targetLanguage, source: 'pt' })
             });
             const data = await res.json();
