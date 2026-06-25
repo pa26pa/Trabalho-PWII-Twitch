@@ -46,7 +46,7 @@ class signin(Resource):
         check = check_csrf(token)
         
         if not check or check.get("status") == "error":
-            return {check.get("mensagem")}
+            return {'status': 'error', 'mensagem' : check.get("mensagem")}
         
         captcha_enviado = data.get('captcha')
         
@@ -136,7 +136,7 @@ class login(Resource):
         check = check_csrf(token)
         
         if not check or check.get("status") == "error":
-            return {check.get("mensagem")}
+            return {'status': 'error', 'mensagem' :check.get("mensagem")}
         
         data = request.get_json()
         
@@ -193,7 +193,7 @@ class logout(Resource):
         check = check_csrf(token)
         
         if not check or check.get("status") == "error":
-            return {check.get("mensagem")}
+            return {'status': 'error', 'mensagem' : check.get("mensagem")}
         
         session.clear()
         return {
@@ -214,7 +214,7 @@ class check_login(Resource):
         check = check_csrf(token)
         
         if not check or check.get("status") == "error":
-            return {check.get("mensagem")}
+            return {'status': 'error', 'mensagem' : check.get("mensagem")}
         
         if 'usuario_id' in session:
             con = connection()
@@ -335,7 +335,7 @@ class forgot(Resource):
         check = check_csrf(token)
         
         if not check or check.get("status") == "error":
-            return {check.get("mensagem")}
+            return {'status': 'error', 'mensagem' :check.get("mensagem")}
         
         data = request.get_json()
         
@@ -407,7 +407,7 @@ class resend_code(Resource):
         check = check_csrf(token)
         
         if not check or check.get("status") == "error":
-            return {check.get("mensagem")}
+            return {'status': 'error', 'mensagem' :check.get("mensagem")}
         
         con = connection()
         cursor = con.cursor()
@@ -439,7 +439,7 @@ class check_codigo(Resource):
         check = check_csrf(token)
         
         if not check or check.get("status") == "error":
-            return {check.get("mensagem")}
+            return {'status': 'error', 'mensagem' :check.get("mensagem")}
         
         data = request.get_json()
         
@@ -470,7 +470,7 @@ class redefine_password(Resource):
         check = check_csrf(token)
         
         if not check or check.get("status") == "error":
-            return {check.get("mensagem")}
+            return {'status': 'error', 'mensagem' :check.get("mensagem")}
         
         data = request.get_json()
         
@@ -512,7 +512,7 @@ class subscribe(Resource):
         check = check_csrf(token)
         
         if not check or check.get("status") == "error":
-            return {check.get("mensagem")}
+            return {'status': 'error', 'mensagem' :check.get("mensagem")}
         
         data = request.get_json()
         
@@ -545,7 +545,7 @@ class search(Resource):
         check = check_csrf(token)
         
         if not check or check.get("status") == "error":
-            return {check.get("mensagem")}
+            return {'status': 'error', 'mensagem' :check.get("mensagem")}
         
         data = request.get_json()
         
@@ -579,7 +579,7 @@ class block_code(Resource):
         check = check_csrf(token)
         
         if not check or check.get("status") == "error":
-            return {check.get("mensagem")}
+            return {'status': 'error', 'mensagem' :check.get("mensagem")}
         
         session.pop('code', None)
         
@@ -595,7 +595,7 @@ class translate(Resource):
         check = check_csrf(token)
         
         if not check or check.get("status") == "error":
-            return {check.get("mensagem")}
+            return {'status': 'error', 'mensagem' :check.get("mensagem")}
         
         data = request.json
         lingua = data['lang']
@@ -639,7 +639,7 @@ class delete_Account(Resource):
         check = check_csrf(token)
         
         if not check or check.get("status") == "error":
-            return {check.get("mensagem")}
+            return {'status': 'error', 'mensagem' :check.get("mensagem")}
         
         con = connection()
         cursor = con.cursor(pymysql.cursors.DictCursor)
@@ -689,7 +689,7 @@ class update_Password(Resource):
         check = check_csrf(token)
         
         if not check or check.get("status") == "error":
-            return {check.get("mensagem")}
+            return {'status': 'error', 'mensagem' :check.get("mensagem")}
         
         data = request.get_json()
         
@@ -728,7 +728,7 @@ class bloquear(Resource):
         check = check_csrf(token)
         
         if not check or check.get("status") == "error":
-            return {check.get("mensagem")}
+            return {'status': 'error', 'mensagem' :check.get("mensagem")}
         
         data = request.get_json()
         
@@ -786,7 +786,7 @@ class desbloquear(Resource):
         check = check_csrf(token)
         
         if not check or check.get("status") == "error":
-            return {check.get("mensagem")}
+            return {'status': 'error', 'mensagem' :check.get("mensagem")}
         
         data = request.get_json()
         
@@ -831,7 +831,7 @@ class editar_bio(Resource):
         check = check_csrf(token)
         
         if not check or check.get("status") == "error":
-            return {check.get("mensagem")}
+            return {'status': 'error', 'mensagem' :check.get("mensagem")}
         
         data = request.get_json()
         con = connection()
@@ -859,7 +859,7 @@ class editar_nome(Resource):
         check = check_csrf(token)
         
         if not check or check.get("status") == "error":
-            return {check.get("mensagem")}
+            return {'status': 'error', 'mensagem' :check.get("mensagem")}
         
         data = request.get_json()
         con = connection()
@@ -901,7 +901,7 @@ class salvar_video(Resource):
         check = check_csrf(token)
         
         if not check or check.get("status") == "error":
-            return {check.get("mensagem")}
+            return {'status': 'error', 'mensagem' :check.get("mensagem")}
         
         con = connection()
         cursor = con.cursor(pymysql.cursors.DictCursor)
@@ -958,7 +958,7 @@ class salvar_foto(Resource):
         check = check_csrf(token)
         
         if not check or check.get("status") == "error":
-            return {check.get("mensagem")}
+            return {'status': 'error', 'mensagem' :check.get("mensagem")}
         
         con = connection()
         cursor = con.cursor(pymysql.cursors.DictCursor)
@@ -1013,7 +1013,7 @@ class validar_captcha(Resource):
         check = check_csrf(token)
         
         if not check or check.get("status") == "error":
-            return {check.get("mensagem")}
+            return {'status': 'error', 'mensagem' :check.get("mensagem")}
         
         data = request.get_json()
         
