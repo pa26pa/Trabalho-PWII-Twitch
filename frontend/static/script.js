@@ -1,13 +1,13 @@
 //DOMContentLoaded garante que o script só rode depois de todo o HTML estar carregado
 document.addEventListener('DOMContentLoaded', function () {
 
-    let csrfToken = "";
+    let csrfToken = null;
 
-    fetch("/csrf-token")
-        .then(res => res.json())
-        .then(data => {
-            csrfToken = data.csrf_token;
-        });
+    async function carregarCsrf() {
+        const res = await fetch("/csrf-token");
+        const data = await res.json();
+        csrfToken = data.csrf_token;
+    }
 
     // CONTROLE DE ESTADO LOGADO/DESLOGADO
     function mostrarLogado(nome) {
@@ -26,22 +26,30 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // verifica sessão ao carregar
-    async function verificarSessao() { 
+   async function verificarSessao() {
+        if (!csrfToken) {
+            await carregarCsrf();
+        }
 
         try {
             const res = await fetch("/session", {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
-                    "X-CSRFToken":csrfToken
-            }});
+                    "X-CSRFToken": csrfToken
+                }
+            });
+
             const data = await res.json();
+
             if (data.logado) {
-                mostrarLogado(data.nome)
-            } else{
+                mostrarLogado(data.name);
+            } else {
                 mostrarDeslogado();
             }
-        } catch {
+
+        } catch (err) {
+            console.error(err);
             mostrarDeslogado();
         }
     }
