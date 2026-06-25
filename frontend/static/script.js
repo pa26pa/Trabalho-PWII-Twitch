@@ -482,8 +482,9 @@ document.addEventListener('DOMContentLoaded', function () {
         }) 
         .then(res => res.json())
         .then(data => {
-
+            console.log('yey')
             let cpf = mascara_CPF_config(data.cpf);
+            console.log("cpf")
             info_user_CPF(cpf);
             info_user_data(data.data);
             info_user_email(data.email);
