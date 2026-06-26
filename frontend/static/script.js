@@ -1592,7 +1592,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     async function init() {
         await carregarCsrf();
-        verificarSessao();
+        await verificarSessao();
         info_user();
     }
 
