@@ -187,7 +187,7 @@ class login(Resource):
         }, 405
 
 class logout(Resource):
-    def get(self):
+    def post(self):
         token = request.headers.get("X-CSRFToken")
         
         check = check_csrf(token)
@@ -201,7 +201,7 @@ class logout(Resource):
             'mensagem':'Você saiu da sua conta'
         }, 200
     
-    def post(self):
+    def get(self):
         return {
             'status':'error',
             'mensagem':'Esse metodo não é reconhecido'
