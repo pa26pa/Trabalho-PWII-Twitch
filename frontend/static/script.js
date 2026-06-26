@@ -58,8 +58,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const btnLogout = document.getElementById('btn-logout');
     if (btnLogout) {
         btnLogout.addEventListener('click', async () => {
-            const res = await fetch("/session", {
-                method: "GET",
+            const res = await fetch("/logout", {
+                method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                     "X-CSRFToken":csrfToken
@@ -1597,5 +1597,5 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     init();
-    
+
 });
