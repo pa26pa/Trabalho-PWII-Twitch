@@ -44,6 +44,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             if (data.logado) {
                 mostrarLogado(data.name);
+                info_user(data);
             } else {
                 mostrarDeslogado();
             }
@@ -470,24 +471,24 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // função que pega as informações da api e relaciona com o htmls
-    function info_user() {
-        fetch("/session", {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRFToken":csrfToken
-            }
-        }) 
-        .then(res => res.json())
-        .then(data => {
-            console.log('yey')
-            let cpf = mascara_CPF_config(data.cpf);
-            console.log("cpf")
-            info_user_CPF(cpf);
-            info_user_data(data.data);
-            info_user_email(data.email);
-            info_user_name(data.name);
-        });
+    function info_user(data) {
+        if (!data) return;
+        let cpf = mascara_CPF_config(data.cpf);
+        info_user_CPF(cpf);
+        info_user_data(data.data);
+        info_user_email(data.email);
+        info_user_name(data.name);
+        const bioPag  = document.getElementById('bio-usuario');
+        const bioDesc = document.getElementById('description-channel');
+        if (bioPag && data.bio)  bioPag.textContent  = data.bio;
+        if (bioDesc && data.bio) bioDesc.textContent = data.bio;
+
+        if (data.foto) {
+            const fotoPerfilPag = document.querySelector('.photo-user');
+            if (fotoPerfilPag) { fotoPerfilPag.src = data.foto; fotoPerfilPag.classList.add('tem-foto'); }
+            const bgAvatar = document.querySelector('#dropdown-usuario .background-avatar');
+            if (bgAvatar) bgAvatar.innerHTML = `<img src="${data.foto}" style="width:38px;height:38px;border-radius:50%;object-fit:cover;" alt="avatar">`;
+        }
     }
 
     function fecharModal(form) {
@@ -1504,29 +1505,6 @@ document.addEventListener('DOMContentLoaded', function () {
             } catch { mostrarToast('Erro ao salvar perfil.', 'error'); }
         });
     }
-    
-    function info_user() {
-        fetch("/session", { method: "GET", headers: {'Content-Type': 'application/json',"X-CSRFToken":csrfToken } })
-        .then(res => res.json())
-        .then(data => {
-            info_user_name(data.name);
-            info_user_email(data.email);
-            info_user_CPF(mascara_CPF_config(data.cpf));
-            info_user_data(data.data);
-
-            const bioPag  = document.getElementById('bio-usuario');
-            const bioDesc = document.getElementById('description-channel');
-            if (bioPag && data.bio)  bioPag.textContent  = data.bio;
-            if (bioDesc && data.bio) bioDesc.textContent = data.bio;
-
-            if (data.foto) {
-                const fotoPerfilPag = document.querySelector('.photo-user');
-                if (fotoPerfilPag) { fotoPerfilPag.src = data.foto; fotoPerfilPag.classList.add('tem-foto'); }
-                const bgAvatar = document.querySelector('#dropdown-usuario .background-avatar');
-                if (bgAvatar) bgAvatar.innerHTML = `<img src="${data.foto}" style="width:38px;height:38px;border-radius:50%;object-fit:cover;" alt="avatar">`;
-            }
-        });
-    }
 
     //MODAL INICIAR LIVE 
     // SELECT CUSTOMIZADO DE CATEGORIAS
@@ -1593,7 +1571,6 @@ document.addEventListener('DOMContentLoaded', function () {
     async function init() {
         await carregarCsrf();
         await verificarSessao();
-        info_user();
     }
 
     init();
