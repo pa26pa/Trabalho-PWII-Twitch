@@ -74,8 +74,6 @@ document.addEventListener('DOMContentLoaded', function () {
             if (dropdownMenu) dropdownMenu.classList.remove('show');
         });
     }
-    // chama ao carregar
-    verificarSessao();
 
     // MODAIS
     const openButtons = document.querySelectorAll('.btn-open-modal');
@@ -847,7 +845,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     //botão para fechar os modais
     const closeButtons = document.querySelectorAll('.btn-close-modal');
-    info_user();
+
     closeButtons.forEach(button => {
         button.addEventListener('click', () => {//=> : é uma função anônima, mais curta que function(){} e mantém o contexto de 'this'
             const modalId = button.getAttribute('data-modal');
@@ -1418,7 +1416,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     const res = await fetch('/salvar_foto', {
                         method: 'POST',
                         headers: {
-                            "Content-Type": "application/json",
                             "X-CSRFToken":csrfToken
                         },
                         body: formData
@@ -1591,4 +1588,13 @@ document.addEventListener('DOMContentLoaded', function () {
         // para pegar os valores selecionados no envio:
         // const categorias = [...selectDropdown.querySelectorAll('input:checked')].map(cb => cb.value);
     }
+
+    async function init() {
+        await carregarCsrf();
+        verificarSessao();
+        info_user();
+    }
+
+    init();
+    
 });
