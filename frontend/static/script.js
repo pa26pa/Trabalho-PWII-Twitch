@@ -589,7 +589,6 @@ document.addEventListener('DOMContentLoaded', function () {
                                 mostrarToast(data.mensagem, data.status)
                             } else {
                                 fecharModal(form);
-                                window.location.href = '/';
                                 verificarSessao();
                             }
                         });
@@ -618,7 +617,6 @@ document.addEventListener('DOMContentLoaded', function () {
                         mostrarToast(data.mensagem, data.status)
                     } else {
                         fecharModal(form);
-                        window.location.href = '/';
                         verificarSessao();
                         
                     }
