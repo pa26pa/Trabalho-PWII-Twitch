@@ -50,7 +50,6 @@ def email_valido(email):
     try:
         check = validate_email(email)
         
-        # Normalizando o email, e deixando ele minusculo
         email = check.email.lower()
         
         return email

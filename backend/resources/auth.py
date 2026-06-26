@@ -52,7 +52,7 @@ class signin(Resource):
         
         captcha_valido = captcha(captcha_enviado)
         
-        if captcha_valido['status'] == 'error':
+        if captcha_valido['statuscap'] == 'error':
             return {
                 'status':'error',
                 'mensagem':'captcha inválido'

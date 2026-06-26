@@ -27,9 +27,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // verifica sessão ao carregar
    async function verificarSessao() {
-        if (!csrfToken) {
-            await carregarCsrf();
-        }
 
         try {
             const res = await fetch("/session", {
