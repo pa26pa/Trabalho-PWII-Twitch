@@ -1191,8 +1191,8 @@ document.addEventListener('DOMContentLoaded', function () {
         let blockUsers = []; //array que vai guardar os usuários bloqueados
 
         fetch('/bloqueados', {
-            method="GET",
-            headers={
+            method:"GET",
+            headers: {
                 "Content-Type": "application/json",
                 "X-CSRFToken": csrfToken
             }
@@ -1578,7 +1578,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     async function init() {
         await carregarCsrf();
-        mostrarDeslogado()
+       // mostrarDeslogado()
         await verificarSessao();
     }
 
