@@ -849,7 +849,7 @@ class bloqueados(Resource):
         info = []
         for i in id_bloqueado:
             q = """select user_name from usuarios where id_usuario = %s"""
-            cursor.execute(q,(i['id_bloqueado']))
+            cursor.execute(q,(i['id_bloqueado'],))
             usuario = cursor.fetchone()
             info.append({
                 'nome': usuario['user_name'],
