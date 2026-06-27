@@ -1199,7 +1199,9 @@ document.addEventListener('DOMContentLoaded', function () {
         })
         .then(res => res.json())
         .then(data => {
+            console.log('aaaaaaaaa:(')
             if (data.info) {
+                console.log('aaaa:)')
                 blockUsers = data.info
             }
         });
