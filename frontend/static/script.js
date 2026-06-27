@@ -1190,6 +1190,19 @@ document.addEventListener('DOMContentLoaded', function () {
         let isOpen = false; //controla pra saber se o dropdown tá aberto
         let blockUsers = []; //array que vai guardar os usuários bloqueados
 
+        fetch('/bloqueados', {
+            method="GET",
+            headers={
+                "Content-Type": "application/json",
+                "X-CSRFToken": csrfToken
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.info) {
+                blockUsers = data.info
+            }
+        });
         //funçõ para montar a tabela dos users bloquados
         function renderTable() {
             blockBody.innerHTML = ''; //limpa linhas antigas

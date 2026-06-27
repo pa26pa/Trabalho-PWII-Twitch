@@ -739,7 +739,6 @@ class bloquear(Resource):
         date = data.get('data')
 
         data_bloq = data_valida(date)
-        print(data_bloq)
         query = """select * from usuarios where BINARY user_name = %s"""
         cursor.execute(query,(person,))
         existe = cursor.fetchone()
@@ -823,7 +822,44 @@ class desbloquear(Resource):
                 'mensagem':'não foi possivel desbloquear'
             }
         
-
+class bloqueados(Resource):
+    def get(self):
+        token = request.headers.get("X-CSRFToken")
+        
+        check = check_csrf(token)
+        
+        if not check or check.get("status") == "error":
+            return {'status': 'error', 'mensagem' :check.get("mensagem")}
+        
+        if "usuario_id" not in session:
+            return {
+                'status':'success',
+                'mensagem':'Você precisa estar logado para fazer essa ação'
+            }, 401
+        
+        con = connection()
+        cursor = con.cursor(pymysql.cursors.DictCursor)
+        
+        id = session["usuario_id"]
+        
+        query = """select id_bloqueado,data_bloq from bloqueados where id_bloqueador = %s """
+        cursor.execute(query,(id,))
+        id_bloqueado = cursor.fetchall()
+        
+        info = []
+        for i in id_bloqueado:
+            q = """select user_name from usuarios where id_usuario = %s"""
+            cursor.execute(q,(i['id_bloqueado']))
+            usuario = cursor.fetchone()
+            info.append({
+                'nome': usuario['user_name'],
+                'data': i['data_bloq'].strftime('%d/%m/%Y')
+            })
+        return {
+            'status':'success',
+            'bloqueados':info
+        }, 200
+        
 class editar_bio(Resource):
     def post(self):
         token = request.headers.get("X-CSRFToken")
