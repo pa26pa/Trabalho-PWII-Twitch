@@ -1200,9 +1200,9 @@ document.addEventListener('DOMContentLoaded', function () {
         .then(res => res.json())
         .then(data => {
             console.log('aaaaaaaaa:(')
-            if (data.info) {
+            if (data.bloqueados) {
                 console.log('aaaa:)')
-                blockUsers = data.info
+                blockUsers = data.bloqueados
             }
         });
         //funçõ para montar a tabela dos users bloquados
