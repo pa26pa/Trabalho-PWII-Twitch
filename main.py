@@ -42,7 +42,7 @@ app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 #  é pra ficar mais fácil, porque e ele abre o site 
 @app.route("/")
 def home():  
-    return render_template("teste.html")
+    return render_template("inicio.html")
 
 @app.route("/csrf-token")
 def csrf_token():

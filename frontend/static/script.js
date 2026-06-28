@@ -1519,7 +1519,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // fecha ao clicar fora
         document.addEventListener('click', (e) => {
-            if (!document.getElementById('select-categorias').contains(e.target)) {
+            if (document.getElementById('select-categorias').contains(e.target)) {
                 btnSelectCat.classList.remove('open');
                 selectDropdown.classList.remove('open');
             }
