@@ -943,10 +943,10 @@ class salvar_video(Resource):
         con = connection()
         cursor = con.cursor(pymysql.cursors.DictCursor)
         
-        video = request.files["video"]
-        categoria = request.files["categoria"]
-        titulo = request.files["titulo"]
-        descrisao = request.files["descrisao"]
+        video = request.files["arquivo"]
+        categoria = request.form["categoria"]
+        titulo = request.form["titulo"]
+        descrisao = request.form["descrisao"]
         id = 1#session['usuario_id']
         
         data = date.today()
