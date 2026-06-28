@@ -969,7 +969,7 @@ class salvar_video(Resource):
         
         except Exception as e:
             print("erro",str(e))
-            retunrn {"status":"error"},500
+            return {"status":"error"},500
             
         ext = video.filename.rsplit('.', 1)[-1].lower()
         
