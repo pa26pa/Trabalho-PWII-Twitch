@@ -1515,9 +1515,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
             if (!isOpen) {
                 const rect = btnSelectCat.getBoundingClientRect();
-                selectDropdown.style.top    = (rect.bottom + 4) + 'px';
-                selectDropdown.style.left   = rect.left + 'px';
-                selectDropdown.style.width  = rect.width + 'px';
+                selectDropdown.style.top = (rect.bottom + 4) + 'px';
+                selectDropdown.style.left = rect.left + 'px';
+                selectDropdown.style.width = rect.width + 'px';
             }
 
             btnSelectCat.classList.toggle('open');
