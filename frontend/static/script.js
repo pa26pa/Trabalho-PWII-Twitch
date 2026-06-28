@@ -1515,11 +1515,19 @@ document.addEventListener('DOMContentLoaded', function () {
             selectDropdown.classList.toggle('open');
         });
 
-        // fecha ao clicar fora
-        document.addEventListener('click', (e) => {
-            if (!document.getElementById('select-categorias').contains(e.target) && e.target !== btnSelectCat) {
-                selectDropdown.classList.remove('open');
+        btnSelectCat.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isOpen = selectDropdown.classList.contains('open');
+
+            if (!isOpen) {
+                const rect = btnSelectCat.getBoundingClientRect();
+                selectDropdown.style.top    = (rect.bottom + 4) + 'px';
+                selectDropdown.style.left   = rect.left + 'px';
+                selectDropdown.style.width  = rect.width + 'px';
             }
+
+            btnSelectCat.classList.toggle('open');
+            selectDropdown.classList.toggle('open');
         });
 
         // atualiza tags ao marcar/desmarcar
