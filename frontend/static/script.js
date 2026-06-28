@@ -1018,7 +1018,7 @@ document.addEventListener('DOMContentLoaded', function () {
         window.addEventListener('resize', () => goToHome(currentHome));
     }
 
-    //controles dos videos
+    /*controles dos videos
     const player = document.getElementById('player');
     const gifImg = document.getElementById('gif-img');
     const playBtn = document.getElementById('play-btn');
@@ -1087,9 +1087,9 @@ document.addEventListener('DOMContentLoaded', function () {
             e.stopPropagation();
             muted = volRange.value == 0;
             // ícone muda conforme o nível
-            if (muted)              volIcon.className = 'ti ti-volume-off';
+            if (muted) volIcon.className = 'ti ti-volume-off';
             else if (volRange.value < 50) volIcon.className = 'ti ti-volume-2';
-            else                    volIcon.className = 'ti ti-volume';
+            else volIcon.className = 'ti ti-volume';
         });
 
         // ── TELA CHEIA ──
@@ -1106,7 +1106,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // inicia o progresso simulado ao carregar
         startProgress();
-    }
+    }*/
 
     //----------------MOON--------------------
     // CARROSSEL 
