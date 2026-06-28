@@ -934,8 +934,10 @@ class editar_nome(Resource):
 class salvar_video(Resource):
     def post(self):
         token = request.headers.get("X-CSRFToken")
+        print("token:", token)
         
         check = check_csrf(token)
+        print("check:", check)
         
         if not check or check.get("status") == "error":
             return {'status': 'error', 'mensagem' :check.get("mensagem")}
