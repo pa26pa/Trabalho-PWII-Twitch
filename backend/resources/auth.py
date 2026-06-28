@@ -256,7 +256,7 @@ class check_login(Resource):
         return {
             'status':'error',
             'mensagem':'não está logado'
-        }, 204
+        }, 400
     
 class dados_config(Resource):
     def get(self):
