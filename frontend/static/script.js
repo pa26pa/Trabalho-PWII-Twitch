@@ -1511,12 +1511,6 @@ document.addEventListener('DOMContentLoaded', function () {
         // abre/fecha
         btnSelectCat.addEventListener('click', (e) => {
             e.stopPropagation();
-            btnSelectCat.classList.toggle('open');
-            selectDropdown.classList.toggle('open');
-        });
-
-        btnSelectCat.addEventListener('click', (e) => {
-            e.stopPropagation();
             const isOpen = selectDropdown.classList.contains('open');
 
             if (!isOpen) {
@@ -1528,6 +1522,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
             btnSelectCat.classList.toggle('open');
             selectDropdown.classList.toggle('open');
+        });
+
+        // fecha o dropdown do select ao clicar fora
+        document.addEventListener('click', (e) => {
+            if (!document.getElementById('select-categorias').contains(e.target) && e.target !== btnSelectCat) {
+                selectDropdown.classList.remove('open');
+            }
         });
 
         // atualiza tags ao marcar/desmarcar
