@@ -868,6 +868,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 //volta o checkbox do flip para login
                 const checkbox = document.getElementById('checkbox');
                 if (checkbox) checkbox.checked = false;
+
+                if (typeof grecaptcha !== 'undefined') {
+                    grecaptcha.reset();
+                }
             }
         });
     });

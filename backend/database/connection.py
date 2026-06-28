@@ -103,6 +103,6 @@ def salvar(cache):
     
 #     return {
 #         'arquivo':arquivo.data
-#     }
+#      }
 
 cache_traducoes = carregar()
