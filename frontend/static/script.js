@@ -1186,25 +1186,11 @@ document.addEventListener('DOMContentLoaded', function () {
     const blockBody = document.getElementById('blocked-body');
     const blockEmpty = document.getElementById('blocked-empty');
 
+    let blockUsers = []; 
+
     if (blockBtn) {
         let isOpen = false; //controla pra saber se o dropdown tá aberto
-        let blockUsers = []; //array que vai guardar os usuários bloqueados
-
-        fetch('/bloqueados', {
-            method:"GET",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRFToken": csrfToken
-            }
-        })
-        .then(res => res.json())
-        .then(data => {
-            console.log('aaaaaaaaa:(')
-            if (data.bloqueados) {
-                console.log('aaaa:)')
-                blockUsers = data.bloqueados
-            }
-        });
+        
         //funçõ para montar a tabela dos users bloquados
         function renderTable() {
             blockBody.innerHTML = ''; //limpa linhas antigas
@@ -1582,6 +1568,24 @@ document.addEventListener('DOMContentLoaded', function () {
         await carregarCsrf();
        // mostrarDeslogado()
         await verificarSessao();
+
+        if (document.getElementById('block-brn')) {
+            fetch('/bloqueados', {
+            method:"GET",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": csrfToken
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            console.log('aaaaaaaaa:(')
+            if (data.bloqueados) {
+                console.log('aaaa:)')
+                blockUsers = data.bloqueados
+            }
+        });
+        }
     }
 
     init();
