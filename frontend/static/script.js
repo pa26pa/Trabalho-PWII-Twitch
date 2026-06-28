@@ -1569,7 +1569,7 @@ document.addEventListener('DOMContentLoaded', function () {
        // mostrarDeslogado()
         await verificarSessao();
 
-        if (document.getElementById('block-brn')) {
+        if (document.getElementById('block-btn')) {
             fetch('/bloqueados', {
             method:"GET",
             headers: {
