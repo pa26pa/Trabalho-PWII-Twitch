@@ -951,6 +951,8 @@ class salvar_video(Resource):
         descrisao = request.form["descrisao"]
         id = 1#session['usuario_id']
         
+        print("files:", request.files) 
+        print("form:", request.form)
         print("video:", video)
         print("categoria:", categoria)
         print("titulo:", titulo)
