@@ -1,3 +1,14 @@
+let csrfToken = null;
+
+async function carregarCsrf() {
+    const res = await fetch("/csrf-token");
+    const data = await res.json();
+    csrfToken = data.csrf_token;
+}
+
+carregarCsrf()
+
+if (csrfToken) {
 
 function cadastrar() {
     const dados = {
@@ -11,7 +22,8 @@ function cadastrar() {
     fetch("/signin", {
         method: "POST",
         headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "X-CSRFToken": csrfToken
         },
         body: JSON.stringify(dados)
     })
@@ -30,7 +42,8 @@ function login() {
     fetch("/login", {
         method: "POST",
         headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "X-CSRFToken": csrfToken
         },
         body: JSON.stringify(dados)
     })
@@ -48,7 +61,8 @@ function forgot() {
     fetch("/forgot", {
         method: "POST",
         headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "X-CSRFToken": csrfToken
         },
         body: JSON.stringify(dados)
     })
@@ -66,7 +80,8 @@ function check_codigo() {
     fetch("/check_codigo", {
         method: "POST",
         headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "X-CSRFToken": csrfToken
         },
         body: JSON.stringify(dados)
     })
@@ -78,7 +93,13 @@ function check_codigo() {
 
 function resend_code() {
 
-    fetch("/resend")
+    fetch("/resend", {
+        method:"POST", 
+        headers: {
+            "Content-Type":"application/json",
+            "X-CSRFToken": csrfToken
+        }
+    })
     .then(res => res.json())
     .then(data => {
         document.getElementById("resposta").innerText = JSON.stringify(data, null, 2);
@@ -93,7 +114,8 @@ function redefine_password() {
     fetch("/redefine_password", {
         method: "POST",
         headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "X-CSRFToken": csrfToken
         },
         body: JSON.stringify(dados)
     })
@@ -111,7 +133,8 @@ function pesquisa() {
     fetch("/search", {
         method: "POST",
         headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "X-CSRFToken": csrfToken
         },
         body: JSON.stringify(dados)
     })
@@ -121,7 +144,7 @@ function pesquisa() {
         const div = document.getElementById("resultados");
         div.innerHTML = ""; // limpa resultados antigos
 
-       data.resultados.forEach(item => {
+        data.resultados.forEach(item => {
         const nome = item.user_name || item.titulo;
         div.innerHTML += `<p>${nome}</p>`;
         });
@@ -130,9 +153,10 @@ function pesquisa() {
 
 function deletar() {
     fetch("/delete", {
-        method: "DELETE",
+        method: "POST",
         headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "X-CSRFToken": csrfToken
         }
     })
     .then(res => res.json())
@@ -160,7 +184,11 @@ function enviar_foto() {
 
     fetch("/salvar_foto", {
         method: "POST",
-        body: formData
+        body: formData,
+        headers : {
+            "Content-Type":"application/json",
+            "X-CSRFToken": csrfToken
+        }
     })
     .then(res => res.json())
     .then(data => {
@@ -191,7 +219,11 @@ function enviar_video() {
 
     fetch("/salvar_video", {
         method: "POST",
-        body: formData
+        body: formData,
+        headers:{
+            "Content-Type":"application/json",
+            "X-CSRFToken": csrfToken
+        }
     })
     .then(res => res.json())
     .then(data => {
@@ -199,4 +231,5 @@ function enviar_video() {
     })
     .catch(err => console.error(err));
 
+}
 }
