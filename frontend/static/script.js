@@ -828,9 +828,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     });
-
-    // substitui os listeners de troca de tela que você já tem:
-    // esqueceu senha: login → email
+    
     if (forgotLink) {
         forgotLink.addEventListener('click', e => {
             e.preventDefault();
@@ -1519,8 +1517,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // fecha ao clicar fora
         document.addEventListener('click', (e) => {
-            if (document.getElementById('select-categorias').contains(e.target)) {
-                btnSelectCat.classList.remove('open');
+            if (!document.getElementById('select-categorias').contains(e.target) && e.target !== btnSelectCat) {
                 selectDropdown.classList.remove('open');
             }
         });

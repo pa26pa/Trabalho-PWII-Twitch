@@ -1676,6 +1676,7 @@ a {text-decoration: none;}
 .select-custom {
     position: relative;
     width: 90%;
+    height: 50px;
     margin-bottom: 8px;
     border: 4px solid blue;
 }
@@ -1800,12 +1801,11 @@ a {text-decoration: none;}
 .tag button:hover { color: #e74c3c; }
 
 /*---------MODAL DO TURBO --------------*/
-
 #modal-5 {
     position: fixed;
     width: min(420px, 92vw);
     height: auto;
-    max-height: 90vh;
+    max-height: max-content;
     overflow-y: auto;
     border: none;
     border-radius: 16px;
