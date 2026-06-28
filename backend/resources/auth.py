@@ -214,7 +214,7 @@ class logout(Resource):
         }, 405
         
 class check_login(Resource):
-    def get(self):
+    def post(self):
         token = request.headers.get("X-CSRFToken")
         
         check = check_csrf(token)

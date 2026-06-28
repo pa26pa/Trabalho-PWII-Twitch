@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         try {
             const res = await fetch("/session", {
-                method: "GET",
+                method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                     "X-CSRFToken": csrfToken
