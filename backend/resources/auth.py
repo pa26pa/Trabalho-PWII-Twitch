@@ -24,6 +24,7 @@ import requests
 import os
 from dotenv import load_dotenv
 from backend.database.connection import limiter
+from datetime import date
 
 load_dotenv()
 
@@ -948,6 +949,8 @@ class salvar_video(Resource):
         descrisao = request.files["descrisao"]
         id = session['usuario_id']
         
+        data = date.today()
+        
         if not video:
             return {
                 'status':'error',
@@ -977,7 +980,7 @@ class salvar_video(Resource):
             },400 
         
         query = """insert into streams (categoria, titulo, descrisao, video_url, data_upload, id_streamer) values (%s,%s,%s,%s,%s,%s);"""
-        cursor.execute(query,(url,id))
+        cursor.execute(query,(categoria,titulo,descrisao,url,data,id))
         con.commit()
         cursor.close()
         con.close()
