@@ -945,27 +945,32 @@ class salvar_video(Resource):
         con = connection()
         cursor = con.cursor(pymysql.cursors.DictCursor)
         
-        video = request.files["arquivo"]
-        categoria = request.form["categoria"]
-        titulo = request.form["titulo"]
-        descrisao = request.form["descrisao"]
-        id = 1#session['usuario_id']
+        try:
+            video = request.files["arquivo"]
+            categoria = request.form["categoria"]
+            titulo = request.form["titulo"]
+            descrisao = request.form["descrisao"]
+            id = 1#session['usuario_id']
+            
+            print("files:", request.files) 
+            print("form:", request.form)
+            print("video:", video)
+            print("categoria:", categoria)
+            print("titulo:", titulo)
+            print("descrisao:", descrisao)
+            data = date.today()
+            
+            if not video:
+                print("video n chegou")
+                return {
+                    'status':'error',
+                    'mensagem':'Nenhum arquivo foi enviado'
+                }, 400
         
-        print("files:", request.files) 
-        print("form:", request.form)
-        print("video:", video)
-        print("categoria:", categoria)
-        print("titulo:", titulo)
-        print("descrisao:", descrisao)
-        data = date.today()
-        
-        if not video:
-            print("video n chegou")
-            return {
-                'status':'error',
-                'mensagem':'Nenhum arquivo foi enviado'
-            }, 400
-        
+        except Exception as e:
+            print("erro",str(e))
+            return {"status":"error"},500
+            
         ext = video.filename.rsplit('.', 1)[-1].lower()
         
         if ext not in extensoes_permitidas:
