@@ -23,6 +23,8 @@ oauth = OAuth(app)
 limiter.init_app(app)
 
 csrf = CSRFProtect(app)
+csrf.exempt(salvar_video) 
+csrf.exempt(salvar_foto)
 
 app.config['SESSION_COOKIE_HTTPONLY'] = True   
 app.config['SESSION_COOKIE_SECURE'] = True     
