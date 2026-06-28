@@ -1583,6 +1583,7 @@ a {text-decoration: none;}
     border-radius: 20px;
     background-color: white;
     overflow-y: hidden;
+    z-index: 1;
 }
 #modal-4[open], #modal-6[open] {
     display: flex;
@@ -1680,6 +1681,7 @@ a {text-decoration: none;}
 }
 
 .select-trigger {
+    position: absolute;
     width: 100%;
     padding: 10px 12px;
     border: 3px solid #DEC7FF;
@@ -1719,7 +1721,7 @@ a {text-decoration: none;}
     border-radius: 10px;
     padding: 6px 0;
     z-index: 200;
-    max-height: 200px;
+    max-height: 100px;
     overflow-y: auto;
     box-shadow: 0 4px 12px rgba(72, 35, 127, 0.2);
 }
@@ -1764,13 +1766,15 @@ a {text-decoration: none;}
     display: flex;
     flex-wrap: wrap;
     gap: 6px;
-    width: 10%;
+    width: 90%;
     min-height: 10px;
     margin-bottom: 10px;
+    border: 4px solid green;
 }
 
 .tag {
     display: flex;
+    width: max-content;
     align-items: center;
     gap: 5px;
     background: #DEC7FF;
