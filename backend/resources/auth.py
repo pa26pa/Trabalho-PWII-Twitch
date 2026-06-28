@@ -25,6 +25,7 @@ import os
 from dotenv import load_dotenv
 from backend.database.connection import limiter
 from datetime import date
+from markupsafe import escape
 
 load_dotenv()
 
@@ -88,7 +89,7 @@ class signin(Resource):
 
         
         query = """select * from usuarios where cpf = %s or email = %s or BINARY user_name = %s"""
-        cursor.execute(query,(cpf,email,user_name))
+        cursor.execute(query,(cpf_limpo,email,user_name))
         existe = cursor.fetchone()
         
         
@@ -101,10 +102,13 @@ class signin(Resource):
                 'status':'error',
                 'mensagem':'Já existe um usuário com este CPF, email ou nome de usuario'
             }, 406
-            
+        
+        user_name = str(escape(user_name))
+        email = str(escape(email))
+        
         try:
             insert = """insert into usuarios(cpf,email,user_name,senha,data_nascimento) values (%s,%s,%s,%s,%s)"""
-            cursor.execute(insert,(cpf,email,user_name,senha_hash,data_formatada))
+            cursor.execute(insert,(cpf_limpo,email,user_name,senha_hash,data_formatada))
         
         except pymysql.err.IntegrityError:
             return {
@@ -153,6 +157,7 @@ class login(Resource):
 
         if vendo == False:
             coluna = 'user_name'
+            username_email = str(escape(username_email))
         else:
             coluna = 'email'
         
@@ -346,8 +351,7 @@ class forgot(Resource):
         # pegando email do js
         email_forgot = str(data.get('email'))
         who = str(data.get('who'))
-        
-        print(email_forgot)
+
 
         valido = email_valido(email_forgot)
         
@@ -700,7 +704,7 @@ class update_Password(Resource):
         old = data.get('senha_antiga')
         nova = data.get('senha_nova')
         id = session['usuario_id']
-        print(nova)
+        
         nova = generate_password_hash(nova)
         query = """select senha from usuarios where id_usuario = %s"""
         cursor.execute(query, (id,))
@@ -739,6 +743,8 @@ class bloquear(Resource):
         person = data.get('nome')
         date = data.get('data')
 
+        person = str(escape(person))
+          
         data_bloq = data_valida(date)
         query = """select * from usuarios where BINARY user_name = %s"""
         cursor.execute(query,(person,))
@@ -877,6 +883,7 @@ class editar_bio(Resource):
         id = session['usuario_id']
         
         bio = data.get('bio')
+        bio = str(escape(bio))
         
         query = """update usuarios set bio = %s where id_usuario = %s"""
         cursor.execute(query,(bio,id))
@@ -905,6 +912,7 @@ class editar_nome(Resource):
         id = session['usuario_id']
         
         nome = data.get('nome')
+        nome = str(escape(nome))
         
         a = """select id_usuario, user_name from usuarios where BINARY user_name = %s"""
         cursor.execute(a,(nome,))
