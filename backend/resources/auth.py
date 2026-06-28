@@ -947,7 +947,7 @@ class salvar_video(Resource):
         categoria = request.files["categoria"]
         titulo = request.files["titulo"]
         descrisao = request.files["descrisao"]
-        id = session['usuario_id']
+        id = 1#session['usuario_id']
         
         data = date.today()
         
