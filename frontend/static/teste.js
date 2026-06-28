@@ -219,7 +219,6 @@ function enviar_video() {
         method: "POST",
         body: formData,
         headers:{
-            "Content-Type":"application/json",
             "X-CSRFToken": csrfToken
         }
     })
