@@ -225,6 +225,7 @@ body.modal-open {
     padding: 10px;
     border: none;
     background: transparent;
+    z-index: 999;
 }
 /*quando o modal estiver aberto, exibe:*/
 #modal-1[open], #modal-2[open], #modal-3[open] {
@@ -490,10 +491,13 @@ h2 {
 #icon-google {width: 20px; height: 20px; margin-right: 10px;}
 #icon-amazon {width: 35px; height: 15px; margin-right: 10px;}
 
-/*CAPTCHA no cadastro*/
+/*CAPTCHA no cadastro
 .g-recaptcha {
     margin-bottom: 10px;
     z-index: 9999;
+}*/
+.grecaptcha-badge, iframe[title="recaptcha challenge"], #rc-imageselect {
+    z-index: 9999999 !important; /*!important = garante que o estilo seja aplicado mesmo que haja outros estilos conflitantes*/
 }
 
 /*termos de politica no cadastro*/
@@ -2180,18 +2184,19 @@ a {text-decoration: none;}
 
 /* OIEEE aqui é a leta, to fazendo os negocio do TOAST*/
 .toast {
-    position: absolute;
+    display: flex;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
     margin: 0 auto;
-    /* top: 10px;
-    left: 45%; */
     padding: 14px 24px;
     border-radius: 8px;
     color: white;
     font-size: 1em;
     opacity: 0;
     transition: opacity 0.4s ease;
-    z-index: 999;
-    max-width: 300px;
+    z-index: 9999;
+    max-width: max-content;
 }
 
 .toast.show {
