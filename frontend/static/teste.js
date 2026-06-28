@@ -6,9 +6,7 @@ async function carregarCsrf() {
     csrfToken = data.csrf_token;
 }
 
-carregarCsrf()
-
-if (csrfToken) {
+carregarCsrf();
 
 function cadastrar() {
     const dados = {
@@ -231,5 +229,4 @@ function enviar_video() {
     })
     .catch(err => console.error(err));
 
-}
 }
