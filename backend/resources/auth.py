@@ -949,6 +949,10 @@ class salvar_video(Resource):
         descrisao = request.form["descrisao"]
         id = 1#session['usuario_id']
         
+        print("video:", video)
+        print("categoria:", categoria)
+        print("titulo:", titulo)
+        print("descrisao:", descrisao)
         data = date.today()
         
         if not video:

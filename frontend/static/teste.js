@@ -6,7 +6,9 @@ async function carregarCsrf() {
     csrfToken = data.csrf_token;
 }
 
-carregarCsrf();
+document.addEventListener('DOMContentLoaded', async () => {
+    await carregarCsrf();
+})
 
 function cadastrar() {
     const dados = {
