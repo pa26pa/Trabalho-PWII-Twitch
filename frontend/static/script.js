@@ -592,7 +592,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                 verificarSessao();
                             }
                         });
-                        fecharModal(form);
+                        
                     }
                 });
             }
