@@ -9,24 +9,26 @@ from flask_limiter.util import get_remote_address
 from flask_wtf.csrf import generate_csrf
 from datetime import timedelta
 from backend.database.connection import limiter
+from werkzeug.exceptions import RequestEntityTooLarge
 
 # aqui eu to carregando o .env pra que eu possa pegar asn senhas dele
 load_dotenv()
 
 # Oiii prof aqui eu to expecificando aonde tão as pastas porque ele não tava encontrando
 app = Flask(__name__, template_folder='frontend/templates', static_folder='frontend/static')
-api = Api(app)
 app.secret_key = os.getenv("SECRET_KEY")
 
+app.config['MAX_CONTENT_LENGTH'] = 500 * 1024 * 1024
+app.config['SESSION_COOKIE_HTTPONLY'] = True   
+app.config['SESSION_COOKIE_SECURE'] = True     
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax' 
+
+api = Api(app)
 oauth = OAuth(app)
 
 limiter.init_app(app)
 
 
-app.config['SESSION_COOKIE_HTTPONLY'] = True   
-app.config['SESSION_COOKIE_SECURE'] = True     
-app.config['SESSION_COOKIE_SAMESITE'] = 'Lax' 
-app.config['MAX_CONTENT_LENGTH'] = 500 * 1024 * 1024
 #app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=7)
 
 #google = oauth.register(
@@ -61,6 +63,10 @@ def ajuda():
 @app.route("/perfil")
 def perfil():
     return render_template("perfil.html")
+
+@app.errorhandler(RequestEntityTooLarge)
+def handle_large_file(e):
+    return {'status': 'error', 'mensagem': 'Arquivo muito grande'}, 413
 
 # Aqui eu defino os endpoints que o js pode acessar, e defino uma função para cada um delessssssss
 api.add_resource(signin,'/signin')
