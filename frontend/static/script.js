@@ -124,9 +124,11 @@ document.addEventListener('DOMContentLoaded', function () {
     const inputEmail = document.getElementById('email_forgot');
 
     if (btnreceberCodigo && insertcodeBox && inputEmail) {  // ← proteção do bloco inteiro
+        console.log('127');
         inputEmail.addEventListener('input', function () {
             btnreceberCodigo.disabled = !inputEmail.checkValidity();//checkValidity(): método nativo que verifica se o valor do input é válido de acordo com os atributos HTML (como type="email")
         });
+        console.log('131');
         btnreceberCodigo.disabled = true;
     }
 
@@ -631,7 +633,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     email: document.getElementById('email_forgot').value,
                     who: 'forgot_password'
                 };
-                console.log('aaa')
+                console.log('aaa');
                 fetch("/forgot", {
                     method: "POST",
                     headers: { "Content-Type": "application/json", "X-CSRFToken":csrfToken },
