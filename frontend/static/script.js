@@ -522,7 +522,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             let envio = true;
             const inputsVisiveis = Array.from(form.querySelectorAll('input[required]'))
-                .filter(input => input.offserParent !== null);
+                .filter(input => input.offsetParent !== null);
             const todosValidos = inputsVisiveis.every(input => input.checkValidity());
             if (!todosValidos) envio = false
             if (form.querySelector('#data-nascimento') && !validarIdade()) envio = false;
