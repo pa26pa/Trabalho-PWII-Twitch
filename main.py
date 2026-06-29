@@ -6,7 +6,7 @@ from authlib.integrations.flask_client import OAuth
 import os
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
-from flask_wtf.csrf import CSRFProtect, generate_csrf
+from flask_wtf.csrf import generate_csrf
 from datetime import timedelta
 from backend.database.connection import limiter
 
@@ -22,9 +22,6 @@ oauth = OAuth(app)
 
 limiter.init_app(app)
 
-csrf = CSRFProtect(app)
-csrf.exempt("backend.resources.auth.salvar_video")
-csrf.exempt("backend.resources.auth.salvar_foto")
 
 app.config['SESSION_COOKIE_HTTPONLY'] = True   
 app.config['SESSION_COOKIE_SECURE'] = True     
