@@ -124,12 +124,12 @@ document.addEventListener('DOMContentLoaded', function () {
     const inputEmail = document.getElementById('email_forgot');
 
     if (btnreceberCodigo && insertcodeBox && inputEmail) {  // ← proteção do bloco inteiro
-        console.log('127');
         btnreceberCodigo.disabled = true;
         inputEmail.addEventListener('input', function () {
             btnreceberCodigo.disabled = false//!inputEmail.checkValidity();//checkValidity(): método nativo que verifica se o valor do input é válido de acordo com os atributos HTML (como type="email")
         });
         //btnreceberCodigo.disabled = true;
+        console.log(btnreceberCodigo.disabled);
     }
 
     // ── FUNÇÃO GENÉRICA DE OTP ──
