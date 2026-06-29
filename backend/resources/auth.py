@@ -926,6 +926,7 @@ class salvar_video(Resource):
         cursor = con.cursor(pymysql.cursors.DictCursor)
         
         try:
+            request.max_content_length = None
             video = request.files["arquivo"]
             categoria = request.form["categoria"]
             titulo = request.form["titulo"]

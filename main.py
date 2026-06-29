@@ -10,6 +10,7 @@ from flask_wtf.csrf import generate_csrf
 from datetime import timedelta
 from backend.database.connection import limiter
 from werkzeug.exceptions import RequestEntityTooLarge
+from werkzeug.formparser import MultiPartParser
 
 # aqui eu to carregando o .env pra que eu possa pegar asn senhas dele
 load_dotenv()
@@ -28,6 +29,7 @@ oauth = OAuth(app)
 
 limiter.init_app(app)
 
+MultiPartParser.max_form_memory_size = 500 * 1024 * 1024
 
 #app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=7)
 
