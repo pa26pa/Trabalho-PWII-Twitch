@@ -123,14 +123,14 @@ document.addEventListener('DOMContentLoaded', function () {
     const insertcodeBox = document.getElementById('insert-code');
     const inputEmail = document.getElementById('email_forgot');
 
-    if (btnreceberCodigo && insertcodeBox && inputEmail) {  // ← proteção do bloco inteiro
-        btnreceberCodigo.disabled = true;
-        inputEmail.addEventListener('input', function () {
-            btnreceberCodigo.disabled = false//!inputEmail.checkValidity();//checkValidity(): método nativo que verifica se o valor do input é válido de acordo com os atributos HTML (como type="email")
-        });
-        //btnreceberCodigo.disabled = true;
-        console.log(btnreceberCodigo.disabled);
-    }
+    // if (btnreceberCodigo && insertcodeBox && inputEmail) {  // ← proteção do bloco inteiro
+    //     btnreceberCodigo.disabled = true;
+    //     inputEmail.addEventListener('input', function () {
+    //         btnreceberCodigo.disabled = false//!inputEmail.checkValidity();//checkValidity(): método nativo que verifica se o valor do input é válido de acordo com os atributos HTML (como type="email")
+    //     });
+    //     //btnreceberCodigo.disabled = true;
+    //     console.log(btnreceberCodigo.disabled);
+    // }
 
     // ── FUNÇÃO GENÉRICA DE OTP ──
     function setupOTP(container) {
