@@ -961,7 +961,7 @@ class salvar_video(Resource):
         nome = f'{uuid4()}.{ext}'
         
         try:
-            resposta = cloudinary.uploader.upload(video,
+            resposta = cloudinary.uploader.upload(video.stream,
                 resource_type = "video",
                 public_id=nome)
             url = resposta["secure_url"]
@@ -1019,7 +1019,7 @@ class salvar_foto(Resource):
         #session.permanent = True
         
         try:
-            resposta = cloudinary.uploader.upload(foto, public_id=nome)
+            resposta = cloudinary.uploader.upload(foto.stream, public_id=nome)
             url = resposta["secure_url"]
         except Exception as e:
             print(e)

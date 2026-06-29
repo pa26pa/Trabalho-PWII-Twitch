@@ -186,7 +186,6 @@ function enviar_foto() {
         method: "POST",
         body: formData,
         headers : {
-            "Content-Type":"application/json",
             "X-CSRFToken": csrfToken
         }
     })
