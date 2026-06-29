@@ -125,11 +125,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
     if (btnreceberCodigo && insertcodeBox && inputEmail) {  // ← proteção do bloco inteiro
         console.log('127');
-        inputEmail.addEventListener('input', function () {
-            btnreceberCodigo.disabled = true//!inputEmail.checkValidity();//checkValidity(): método nativo que verifica se o valor do input é válido de acordo com os atributos HTML (como type="email")
-        });
-        console.log('131');
         btnreceberCodigo.disabled = true;
+        inputEmail.addEventListener('input', function () {
+            btnreceberCodigo.disabled = false//!inputEmail.checkValidity();//checkValidity(): método nativo que verifica se o valor do input é válido de acordo com os atributos HTML (como type="email")
+        });
+        //btnreceberCodigo.disabled = true;
     }
 
     // ── FUNÇÃO GENÉRICA DE OTP ──
