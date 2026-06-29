@@ -2195,7 +2195,7 @@ a {text-decoration: none;}
     font-size: 1em;
     opacity: 0;
     transition: opacity 0.4s ease;
-    z-index: 9999;
+    z-index: 9999999;
     max-width: max-content;
 }
 
