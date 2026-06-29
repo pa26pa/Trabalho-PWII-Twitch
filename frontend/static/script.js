@@ -1367,7 +1367,7 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(res => res.json())
             .then(data => {
                 const inputNome = document.getElementById('name-user');
-                const inputBio  = document.getElementById('bio-user');
+                const inputBio = document.getElementById('bio-user');
                 const previewFoto = document.getElementById('preview-foto');
 
                 if (inputNome) inputNome.value = data.name || '';
