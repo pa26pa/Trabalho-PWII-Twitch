@@ -491,11 +491,11 @@ h2 {
 #icon-google {width: 20px; height: 20px; margin-right: 10px;}
 #icon-amazon {width: 35px; height: 15px; margin-right: 10px;}
 
-/*CAPTCHA no cadastro
+/*CAPTCHA no cadastro*/
 .g-recaptcha {
-    margin-bottom: 10px;
-    z-index: 9999;
-}*/
+    position: relative;
+    z-index: 99999 !important;
+}
 .grecaptcha-badge, iframe[title="recaptcha challenge"], #rc-imageselect {
     z-index: 9999999 !important; /*!important = garante que o estilo seja aplicado mesmo que haja outros estilos conflitantes*/
 }

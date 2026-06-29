@@ -852,6 +852,32 @@ document.addEventListener('DOMContentLoaded', function () {
             const continueBtn = document.getElementById('continueBtn');
             if (modal) {  // ← proteção
                 modal.close();
+                // reseta modal-6 (live)
+                if (modalId === 'modal-6') {
+                    // limpa inputs de texto
+                    const nomeInput = document.getElementById('nome-live');
+                    const descInput = document.getElementById('descricao-live');
+                    if (nomeInput) nomeInput.value = '';
+                    if (descInput) descInput.value = '';
+
+                    // desmarca todos os checkboxes do select
+                    const selectDrop = document.getElementById('select-dropdown');
+                    if (selectDrop) {
+                        selectDrop.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+                    }
+
+                    // limpa as tags e reseta o placeholder
+                    const tags = document.getElementById('selected-tags');
+                    const ph   = document.getElementById('select-placeholder');
+                    const btn  = document.getElementById('btn-select-cat');
+                    if (tags) tags.innerHTML = '';
+                    if (ph)   ph.textContent = 'Selecione categorias...';
+                    if (btn)  btn.classList.remove('open');
+
+                    // fecha o dropdown se estiver aberto
+                    const dropEl = document.getElementById('select-dropdown');
+                    if (dropEl) dropEl.classList.remove('open');
+                }
                 document.body.classList.remove('modal-open');
 
                 // limpa todos os inputs do modal ao fechar
