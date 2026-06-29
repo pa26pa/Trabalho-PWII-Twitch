@@ -916,10 +916,9 @@ class salvar_video(Resource):
         print("token:", token)
         
         check = check_csrf(token)
-        print("check:", check)
         
         if not check or check.get("status") == "error":
-            return {'status': 'error', 'mensagem' :check.get("mensagem")}
+            return {'status': 'error', 'mensagem' :check.get("mensagem")}, 400
         
         con = connection()
         cursor = con.cursor(pymysql.cursors.DictCursor)

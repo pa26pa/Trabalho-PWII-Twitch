@@ -3,8 +3,8 @@ from validate_docbr import CPF
 import os
 from dotenv import load_dotenv
 from flask_wtf.csrf import validate_csrf
-from flask import request, current_app
-from itsdangerous import URLSafeTimedSerializer, BadTimeSignature, SignatureExpired
+from flask import request
+
 load_dotenv()
 
 secret = os.getenv("CAPTCHA_SECRET")
@@ -75,8 +75,7 @@ def captcha(captcha):
     
 def check_csrf(token):
     try:
-        s = URLSafeTimedSerializer(current_app.secret_key)
-        s.loads(token, max_age=3600)
+        validate_csrf(token)
     except Exception:
         return {
             'status':'error',
@@ -84,5 +83,5 @@ def check_csrf(token):
         }
     return {
         'status':'success',
-        'mensagem':'Token válido'
+        'mensagem':'Token'
     }
