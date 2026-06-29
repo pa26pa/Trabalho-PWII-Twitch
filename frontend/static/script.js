@@ -569,6 +569,7 @@ document.addEventListener('DOMContentLoaded', function () {
             } 
             
             if (form.classList.contains('sign')) {
+                if (document.getElementById('cadastro').offsetParent === null) return;
                 const captcha = grecaptcha.getResponse();
 
                 if (captcha.length === 0) {
