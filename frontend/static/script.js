@@ -861,7 +861,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 modal.querySelectorAll('.erroSenha, .erroSenha2, #erroIdade').forEach(el => el.style.display = 'none');
                 modal.querySelectorAll('.input-erro').forEach(el => el.classList.remove('input-erro'));
                 if (continueBtn) continueBtn.disabled = true;
-                if (btnreceberCodigo) btnreceberCodigo.disabled = true;
+                if (btnreceberCodigo) btnreceberCodigo.disabled = false;
 
                 // <- volta sempre para o lado do login ao fechar o modal
                 if (loginBox) {loginBox.style.display = ''};
