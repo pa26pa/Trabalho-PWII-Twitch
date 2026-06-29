@@ -43,7 +43,7 @@ app.config['MAX_CONTENT_LENGHT'] = 500 * 1024 * 1024
 #  é pra ficar mais fácil, porque e ele abre o site 
 @app.route("/")
 def home():  
-    return render_template("teste.html")
+    return render_template("inicio.html")
 
 @app.route("/csrf-token")
 def csrf_token():
