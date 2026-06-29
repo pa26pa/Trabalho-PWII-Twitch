@@ -126,7 +126,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (btnreceberCodigo && insertcodeBox && inputEmail) {  // ← proteção do bloco inteiro
         console.log('127');
         inputEmail.addEventListener('input', function () {
-            btnreceberCodigo.disabled = !inputEmail.checkValidity();//checkValidity(): método nativo que verifica se o valor do input é válido de acordo com os atributos HTML (como type="email")
+            btnreceberCodigo.disabled = true//!inputEmail.checkValidity();//checkValidity(): método nativo que verifica se o valor do input é válido de acordo com os atributos HTML (como type="email")
         });
         console.log('131');
         btnreceberCodigo.disabled = true;
@@ -861,7 +861,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 modal.querySelectorAll('.erroSenha, .erroSenha2, #erroIdade').forEach(el => el.style.display = 'none');
                 modal.querySelectorAll('.input-erro').forEach(el => el.classList.remove('input-erro'));
                 if (continueBtn) continueBtn.disabled = true;
-                if (btnreceberCodigo) btnreceberCodigo.disabled = false;
+                if (btnreceberCodigo) btnreceberCodigo.disabled = true;
 
                 // <- volta sempre para o lado do login ao fechar o modal
                 if (loginBox) {loginBox.style.display = ''};
