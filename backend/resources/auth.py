@@ -912,6 +912,8 @@ class editar_nome(Resource):
         
 class salvar_video(Resource):
     def post(self):
+        print("content-type:", request.content_type)
+        print("content-length:", request.content_length)
         token = request.headers.get("X-CSRFToken")
         print("token:", token)
         
