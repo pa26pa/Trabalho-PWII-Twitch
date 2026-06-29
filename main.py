@@ -29,7 +29,7 @@ csrf.exempt(salvar_foto)
 app.config['SESSION_COOKIE_HTTPONLY'] = True   
 app.config['SESSION_COOKIE_SECURE'] = True     
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax' 
-app.config['MAX_CONTENT_LENGHT'] = 500 * 1024 * 1024
+app.config['MAX_CONTENT_LENTGH'] = 500 * 1024 * 1024
 #app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=7)
 
 #google = oauth.register(
