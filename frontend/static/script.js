@@ -467,6 +467,30 @@ document.addEventListener('DOMContentLoaded', function () {
         return cpf.replace(/(\d{3})\.(\d{3})\.(\d{3})\-(\d{2})/, "$1.***.***-$4");
     }
 
+    function atualizarAvatarDropdown(fotoUrl) {
+        // avatar no li do dropdown
+        const bgAvatar = document.querySelector('#dropdown-usuario .background-avatar');
+        if (bgAvatar) {
+            bgAvatar.innerHTML = `<img src="${fotoUrl}" style="width:38px;height:38px;border-radius:50%;object-fit:cover;" alt="avatar">`;
+        }
+        // ícone do próprio botão btn-dropdown
+        const btnDropdown = document.getElementById('btn-dropdown');
+        if (btnDropdown) {
+            const existing = btnDropdown.querySelector('img.avatar-btn-dropdown');
+            if (!existing) {
+                const iconEl = btnDropdown.querySelector('i');
+                const img = document.createElement('img');
+                img.src = fotoUrl;
+                img.className = 'avatar-btn-dropdown';
+                img.style.cssText = 'width:100%;height:100%;border-radius:50%;object-fit:cover;';
+                if (iconEl) iconEl.replaceWith(img);
+                else btnDropdown.appendChild(img);
+            } else {
+                existing.src = fotoUrl;
+            }
+        }
+    }
+
     // função que pega as informações da api e relaciona com o htmls
     function info_user(data) {
         if (!data) return;
@@ -482,16 +506,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (data.foto) {
             const fotoPerfilPag = document.querySelector('.photo-user');
-            if (fotoPerfilPag) { fotoPerfilPag.src = data.foto; fotoPerfilPag.classList.add('tem-foto'); }
-            const bgAvatar = document.querySelector('#dropdown-usuario .background-avatar');
-            if (bgAvatar) {
-                const img = document.createElement('img');
-                img.src = data.foto;
-                img.style.cssText = 'width:38px;height:38px;border-radius:50%;object-fit:cover;';
-                img.alt = 'avatar';
-                bgAvatar.innerHTML = '';
-                bgAvatar.appendChild(img);
+            if (fotoPerfilPag) {
+                fotoPerfilPag.src = data.foto;
+                fotoPerfilPag.classList.add('tem-foto');
             }
+            atualizarAvatarDropdown(data.foto);
         }
     }
 
@@ -1404,23 +1423,19 @@ document.addEventListener('DOMContentLoaded', function () {
     const btnEditar = document.getElementById('btn-editar');
     if (btnEditar) {
         btnEditar.addEventListener('click', () => {
-            // Busca dados SEMPRE da sessão atual, nunca do localStorage
-            fetch("/session", { method: "GET", headers : {"Content-Type": "application/json", "X-CSRFToken":csrfToken } })
+            fetch("/session", { method: "GET", headers: { "Content-Type": "application/json", "X-CSRFToken": csrfToken } })
             .then(res => res.json())
             .then(data => {
                 const inputNome = document.getElementById('name-user');
-                const inputBio = document.getElementById('bio-user');
+                const inputBio  = document.getElementById('bio-user');
                 const previewFoto = document.getElementById('preview-foto');
 
                 if (inputNome) inputNome.value = data.name || '';
                 if (inputBio)  inputBio.value  = data.bio  || '';
 
-                if (data.foto && previewFoto) {
-                    previewFoto.src = data.foto;
-                    previewFoto.classList.add('tem-foto');
-                } else if (previewFoto) {
-                    previewFoto.src = '/static/user.png';
-                    previewFoto.classList.remove('tem-foto');
+                if (previewFoto) {
+                    previewFoto.src = data.foto || '/static/user.png';
+                    previewFoto.classList.toggle('tem-foto', !!data.foto);
                 }
             });
         });
@@ -1531,15 +1546,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
 
                     // Atualiza avatar no dropdown
-                    const bgAvatar = document.querySelector('#dropdown-usuario .background-avatar');
-                    if (bgAvatar) {
-                        const img = document.createElement('img');
-                        img.src = fotoTemp;
-                        img.style.cssText = 'width:38px;height:38px;border-radius:50%;object-fit:cover;';
-                        img.alt = 'avatar';
-                        bgAvatar.innerHTML = '';
-                        bgAvatar.appendChild(img);
-                    }
+                    atualizarAvatarDropdown(fotoTemp);
 
                     fotoTemp = null;
                 }
@@ -1651,6 +1658,140 @@ document.addEventListener('DOMContentLoaded', function () {
         });
         }
     }
+
+    // ── LIVES: salvar e renderizar histórico no perfil ──
+    function getLives() {
+        try { return JSON.parse(sessionStorage.getItem('witch_lives') || '[]'); } catch { return []; }
+    }
+    function saveLives(lives) {
+        try { sessionStorage.setItem('witch_lives', JSON.stringify(lives)); } catch {}
+    }
+
+    const btnIniciarLive = document.getElementById('btn-iniciar-live');
+    if (btnIniciarLive) {
+        btnIniciarLive.addEventListener('click', () => {
+            const nomeLive  = document.getElementById('nome-live')?.value.trim();
+            const descLive  = document.getElementById('descricao-live')?.value.trim();
+            const videoInput = document.getElementById('video-live');
+            const categorias = [...document.querySelectorAll('#select-dropdown input:checked')].map(cb => cb.value);
+
+            if (!nomeLive) { mostrarToast('Digite um nome para a live!', 'error'); return; }
+
+            const finalizar = (src) => {
+                const lives = getLives();
+                lives.unshift({
+                    id: Date.now(),
+                    titulo: nomeLive,
+                    descricao: descLive || '',
+                    categorias,
+                    src,
+                    data: new Date().toLocaleDateString('pt-BR')
+                });
+                saveLives(lives);
+                renderVideosPerfil();
+                const modal6 = document.getElementById('modal-6');
+                if (modal6) { modal6.close(); document.body.classList.remove('modal-open'); }
+                mostrarToast('Live salva!', 'success');
+            };
+
+            const videoFile = videoInput?.files[0];
+            if (videoFile) {
+                const reader = new FileReader();
+                reader.onload = (ev) => finalizar(ev.target.result);
+                reader.readAsDataURL(videoFile);
+            } else {
+                finalizar('');
+            }
+        });
+    }
+
+    function renderVideosPerfil() {
+        const container = document.getElementById('videos-perfil-grid');
+        if (!container) return;
+        const lives = getLives();
+        container.innerHTML = '';
+        if (lives.length === 0) {
+            container.innerHTML = '<p style="color:#888;text-align:center;padding:20px;grid-column:1/-1;">Nenhuma live realizada ainda.</p>';
+            return;
+        }
+        lives.forEach(live => {
+            const card = document.createElement('div');
+            card.className = 'video-card';
+            card.innerHTML = `
+                <div class="video-thumb">
+                    ${live.src
+                        ? `<video src="${live.src}" preload="metadata"></video>`
+                        : `<div style="width:100%;height:100%;background:#2a1a4a;display:flex;align-items:center;justify-content:center;">
+                            <i class="fa-solid fa-video" style="font-size:2em;color:#9147FF;"></i>
+                        </div>`}
+                    <span class="thumb-views">${live.data}</span>
+                </div>
+                <p class="thumb-title">${live.titulo}</p>
+                <p class="thumb-user">${live.categorias.join(', ') || 'Sem categoria'}</p>
+            `;
+            container.appendChild(card);
+        });
+    }
+    renderVideosPerfil();
+
+    // ── ASIDE → DROPDOWN em telas < 1024px ──
+    function sincronizarAsideDropdown() {
+        const dropdownList = document.querySelector('#dropdown-menu ul');
+        if (!dropdownList) return;
+
+        dropdownList.querySelectorAll('.aside-migrado').forEach(el => el.remove());
+
+        if (window.innerWidth >= 1024) return;
+
+        const logado = document.querySelector('.with-login')?.style.display !== 'none';
+
+        // Separador + título AO VIVO
+        const hrLives = criarEl('hr', 'aside-migrado' + (logado ? '' : ' hidden-deslogado'));
+        const tituloLives = criarEl('li', 'aside-migrado dropdown-section-title' + (logado ? '' : ' hidden-deslogado'));
+        tituloLives.innerHTML = '<span style="font-size:0.85em;color:#9147FF;font-weight:bold;">AO VIVO</span>';
+        dropdownList.appendChild(hrLives);
+        dropdownList.appendChild(tituloLives);
+
+        [['Pessoa 1.0','1.3M'],['Pessoa 2.0','1.3M'],['Pessoa 3.0','1.3M'],['Pessoa 4.0','1.3M']].forEach(([nome, views]) => {
+            const li = criarEl('li', 'aside-migrado aside-live-item' + (logado ? '' : ' hidden-deslogado'));
+            li.innerHTML = `
+                <i class="fa-solid fa-circle" style="color:purple;font-size:1.1em;"></i>
+                <span style="flex:1;">${nome}</span>
+                <span style="font-size:0.8em;color:#888;">${views}</span>
+                <i class="fa-solid fa-circle" style="color:red;font-size:0.4em;"></i>`;
+            dropdownList.appendChild(li);
+        });
+
+        // Links de configurações e ajuda
+        dropdownList.appendChild(criarEl('hr', 'aside-migrado'));
+
+        const configHref = document.querySelector('a[href*="config"]')?.href || '/config';
+        const ajudaHref  = document.querySelector('a[href*="ajuda"]')?.href  || '/ajuda';
+
+        const liConfig = criarEl('li', 'aside-migrado' + (logado ? '' : ' hidden-deslogado'));
+        liConfig.innerHTML = `<a href="${configHref}" style="display:flex;align-items:center;gap:10px;color:inherit;width:100%;">
+            <i class="fa-solid fa-gear" style="font-size:1.2em;color:#9147FF;"></i><span>Configurações</span></a>`;
+
+        const liAjuda = criarEl('li', 'aside-migrado');
+        liAjuda.innerHTML = `<a href="${ajudaHref}" style="display:flex;align-items:center;gap:10px;color:inherit;width:100%;">
+            <i class="fa-regular fa-circle-question" style="font-size:1.2em;color:#9147FF;"></i><span>Ajuda</span></a>`;
+
+        dropdownList.appendChild(liConfig);
+        dropdownList.appendChild(liAjuda);
+
+        // esconde itens logado-only se deslogado
+        if (!logado) {
+            dropdownList.querySelectorAll('.hidden-deslogado').forEach(el => el.style.display = 'none');
+        }
+    }
+
+    function criarEl(tag, classes) {
+        const el = document.createElement(tag);
+        el.className = classes;
+        return el;
+    }
+
+    window.addEventListener('resize', sincronizarAsideDropdown);
 
     init();
 

@@ -294,6 +294,9 @@
                             <!-- tags das selecionadas -->
                             <div class="selected-tags" id="selected-tags"></div>
 
+                            <label class="label-perfil" for="video-live" data-i18n>Vídeo da Live (opcional)</label>
+                            <input type="file" id="video-live" accept="video/*">
+
                         <div class="box-btn-modal-perfil">
                             <button type="button" class="btn-perfil" id="btn-iniciar-live" data-i18n>Iniciar Live</button>
                             <button type="button" class="btn-close-modal btn-red open-modal" data-modal="modal-6" data-i18n>Cancelar</button>
@@ -323,8 +326,11 @@
             </table>
         </section>
 
-        <section class="box-videos-clips">
+        <section class="box-videos-perfil">
             <h2 data-i18n>Lives e Clipes</h2>
+            <div id="videos-perfil-grid">
+                <!-- preenchido pelo JS -->
+            </div>
         </section>
     </div>
 

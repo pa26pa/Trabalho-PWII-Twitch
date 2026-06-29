@@ -2181,7 +2181,7 @@ a {text-decoration: none;}
     .lives-dropdown:hover { background: #b68cf5; }
 }
 
-.toast {
+/*.toast {
     position: fixed;
     top: 20px;
     left: 50%;
@@ -2211,4 +2211,85 @@ a {text-decoration: none;}
 
 .toast.error {
     background-color: #e74c3c;
+}*/
+
+/* Toast sempre na frente de tudo */
+.toast {
+    z-index: 999999 !important;
+}
+
+/* reCAPTCHA iframe sempre na frente do modal */
+body > div[style*="z-index"],
+body > div[style*="position: fixed"] {
+    z-index: 9999998 !important;
+}
+
+/* Select da live ocupa 100% */
+.select-custom {
+    width: 100% !important;
+    border: none !important;
+    box-sizing: border-box;
+}
+.selected-tags {
+    width: 100% !important;
+    border: none !important;
+}
+.form-perfil { border: none !important; }
+
+/* Foto no botão do dropdown */
+#btn-dropdown img.avatar-btn-dropdown {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+}
+
+/* Itens migrados do aside */
+.aside-live-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 15px;
+    cursor: pointer;
+    font-size: 1em;
+}
+.aside-live-item:hover { background: #b68cf5; }
+.dropdown-section-title { cursor: default; padding: 6px 15px 2px; }
+.dropdown-section-title:hover { background: transparent; }
+
+/* Histórico de vídeos no perfil */
+.box-videos-perfil {
+    width: 100%;
+    padding: 10px 0;
+}
+.box-videos-perfil h2 {
+    font-size: 1.5em;
+    color: #48237F;
+    margin-bottom: 16px;
+    font-weight: bold;
+    border-bottom: 2px solid #DEC7FF;
+    padding-bottom: 8px;
+}
+#videos-perfil-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+}
+#video-live {
+    width: 90%;
+    padding: 6px;
+    border: 3px solid #DEC7FF;
+    border-radius: 10px;
+    font-size: 0.9em;
+    color: #48237F;
+    background: #fff;
+    cursor: pointer;
+    margin-bottom: 8px;
+}
+#video-live:focus { border-color: #9147FF; outline: none; }
+
+/* Itens migrados só aparecem em <1024px */
+@media (min-width: 1024px) {
+    .aside-migrado { display: none !important; }
 }
