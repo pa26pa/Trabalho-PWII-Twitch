@@ -32,8 +32,6 @@ load_dotenv()
 secret = os.getenv("CAPTCHA_SECRET")
 
 extensoes_permitidas = {'jpg','jpeg','png','gif','mp4','webm'}
-#from main import app, google, User
-# criação do signin
 
 acorda_cloudinary()
 class signin(Resource):
@@ -257,33 +255,6 @@ class check_login(Resource):
             'status':'error',
             'mensagem':'não está logado'
         }, 400
-    
-class dados_config(Resource):
-    def get(self):
-        con = connection()
-        cursor = con.cursor(pymysql.cursors.DictCursor)
-
-        #id_ficticio = 1
-        
-        #session['usuario_id'] = id_ficticio
-        
-        email = """select cpf, email, user_name, data_nascimento from usuarios where id_usuario = %s"""
-        cursor.execute(email,(session['usuario_id'],))
-        info_usuario = cursor.fetchone()
-        
-        data_formatada = info_usuario['data_nascimento'].strftime('%d/%m/%Y')
-        
-        cursor.close()
-        con.close()
-        
-        return {
-            'status':'success',
-            'mensagem':'Email encontrado',
-            'email': info_usuario['email'],
-            'cpf': info_usuario['cpf'],
-            'data': data_formatada,
-            'name':info_usuario['user_name'] 
-        }, 200
 
 class google(Resource):
     def post(self):

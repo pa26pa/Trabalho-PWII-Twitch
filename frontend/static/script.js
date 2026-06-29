@@ -522,7 +522,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             let envio = true;
             const inputsVisiveis = Array.from(form.querySelectorAll('input[required]'))
-                .filter(input => input.offserParent !== null);
+                .filter(input => input.offsetParent !== null);
             const todosValidos = inputsVisiveis.every(input => input.checkValidity());
             if (!todosValidos) envio = false
             if (form.querySelector('#data-nascimento') && !validarIdade()) envio = false;
@@ -627,11 +627,12 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
             if (form.classList.contains('email-forgot-password')) {
+                console.log('aaa');
                 const dados = {
                     email: document.getElementById('email_forgot').value,
                     who: 'forgot_password'
                 };
-
+                console.log('aaa');
                 fetch("/forgot", {
                     method: "POST",
                     headers: { "Content-Type": "application/json", "X-CSRFToken":csrfToken },
