@@ -928,9 +928,9 @@ class salvar_video(Resource):
         try:
             request.max_content_length = None
             video = request.files["arquivo"]
-            categoria = request.form["categoria"]
-            titulo = request.form["titulo"]
-            descrisao = request.form["descrisao"]
+            categoria = str(escape(request.form["categoria"]))
+            titulo = str(escape(request.form["titulo"]))
+            descrisao = str(escape(request.form["descrisao"]))
             id = 1#session['usuario_id']
             
             print("files:", request.files) 

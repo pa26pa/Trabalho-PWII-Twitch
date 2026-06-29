@@ -484,7 +484,14 @@ document.addEventListener('DOMContentLoaded', function () {
             const fotoPerfilPag = document.querySelector('.photo-user');
             if (fotoPerfilPag) { fotoPerfilPag.src = data.foto; fotoPerfilPag.classList.add('tem-foto'); }
             const bgAvatar = document.querySelector('#dropdown-usuario .background-avatar');
-            if (bgAvatar) bgAvatar.innerHTML = `<img src="${data.foto}" style="width:38px;height:38px;border-radius:50%;object-fit:cover;" alt="avatar">`;
+            if (bgAvatar) {
+                const img = document.createElement('img');
+                img.src = data.foto;
+                img.style.cssText = 'width:38px;height:38px;border-radius:50%;object-fit:cover;';
+                img.alt = 'avatar';
+                bgAvatar.innerHTML = '';
+                bgAvatar.appendChild(img);
+            }
         }
     }
 
@@ -1238,14 +1245,22 @@ document.addEventListener('DOMContentLoaded', function () {
                 blockUsers.forEach((usuario, index) => {
                     //cria uma linha na table pra cada user
                     const tr = document.createElement('tr');
-                    //cria as 3 células da table (nome, data e botão para desbloquear)
-                    tr.innerHTML = `
-                        <td>${usuario.nome}</td>
-                        <td>${usuario.data}</td>
-                        <td>
-                            <button class="unblock-btn" data-index="${index}">Desbloquear</button>
-                        </td>
-                    `; 
+
+                    const td1 = document.createElement('td');
+                    td1.textContent = usuario.nome;
+
+                    const td2 = document.createElement('td');
+                    td2.textContent = usuario.data;
+
+                    const td3 = document.createElement('td');
+                    const btnUnblock = document.createElement('button');
+                    btnUnblock.className = 'unblock-btn';
+                    btnUnblock.dataset.index = index;
+                    btnUnblock.textContent = 'Desbloquear';
+                    td3.appendChild(btnUnblock);
+
+                    tr.append(td1, td2, td3);
+                    
                     blockBody.appendChild(tr); //une a linha na table
                 });
 
@@ -1518,9 +1533,12 @@ document.addEventListener('DOMContentLoaded', function () {
                     // Atualiza avatar no dropdown
                     const bgAvatar = document.querySelector('#dropdown-usuario .background-avatar');
                     if (bgAvatar) {
-                        bgAvatar.innerHTML = `<img src="${fotoTemp}" 
-                            style="width:38px;height:38px;border-radius:50%;object-fit:cover;" 
-                            alt="avatar">`;
+                        const img = document.createElement('img');
+                        img.src = fotoTemp;
+                        img.style.cssText = 'width:38px;height:38px;border-radius:50%;object-fit:cover;';
+                        img.alt = 'avatar';
+                        bgAvatar.innerHTML = '';
+                        bgAvatar.appendChild(img);
                     }
 
                     fotoTemp = null;
@@ -1585,12 +1603,18 @@ document.addEventListener('DOMContentLoaded', function () {
                 const label = cb.closest('label').textContent.trim();
                 const tag = document.createElement('div');
                 tag.className = 'tag';
-                tag.innerHTML = `
-                    <span>${label}</span>
-                    <button type="button" title="Remover">
-                        <i class="fa-solid fa-xmark"></i>
-                    </button>
-                `;
+
+                const span = document.createElement('span');
+                span.textContent = label;
+
+                const btnRemove = document.createElement('button');
+                btnRemove.type = 'button';
+                btnRemove.title = 'Remover';
+                const icon = document.createElement('i');
+                icon.className = 'fa-solid fa-xmark';
+                btnRemove.appendChild(icon);
+
+                tag.append(span, btnRemove);
                 // botão X da tag desmarca o checkbox
                 tag.querySelector('button').addEventListener('click', () => {
                     cb.checked = false;
