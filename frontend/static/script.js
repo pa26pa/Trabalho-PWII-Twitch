@@ -627,11 +627,12 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
             if (form.classList.contains('email-forgot-password')) {
+                console.log('aaa');
                 const dados = {
                     email: document.getElementById('email_forgot').value,
                     who: 'forgot_password'
                 };
-                console.log('aaa')
+                console.log('aaa');
                 fetch("/forgot", {
                     method: "POST",
                     headers: { "Content-Type": "application/json", "X-CSRFToken":csrfToken },
