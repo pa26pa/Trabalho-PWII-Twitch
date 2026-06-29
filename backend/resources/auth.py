@@ -969,7 +969,7 @@ class salvar_video(Resource):
             url = resposta["secure_url"]
         
         except Exception as e:
-            print("exception")
+            print("exception: ", str(e))
             return {
                 "status":"error",
                 "mensagem":"Não foi possivel salvar o video no cloudinary"
