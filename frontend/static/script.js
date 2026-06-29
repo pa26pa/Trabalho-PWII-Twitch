@@ -631,7 +631,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     email: document.getElementById('email_forgot').value,
                     who: 'forgot_password'
                 };
-
+                console.log('aaa')
                 fetch("/forgot", {
                     method: "POST",
                     headers: { "Content-Type": "application/json", "X-CSRFToken":csrfToken },
