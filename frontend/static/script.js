@@ -130,9 +130,27 @@ document.addEventListener('DOMContentLoaded', function () {
         });
         btnreceberCodigo.disabled = true;
 
-        btnreceberCodigo.addEventListener('click', (e) => {
-            e.preventDefault();
-            btnreceberCodigo.closest('form').dispatchEvent(new Event('submit', { bubbles: false, cancelable: true }));
+        btnreceberCodigo.addEventListener('click', () => {
+            if (!inputEmail.checkValidity()) return;
+            const dados = {
+                email: inputEmail.value,
+                who: 'forgot_password'
+            };
+            fetch("/forgot", {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "X-CSRFToken": csrfToken },
+                body: JSON.stringify(dados)
+            })
+            .then(res => res.json())
+            .then(data => {
+                mostrarToast(data.mensagem, data.status);
+                if (data.status === 'success') {
+                    telaAtual.avancar('email', 'codigo');
+                    inputEmail.value = '';
+                    btnreceberCodigo.disabled = true;
+                    if (otpLogin) { otpLogin.reset(); otpLogin.startTimer(); }
+                }
+            });
         });
     }
 
