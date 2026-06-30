@@ -1836,4 +1836,30 @@ document.addEventListener('DOMContentLoaded', function () {
 
     init();
 
+    // Captcha
+    // FIX: o Google injeta o iframe do desafio direto no <body>, fora do
+    // dialog, e por isso ele renderiza ATRÁS do top layer do modal.
+    // Aqui movemos esse iframe para DENTRO do #modal-1, fazendo-o herdar
+    // o mesmo top layer do dialog (acima do ::backdrop, acima de tudo).
+    const modal1 = document.getElementById('modal-1');
+
+    const recaptchaObserver = new MutationObserver(() => {
+        if (!modal1 || !modal1.open) return;
+
+        document.querySelectorAll('body > div').forEach(div => {
+            const isRecaptchaDiv = div.querySelector('iframe[src*="recaptcha"]');
+            if (isRecaptchaDiv && div.parentElement === document.body) {
+                // move o div do captcha para dentro do dialog aberto
+                modal1.appendChild(div);
+                div.style.position = 'fixed';
+                div.style.top = '50%';
+                div.style.left = '50%';
+                div.style.transform = 'translate(-50%, -50%)';
+                div.style.zIndex = '999999';
+            }
+        });
+    });
+
+    recaptchaObserver.observe(document.body, { childList: true });
+
 });
