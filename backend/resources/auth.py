@@ -213,23 +213,13 @@ class logout(Resource):
         
 class check_login(Resource):
     def post(self):
-        token = request.headers.get("X-CSRFToken")
-        
-        check = check_csrf(token)
-        
-        if not check or check.get("status") == "error":
-            return {'status': 'error', 'mensagem' : check.get("mensagem")}
-        
+        # sem check_csrf aqui — só leitura
         if 'usuario_id' in session:
             con = connection()
             cursor = con.cursor(pymysql.cursors.DictCursor)
-
-            #id_ficticio = 1
             
-            #session['usuario_id'] = id_ficticio
-            
-            email = """select cpf, email, user_name, data_nascimento,foto_url,bio from usuarios where id_usuario = %s"""
-            cursor.execute(email,(session['usuario_id'],))
+            email = """select cpf, email, user_name, data_nascimento, foto_url, bio from usuarios where id_usuario = %s"""
+            cursor.execute(email, (session['usuario_id'],))
             info_usuario = cursor.fetchone()
             
             data_formatada = info_usuario['data_nascimento'].strftime('%d/%m/%Y')
@@ -237,24 +227,23 @@ class check_login(Resource):
             cursor.close()
             con.close()
             
-            print('yey')
-            
             return {
-                'status':'success',
-                'mensagem':'Logado',
-                'logado':'true',
-                'foto':info_usuario['foto_url'],
-                'bio':info_usuario['bio'],
+                'status': 'success',
+                'mensagem': 'Logado',
+                'logado': 'true',
+                'foto': info_usuario['foto_url'],
+                'bio': info_usuario['bio'],
                 'email': info_usuario['email'],
                 'cpf': info_usuario['cpf'],
                 'data': data_formatada,
-                'name':info_usuario['user_name'] 
+                'name': info_usuario['user_name']
             }, 200
 
         return {
-            'status':'error',
-            'mensagem':'não está logado'
-        }, 400
+            'status': 'error',
+            'mensagem': 'não está logado',
+            'logado': False
+        }, 200
 
 class google(Resource):
     def post(self):
