@@ -124,11 +124,15 @@ document.addEventListener('DOMContentLoaded', function () {
     const insertcodeBox = document.getElementById('insert-code');
     const inputEmail = document.getElementById('email_forgot');
 
-    if (btnreceberCodigo && insertcodeBox && inputEmail) {  // ← proteção do bloco inteiro
+    if (btnreceberCodigo && insertcodeBox && inputEmail) {
         inputEmail.addEventListener('input', function () {
-            btnreceberCodigo.disabled = !inputEmail.checkValidity();//checkValidity(): método nativo que verifica se o valor do input é válido de acordo com os atributos HTML (como type="email")
+            btnreceberCodigo.disabled = !inputEmail.checkValidity();
         });
         btnreceberCodigo.disabled = true;
+
+        btnreceberCodigo.addEventListener('click', () => {
+            btnreceberCodigo.closest('form').dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+        });
     }
 
     // ── FUNÇÃO GENÉRICA DE OTP ──
