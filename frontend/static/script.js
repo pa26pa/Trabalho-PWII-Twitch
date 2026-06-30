@@ -548,6 +548,7 @@ document.addEventListener('DOMContentLoaded', function () {
             if (dialog && !dialog.open) return;
 
             if (!form.classList.contains('email-forgot-password')) {
+                console.log('começou')
                 let envio = true;
                 const inputsVisiveis = Array.from(form.querySelectorAll('input[required]'))
                     .filter(input => input.offsetParent !== null);
@@ -568,6 +569,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     inputsVisiveis.forEach(input => {
                         if (!input.checkValidity()) input.reportValidity();
                     });
+                    console.log("572")
                     return;
                 }
             } 
