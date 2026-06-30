@@ -1854,21 +1854,32 @@ document.addEventListener('DOMContentLoaded', function () {
     // o mesmo top layer do dialog (acima do ::backdrop, acima de tudo).
     const modal1 = document.getElementById('modal-1');
 
-    const recaptchaObserver = new MutationObserver(() => {
-        if (!modal1 || !modal1.open) return;
+const recaptchaObserver = new MutationObserver(() => {
+    if (!modal1 || !modal1.open) return;
 
-        document.querySelectorAll('body > div').forEach(div => {
-            const isRecaptchaDiv = div.querySelector('iframe[src*="recaptcha"]');
-            if (isRecaptchaDiv && div.parentElement === document.body) {
-                // marca o wrapper com uma classe — o CSS faz toda a
-                // centralização, sem definir width/height/transform via JS,
-                // que é o que estava cortando o conteúdo e gerando scroll
-                div.classList.add('recaptcha-challenge-wrapper');
-                modal1.appendChild(div);
-            }
-        });
+    document.querySelectorAll('body > div').forEach(div => {
+        // ignora o próprio dialog e qualquer wrapper já processado
+        if (div === modal1 || div.dataset.recaptchaMoved === 'true') return;
+
+        const isRecaptchaDiv = div.querySelector('iframe[src*="recaptcha"]');
+        if (isRecaptchaDiv) {
+            div.classList.add('recaptcha-challenge-wrapper');
+            div.dataset.recaptchaMoved = 'true'; // FIX: evita reprocessar o mesmo div em loop
+            modal1.appendChild(div);
+
+            // FIX: quando o iframe do desafio for removido pelo Google
+            // (resolveu o captcha ou fechou), some o wrapper inteiro
+            const innerObserver = new MutationObserver(() => {
+                if (!div.querySelector('iframe[src*="recaptcha"]')) {
+                    div.remove();
+                    innerObserver.disconnect();
+                }
+            });
+            innerObserver.observe(div, { childList: true, subtree: true });
+        }
     });
+});
 
-    recaptchaObserver.observe(document.body, { childList: true });
+recaptchaObserver.observe(document.body, { childList: true });
 
 });
