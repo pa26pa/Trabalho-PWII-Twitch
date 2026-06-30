@@ -67,6 +67,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 mostrarToast(data.mensagem, data.status)
                 return;
             } 
+            await carregarCsrf();
             window.location.href = "/";
             mostrarDeslogado();
             if (dropdownMenu) dropdownMenu.classList.remove('show');
