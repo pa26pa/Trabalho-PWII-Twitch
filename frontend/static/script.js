@@ -565,7 +565,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (!validarSenha(senhaInput, erroSenha)) envio = false;
             });
             if (!envio) {//se envio for false, ou seja, se alguma validação falhou, o formulário não será enviado e as mensagens de erro serão exibidas
-                form.reportValidity();
+                inputsVisiveis.forEach(input => {
+                    if (!input.checkValidity()) input.reportValidity();
+                });
                 return;
             } 
             
