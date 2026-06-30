@@ -23,6 +23,20 @@ document.addEventListener('DOMContentLoaded', function () {
     function mostrarDeslogado() {
         document.querySelectorAll('.with-login').forEach(el => el.style.display = 'none');
         document.querySelectorAll('.without-login').forEach(el => el.style.display = '');
+
+        // FIX: restaura o ícone de hambúrguer no btn-dropdown ao deslogar
+        const btnDropdown = document.getElementById('btn-dropdown');
+        if (btnDropdown) {
+            const avatarImg = btnDropdown.querySelector('img.avatar-btn-dropdown');
+            if (avatarImg) {
+                avatarImg.remove();
+                // recria os dois ícones originais (hambúrguer + pessoinha)
+                btnDropdown.innerHTML = `
+                    <i class="fa-solid fa-bars menu-icon without-login" style="color: rgb(255, 255, 255);"></i>
+                    <i class="fa-solid fa-user with-login menu-icon" style="color: rgb(255, 255, 255);"></i>
+                `;
+            }
+        }
     }
 
     // verifica sessão ao carregar
@@ -462,26 +476,23 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function atualizarAvatarDropdown(fotoUrl) {
-        // avatar no li do dropdown
+        // avatar no li do dropdown (substitui TUDO dentro do background-avatar)
         const bgAvatar = document.querySelector('#dropdown-usuario .background-avatar');
         if (bgAvatar) {
-            bgAvatar.innerHTML = `<img src="${fotoUrl}" style="width:38px;height:38px;border-radius:50%;object-fit:cover;" alt="avatar">`;
+            bgAvatar.innerHTML = `<img src="${fotoUrl}" style="width:38px;height:38px;border-radius:50%;object-fit:cover;display:block;" alt="avatar">`;
         }
-        // ícone do próprio botão btn-dropdown
+
+        // ícone do botão btn-dropdown — substitui TODOS os <i> e <img> antigos
         const btnDropdown = document.getElementById('btn-dropdown');
         if (btnDropdown) {
-            const existing = btnDropdown.querySelector('img.avatar-btn-dropdown');
-            if (!existing) {
-                const iconEl = btnDropdown.querySelector('i');
-                const img = document.createElement('img');
-                img.src = fotoUrl;
-                img.className = 'avatar-btn-dropdown';
-                img.style.cssText = 'width:100%;height:100%;border-radius:50%;object-fit:cover;';
-                if (iconEl) iconEl.replaceWith(img);
-                else btnDropdown.appendChild(img);
-            } else {
-                existing.src = fotoUrl;
-            }
+            // remove qualquer ícone ou imagem de avatar que já exista ali dentro
+            btnDropdown.querySelectorAll('i.menu-icon, img.avatar-btn-dropdown').forEach(el => el.remove());
+
+            const img = document.createElement('img');
+            img.src = fotoUrl;
+            img.className = 'avatar-btn-dropdown';
+            img.style.cssText = 'width:100%;height:100%;border-radius:50%;object-fit:cover;display:block;';
+            btnDropdown.appendChild(img);
         }
     }
 
@@ -1849,13 +1860,11 @@ document.addEventListener('DOMContentLoaded', function () {
         document.querySelectorAll('body > div').forEach(div => {
             const isRecaptchaDiv = div.querySelector('iframe[src*="recaptcha"]');
             if (isRecaptchaDiv && div.parentElement === document.body) {
-                // move o div do captcha para dentro do dialog aberto
+                // marca o wrapper com uma classe — o CSS faz toda a
+                // centralização, sem definir width/height/transform via JS,
+                // que é o que estava cortando o conteúdo e gerando scroll
+                div.classList.add('recaptcha-challenge-wrapper');
                 modal1.appendChild(div);
-                div.style.position = 'fixed';
-                div.style.top = '50%';
-                div.style.left = '50%';
-                div.style.transform = 'translate(-50%, -50%)';
-                div.style.zIndex = '999999';
             }
         });
     });
