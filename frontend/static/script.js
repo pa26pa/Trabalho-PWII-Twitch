@@ -598,42 +598,66 @@ document.addEventListener('DOMContentLoaded', function () {
                 
                 
                 fetch("/signin", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-CSRFToken":csrfToken
-                },
-                body: JSON.stringify(dados)
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": csrfToken
+                    },
+                    body: JSON.stringify(dados)
                 })
-                .then(res => res.json())
+                .then(async res => {
+                    // FIX: erro 500/4xx não tem o formato {status, mensagem} esperado —
+                    // trata como erro genérico antes de tentar fazer .json()
+                    if (!res.ok) {
+                        let msg = 'Erro ao cadastrar. Tente novamente.';
+                        try {
+                            const errData = await res.json();
+                            if (errData.mensagem) msg = errData.mensagem;
+                        } catch {}
+                        mostrarToast(msg, 'error');
+                        return null; // sinaliza que não deve continuar pro login
+                    }
+                    return res.json();
+                })
                 .then(data => {
-                    if (data.status == 'error'){
-                        mostrarToast(data.mensagem, data.status)
+                    if (!data) return; // erro já tratado acima
+
+                    if (data.status == 'error') {
+                        mostrarToast(data.mensagem, data.status);
                     } else {
                         const dado = {
                             username_email: dados['user_name'],
                             senha: dados['senha']
-                        }
+                        };
 
                         fetch("/login", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                            "X-CSRFToken":csrfToken
-                        },
-                        body: JSON.stringify(dado)
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "X-CSRFToken": csrfToken
+                            },
+                            body: JSON.stringify(dado)
                         })
-                        .then(res => res.json())
+                        .then(async res => {
+                            if (!res.ok) {
+                                mostrarToast('Cadastro feito, mas o login automático falhou. Faça login manualmente.', 'error');
+                                return null;
+                            }
+                            return res.json();
+                        })
                         .then(data => {
-                            if (data.status == 'error'){
-                                mostrarToast(data.mensagem, data.status)
+                            if (!data) return;
+                            if (data.status == 'error') {
+                                mostrarToast(data.mensagem, data.status);
                             } else {
                                 fecharModal(form);
                                 verificarSessao();
                             }
                         });
-                        
                     }
+                })
+                .catch(() => {
+                    mostrarToast('Erro de conexão com o servidor.', 'error');
                 });
             }
 

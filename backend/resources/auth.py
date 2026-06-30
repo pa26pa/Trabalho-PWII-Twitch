@@ -42,14 +42,12 @@ class signin(Resource):
         cursor = con.cursor()
         
         token = request.headers.get("X-CSRFToken")
-        
         check = check_csrf(token)
         
         if not check or check.get("status") == "error":
             return {'status': 'error', 'mensagem' : check.get("mensagem")}
         
         captcha_enviado = data.get('captcha')
-        
         captcha_valido = captcha(captcha_enviado)
         
         if captcha_valido['statuscap'] == 'error':
@@ -59,8 +57,6 @@ class signin(Resource):
             }, 403
             
         cpf = str(data.get('cpf'))
-        
-
         cpf = cpf.strip()
         cpf_limpo = cpf.replace(".","").replace("-","")
         
@@ -69,33 +65,48 @@ class signin(Resource):
         data_nascimento = data.get('data_nascimento')
         senha = data.get('senha')
         
+        # FIX: valida se todos os campos obrigatórios vieram preenchidos
+        # antes de tentar processar — evita None chegando no banco
+        if not all([cpf_limpo, email, user_name, data_nascimento, senha]):
+            cursor.close()
+            con.close()
+            return {
+                'status': 'error',
+                'mensagem': 'Todos os campos são obrigatórios'
+            }, 400
 
         valido = email_valido(email)
         if valido == False:
+            cursor.close()
+            con.close()
             return {
                 'status':'error',
                 'mensagem':'Este email não é valido'
             }, 406
         
         email = valido
-        
 
+        # FIX: captura explicitamente se data_valida() falhar e retornar None,
+        # em vez de deixar o erro estourar só no INSERT (gerando 500 sem
+        # mensagem clara)
         data_formatada = data_valida(data_nascimento)
-
+        if not data_formatada:
+            cursor.close()
+            con.close()
+            return {
+                'status': 'error',
+                'mensagem': 'Data de nascimento inválida. Use o formato DD/MM/AAAA'
+            }, 400
 
         senha_hash = generate_password_hash(senha)
-
         
         query = """select * from usuarios where cpf = %s or email = %s or BINARY user_name = %s"""
         cursor.execute(query,(cpf_limpo,email,user_name))
         existe = cursor.fetchone()
-        
-        
                 
         if existe:
             cursor.close()
             con.close()
-
             return{
                 'status':'error',
                 'mensagem':'Já existe um usuário com este CPF, email ou nome de usuario'
@@ -107,14 +118,26 @@ class signin(Resource):
         try:
             insert = """insert into usuarios(cpf,email,user_name,senha,data_nascimento) values (%s,%s,%s,%s,%s)"""
             cursor.execute(insert,(cpf_limpo,email,user_name,senha_hash,data_formatada))
+            con.commit()
         
         except pymysql.err.IntegrityError:
+            cursor.close()
+            con.close()
             return {
-            'status':'error',
-            'mensagem':'Ouve um erro, informações duplicadas'
+                'status':'error',
+                'mensagem':'Ouve um erro, informações duplicadas'
             }, 400
-        
-        con.commit()
+        # FIX: captura QUALQUER outra exceção do banco (conexão perdida,
+        # campo NULL não esperado, etc) e retorna erro tratado em vez
+        # de deixar o Flask devolver 500 cru
+        except Exception as e:
+            cursor.close()
+            con.close()
+            print("ERRO NO INSERT:", str(e))  # log pra você ver no terminal/Railway
+            return {
+                'status': 'error',
+                'mensagem': 'Erro ao cadastrar usuário'
+            }, 500
         
         cursor.close()
         con.close()
@@ -122,14 +145,7 @@ class signin(Resource):
             'status':'success',
             'mensagem':'O cadastro foi feito com sucesso'
         }, 201
-  
-    def get(self):
-        # Só pra deixar organizado e deixar claro que get não está desponivel
-        return{
-            'status':'error',
-            'mensagem':'get não é um metodo aceito'
-        }, 405
-
+    
 class login(Resource):
     decorators = [limiter.limit("10 per minute")]
     def post(self):
