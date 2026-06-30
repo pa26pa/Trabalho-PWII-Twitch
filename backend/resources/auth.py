@@ -368,33 +368,57 @@ class forgot(Resource):
 class resend_code(Resource):
     def get(self):
         token = request.headers.get("X-CSRFToken")
-        
+
         check = check_csrf(token)
-        
+
         if not check or check.get("status") == "error":
-            return {'status': 'error', 'mensagem' :check.get("mensagem")}
-        
+            return {
+                'status': 'error',
+                'mensagem': check.get("mensagem")
+            }, 400
+
+        # Verifica se a sessão ainda existe
+        id_usuario = session.get("id_provisorio")
+        tipo = session.get("who")
+
+        if not id_usuario or not tipo:
+            return {
+                'status': 'error',
+                'mensagem': 'Sessão expirada'
+            }, 401
+
         con = connection()
         cursor = con.cursor()
-        
-        # Usando a session para pegar o email so usuario
-        query = """select email from usuarios where id_usuario = %s"""
-        cursor.execute(query,(session['id_provisorio']))
-        email = cursor.fetchone()
-        
-        tipo = session['who']
-        # enviando código
-        codigo = send_code(email,tipo)
-        
-        # atualizando a session
-        session['code'] = codigo 
-        
+
+        query = """SELECT email FROM usuarios WHERE id_usuario = %s"""
+        cursor.execute(query, (id_usuario,))
+
+        resultado = cursor.fetchone()
+
+        if resultado is None:
+            cursor.close()
+            con.close()
+
+            return {
+                'status': 'error',
+                'mensagem': 'Usuário não encontrado'
+            }, 404
+
+        # Pega apenas o email da tupla
+        email = resultado[0]
+
+        # Envia o novo código
+        codigo = send_code(email, tipo)
+
+        # Atualiza o código na sessão
+        session["code"] = codigo
+
         cursor.close()
         con.close()
-        
+
         return {
-            'status':'success',
-            'mensagem':'Código enviado'
+            'status': 'success',
+            'mensagem': 'Código enviado com sucesso'
         }, 200
     
 class check_codigo(Resource):
@@ -416,17 +440,17 @@ class check_codigo(Resource):
         codigo_salvo = str(session.get('code'))
         
         if codigo_inserido != codigo_salvo:
-            # Retirando o código da session
-            session.pop('code',None)
             return {
-                'status':'error',
-                'mensagem':'Código invalido'
+                'status': 'error',
+                'mensagem': 'Código inválido'
             }, 401
-        
-        session.pop('code')
-        return{
-            'status':'success',
-            'mensagem':'Codigo correto'
+
+        # Se chegou aqui, acertou o código
+        session.pop("code", None)
+
+        return {
+            'status': 'success',
+            'mensagem': 'Código correto'
         }, 200
 class redefine_password(Resource):
     def put(self):
