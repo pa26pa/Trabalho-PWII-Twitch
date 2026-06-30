@@ -130,7 +130,8 @@ document.addEventListener('DOMContentLoaded', function () {
         });
         btnreceberCodigo.disabled = true;
 
-        btnreceberCodigo.addEventListener('click', () => {
+        btnreceberCodigo.addEventListener('click', (e) => {
+            e.preventDefault();
             btnreceberCodigo.closest('form').dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
         });
     }
