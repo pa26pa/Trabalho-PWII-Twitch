@@ -124,36 +124,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const insertcodeBox = document.getElementById('insert-code');
     const inputEmail = document.getElementById('email_forgot');
 
-    if (btnreceberCodigo && insertcodeBox && inputEmail) {
-        inputEmail.addEventListener('input', function () {
-            btnreceberCodigo.disabled = !inputEmail.checkValidity();
-        });
-        btnreceberCodigo.disabled = true;
-
-        btnreceberCodigo.addEventListener('click', () => {
-            if (!inputEmail.checkValidity()) return;
-            const dados = {
-                email: inputEmail.value,
-                who: 'forgot_password'
-            };
-            fetch("/forgot", {
-                method: "POST",
-                headers: { "Content-Type": "application/json", "X-CSRFToken": csrfToken },
-                body: JSON.stringify(dados)
-            })
-            .then(res => res.json())
-            .then(data => {
-                mostrarToast(data.mensagem, data.status);
-                if (data.status === 'success') {
-                    telaAtual.avancar('email', 'codigo');
-                    inputEmail.value = '';
-                    btnreceberCodigo.disabled = true;
-                    if (otpLogin) { otpLogin.reset(); otpLogin.startTimer(); }
-                }
-            });
-        });
-    }
-
     // ── FUNÇÃO GENÉRICA DE OTP ──
     function setupOTP(container) {
         if (!container) return;
@@ -898,7 +868,36 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    //botão para fechar os modais
+    if (btnreceberCodigo && insertcodeBox && inputEmail) {
+        inputEmail.addEventListener('input', function () {
+            btnreceberCodigo.disabled = !inputEmail.checkValidity();
+        });
+        btnreceberCodigo.disabled = true;
+
+        btnreceberCodigo.addEventListener('click', () => {
+            if (!inputEmail.checkValidity()) return;
+            const dados = {
+                email: inputEmail.value,
+                who: 'forgot_password'
+            };
+            fetch("/forgot", {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "X-CSRFToken": csrfToken },
+                body: JSON.stringify(dados)
+            })
+            .then(res => res.json())
+            .then(data => {
+                mostrarToast(data.mensagem, data.status);
+                if (data.status === 'success') {
+                    telaAtual.avancar('email', 'codigo');
+                    inputEmail.value = '';
+                    btnreceberCodigo.disabled = true;
+                    if (otpLogin) { otpLogin.reset(); otpLogin.startTimer(); }
+                }
+            });
+        });
+    }
+        //botão para fechar os modais
     const closeButtons = document.querySelectorAll('.btn-close-modal');
 
     closeButtons.forEach(button => {
