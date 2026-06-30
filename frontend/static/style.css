@@ -492,13 +492,24 @@ h2 {
 #icon-google {width: 20px; height: 20px; margin-right: 10px;}
 #icon-amazon {width: 35px; height: 15px; margin-right: 10px;}
 
-/*CAPTCHA no cadastro*/
-.g-recaptcha {
-    position: relative;
-    z-index: 99999 !important;
+/* garante que o dialog não bloqueie cliques no iframe do captcha */
+#modal-1[open] {
+    isolation: isolate;
 }
-.grecaptcha-badge, iframe[title="recaptcha challenge"], #rc-imageselect {
-    z-index: 9999999 !important; /*!important = garante que o estilo seja aplicado mesmo que haja outros estilos conflitantes*/
+
+/*CAPTCHA no cadastro*/
+#recaptcha-container {
+    position: relative;
+    z-index: 100000;
+}
+
+/* o desafio do reCAPTCHA é injetado pelo Google direto no <body>,
+   fora do dialog, então precisa de z-index maior que o do modal */
+body > div.grecaptcha-badge,
+iframe[src*="recaptcha"],
+iframe[title*="recaptcha"],
+iframe[title*="reCAPTCHA"] {
+    z-index: 2147483647 !important; /* valor máximo de z-index do CSS */
 }
 
 /*termos de politica no cadastro*/
@@ -2216,12 +2227,6 @@ a {text-decoration: none;}
 /* Toast sempre na frente de tudo */
 .toast {
     z-index: 999999 !important;
-}
-
-/* reCAPTCHA iframe sempre na frente do modal */
-body > div[style*="z-index"],
-body > div[style*="position: fixed"] {
-    z-index: 9999999 !important;
 }
 
 /* Select da live ocupa 100% */
