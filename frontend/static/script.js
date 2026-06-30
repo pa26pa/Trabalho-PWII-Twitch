@@ -874,7 +874,9 @@ document.addEventListener('DOMContentLoaded', function () {
         });
         btnreceberCodigo.disabled = true;
 
-        btnreceberCodigo.addEventListener('click', () => {
+        btnreceberCodigo.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
             if (!inputEmail.checkValidity()) return;
             const dados = {
                 email: inputEmail.value,
