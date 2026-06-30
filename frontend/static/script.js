@@ -547,28 +547,29 @@ document.addEventListener('DOMContentLoaded', function () {
             const dialog = form.closest('dialog');
             if (dialog && !dialog.open) return;
 
-            let envio = true;
-            const inputsVisiveis = Array.from(form.querySelectorAll('input[required]'))
-                .filter(input => input.offsetParent !== null);
-            const todosValidos = inputsVisiveis.every(input => input.checkValidity());
-            if (!todosValidos) envio = false
-            if (form.querySelector('#data-nascimento') && !validarIdade()) envio = false;
-            if (form.querySelector('.password2')) {
-                if (!confirmarSenha(senha1,senha2,erro)) {
-                envio = false;    
-                }
-            } 
-
-            form.querySelectorAll('.password-box').forEach(box => {
-                const senhaInput = box.querySelector('.password');
-                const erroSenha = box.querySelector('.erroSenha');
-                if (!validarSenha(senhaInput, erroSenha)) envio = false;
-            });
-            if (!envio) {//se envio for false, ou seja, se alguma validação falhou, o formulário não será enviado e as mensagens de erro serão exibidas
-                inputsVisiveis.forEach(input => {
-                    if (!input.checkValidity()) input.reportValidity();
+            if (!form.classList.contains('email-forgot-password')) {
+                let envio = true;
+                const inputsVisiveis = Array.from(form.querySelectorAll('input[required]'))
+                    .filter(input => input.offsetParent !== null);
+                const todosValidos = inputsVisiveis.every(input => input.checkValidity());
+                if (!todosValidos) envio = false;
+                if (form.querySelector('#data-nascimento') && !validarIdade()) envio = false;
+                if (form.querySelector('.password2')) {
+                    if (!confirmarSenha(senha1,senha2,erro)) {
+                        envio = false;    
+                    }
+                } 
+                form.querySelectorAll('.password-box').forEach(box => {
+                    const senhaInput = box.querySelector('.password');
+                    const erroSenha = box.querySelector('.erroSenha');
+                    if (!validarSenha(senhaInput, erroSenha)) envio = false;
                 });
-                return;
+                if (!envio) {
+                    inputsVisiveis.forEach(input => {
+                        if (!input.checkValidity()) input.reportValidity();
+                    });
+                    return;
+                }
             } 
             
             if (form.classList.contains('sign')) {
