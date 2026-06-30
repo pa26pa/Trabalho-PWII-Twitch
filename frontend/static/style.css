@@ -492,24 +492,35 @@ h2 {
 #icon-google {width: 20px; height: 20px; margin-right: 10px;}
 #icon-amazon {width: 35px; height: 15px; margin-right: 10px;}
 
-/* garante que o dialog não bloqueie cliques no iframe do captcha */
-#modal-1[open] {
-    isolation: isolate;
+
+/*BACKDROP DO MODAL-1*/
+#modal-1::backdrop {
+    background: rgba(0, 0, 0, 0.5);
 }
 
 /*CAPTCHA no cadastro*/
 #recaptcha-container {
     position: relative;
-    z-index: 100000;
+    z-index: 1;
 }
 
-/* o desafio do reCAPTCHA é injetado pelo Google direto no <body>,
-   fora do dialog, então precisa de z-index maior que o do modal */
-body > div.grecaptcha-badge,
-iframe[src*="recaptcha"],
-iframe[title*="recaptcha"],
-iframe[title*="reCAPTCHA"] {
-    z-index: 2147483647 !important; /* valor máximo de z-index do CSS */
+/* O segredo: o iframe do desafio do captcha, quando o Google injeta,
+   deve ficar DENTRO do top layer do próprio dialog. Para isso,
+   garantimos que ele seja filho do modal-1 (via JS) e tenha
+   z-index alto dentro desse contexto de empilhamento */
+#modal-1 iframe[src*="recaptcha"],
+#modal-1 .grecaptcha-badge {
+    z-index: 999999 !important;
+    position: fixed !important;
+}
+
+/* centraliza o desafio do captcha na tela quando ele for reanexado ao modal */
+#modal-1 div:has(> iframe[title*="recaptcha challenge"]) {
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    z-index: 999999 !important;
 }
 
 /*termos de politica no cadastro*/
