@@ -1539,7 +1539,7 @@ a {text-decoration: none;}
     display: flex;
     flex-direction: column;
     gap: 20px;
-    border: 4px solid red;
+
 }
 .container-perfil h1 {
     font-size: 2em;
@@ -1628,7 +1628,7 @@ a {text-decoration: none;}
     justify-content: center;
 }
 .form-perfil {
-    border: 4px solid red;
+
     width: 100%;
     height: 100%;
     display: flex;
@@ -1716,7 +1716,7 @@ a {text-decoration: none;}
     width: 90%;
     height: auto;
     margin-bottom: 8px;
-    border: 4px solid blue;
+
 }
 .select-trigger {
     position: static;
@@ -1807,7 +1807,7 @@ a {text-decoration: none;}
     width: 90%;
     min-height: 4px;
     margin-bottom: 10px;
-    border: 4px solid green;
+
 }
 
 .tag {
