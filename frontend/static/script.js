@@ -965,13 +965,23 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // FLIP LOGIN ↔ CADASTRO — limpa inputs dos dois lados
     const checkbox = document.getElementById('checkbox');
-    if (checkbox) {
-        checkbox.addEventListener('change', () => { 
-            document.getElementById('wrap').querySelectorAll('input').forEach(input => input.value = '');
-            document.querySelectorAll('.erroSenha, .erroSenha2, #erroIdade').forEach(el => el.style.display = 'none');
-            document.querySelectorAll('.input-erro').forEach(el => el.classList.remove('input-erro'));
-        });
-    }
+        let captchaRendered = false;
+
+        if (checkbox) {
+            checkbox.addEventListener('change', () => { 
+                document.getElementById('wrap').querySelectorAll('input').forEach(input => input.value = '');
+                document.querySelectorAll('.erroSenha, .erroSenha2, #erroIdade').forEach(el => el.style.display = 'none');
+                document.querySelectorAll('.input-erro').forEach(el => el.classList.remove('input-erro'));
+
+                // renderiza o captcha só quando o cadastro aparecer
+                if (checkbox.checked && !captchaRendered) {
+                    grecaptcha.render('recaptcha-container', {
+                        sitekey: '6LemWTAtAAAAAM2v-HHAGkaNtjG8vm-Huju47Nvs'
+                    });
+                    captchaRendered = true;
+                }
+            });
+        }
 
     // BOTÃO CADASTRAR — desabilitado até tudo preenchido e checkbox marcado
     const formSign = document.querySelector('.sign');
