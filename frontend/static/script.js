@@ -1601,7 +1601,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 };
 
                 const res_ = await fetch('/editar_nome', {
-                    method: 'POST',
+                    method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
                         "X-CSRFToken":csrfToken
@@ -1618,7 +1618,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 };
 
                 const resp = await fetch('/editar_bio', {
-                    method: 'POST',
+                    method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
                         "X-CSRFToken":csrfToken
