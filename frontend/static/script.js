@@ -1,8 +1,9 @@
 //DOMContentLoaded garante que o script só rode depois de todo o HTML estar carregado
 document.addEventListener('DOMContentLoaded', function () {
 
+    // CARREGAMENTO DO CSRF TOKEN 
+    // o token é necessário para proteger contra ataques CSRF, garantindo que as requisições venham de fontes confiáveis
     let csrfToken = null;
-
     async function carregarCsrf() {
         const res = await fetch("/csrf-token");
         const data = await res.json();
@@ -40,7 +41,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // verifica sessão ao carregar
-   async function verificarSessao() {
+    async function verificarSessao() {
 
         try {
             const res = await fetch("/session", {
@@ -88,7 +89,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // MODAIS
+    // ABRIR MODAIS
     const openButtons = document.querySelectorAll('.btn-open-modal');
     openButtons.forEach(button => { // para cada botão de abrir modal
         button.addEventListener('click', () => {
@@ -138,7 +139,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const insertcodeBox = document.getElementById('insert-code');
     const inputEmail = document.getElementById('email_forgot');
 
-    // ── FUNÇÃO GENÉRICA DE OTP ──
+    // FUNÇÃO GENÉRICA DE OTP
     function setupOTP(container) {
         if (!container) return;
 
@@ -174,6 +175,7 @@ document.addEventListener('DOMContentLoaded', function () {
             checkCode();
         });
 
+        // TIMER PARA REENVIO DE CÓDIGO
         let timeLeft = 60;
         let interval;
 
@@ -232,18 +234,19 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // BOTÃO REDEFINIR SENHA — desabilitado até senhas válidas e iguais
     const btnRedefinir = document.getElementById('backLogin');
-    const newPwInput1  = document.querySelector('#new-password .password1');
-    const newPwInput2  = document.querySelector('#new-password .password2');
-    const newPwErro1   = document.querySelector('#new-password .erroSenha');
-    const newPwErro2   = document.querySelector('#new-password .erroSenha2');
+    const newPwInput1 = document.querySelector('#new-password .password1');
+    const newPwInput2 = document.querySelector('#new-password .password2');
+    const newPwErro1 = document.querySelector('#new-password .erroSenha');
+    const newPwErro2 = document.querySelector('#new-password .erroSenha2');
 
     if (btnRedefinir && newPwInput1 && newPwInput2) {
         btnRedefinir.disabled = true; // começa desabilitado
 
+        // função para verificar se as senhas são válidas e iguais, habilitando ou desabilitando o botão de redefinir senha
         function checkRedefinir() {
             const senha1ok = newPwInput1.value.length >= 5;
             const senha2ok = newPwInput2.value.length >= 5;
-            const iguais   = newPwInput1.value === newPwInput2.value;
+            const iguais = newPwInput1.value === newPwInput2.value;
             btnRedefinir.disabled = !(senha1ok && senha2ok && iguais);
         }
 
@@ -288,6 +291,7 @@ document.addEventListener('DOMContentLoaded', function () {
         checkCode();//verifica o código após colar para habilitar/desabilitar o botão de continuar
     });
 
+    // BOTÃO VOLTAR — volta para a tela anterior, ou para o login se estiver na tela de nova senha
     const newpasswordBox = document.getElementById('new-password');
     document.querySelectorAll('.back-arrow-modal').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -448,6 +452,7 @@ document.addEventListener('DOMContentLoaded', function () {
         mostra.textContent = cpf;
     }
 
+    // função para mostrar nome
     function info_user_name(user_name) {
         const mostra = document.querySelectorAll('.show_name');
         if (!user_name || !mostra) return ;
@@ -496,7 +501,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // função que pega as informações da api e relaciona com o htmls
+    // função que pega as informações da api e relaciona com oS htmls
     function info_user(data) {
         if (!data) return;
         let cpf = mascara_CPF_config(data.cpf);
@@ -519,6 +524,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    // FUNÇÃO PARA FECHAR MODAL E RESETAR FORMULÁRIO
     function fecharModal(form) {
 
         const dialog = form.closest('dialog');
@@ -531,6 +537,7 @@ document.addEventListener('DOMContentLoaded', function () {
         form.reset();
     }
 
+    // função que retorna o código inserido nos inputs de OTP como uma string concatenada
     function codigoInserido() {
         const inputs = document.querySelectorAll('.otp-input');
         if (inputs.length === 0) return null;
@@ -539,6 +546,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // ENVIO DOS FORMS
+    // para cada form, adiciona um listener de submit que previne o envio padrão e faz validações antes de enviar os dados via fetch
     document.querySelectorAll('.forms').forEach(form => {
         const senha1 = form.querySelector('.password1');
         const senha2 = form.querySelector('.password2');
@@ -578,6 +586,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             } 
             
+            // CADASTRO
             if (form.classList.contains('sign')) {
                 if (document.getElementById('cadastro').offsetParent === null) return;
                 const captcha = grecaptcha.getResponse();
@@ -661,6 +670,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 });
             }
 
+            // LOGIN
             if (form.classList.contains('login')) {
                 const dados = {
                     username_email: document.getElementById('user_email').value,
@@ -712,6 +722,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 });
             }
 
+            // INSERIR CÓDIGO
             if (form.classList.contains('insert-code')) {
                 const otp = form.closest('#modal-3') ? otpDelete : otpLogin;
                 const codigo = otp ? otp.getCode() : '';
@@ -745,6 +756,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 });
             }
 
+            // NOVA SENHA
             if (form.classList.contains('new-password')) {
                 const dados = {
                     nova_senha: form.querySelector('.password2').value
@@ -775,6 +787,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 });
 
             }
+
+            // ATUALIZAR SENHA
             if (form.classList.contains('form-new-password')) {
                 const dados = {
                     senha_nova: form.querySelector('.password2').value,
@@ -801,6 +815,8 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     });
+
+    // BOTÃO DE EXCLUIR CONTA
     const btnDeleteAccount = document.querySelector(".btn-delete-code");
     if (btnDeleteAccount) {
         btnDeleteAccount.addEventListener("click", function() {
@@ -828,6 +844,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    // BOTÃO DE CONFIRMAR EXCLUSÃO DE CONTA
     const btnDelete = document.querySelector(".btn-delete");
     if (btnDelete) {
         btnDelete.addEventListener("click", function() {
@@ -894,6 +911,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
     
+    // botão "Esqueci minha senha" no modal de login
     if (forgotLink) {
         forgotLink.addEventListener('click', e => {
             e.preventDefault();
@@ -903,6 +921,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    // botão "Receber código" no modal de email
     if (btnreceberCodigo && insertcodeBox && inputEmail) {
         inputEmail.addEventListener('input', function () {
             btnreceberCodigo.disabled = !inputEmail.checkValidity();
@@ -934,7 +953,8 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         });
     }
-        //botão para fechar os modais
+    
+    //botão para fechar os modais
     const closeButtons = document.querySelectorAll('.btn-close-modal');
 
     closeButtons.forEach(button => {
@@ -1018,7 +1038,7 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         }
 
-    // BOTÃO CADASTRAR — desabilitado até tudo preenchido e checkbox marcado
+    // BOTÃO CADASTRAR — desabilitado até tudo preenchido, checkbox marcado e CAPTCHA feito
     const formSign = document.querySelector('.sign');
     if (formSign) {
         const btnCadastrar = formSign.querySelector('.btn-wrapper');
@@ -1133,7 +1153,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Página Inicial - Em Alta (galeria de lives)
     const carouselHome = document.querySelector('.carousel-wrap');
-    const trackHome    = document.getElementById('track-home');
+    const trackHome = document.getElementById('track-home');
 
     if (carouselHome && trackHome) {
         let currentHome = 0;
@@ -1241,7 +1261,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }*/
 
     //----------------MOON--------------------
-    // CARROSSEL 
+    // CARROUSSEL 
     const carousel = document.querySelector('.carousel-wrap');
     const track = document.getElementById('track');
     if (carousel && track) {
@@ -1267,6 +1287,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     //---------------CONFIGURAÇÕS ---------------
+    // NAVEGAÇÃO ENTRE SEÇÕES DE CONFIGURAÇÃO
     const configNav = document.querySelectorAll('.nav-config a');
     const configSections = document.querySelectorAll('.section-config');
 
@@ -1289,6 +1310,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    // EXCLUIR CONTA 
     const btnDeleteCode = document.querySelector('.btn-delete-code');
     const wrapperDelete = document.getElementById('wrapper-delete');
     if (btnDeleteCode && wrapperDelete) {
@@ -1300,6 +1322,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    // botão de voltar tela no modal de exclusão de conta
     const btnBackDelete = document.querySelector('.back-modal-delete');
     if (btnBackDelete) {
         btnBackDelete.addEventListener('click', () => {
@@ -1490,7 +1513,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    //--------------perfil.html (meu canal)-------------------
+    //--------------perfil (meu canal)-------------------
     // UPLOAD DE FOTO DE PERFIL
     const uploadFoto = document.getElementById('upload-foto');
     const previewFoto = document.getElementById('preview-foto');
@@ -1517,6 +1540,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    // variáveis para armazenar a foto temporária e o arquivo selecionado
     let fotoTemp = null;
     if (uploadFoto && previewFoto) {
         previewFoto.addEventListener('click', () => uploadFoto.click());
@@ -1671,6 +1695,7 @@ document.addEventListener('DOMContentLoaded', function () {
             cb.addEventListener('change', () => updateTags());
         });
 
+        // função para atualizar as tags selecionadas
         function updateTags() {
             selectedTags.innerHTML = '';
             const checked = selectDropdown.querySelectorAll('input[type="checkbox"]:checked');
@@ -1711,6 +1736,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // const categorias = [...selectDropdown.querySelectorAll('input:checked')].map(cb => cb.value);
     }
 
+    // ── INICIALIZAÇÃO ──
     async function init() {
         await carregarCsrf();
        // mostrarDeslogado()
@@ -1811,6 +1837,7 @@ document.addEventListener('DOMContentLoaded', function () {
     renderVideosPerfil();
 
     // ── ASIDE → DROPDOWN em telas < 1024px ──
+    // sincroniza o conteúdo do aside para dentro do dropdown
     function sincronizarAsideDropdown() {
         const dropdownList = document.querySelector('#dropdown-menu ul');
         if (!dropdownList) return;
@@ -1878,32 +1905,32 @@ document.addEventListener('DOMContentLoaded', function () {
     // o mesmo top layer do dialog (acima do ::backdrop, acima de tudo).
     const modal1 = document.getElementById('modal-1');
 
-const recaptchaObserver = new MutationObserver(() => {
-    if (!modal1 || !modal1.open) return;
+    const recaptchaObserver = new MutationObserver(() => {
+        if (!modal1 || !modal1.open) return;
 
-    document.querySelectorAll('body > div').forEach(div => {
-        // ignora o próprio dialog e qualquer wrapper já processado
-        if (div === modal1 || div.dataset.recaptchaMoved === 'true') return;
+        document.querySelectorAll('body > div').forEach(div => {
+            // ignora o próprio dialog e qualquer wrapper já processado
+            if (div === modal1 || div.dataset.recaptchaMoved === 'true') return;
 
-        const isRecaptchaDiv = div.querySelector('iframe[src*="recaptcha"]');
-        if (isRecaptchaDiv) {
-            div.classList.add('recaptcha-challenge-wrapper');
-            div.dataset.recaptchaMoved = 'true'; // FIX: evita reprocessar o mesmo div em loop
-            modal1.appendChild(div);
+            const isRecaptchaDiv = div.querySelector('iframe[src*="recaptcha"]');
+            if (isRecaptchaDiv) {
+                div.classList.add('recaptcha-challenge-wrapper');
+                div.dataset.recaptchaMoved = 'true'; // FIX: evita reprocessar o mesmo div em loop
+                modal1.appendChild(div);
 
-            // FIX: quando o iframe do desafio for removido pelo Google
-            // (resolveu o captcha ou fechou), some o wrapper inteiro
-            const innerObserver = new MutationObserver(() => {
-                if (!div.querySelector('iframe[src*="recaptcha"]')) {
-                    div.remove();
-                    innerObserver.disconnect();
-                }
-            });
-            innerObserver.observe(div, { childList: true, subtree: true });
-        }
+                // FIX: quando o iframe do desafio for removido pelo Google
+                // (resolveu o captcha ou fechou), some o wrapper inteiro
+                const innerObserver = new MutationObserver(() => {
+                    if (!div.querySelector('iframe[src*="recaptcha"]')) {
+                        div.remove();
+                        innerObserver.disconnect();
+                    }
+                });
+                innerObserver.observe(div, { childList: true, subtree: true });
+            }
+        });
     });
-});
 
-recaptchaObserver.observe(document.body, { childList: true });
+    recaptchaObserver.observe(document.body, { childList: true });
 
 });
