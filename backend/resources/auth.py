@@ -525,7 +525,21 @@ class resend_code(Resource):
         }, 200
     
 class check_codigo(Resource):
+    """
+        Esse endpoint tem a função de checar se o código enviado é valido.
+    """
+    
     def post(self):
+        """
+            Valida o código enviado
+            
+            Validações:
+                Token('X-CSRFToken'), verifica se o código inserido é igual ao código salvo
+                
+            Retornos:
+                401 = Código inválido
+                200 = Código válido
+        """
         token = request.headers.get("X-CSRFToken")
         
         check = check_csrf(token)
@@ -538,7 +552,6 @@ class check_codigo(Resource):
         con = connection()
         cursor = con.cursor()
         
-        # pegando o código do js
         codigo_inserido = data.get('codigo')
         codigo_salvo = str(session.get('code'))
         
@@ -548,7 +561,6 @@ class check_codigo(Resource):
                 'mensagem': 'Código inválido'
             }, 401
 
-        # Se chegou aqui, acertou o código
         session.pop("code", None)
 
         return {
@@ -556,7 +568,20 @@ class check_codigo(Resource):
             'mensagem': 'Código correto'
         }, 200
 class redefine_password(Resource):
+    """
+        Endpoint responsável pela redefinição da senha do usuário (para o esqueci a senha)
+    """
     def put(self):
+        """
+            Atualiza a senha do usuário pela nova
+            
+            Validações:
+                Token('X-CSRFToken'), 
+            
+            Retornos:
+                200 = Senha mudada com sucesso
+        """
+        
         token = request.headers.get("X-CSRFToken")
         
         check = check_csrf(token)
@@ -569,13 +594,10 @@ class redefine_password(Resource):
         con = connection()
         cursor = con.cursor()
         
-        # pegando a nova senha do JS
         nova_senha = data.get('nova_senha')
         
-        # tranformando ela em hash
         nova_senha_hash = generate_password_hash(nova_senha)
         
-        # atualizando a senha
         update = """ update usuarios set senha = %s where id_usuario = %s"""
         cursor.execute(update,(nova_senha_hash,session['id_provisorio']))
         con.commit()
@@ -598,7 +620,21 @@ class redefine_password(Resource):
         }, 405
 
 class subscribe(Resource):
+    """
+        Endpoint responsável pelo processo de inscrição 
+    """
     def post(self):
+        """
+            Inscreve o usuário em algum canal
+            
+            Validações:
+                Token('X-CSRFToken'), sessão existente
+                
+            Retornos:
+                400 = Usuário não está logado
+                200 = Incrição feita com sucesso
+        """
+        
         token = request.headers.get("X-CSRFToken")
         
         check = check_csrf(token)
@@ -631,7 +667,20 @@ class subscribe(Resource):
         }, 200
         
 class search(Resource):
+    """
+        Endpoint responsável pela pesquisa de informações
+    """
     def post(self):
+        """
+            Retira as informações do Banco de Dados
+            
+            Validações: 
+                Token('X-CSRFToken')
+                
+            Retornos: 
+                200 =Informações retiradas com sucesso
+        """
+        
         token = request.headers.get("X-CSRFToken")
         
         check = check_csrf(token)
@@ -665,7 +714,21 @@ class search(Resource):
         }, 200
 
 class block_code(Resource):
+    """
+        Endpoint responsável por anular o código salvo na session
+    """
     def get(self):
+        """
+            Anula o código salvo na session
+            
+            Verificações: 
+                Token('X-CSRFToken'), existencia de uma session
+                
+            Retornos: 
+                500 = Não existe session (Erro interno da API)
+                200 = Código espirado com sucesso
+        """
+        
         token = request.headers.get("X-CSRFToken")
         
         check = check_csrf(token)
@@ -673,6 +736,12 @@ class block_code(Resource):
         if not check or check.get("status") == "error":
             return {'status': 'error', 'mensagem' :check.get("mensagem")}
         
+        if not session:
+            return {
+                "status":"error",
+                "mensagem":"código não foi salvo na session"
+            }, 500
+                
         session.pop('code', None)
         
         return {
@@ -681,7 +750,19 @@ class block_code(Resource):
         }, 200
         
 class translate(Resource):
+    """
+        Endpoint Responsável por traduzir o site
+    """
     def post(self):
+        """
+            Traduz o site
+            
+            Validações: 
+                Token('X-CSRFToken')
+            
+            Retorno:
+                200 = Traduzido com sucesso
+        """
         token = request.headers.get("X-CSRFToken")
         
         check = check_csrf(token)
@@ -697,7 +778,7 @@ class translate(Resource):
         textos_para_traduzir = []
         indices_para_traduzir = []
 
-        # verifica quais já estão no cache
+
         for i, texto in enumerate(textos):
             chave = f"{texto}_{lingua}"
             if chave in cache_traducoes:
@@ -707,7 +788,6 @@ class translate(Resource):
                 textos_para_traduzir.append(texto)
                 indices_para_traduzir.append(i)
 
-        # traduz só os que faltam
         if textos_para_traduzir:
             novas = GoogleTranslator(source='pt', target=lingua).translate_batch(textos_para_traduzir)
             
@@ -725,7 +805,21 @@ class translate(Resource):
         }, 200           
 
 class delete_Account(Resource):
+    """
+        Endpoint responsável por apagar a conta do usuário
+    """
     def delete(self):
+        """
+            Apaga a conta do usuário do Banco de Dados
+            
+            Verificações:
+                Token, usuário logado
+            
+            Retornos: 
+                400 = Usuário não está logado
+                200 = Conta excluida com sucesso
+        """
+        
         token = request.headers.get("X-CSRFToken")
         
         check = check_csrf(token)
@@ -736,6 +830,11 @@ class delete_Account(Resource):
         con = connection()
         cursor = con.cursor(pymysql.cursors.DictCursor)
         
+        if 'usuario_id' not in session:
+            return {
+                "status":"error",
+                "mensagem":"Você precisa estar logado para deletar sua conta"
+            }, 400
         id = session['usuario_id']
         
         a = """delete from bloqueados where id_bloqueador = %s or id_bloqueado = %s"""
@@ -775,7 +874,23 @@ class delete_Account(Resource):
         }, 200
     
 class update_Password(Resource):
+    """
+        Endpoint responsável por atualizar a senha de um usuário que já está logado
+    """
     def put(self):
+        """
+            Atualiza a senha do usuário
+            
+            Validações:
+                Token('X-CSRFToken'), id do usuário na session, senha inserida igual a senha antiga
+            
+            Retornos:
+                400 = Usuário não está logado
+                200 = Senha atualizada com sucesso
+                401 = Senha não é igual a antiga
+                
+        """
+        
         token = request.headers.get("X-CSRFToken")
         
         check = check_csrf(token)
@@ -790,6 +905,13 @@ class update_Password(Resource):
         
         old = data.get('senha_antiga')
         nova = data.get('senha_nova')
+        
+        if 'usuario_id' not in session:
+            return {
+                "status":"error",
+                "mensagem":"Você precisa estar logado para deletar sua conta"
+            }, 400
+        
         id = session['usuario_id']
         
         nova = generate_password_hash(nova)
@@ -802,7 +924,7 @@ class update_Password(Resource):
             a = """update usuarios set senha = %s where id_usuario = %s"""
             cursor.execute(a,(nova,id))
             con.commit()
-            print('deu BOM') 
+
             return {
                 'status':'success',
                 'mensagem':'Senha atualizada'
@@ -811,10 +933,24 @@ class update_Password(Resource):
         return {
             'status':'error',
             'mensagem':'senha incorreta'
-        }, 400
+        }, 401
 
 class bloquear(Resource):
+    """
+        Endpoint responsável por bloquear usuários
+    """
     def post(self):
+        """
+            Bloqueia usuários
+            
+            Verificações:
+                Token('X-CSRFToken'),id do bloqueador na session, usuário existente, se usuário já foi bloqueado
+                
+            Retornos:
+                400 = Usuário não encontrado, usuário ja foi bloqueado ou usuário não está logado
+                200 = Usuário bloqueado
+        """
+        
         token = request.headers.get("X-CSRFToken")
         
         check = check_csrf(token)
@@ -842,6 +978,13 @@ class bloquear(Resource):
             cursor.execute(b,(person,))
             resposta = cursor.fetchone()
             id_bloqueado = resposta['id_usuario']
+            
+            if 'usuario_id' not in session:
+                return {
+                    "status":"error",
+                    "mensagem":"Você precisa estar logado para deletar sua conta"
+                }, 400
+                
             id_bloqueador = session['usuario_id']
                     
             aaa = """select id_bloqueador from bloqueados where id_bloqueador = %s and id_bloqueado = %s"""
@@ -873,7 +1016,21 @@ class bloquear(Resource):
         }, 400
 
 class desbloquear(Resource):
+    """
+        Endpoint responsável por desbloquear usuários
+    """
     def post(self):
+        """
+            Cancela bloqueios
+            
+            Validações:
+                Token('X-CSRFToken'), id do usuário na session
+            
+            Retornos:
+                400 = Não foi possivel cancelar o bloqueio 
+                200 = Desbloqueou com sucesso
+        """
+        
         token = request.headers.get("X-CSRFToken")
         
         check = check_csrf(token)
@@ -887,7 +1044,13 @@ class desbloquear(Resource):
         cursor = con.cursor(pymysql.cursors.DictCursor)
         
         nome = data.get('nome')
-   
+
+        if 'usuario_id' not in session:
+            return {
+                "status":"error",
+                "mensagem":"Você precisa estar logado para deletar sua conta"
+            }, 400
+            
         usuario = session['usuario_id']
         
         a = """select id_usuario from usuarios where BINARY user_name = %s"""
@@ -908,16 +1071,31 @@ class desbloquear(Resource):
             return {
                 'status':'success',
                 'mensagem':'Usuario desbloqueado com sucesso'
-            }
+            }, 200
+            
         except pymysql.MySQLError as error:
             
             return {
                 'status':'error',
                 'mensagem':'não foi possivel desbloquear'
-            }
+            }, 500
         
 class bloqueados(Resource):
+    """
+        Endpoint que mostra todos os usuários já bloqueados
+    """
     def get(self):
+        """
+            Pega todos os usuários que já foram bloqueados pelo cliente
+            
+            Validações:
+                Token('X-CSRFToken'), id do cliente na session
+            
+            Retornos:
+                401 = Usuário não está logado
+                200 = Informações retiradas com sucesso
+        """
+        
         token = request.headers.get("X-CSRFToken")
         
         check = check_csrf(token)
@@ -955,7 +1133,21 @@ class bloqueados(Resource):
         }, 200
         
 class editar_bio(Resource):
-    def post(self):
+    """
+        Endpoint responsável por editar a bio
+    """
+    def put(self):
+        """
+            Atualiza a bio
+            
+            Verificações:
+                Token('X-CSRFToken'), id do usuário na session
+            
+            Retornos:
+                400 = Usuário não está logado 
+                200 = Bio editada com sucesso
+        """
+        
         token = request.headers.get("X-CSRFToken")
         
         check = check_csrf(token)
@@ -967,6 +1159,12 @@ class editar_bio(Resource):
         con = connection()
         cursor = con.cursor(pymysql.cursors.DictCursor)
         
+        if 'usuario_id' not in session:
+            return {
+                "status":"error",
+                "mensagem":"Você precisa estar logado para deletar sua conta"
+            }, 400
+            
         id = session['usuario_id']
         
         bio = data.get('bio')
@@ -984,7 +1182,22 @@ class editar_bio(Resource):
             'mensagem':'bio mudada com sucesso'
         }, 200
 class editar_nome(Resource):
-    def post(self):
+    """
+        Endpoint responsável por editar o nome
+    """
+    def put(self):
+        """
+            Atualiza o nome do usuário
+            
+            Verificações:
+                Token('X-CSRFToken'), id do usuário na session, se já existe um usuário com o mesmo nome
+                
+            Retornos:
+                401 = Usuário não está logado
+                400 = Nome já está sendo utilizado
+                200 = Nome editado com sucesso
+        """
+        
         token = request.headers.get("X-CSRFToken")
         
         check = check_csrf(token)
@@ -996,6 +1209,12 @@ class editar_nome(Resource):
         con = connection()
         cursor = con.cursor(pymysql.cursors.DictCursor)
         
+        if 'usuario_id' not in session:
+            return {
+                "status":"error",
+                "mensagem":"Você precisa estar logado para deletar sua conta"
+            }, 401
+            
         id = session['usuario_id']
         
         nome = data.get('nome')
@@ -1011,7 +1230,7 @@ class editar_nome(Resource):
                 return {
                     'status':'error',
                     'mensagem':'esse nome de usuario já está sendo utilizado'
-                }, 200
+                }, 400
             
             
         query = """update usuarios set user_name = %s where id_usuario = %s"""
@@ -1103,7 +1322,24 @@ class salvar_video(Resource):
         }, 200
     
 class salvar_foto(Resource):
+    """
+        Endpoint responsável por salvar fotos no cloudnary
+    """
     def post(self):
+        """
+            Salva foto de perfil
+            
+            Verificações:
+                Token('X-CSRFToken'), foto foi carregada, tipo de arquivo permitido, id do usuário na session
+                
+            Retornos:    
+                401 = Usuário não está logado
+                400 = Nenhum arquivo enviado ou arquivo não suportado
+                500 = Não foi possivel salvar a imagem no clounary (erro da API)
+                200 = Imagem salva
+                
+        """
+        
         token = request.headers.get("X-CSRFToken")
         
         check = check_csrf(token)
@@ -1132,6 +1368,12 @@ class salvar_foto(Resource):
         
         nome = f'{uuid4()}.{ext}'
         
+        if 'usuario_id' not in session:
+            return {
+                "status":"error",
+                "mensagem":"Você precisa estar logado para deletar sua conta"
+            }, 401
+            
         id = session['usuario_id']
         #session['usuario_id'] = usuario['id']
         #session.permanent = True
@@ -1144,7 +1386,7 @@ class salvar_foto(Resource):
             return {
                 "status":"error",
                 "mensagem":"Não foi possivel salvar a imagem no cloudinary"
-            },400 
+            },500 
         
         query = """update usuarios set foto_url = %s where id_usuario = %s"""
         cursor.execute(query,(url,id))
@@ -1158,7 +1400,22 @@ class salvar_foto(Resource):
         }, 200        
     
 class validar_captcha(Resource):
+    """
+        Endpoint responsável por validar captcha
+    """
+    
     def post(self):
+        """
+            Valida o CAPTCHA enviado
+            
+            Validações:
+                Token('X-CSRFToken'), captcha correto
+            
+            Retornos: 
+                200 = CAPTCHA valido
+                403 = CAPTCHA invalido
+        """
+        
         token = request.headers.get("X-CSRFToken")
         
         check = check_csrf(token)
