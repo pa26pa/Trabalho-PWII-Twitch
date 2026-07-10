@@ -1,3 +1,12 @@
+"""
+            Módulo de autentificação e gerenciamento de contas de usuários
+    Esse módulo cria endoints que são utilizados pela APIRest, alguns dos endpoints são
+    de autentificação (login), criação de conta (signin), encerramento de sessão (logout).
+    
+    Seguranças: 
+        Proteção contra Captcha inválido, validação de token enviado pelo JS e futuramente válidação de CPF válido
+"""
+
 from flask import Flask, Blueprint,render_template, request, flash, redirect, url_for, session, make_response
 from flask_restful import Api, Resource
 from flask_limiter import Limiter
@@ -27,15 +36,37 @@ from backend.database.connection import limiter
 from datetime import date
 from markupsafe import escape
 
+#carregando o .env
 load_dotenv()
 
 secret = os.getenv("CAPTCHA_SECRET")
 
 extensoes_permitidas = {'jpg','jpeg','png','gif','mp4','webm'}
 
+#chamando função para poder inserir videos e imagens no cloudnary
 acorda_cloudinary()
+
+
 class signin(Resource):
+    """
+        Endpoint responsável pelo registro de novos usuários no sistema.
+    """
     def post(self):
+        """
+            Processa a criação de um novo usuário.
+            
+            Válidações: 
+                Token('X-CSRFToken'), captcha, cpf, email, existência de um usuário já criado com os mesmos dados.
+            
+            Retornos: 
+                403 = CAPTCHA inválido
+                400 = Campos incompletos
+                406 = Email inválido ou informações duplicadas
+                500 = Erro interno do servidor 
+                201 = Usuário criado com sucesso
+                
+        """
+        
         data = request.get_json()
 
         con = connection()
@@ -65,8 +96,6 @@ class signin(Resource):
         data_nascimento = data.get('data_nascimento')
         senha = data.get('senha')
         
-        # FIX: valida se todos os campos obrigatórios vieram preenchidos
-        # antes de tentar processar — evita None chegando no banco
         if not all([cpf_limpo, email, user_name, data_nascimento, senha]):
             cursor.close()
             con.close()
@@ -86,9 +115,7 @@ class signin(Resource):
         
         email = valido
 
-        # FIX: captura explicitamente se data_valida() falhar e retornar None,
-        # em vez de deixar o erro estourar só no INSERT (gerando 500 sem
-        # mensagem clara)
+        
         data_formatada = data_valida(data_nascimento)
         if not data_formatada:
             cursor.close()
@@ -96,7 +123,7 @@ class signin(Resource):
             return {
                 'status': 'error',
                 'mensagem': 'Data de nascimento inválida. Use o formato DD/MM/AAAA'
-            }, 400
+            }, 500
 
         senha_hash = generate_password_hash(senha)
         
@@ -127,13 +154,11 @@ class signin(Resource):
                 'status':'error',
                 'mensagem':'Ouve um erro, informações duplicadas'
             }, 400
-        # FIX: captura QUALQUER outra exceção do banco (conexão perdida,
-        # campo NULL não esperado, etc) e retorna erro tratado em vez
-        # de deixar o Flask devolver 500 cru
+        
         except Exception as e:
             cursor.close()
             con.close()
-            print("ERRO NO INSERT:", str(e))  # log pra você ver no terminal/Railway
+            print("ERRO NO INSERT:", str(e))
             return {
                 'status': 'error',
                 'mensagem': 'Erro ao cadastrar usuário'
@@ -147,9 +172,23 @@ class signin(Resource):
         }, 201
     
 class login(Resource):
-    decorators = [limiter.limit("10 per minute")]
+    """
+        Endpoint responsável pela autentificação do usuário
+    """
+    decorators = [limiter.limit("10 per minute")] # define um limite de utilizações desse endpoint
+    
     def post(self):
-        
+        """
+            Autentifica as informações dadas pelo usuário
+            
+            Validações: 
+                Token('X-XSRFToken'), email, existencia de uma conta com aquelas credênciais, validação da senha em hash
+            
+            Retornos: 
+                202 = Login feito com sucesso
+                401 = Email, nome de usuário ou senha incorretos
+        """
+            
         token = request.headers.get("X-CSRFToken")
         
         check = check_csrf(token)
@@ -162,11 +201,11 @@ class login(Resource):
         con = connection()
         cursor = con.cursor(pymysql.cursors.DictCursor)
             
-        #retirando dados do js
+        
         username_email = data.get('username_email')
         senha = data.get('senha')
 
-        # sabendo se é um email ou um nome de usuário
+        
         vendo = email_valido(username_email)
 
         if vendo == False:
@@ -207,7 +246,20 @@ class login(Resource):
         }, 405
 
 class logout(Resource):
+    """
+        Endpoint responsável pelo termino de sessões
+    """
     def post(self):
+        """
+            Encerra a sessão do usuário
+            
+            Validações: 
+                Token('X-CSRFToken'), existencia da session
+            
+            Retornos: 
+                400 = Usuário não está logado
+                200 = Logout feito com sucesso
+        """
         token = request.headers.get("X-CSRFToken")
         
         check = check_csrf(token)
@@ -215,6 +267,12 @@ class logout(Resource):
         if not check or check.get("status") == "error":
             return {'status': 'error', 'mensagem' : check.get("mensagem")}
         
+        if not session:
+            return {
+                "status":"error",
+                "mensagem":"Você ainda não está logado"
+            }, 400
+            
         session.clear()
         return {
             "status":'success',
@@ -228,7 +286,21 @@ class logout(Resource):
         }, 405
         
 class check_login(Resource):
+    """
+        Endpoint responsável por buscar informações do usuári
+    """
     def post(self):
+        """
+            Acha e envia as informações ao JS
+            
+            Validações: 
+                Existencia do id do usuário na session, (O token tava dando problema, então retirei ele por enquanto)
+            
+            Retornos: 
+                200 = Informações retiradas com sucesso
+                400 = Usuário não logado
+        """
+        
         # sem check_csrf aqui — só leitura
         if 'usuario_id' in session:
             con = connection()
@@ -259,7 +331,7 @@ class check_login(Resource):
             'status': 'error',
             'mensagem': 'não está logado',
             'logado': False
-        }, 200
+        }, 400
 
 class google(Resource):
     def post(self):
@@ -311,7 +383,22 @@ class auth_google(Resource):
         }, 500
         
 class forgot(Resource):
+    """
+        Endpoint responsável pela troca de senha do usuário
+    """
     def post(self):
+        """
+            Troca a senha do usuário
+            
+            Validação: 
+                Token('X-CSRFToken'), email, existencia de uma conta com o email
+            
+            Retornos:
+                401 = Email inválido
+                404 = Email ainda não foi cadastrado 
+                200 = Código enviado com sucesso
+        """
+        
         token = request.headers.get("X-CSRFToken")
         
         check = check_csrf(token)
