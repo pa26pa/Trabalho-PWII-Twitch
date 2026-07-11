@@ -1,3 +1,12 @@
+"""
+            Módulo responsável por fazer conecções com o Banco de dados
+        e com outros recursos como Cloudnary. Além disso ele contém validações de
+        email e datas para que elas não sejam enviadas incorretamente ao MySQL.
+------------------------------------------------------------------------------------------------
+|   Por enquanto ele também contém funções relacionadas ao tradutor e a segurança de acessos   |
+------------------------------------------------------------------------------------------------
+"""
+
 import smtplib
 from email.message import EmailMessage
 import pymysql
@@ -27,7 +36,11 @@ supabase: Client = create_client(url,key)
 bd_password = os.getenv("DB_PASSWORD")
 email_password = os.getenv("EMAIL_PASSWORD")
 
+
 def acorda_cloudinary ():
+    """
+        Função responsável por fazer a conexão com o Cloudinary
+    """
     cloudinary.config(
         cloud_name= os.getenv("CLOUD_NAME"),
         api_key= os.getenv("CLOUDINARY_KEY"),
@@ -37,6 +50,9 @@ def acorda_cloudinary ():
         
 # Conectando com o Mysql :):)
 def connection():
+    """
+        Função responsável por fazer inicializar a conexão com o MySQL do railway
+    """
     return pymysql.connect (
         port=3306,
         host='mysql.railway.internal',
@@ -47,6 +63,16 @@ def connection():
     )
 
 def email_valido(email):
+    """
+        Função responsável por validar o email
+        
+        Parâmetros:
+            email = argumento inserido pelo usuário
+            
+        Retornos: 
+            False = Email não é válido
+            email = Email válido, e corretamente filtrado (Tudo LOWER)
+    """
     try:
         check = validate_email(email)
         
@@ -57,8 +83,17 @@ def email_valido(email):
     except EmailNotValidError:
         return False
 
-# fiz para garantir que não ia ter erro nessa parte de trazer a data para o BD
+
 def data_valida(data):
+    """
+        Função responsável por filtrar a data
+        
+        Parâmetros:
+            data = argumento inserido pelo usuário
+        
+        Retornos: 
+            a = data filtrada corretamente
+    """
     try:
         a = datetime.strptime(data, '%Y-%m-%d').strftime('%Y-%m-%d')
         return a

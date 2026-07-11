@@ -1,3 +1,9 @@
+"""
+            Módulo de seguranças e verificações
+    Esse módulo cria soluções para possiveis ataques ou 
+    falhas da segurança. As soluções serão utilizadas pelos 
+    endpoints da APIRest. 
+"""
 import requests
 from validate_docbr import CPF 
 import os
@@ -13,7 +19,16 @@ token = os.getenv("token_hub")
 cpf_api = CPF()
 
 def cpf_math_validate(cpf):
-    
+    """
+        Essa função valida se o cpf é matemáticamente correto
+
+        Parâmetros:
+            cpf = argumento inserido pelo usuário
+        
+        Retornos:
+            True = CPF matematicamente correto
+            False = CPF matematicamente incorreto
+    """    
     if cpf_api.validate(cpf):
         return True
     
@@ -21,7 +36,20 @@ def cpf_math_validate(cpf):
 
 
 def cpf_real_or_not(cpf, data_nascimento):
-    # URL correta da API atualizada do Hub do Desenvolvedor
+    """
+        Essa função valida se esse cpf existe e retira informações 
+        sobre o dono do cpf, a partir no cpf e a data de nascimento
+        
+        Parâmentros:
+            cpf = argumento inserido pelo usuário
+            data_nascimento = argumento inserido pelo usuário
+        
+        Retornos:
+            True = Dados foram recebidos
+            False = Não foi possivel receber os dados
+            error = Erro conxão com a internet
+    """
+    # URL da API atualizada do Hub do Desenvolvedor
     url_da_api = "https://ws.hubdodesenvolvedor.com.br/v2/cpf/?cpf=$cpf&data=$data_de_nascimento_formato_pt_br&token=208382980qpnWZIDwHB376229152" 
     
     parametros_obrigatorios = {
@@ -52,7 +80,16 @@ def cpf_real_or_not(cpf, data_nascimento):
         }
 
 def captcha(captcha):
-    
+    """
+        Função responsável por validar o CAPTCHA feito melo usuário
+        
+        Parâmetros:
+            captcha = valor enviado pelo js
+        
+        Retornos:
+            error = CAPTCHA inválido
+            success = captcha válido
+    """
     verifica = 'https://www.google.com/recaptcha/api/siteverify'
         
     info = {
@@ -74,6 +111,16 @@ def captcha(captcha):
     }
     
 def check_csrf(token):
+    """
+        Função reponsável por validar o token enviado pelo JS
+        
+        Parâmetros:
+            token = Token('X-CSRFToken') enviado pelo js na requisição
+        
+        Retornos:
+            error = Token incorreto
+            success = Token válido
+    """
     try:
         validate_csrf(token)
     except Exception:
@@ -83,5 +130,5 @@ def check_csrf(token):
         }
     return {
         'status':'success',
-        'mensagem':'Token'
+        'mensagem':'Token válido'
     }
