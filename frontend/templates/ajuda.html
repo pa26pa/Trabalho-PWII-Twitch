@@ -3,9 +3,165 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Witch | Ajuda</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+    <link rel="stylesheet" href="{{url_for('static', filename='style.css')}}">
+    <link rel="icon" type="image/x-icon" href="{{url_for('static', filename='witch.png')}}">
 </head>
 <body>
-    
+    <header id="header"> 
+        <div class="logo"><a href="{{url_for('home')}}"><img id="logo" src="{{url_for('static', filename='witch.png')}}" alt="logo"></a></div>
+        <div class="header-center">
+            <!--BARRA DE PESQUISA-->
+            <div class="bottom-menu">
+                <div class="search-bar">
+                    <div class="search-icon">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </div>
+                    <input type="text" id="search" placeholder="Pesquise aqui" data-i18n-placeholder>
+                </div>
+            </div>
+        </div>
+
+        <div class="toast"></div>
+
+        <div class="menu-modals">
+            <a href="{{url_for('luna')}}" target="_blank" aria-placeholder="Luna">
+                <button id="btn-moon">
+                    <i class="fa-solid fa-crown moon-crown" style="color: rgb(255, 212, 59);"></i>
+                </button>
+            </a>
+            
+            <button id="btn-turbo" class="btn-open-modal" title="Turbo" data-modal="modal-5">
+                <i class="fa-solid fa-battery-half charge-icon" style="color: rgb(255, 255, 255);"></i>
+            </button>
+
+            <dialog id="modal-5">
+                <div class="turbo-modal">
+                    <div class="modal-buttons">
+                        <p> </p>
+                        <button class="btn-close-modal" data-modal="modal-5"><i class="fa-solid fa-x close-x"></i></button>
+                    </div>
+
+                    <!-- banner roxo/pink degradê -->
+                    <div class="turbo-banner">
+                        <h1 class="turbo-logo">Witch <span>TURBO</span></h1>
+                    </div>
+
+                    <div class="turbo-body">
+                        <p class="turbo-price">
+                            <s>R$ 26,99/mês</s> <strong>R$ 18,89/mês</strong> no primeiro mês
+                        </p>
+                        <p class="turbo-sub">Renova automaticamente por R$ 26,99/mês depois disso.</p>
+                        <p class="turbo-headline">Apoie streamers sem interrupções.</p>
+
+                        <div class="turbo-features">
+                            <div class="turbo-feature">
+                                <i class="fa-solid fa-tv"></i>
+                                <div>
+                                    <strong>Assista sem anúncios</strong>
+                                    <p>Assista seus streamers favoritos sem anúncios em vídeo ou banners.</p>
+                                </div>
+                            </div>
+                            <div class="turbo-feature">
+                                <i class="fa-solid fa-hard-drive"></i>
+                                <div>
+                                    <strong>Armazenamento expandido (60 dias)</strong>
+                                    <p>Armazene seus VODs por até 60 dias em vez de 14.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="turbo-extras">
+                            <div class="turbo-extra">
+                                <i class="fa-solid fa-comment"></i>
+                                <span>Distintivo de chat exclusivo</span>
+                            </div>
+                            <div class="turbo-extra">
+                                <i class="fa-solid fa-face-smile"></i>
+                                <span>Dois conjuntos de emotes adicionais</span>
+                            </div>
+                            <div class="turbo-extra">
+                                <i class="fa-solid fa-palette"></i>
+                                <span>Cores personalizadas para nomes no chat</span>
+                            </div>
+                        </div>
+
+                        <br><br>
+                        <p class="turbo-disclaimer">Cobrança mensal • Cancele a qualquer momento</p>                         
+                        <div class="turbo-btns">
+                            <button class="btn-turbo-gift">Presentear Turbo</button>
+                            <button class="btn-turbo-sub">Inscrever-se</button>
+                        </div>
+                    </div>
+                </div>
+            </dialog>
+            
+            <!--DROPDOWN MENU-->
+            <div class="dropdown-menu-wrap">
+                <button class="open-modal" id="btn-dropdown">
+                    <i class="fa-solid fa-user menu-icon" style="color: rgb(255, 255, 255);"></i>
+                </button>
+
+                <div id="dropdown-menu" class="dropdown-menu">
+                    <ul>
+                        <li id="dropdown-usuario">
+                            <div class="background-avatar">
+                                <i class="fa-solid fa-user avatar-dropdown" style="color: rgb(255, 255, 255);"></i>
+                            </div>
+                            <div class="show_name"></div>
+                        </li>
+                        <hr>
+
+                        <a href="{{url_for('perfil')}}">
+                            <li><span data-i18n>Meu Canal</span></li>
+                        </a>
+                        <hr>
+                        
+                        <li id="language-item" class="submenu-item">
+                            <span data-i18n>Idioma</span>
+                            <i class="fa-solid fa-angle-up arrow-language"></i>
+
+                            <div id="language-submenu" class="submenu">
+                                <ul>
+                                    <li class="language-option" data-lang="pt" data-i18n>🇧🇷 Português</li>
+                                    <li class="language-option" data-lang="en" data-i18n>🇺🇸 English</li>
+                                    <li class="language-option" data-lang="es" data-i18n>🇪🇸 Español</li>
+                                </ul>
+                            </div>
+                        </li>
+                        <hr>
+                        <li class="toggle-item">
+                            <span data-i18n>Tema Escuro</span>
+                            <label class="switch">
+                                <input type="checkbox" id="dark-theme">
+                                <span class="slider"></span>
+                            </label>
+                        </li>
+                        <hr>
+                        <li id="btn-logout" class="with-login" data-i18n>Sair</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <aside class="small-aside">
+        <div class="box-links-pages">
+            <!-- aparece só quando logado -->
+            <a href="{{url_for('config')}}" class="aside-pages">
+                <i class="fa-solid fa-gear pages-icon-aside"></i>
+            </a>
+
+            <hr class="aside-hr">
+
+            <a href="{{url_for('ajuda')}}" class="aside-pages">
+                <i class="fa-regular fa-circle-question pages-icon-aside"></i> 
+            </a>
+        </div>
+    </aside>
+
+    <script src="{{url_for('static', filename='tradutor.js')}}"></script>
+    <script src="{{url_for('static', filename='script.js')}}"></script>
 </body>
 </html>
