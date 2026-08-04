@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // o token é necessário para proteger contra ataques CSRF, garantindo que as requisições venham de fontes confiáveis
     let csrfToken = null;
     async function carregarCsrf() {
-        const res = await fetch("/csrf-token");
+        const res = await fetch("http://127.0.0.1:5000/csrf-token");
         const data = await res.json();
         csrfToken = data.csrf_token;
     }
@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', function () {
     async function verificarSessao() {
 
         try {
-            const res = await fetch("/session", {
+            const res = await fetch("http://127.0.0.1:5000/session", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const btnLogout = document.getElementById('btn-logout');
     if (btnLogout) {
         btnLogout.addEventListener('click', async () => {
-            const res = await fetch("/logout", {
+            const res = await fetch("http://127.0.0.1:5000/logout", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -219,7 +219,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // reenvio — login
     if (otpLogin?.resendBtn) {
         otpLogin.resendBtn.addEventListener('click', () => {
-            fetch('/resend', { method: 'GET', headers: { 'Content-Type': 'application/json', "X-CSRFToken":csrfToken } })
+            fetch('http://127.0.0.1:5000/resend', { method: 'GET', headers: { 'Content-Type': 'application/json', "X-CSRFToken":csrfToken } })
             .then(r => r.json()).then(data => mostrarToast(data.mensagem, data.status));
         });
     }
@@ -227,7 +227,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // reenvio — excluir conta
     if (otpDelete?.resendBtn) {
         otpDelete.resendBtn.addEventListener('click', () => {
-            fetch('/resend', { method: 'GET', headers: { 'Content-Type': 'application/json' } })
+            fetch('http://127.0.0.1:5000/resend', { method: 'GET', headers: { 'Content-Type': 'application/json' } })
             .then(r => r.json()).then(data => mostrarToast(data.mensagem, data.status));
         });
     }
@@ -606,7 +606,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 };
                 
                 
-                fetch("/signin", {
+                fetch("http://127.0.0.1:5000/signin", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -639,7 +639,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             senha: dados['senha']
                         };
 
-                        fetch("/login", {
+                        fetch("http://127.0.0.1:5000/login", {
                             method: "POST",
                             headers: {
                                 "Content-Type": "application/json",
@@ -677,7 +677,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     senha: document.getElementById('senha_login').value
                 }
 
-                fetch("/login", {
+                fetch("http://127.0.0.1:5000/login", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -704,7 +704,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     who: 'forgot_password'
                 };
                 console.log('aaa');
-                fetch("/forgot", {
+                fetch("http://127.0.0.1:5000/forgot", {
                     method: "POST",
                     headers: { "Content-Type": "application/json", "X-CSRFToken":csrfToken },
                     body: JSON.stringify(dados)
@@ -727,7 +727,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 const otp = form.closest('#modal-3') ? otpDelete : otpLogin;
                 const codigo = otp ? otp.getCode() : '';
 
-                fetch('/check_codigo', {
+                fetch('http://127.0.0.1:5000/check_codigo', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', "X-CSRFToken":csrfToken},
                     body: JSON.stringify({ codigo })
@@ -739,7 +739,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     if (form.closest('#modal-3')) {
                         // fluxo de excluir conta: valida código e deleta
-                        fetch('/delete', {
+                        fetch('http://127.0.0.1:5000/delete', {
                             method: 'DELETE',
                             headers: { 'Content-Type': 'application/json' }
                         })
@@ -762,7 +762,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     nova_senha: form.querySelector('.password2').value
                 }
 
-                fetch("/redefine_password", {
+                fetch("http://127.0.0.1:5000/redefine_password", {
                 method:"PUT",
                 headers: {
                     "Content-Type":"application/json",
@@ -795,7 +795,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     senha_antiga: form.querySelector('.password-atual').value
                 }
             
-                fetch("/update", {
+                fetch("http://127.0.0.1:5000/update", {
                 method:"PUT",
                 headers: {
                     "Content-Type":"application/json",
@@ -825,7 +825,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 who: 'delete_account'
             };
 
-            fetch("/forgot", {
+            fetch("http://127.0.0.1:5000/forgot", {
                 method: "POST",
                 headers: { "Content-Type": "application/json", "X-CSRFToken":csrfToken },
                 body: JSON.stringify(dados)
@@ -848,7 +848,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const btnDelete = document.querySelector(".btn-delete");
     if (btnDelete) {
         btnDelete.addEventListener("click", function() {
-        fetch("/delete", {
+        fetch("http://127.0.0.1:5000/delete", {
                 method:"DELETE",
                 headers: {
                     "Content-Type":"application/json",
@@ -936,7 +936,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 email: inputEmail.value,
                 who: 'forgot_password'
             };
-            fetch("/forgot", {
+            fetch("http://127.0.0.1:5000/forgot", {
                 method: "POST",
                 headers: { "Content-Type": "application/json", "X-CSRFToken": csrfToken },
                 body: JSON.stringify(dados)
@@ -1393,7 +1393,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             const dados = {
                                 nome:usuario.nome
                             };
-                            const res = await fetch("/desbloquear", {
+                            const res = await fetch("http://127.0.0.1:5000/desbloquear", {
                             method: "POST",
                             headers: {
                                 "Content-Type": "application/json",
@@ -1464,7 +1464,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     data: today
                 };
 
-                const res = await fetch("/bloquear", {
+                const res = await fetch("http://127.0.0.1:5000/bloquear", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -1522,7 +1522,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const btnEditar = document.getElementById('btn-editar');
     if (btnEditar) {
         btnEditar.addEventListener('click', () => {
-            fetch("/session", { method: "GET", headers: { "Content-Type": "application/json", "X-CSRFToken": csrfToken } })
+            fetch("http://127.0.0.1:5000/session", { method: "GET", headers: { "Content-Type": "application/json", "X-CSRFToken": csrfToken } })
             .then(res => res.json())
             .then(data => {
                 const inputNome = document.getElementById('name-user');
@@ -1573,7 +1573,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             try {
                 if (fotoTemp != null) {
-                    const res = await fetch('/salvar_foto', {
+                    const res = await fetch('http://127.0.0.1:5000/salvar_foto', {
                         method: 'POST',
                         headers: {
                             "X-CSRFToken":csrfToken
@@ -1600,7 +1600,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     nome: novoNome
                 };
 
-                const res_ = await fetch('/editar_nome', {
+                const res_ = await fetch('http://127.0.0.1:5000/editar_nome', {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
@@ -1617,7 +1617,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     bio: novaBio
                 };
 
-                const resp = await fetch('/editar_bio', {
+                const resp = await fetch('http://127.0.0.1:5000/editar_bio', {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
@@ -1743,7 +1743,7 @@ document.addEventListener('DOMContentLoaded', function () {
         await verificarSessao();
 
         if (document.getElementById('block-btn')) {
-            fetch('/bloqueados', {
+            fetch('http://127.0.0.1:5000/bloqueados', {
             method:"GET",
             headers: {
                 "Content-Type": "application/json",

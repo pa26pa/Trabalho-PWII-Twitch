@@ -54,11 +54,13 @@ def connection():
         Função responsável por fazer inicializar a conexão com o MySQL do railway
     """
     return pymysql.connect (
-        port=3306,
-        host='mysql.railway.internal',
+        #port=3306,
+        #host='mysql.railway.internal',
+        host='localhost',
         user='root',
         password=bd_password,
-        database='railway',
+        #database='railway',
+        database='twitch',
         cursorclass=pymysql.cursors.Cursor
     )
 
