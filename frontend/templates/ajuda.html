@@ -11,17 +11,6 @@
 <body>
     <header id="header"> 
         <div class="logo"><a href="{{url_for('home')}}"><img id="logo" src="{{url_for('static', filename='witch.png')}}" alt="logo"></a></div>
-        <div class="header-center">
-            <!--BARRA DE PESQUISA-->
-            <div class="bottom-menu">
-                <div class="search-bar">
-                    <div class="search-icon">
-                        <i class="fa-solid fa-magnifying-glass"></i>
-                    </div>
-                    <input type="text" id="search" placeholder="Pesquise aqui" data-i18n-placeholder>
-                </div>
-            </div>
-        </div>
 
         <div class="toast"></div>
 
@@ -99,24 +88,27 @@
             
             <!--DROPDOWN MENU-->
             <div class="dropdown-menu-wrap">
-                <button class="open-modal" id="btn-dropdown">
-                    <i class="fa-solid fa-user menu-icon" style="color: rgb(255, 255, 255);"></i>
-                </button>
+                <button id="btn-dropdown">
+                        <!--DESLOGADO = HAMBURGUER-->
+                        <i class="fa-solid fa-bars menu-icon without-login" style="color: rgb(255, 255, 255);"></i>
+                        <!--LOGADO = PESSOINHA-->
+                        <i class="fa-solid fa-user with-login menu-icon" style="color: rgb(255, 255, 255);"></i>
+                </button> 
 
                 <div id="dropdown-menu" class="dropdown-menu">
                     <ul>
-                        <li id="dropdown-usuario">
+                        <li class="with-login" id="dropdown-usuario">
                             <div class="background-avatar">
                                 <i class="fa-solid fa-user avatar-dropdown" style="color: rgb(255, 255, 255);"></i>
                             </div>
                             <div class="show_name"></div>
                         </li>
-                        <hr>
+                        <hr class="with-login">
 
-                        <a href="{{url_for('perfil')}}">
-                            <li><span data-i18n>Meu Canal</span></li>
+                        <a class="with-login" href="{{url_for('perfil')}}">
+                            <li class="with-login"><span data-i18n>Meu Canal</span></li>
                         </a>
-                        <hr>
+                        <hr class="with-login">
                         
                         <li id="language-item" class="submenu-item">
                             <span data-i18n>Idioma</span>
@@ -149,11 +141,11 @@
     <aside class="small-aside">
         <div class="box-links-pages">
             <!-- aparece só quando logado -->
-            <a href="{{url_for('config')}}" class="aside-pages">
+            <a href="{{url_for('config')}}" class="aside-pages with-login">
                 <i class="fa-solid fa-gear pages-icon-aside"></i>
             </a>
 
-            <hr class="aside-hr">
+            <hr class="aside-hr with-login">
 
             <a href="{{url_for('ajuda')}}" class="aside-pages">
                 <i class="fa-regular fa-circle-question pages-icon-aside"></i> 
@@ -161,7 +153,19 @@
         </div>
     </aside>
 
-    
+    <main>
+        <div class="help-search-box">
+            <!--BARRA DE PESQUISA-->
+            <div class="bottom-menu">
+                <div class="search-bar">
+                    <div class="search-icon">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </div>
+                    <input type="text" id="search" placeholder="Pesquise aqui" data-i18n-placeholder>
+                </div>
+            </div>
+        </div>
+    </main>    
 
     <script src="{{url_for('static', filename='tradutor.js')}}"></script>
     <script src="{{url_for('static', filename='script.js')}}"></script>
