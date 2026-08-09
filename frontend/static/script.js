@@ -1933,4 +1933,32 @@ document.addEventListener('DOMContentLoaded', function () {
 
     recaptchaObserver.observe(document.body, { childList: true });
 
+    //----------AJUDA-----------
+    //extensão pra mostrar resposta da dúvida frequente
+    const questions = document.querySelectorAll(".question");
+
+    if (questions.length > 0) {
+        questions.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const item = btn.closest('.question-item');
+                const isOpen = item.classList.contains('open');
+
+                document.querySelectorAll('.question-item').forEach(a => {
+                    a.classList.remove('open');
+                });
+
+                if (!isOpen) {
+                    item.classList.add('open');
+                }
+            })
+        })
+    }
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.question-item')) {
+            document.querySelectorAll('.question-item').forEach(i => {
+                i.classList.remove('open');
+            });
+        }
+    });
+
 });

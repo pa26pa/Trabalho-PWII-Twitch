@@ -1959,6 +1959,85 @@ a {text-decoration: none;}
 }
 .btn-turbo-sub:hover { background: #6524c7; }
 
+/*-------AJUDA--------*/
+.help-search-box {
+    display: flex;
+    flex-direction: column;
+    width: max-content;
+    height: auto;
+    border: none;
+    margin: 15px auto;
+}
+.help-questions {
+    display: grid;
+    grid-template-columns: 60% 1fr;
+    margin: 20px auto;
+    width: 90vw;
+    height: auto;
+    padding: 20px;
+    gap: 10px;
+}
+.help-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-items: center;
+    padding: 10px;
+    width: 100%;
+    height: auto;
+}
+.help-box:last-child {
+    justify-content: center;
+    border-left: 2px solid #3B2B4F;
+}
+.questions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 90%;
+    height: auto;
+    padding: 5px;
+}
+.help-box:last-child button {
+    margin-top: 15px;
+    width: 150px;
+    height: 40px;
+    font-size: 1.2em;
+}
+.question-item {
+    background-color: #DEC7FF;
+    border-radius: 8px;
+    font-size: 1em;
+    transition: all 0.3s ease;
+}
+.question-item:hover {
+    background-color: #b891f1;
+}
+.question {
+    display: flex;
+    text-align: left;
+    padding: 5px;
+    gap: 10px;
+    background: transparent;
+    border: none;
+    width: 100%;
+    font-weight: bold;
+    cursor: pointer;
+}
+.help-box p {
+    font-size: 1em;
+}
+.answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s ease, padding 0.35s ease;
+    padding: 0 20px;
+}
+.question-item.open .answer {
+    max-height: 300px; /* valor maior que qualquer resposta que você vai colocar */
+    padding: 15px 20px 10px;
+}
+
 /*RESPONSIVIDADE = não é adaptar para telas, é permitir que o layout se adapte sozinho*/
 /*@media = "if"*/
 

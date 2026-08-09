@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,6 +11,8 @@
 <body>
     <header id="header"> 
         <div class="logo"><a href="{{url_for('home')}}"><img id="logo" src="{{url_for('static', filename='witch.png')}}" alt="logo"></a></div>
+
+        <div></div>
 
         <div class="toast"></div>
 
@@ -155,16 +157,56 @@
 
     <main>
         <div class="help-search-box">
+            <h1 data-i18n style="font-size: 2.2em;text-align: center;margin-bottom: 15px;">Ajuda</h1>
             <!--BARRA DE PESQUISA-->
             <div class="bottom-menu">
-                <div class="search-bar">
+                <div class="search-bar" style="background: #DEC7FF;width: 400px;height: 40px;">
                     <div class="search-icon">
                         <i class="fa-solid fa-magnifying-glass"></i>
                     </div>
-                    <input type="text" id="search" placeholder="Pesquise aqui" data-i18n-placeholder>
+                    <input type="text" id="search" placeholder="Pesquise suas dúvidas" data-i18n-placeholder>
                 </div>
             </div>
         </div>
+
+        <section class="help-questions">
+            <div class="help-box">
+                <h2 data-i18n style="font-size: 1.5em;text-align: left;margin-bottom: 10px;">Dúvidas Frequentes</h2>
+                <div class="questions">
+                    <div class="question-item">
+                        <button class="question">
+                            <i class="fa-solid fa-plus" style="color: #3B2B4F"></i>
+                            <p data-i18n>Como faço para criar uma conta?</p>
+                        </button>
+                        <div class="answer">
+                            <p data-i18n>Clique em "Entrar" no canto superior direito e depois em "Cadastrar". Preencha seus dados e pronto!</p>
+                        </div>
+                    </div>
+                    <div class="question-item">
+                        <button class="question">
+                            <i class="fa-solid fa-plus" style="color: #3B2B4F"></i>
+                            <p data-i18n>Como inicio uma live?</p>
+                        </button>
+                        <div class="answer">
+                            <p data-i18n>Acesse "Meu Canal" pelo menu e clique em "Começar Live". Preencha o título, descrição e categoria.</p>
+                        </div>
+                    </div>
+                    <div class="question-item">
+                        <button class="question">
+                            <i class="fa-solid fa-plus" style="color: #3B2B4F"></i>
+                            <p data-i18n>Esqueci minha senha, o que faço?</p>
+                        </button>
+                        <div class="answer">
+                            <p data-i18n>Na tela de login, clique em "Esqueceu a senha?" e siga as instruções para redefinir via email.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="help-box">
+                <p>Ou entre em contato enviando sua dúvida por email</p>
+                <button class="open-modal">Enviar Email</button>
+            </div>
+        </section>
     </main>    
 
     <script src="{{url_for('static', filename='tradutor.js')}}"></script>
