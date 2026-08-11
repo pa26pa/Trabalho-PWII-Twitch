@@ -78,14 +78,14 @@ class signin(Resource):
         if not check or check.get("status") == "error":
             return {'status': 'error', 'mensagem' : check.get("mensagem")}
         
-        captcha_enviado = data.get('captcha')
-        captcha_valido = captcha(captcha_enviado)
+        #captcha_enviado = data.get('captcha')
+        #captcha_valido = captcha(captcha_enviado)
         
-        if captcha_valido['status'] == 'error':
-            return {
-                'status':'error',
-                'mensagem':'captcha inválido'
-            }, 403
+        #if captcha_valido['status'] == 'error':
+        #    return {
+        #        'status':'error',
+        #        'mensagem':'captcha inválido'
+        #    }, 403
             
         cpf = str(data.get('cpf'))
         cpf = cpf.strip()

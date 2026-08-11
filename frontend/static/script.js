@@ -589,12 +589,12 @@ document.addEventListener('DOMContentLoaded', function () {
             // CADASTRO
             if (form.classList.contains('sign')) {
                 if (document.getElementById('cadastro').offsetParent === null) return;
-                const captcha = grecaptcha.getResponse();
+                //const captcha = grecaptcha.getResponse();
 
-                if (captcha.length === 0) {
-                    mostrarToast('Por favor, marque a caixa "Não sou um robô"', 'error')
-                    return;
-                }
+                //if (captcha.length === 0) {
+                //    mostrarToast('Por favor, marque a caixa "Não sou um robô"', 'error')
+                //    return;
+                //}
                 
                 const dados = {
                     cpf: document.getElementById("cpf").value,
@@ -602,7 +602,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     user_name: document.getElementById("user-cadastro").value,
                     data_nascimento: document.getElementById("data-nascimento").value,
                     senha: document.getElementById("senha").value,
-                    captcha: captcha
+                    //captcha: captcha
                 };
                 
                 
@@ -1011,16 +1011,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 const checkbox = document.getElementById('checkbox');
                 if (checkbox) checkbox.checked = false;
 
-                if (typeof grecaptcha !== 'undefined') {
-                    grecaptcha.reset();
-                }
+                //if (typeof grecaptcha !== 'undefined') {
+                //    grecaptcha.reset();
+                //}
             }
         });
     });
 
     // FLIP LOGIN ↔ CADASTRO — limpa inputs dos dois lados
     const checkbox = document.getElementById('checkbox');
-        let captchaRendered = false;
+        //let captchaRendered = false;
 
         if (checkbox) {
             checkbox.addEventListener('change', () => { 
@@ -1029,12 +1029,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 document.querySelectorAll('.input-erro').forEach(el => el.classList.remove('input-erro'));
 
                 // renderiza o captcha só quando o cadastro aparecer
-                if (checkbox.checked && !captchaRendered) {
-                    grecaptcha.render('recaptcha-container', {
-                        sitekey: '6LemWTAtAAAAAM2v-HHAGkaNtjG8vm-Huju47Nvs'
-                    });
-                    captchaRendered = true;
-                }
+                //if (checkbox.checked && !captchaRendered) {
+                //    grecaptcha.render('recaptcha-container', {
+                //        sitekey: '6LemWTAtAAAAAM2v-HHAGkaNtjG8vm-Huju47Nvs'
+                //    });
+                //    captchaRendered = true;
+                //}
             });
         }
 
@@ -1905,33 +1905,33 @@ document.addEventListener('DOMContentLoaded', function () {
     // o mesmo top layer do dialog (acima do ::backdrop, acima de tudo).
     const modal1 = document.getElementById('modal-1');
 
-    const recaptchaObserver = new MutationObserver(() => {
-        if (!modal1 || !modal1.open) return;
+    //const recaptchaObserver = new MutationObserver(() => {
+        //if (!modal1 || !modal1.open) return;
 
-        document.querySelectorAll('body > div').forEach(div => {
+        //document.querySelectorAll('body > div').forEach(div => {
             // ignora o próprio dialog e qualquer wrapper já processado
-            if (div === modal1 || div.dataset.recaptchaMoved === 'true') return;
+            //if (div === modal1 || div.dataset.recaptchaMoved === 'true') return;
 
-            const isRecaptchaDiv = div.querySelector('iframe[src*="recaptcha"]');
-            if (isRecaptchaDiv) {
-                div.classList.add('recaptcha-challenge-wrapper');
-                div.dataset.recaptchaMoved = 'true'; // FIX: evita reprocessar o mesmo div em loop
-                modal1.appendChild(div);
+            //const isRecaptchaDiv = div.querySelector('iframe[src*="recaptcha"]');
+            //if (isRecaptchaDiv) {
+            //    div.classList.add('recaptcha-challenge-wrapper');
+                //div.dataset.recaptchaMoved = 'true'; // FIX: evita reprocessar o mesmo div em loop
+                //modal1.appendChild(div);
 
                 // FIX: quando o iframe do desafio for removido pelo Google
                 // (resolveu o captcha ou fechou), some o wrapper inteiro
-                const innerObserver = new MutationObserver(() => {
-                    if (!div.querySelector('iframe[src*="recaptcha"]')) {
-                        div.remove();
-                        innerObserver.disconnect();
-                    }
-                });
-                innerObserver.observe(div, { childList: true, subtree: true });
-            }
-        });
-    });
+                //const innerObserver = new MutationObserver(() => {
+                //    if (!div.querySelector('iframe[src*="recaptcha"]')) {
+                //        div.remove();
+                //        innerObserver.disconnect();
+                //    }
+                //});
+                //innerObserver.observe(div, { childList: true, subtree: true });
+            //}
+        //});
+    //});
 
-    recaptchaObserver.observe(document.body, { childList: true });
+    //recaptchaObserver.observe(document.body, { childList: true });
 
     //----------AJUDA-----------
     //extensão pra mostrar resposta da dúvida frequente
