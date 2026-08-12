@@ -527,6 +527,7 @@ create table streams(
     categoria varchar(100),
     titulo text,
     descrisao text,
+    video_url text,
     data_updoad datetime,
     id_streamer int,
     
@@ -540,6 +541,7 @@ create table usuarios (
        user_name varchar(50) not null,
        senha varchar(500) not null,
        data_nascimento date not null,
+       bio text,
        foto_url text
 );
 
@@ -551,6 +553,36 @@ create table bloqueados (
     
     foreign key (id_bloqueador) references usuarios(id_usuario),
     foreign key (id_bloqueado) references usuarios(id_usuario)
+);
+
+create table tipo_sub (
+	id_sub_criada int auto_increment primary key,
+    id_criador int,
+    valor decimal(10,2),
+    
+    foreign key (id_criador) references usuarios(id_usuario)
+);
+
+create table seguidores(
+	id_inscrição int,
+    id_seguidor int,
+    id_seguido int,
+    
+    foreign key (id_seguidor) references usuarios(id_usuario),
+    foreign key (id_seguido) references usuarios(id_usuario)
+);
+
+create table subs (
+	id_sub int primary key,
+    id_usuario int,
+    id_tipo_sub int,
+    id_streamer int,
+    data_inicio date,
+    data_fim date,
+    
+    foreign key (id_usuario) references usuarios(id_usuario),
+    foreign key (id_tipo_sub) references usuarios(id_sub_criada),
+    foreign key (id_streamer) references usuarios(id_usuario)
 );-->
     </body>
 </html>
