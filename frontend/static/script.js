@@ -1341,7 +1341,6 @@ document.addEventListener('DOMContentLoaded', function () {
     //ABA DE PRIVACIDADE (USERS BLOQUEADOS)
     const blockInput = document.getElementById('block-input');
     const blockBtn = document.getElementById('block-btn');
-    const blockFeedback = document.getElementById('block-feedback');
     const toggleBtn = document.getElementById('toggle-blocked');
     const toggleIcon = document.getElementById('toggle-icon');
     const listWrap = document.getElementById('blocked-list-wrap');
@@ -1409,14 +1408,15 @@ document.addEventListener('DOMContentLoaded', function () {
                             body: JSON.stringify(dados)
                             }); 
                             const data = await res.json();
-
-                            blockFeedback.textContent = data.mensagem;
+                            
+                            mostrarToast(data.mensagem, data.status);
 
                             blockUsers.splice(i, 1);//remove do array
                             renderTable();//reenderiza a table
                             updateHeight();//ajusta tamanho do dropdown
+
                         } catch {
-                            blockFeedback.textContent = 'Erro ao desbloquear usuário';
+                            mostrarToast('Erro ao desbloquear usuário', data.status);
                         }       
                     });
                 });
@@ -1447,8 +1447,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
             const nome = blockInput.value.trim();
 
-            blockFeedback.textContent = '';
-
             if (!nome) return;
 
             // verifica se já está bloqueado
@@ -1457,7 +1455,7 @@ document.addEventListener('DOMContentLoaded', function () {
             );
 
             if (alreadyExists) {
-                blockFeedback.textContent = 'Esse usuário já está bloqueado';
+                mostrarToast('Esse usuário já está bloqueado', 'error');
                 return;
             }
 
@@ -1479,12 +1477,15 @@ document.addEventListener('DOMContentLoaded', function () {
                     },
                     body: JSON.stringify(dados)
                 });
-
+                
+                
                 const data = await res.json();
+                
+                mostrarToast(data.mensagem,data.status);
 
                 if (data.existe) {
 
-
+                        
                     blockUsers.push({
                         nome: nome,
                         data: today
@@ -1499,12 +1500,11 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
 
                 } else {
-                    blockFeedback.textContent = 'Usuário não encontrado';
+                    mostrarToast('Usuário não encontrado','error');
                 }
 
             } catch (erro) {
-                blockFeedback.textContent =
-                    'Erro ao verificar. Tente novamente';
+                mostrarToast('Erro ao verificar. Tente novamente','error');
 
             } finally {
 
