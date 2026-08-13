@@ -1475,8 +1475,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 const data = await res.json();
 
-                
-
                 if (data.existe) {
 
 
@@ -1498,9 +1496,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
 
             } catch (erro) {
-
-                
-
                 blockFeedback.textContent =
                     'Erro ao verificar. Tente novamente';
 
@@ -1961,4 +1956,142 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
+    //barra de pesquisa com overlay e histórico
+    const searchInput = document.getElementById('help-search');
+    const searchOverlay = document.getElementById('search-overlay');
+    const searchHistorico = document.getElementById('search-historico');
+    const searchHistoricoList = document.getElementById('search-historico-list');
+    const searchResults = document.getElementById('search-results');
+
+    //cria backdrop dinâmico 
+    const searchBackdrop = document.createElement('div');
+    searchBackdrop.id = 'search-backdrop';
+    document.body.appendChild(searchBackdrop);
+
+    if (searchInput && searchOverlay) {
+        //lê os artigoas como fonte de dados
+        const artigos = Array.from(document.querySelectorAll('.artigo')).map(el => ({
+            titulo: el.dataset.titulo,
+            tags: el.dataset.tags,
+            html: el.innerHTML
+        }));
+
+        //histórico salvo no localstorage
+        const HISTORICO_KEY = 'witch_search_historico';
+
+        function getHistorico() {
+            try {return JSON.parse(localStorage.getItem(HISTORICO_KEY) || '[]');}
+            catch {return [];}
+        }
+
+        function saveHistorico(term) {
+            let h = getHistorico().filter(t => t.toLowerCase() !== term.toLowerCase());
+            h.unshift(term); //add no inicio
+            h = h.slice(0, 5); //mostra apenas as últimas 5 pesquisas
+            localStorage.setItem(HISTORICO_KEY, JSON.stringify(h));
+        }
+
+        function renderHistorico() {
+            const h = getHistorico();
+            searchHistoricoList.innerHTML = '';
+
+            if (h.length === 0) {
+                searchHistorico.style.display = 'none';
+                return;
+            }
+
+            searchHistorico.style.display = 'block';
+            h.forEach(term => {
+                const li = document.createElement('li');
+                li.innerHTML = `<i class="fa-solid fa-clock-rotate-left"></i> ${term}`;
+                li.addEventListener('click', () => {
+                    searchInput.value = term;
+                    filtrar(term);
+                    saveHistorico(term);
+                });
+                searchHistoricoList.appendChild(li);
+            });
+        }
+
+        function filtrar(query) {
+            searchResults.innerHTML = '';
+            searchHistorico.style.display = 'none';
+
+            const q = query.trim().toLowerCase();
+
+            if (!q) {
+                renderHistorico();
+                return;
+            }
+
+            const founds = artigos.filter(a =>
+                a.titulo.toLowerCase().includes(q) ||
+                a.tags.toLowerCase().includes(q)
+            );
+
+            if (founds.length === 0) {
+                searchResults.innerHTML = `<p class="search-vazio">Nenhum resultado para "<strong>${query}</strong>"</p>`;
+                return;
+            }
+
+            founds.forEach(artigo => {
+                const card = document.createElement('div');
+                card.className = 'result-card';
+                card.innerHTML = `
+                    <button class="result-btn">
+                        <span>${artigo.titulo}</span>
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </button>
+                    <div class="result-content">${artigo.html}</div>
+                `;
+
+                //expansão dentro dos resultados
+                card.querySelector('.result-btn').addEventListener('click', () => {
+                    const isOpen = card.classList.contains('open');
+                    searchResults.querySelectorAll('.result-card').forEach(c => c.classList.remove('open'));
+                    if (!isOpen) card.classList.add('open');
+                });
+
+                searchResults.appendChild(card);
+            });
+        }
+
+        function openOverlay() {
+            searchOverlay.classList.add('show');
+            searchBackdrop.classList.add('show');
+        }
+
+        function closeOverlay() {
+            searchOverlay.classList.remove('show');
+            searchBackdrop.classList.remove('show');
+            searchResults.innerHTML = '';
+            renderHistorico();
+        }
+
+        //abre overlay quando focar no input de pesquisa
+        searchInput.addEventListener('focus', () => {
+            renderHistorico();
+            openOverlay();
+        });
+
+        //filtra artigos enquanto digita
+        searchInput.addEventListener('input', () => {
+            filtrar(searchInput.value);
+        });
+
+        //salva no histórico quando preessionar Enter
+        searchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && searchInput.value.trim()) {
+                saveHistorico(searchInput.value.trim());
+                renderHistorico();
+            }
+        });
+
+        //fecha ao clicar no backdrop
+        searchBackdrop.addEventListener('click', () => {
+            closeOverlay();
+            searchInput.blur();
+            searchInput.value = '';
+        });
+    }
 });

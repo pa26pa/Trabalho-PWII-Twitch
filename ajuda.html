@@ -164,58 +164,7 @@
                     <div class="search-icon">
                         <i class="fa-solid fa-magnifying-glass"></i>
                     </div>
-                    <input type="text" id="help-search" placeholder="Pesquise suas dúvidas" data-i18n-placeholder>
-                    
-                    <!--overlay que mostra resultados da pesquisa-->
-                    <div id="search-overlay">
-                        <!--últimas 5 pesquisas (histórico)-->
-                        <div id="search-historico">
-                            <p class="search-label">Pesquisas recentes</p>
-                            <ul id="search-historico-list"></ul>
-                        </div>
-
-                        <!--resultados por filtragem da pesquisa-->
-                        <div id="search-results"></div>
-                    </div>
-                </div>
-
-                <!--artigos que serão pesquisados (hidden)-->
-                <div class="artigos-hidden" aria-hidden="true">
-                    <div class="artigo"
-                        data-titulo="Como criar uma conta"
-                        data-tags="conta cadastro criar registro">
-                        <p>Clique em "Entrar" no canto superior direito, depois em "Cadastrar" e preencha seus dados.</p>
-                    </div>
-
-                    <div class="artigo"
-                        data-titulo="Como iniciar uma live"
-                        data-tags="live stream transmissão iniciar começar">
-                        <p>Acesse "Meu Canal" e clique em "Começar Live". Preencha título, descrição e categoria.</p>
-                    </div>
-
-                    <div class="artigo"
-                        data-titulo="Esqueci minha senha"
-                        data-tags="senha esqueci redefinir recuperar">
-                        <p>Na tela de login, clique em "Esqueceu a senha?" e siga as instruções por email.</p>
-                    </div>
-
-                    <div class="artigo"
-                        data-titulo="Como bloquear um usuário"
-                        data-tags="bloquear usuário privacidade">
-                        <p>Acesse Configurações → Privacidade, digite o nome do usuário e clique em "Bloquear".</p>
-                    </div>
-
-                    <div class="artigo"
-                        data-titulo="Como editar meu perfil"
-                        data-tags="perfil editar foto bio nome">
-                        <p>Acesse "Meu Canal" e clique em "Editar Perfil" para alterar foto, nome e bio.</p>
-                    </div>
-
-                    <div class="artigo"
-                        data-titulo="O que é o Turbo"
-                        data-tags="turbo assinatura premium benefícios">
-                        <p>O Turbo é a assinatura premium da Witch. Remove anúncios e dá acesso a emotes exclusivos.</p>
-                    </div>
+                    <input type="text" id="search" placeholder="Pesquise suas dúvidas" data-i18n-placeholder>
                 </div>
             </div>
         </div>
@@ -255,10 +204,10 @@
             </div>
             <div class="help-box">
                 <p>Ou entre em contato enviando sua dúvida por email</p>
-                <a href="https://mail.google.com/mail/?view=cm&fs=1&to=witch.support.help@gmail.com" target="_blank"><button class="open-modal">Enviar Email</button></a>
+                <button class="open-modal">Enviar Email</button>
             </div>
         </section>
-    </main>   
+    </main>    
 
     <script src="{{url_for('static', filename='tradutor.js')}}"></script>
     <script src="{{url_for('static', filename='script.js')}}"></script>

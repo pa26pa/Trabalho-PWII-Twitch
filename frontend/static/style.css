@@ -2038,6 +2038,121 @@ a {text-decoration: none;}
     padding: 15px 20px 10px;
 }
 
+/*pesquisa de ajuda*/
+.artigos-hidden {display: none;}
+#search-overlay {
+    display: none;
+    position: fixed;
+    top: 25%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(600px, 90vw);
+    background: #fff;
+    border: 2px solid #DEC7FF;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(72, 35, 127, 0.18);
+    z-index: 99999;
+    max-height: 70vh;
+    overflow-y: auto;
+    padding: 8px 0;
+}
+#search-overlay.show {display: block;}
+
+/*pesquisas recentes (label)*/
+.search-label {
+    font-size: 0.8em;
+    color: #9147FF;
+    font-weight: bold;
+    padding: 8px 16px 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/*itens do histórico*/
+#search-historico-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+#search-historico-list li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    cursor: pointer;
+    color: #48237F;
+    font-size: 1em;
+    transition: background 0.15s;
+}
+#search-historico-list li:hover {background: #F4ECFF;}
+#search-historico-list li i {
+    color: #9147FF;
+    font-size: 0.9em;
+}
+
+/*card de resultado da pesquisa*/
+.result-card {border-bottom: 1px solid #F4ECFF;}
+.result-card:last-child {border-bottom: none;}
+.result-btn {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 16px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: bold;
+    color: #48237F;
+    text-align: left;
+    transition: background 0.15s;
+}
+.result-btn:hover {background: #F4ECFF;}
+.result-btn i {
+    color: #9147FF;
+    font-size: 0.85em;
+    transition: transform 0.3s;
+    flex-shrink: 0;
+}
+.result-card.open .result-btn i {
+    transform: rotate(180deg);
+}
+
+/* conteúdo expandido do resultado */
+.result-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, padding 0.3s ease;
+    padding: 0 16px;
+    color: #3B2B4F;
+    font-size: 0.95em;
+    line-height: 1.6;
+}
+.result-card.open .result-content {
+    max-height: 200px;
+    padding: 0 16px 14px;
+}
+
+/* mensagem de nada encontrado */
+.search-vazio {
+    padding: 20px 16px;
+    color: #888;
+    font-size: 0.95em;
+    text-align: center;
+}
+
+/* backdrop que fecha o overlay ao clicar fora */
+#search-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 99998;
+}
+#search-backdrop.show {
+    display: block;
+}
+
 /*RESPONSIVIDADE = não é adaptar para telas, é permitir que o layout se adapte sozinho*/
 /*@media = "if"*/
 
