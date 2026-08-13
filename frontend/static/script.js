@@ -833,8 +833,11 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(res => res.json())
             .then(data => {
                 mostrarToast(data.mensagem, data.status);
+                
+                let delete_code = 'error';
 
                 if (data.status === 'success') {
+                    let delete_code = 'success';
                     wrapperDelete.style.display = 'none';
                     const insertCodeDelete = modal3 ? modal3.querySelector('#insert-code') : null;
                     if (insertCodeDelete) insertCodeDelete.style.display = 'flex';
@@ -848,6 +851,10 @@ document.addEventListener('DOMContentLoaded', function () {
     const btnDelete = document.querySelector(".btn-delete");
     if (btnDelete) {
         btnDelete.addEventListener("click", function() {
+        if (delete_code == 'error') {
+            return
+        }
+        
         fetch("http://127.0.0.1:5000/delete", {
                 method:"DELETE",
                 headers: {

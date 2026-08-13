@@ -818,6 +818,7 @@ class delete_Account(Resource):
             Retornos: 
                 400 = Usuário não está logado
                 200 = Conta excluida com sucesso
+                500 = Erro interno ao tentar excluir conta
         """
         
         token = request.headers.get("X-CSRFToken")
@@ -837,36 +838,40 @@ class delete_Account(Resource):
             }, 400
         id = session['usuario_id']
         
-        a = """delete from bloqueados where id_bloqueador = %s or id_bloqueado = %s"""
-        cursor.execute(a, (id,id))
-        con.commit()
-        
-        query = """delete from usuarios where id_usuario = %s """
-        cursor.execute(query, (id,))
-        
-        con.commit()
-        
-        ab = """delete from streams where id_streamer = %s"""
-        cursor.execute(ab, (id,))
+        try: 
+            a = """delete from bloqueados where id_bloqueador = %s or id_bloqueado = %s"""
+            cursor.execute(a, (id,id))
+            
+            ab = """delete from streams where id_streamer = %s"""
+            cursor.execute(ab, (id,))
 
-        con.commit()
+            ac = """delete from subs where id_usuario = %s or id_streamer = %s"""
+            cursor.execute(ac, (id,))
 
-        ac = """delete from subs where id_usuario = %s or id_streamer = %s"""
-        cursor.execute(ac, (id,))
-        con.commit()
 
-        ad = """delete from tipo_sub where id_criador = %s"""
-        cursor.execute(ad, (id,))
-        con.commit()
+            ad = """delete from tipo_sub where id_criador = %s"""
+            cursor.execute(ad, (id,))
 
-        ae = """delete from seguidores where id_seguido = %s or id_seguidor = %s"""
-        cursor.execute(ae, (id,))
-        con.commit()
+
+            ae = """delete from seguidores where id_seguido = %s or id_seguidor = %s"""
+            cursor.execute(ae, (id,))
+
+            
+            query = """delete from usuarios where id_usuario = %s """
+            cursor.execute(query, (id,))
+            
+            con.commit()
+            session.clear()
+            
+            cursor.close()
+            con.close()
         
-        session.clear()
-        
-        cursor.close()
-        con.close()
+        except Exception as e:
+            con.rollback()
+            return {
+                'status':'error',
+                'mensagem':'Erro interno ao tentar deletar conta'
+            }, 500
         
         return {
             'status':'success',
