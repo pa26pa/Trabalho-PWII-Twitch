@@ -1465,7 +1465,7 @@ a {text-decoration: none;}
     min-height: 16px;
 }
 
-#block-effects {margin-left: 5%;}
+.list-config {margin-left: 5%;}
 
 /*botão do dropdown*/
 #toggle-blocked {
@@ -1531,6 +1531,31 @@ a {text-decoration: none;}
     transition: background 0.2s;
 }
 .unblock-btn:hover {background: #fdecea;}
+
+/*aba de notificações*/
+.not-box {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    width: 85%;
+    height: auto;
+    padding: 10px;
+    justify-content: center;
+    margin-left: 5%;
+    background-color: #F0E9FF;
+    border-radius: 12px;
+    border: 4px double #9147FF;
+}
+.not-box h2 {font-size: 1.2em;}
+.not-subbox {
+    display: grid;
+    grid-template-columns: 70% 10% 1fr;
+    align-items: center;
+    padding: 10px;
+}
+.not-subbox .slider {
+    border: 1px solid #3B2B4F;
+}
 
 /* ------ MEU CANAL -----------*/
 .container-perfil {

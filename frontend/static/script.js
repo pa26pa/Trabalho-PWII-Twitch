@@ -1508,7 +1508,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             } finally {
 
-                // SEMPRE executa
+                // sempre executa
                 blockBtn.disabled = false;
                 blockBtn.textContent = 'Bloquear';
             }
