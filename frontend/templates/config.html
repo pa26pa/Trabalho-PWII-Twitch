@@ -289,26 +289,105 @@
         <section id="not" class="section-config">
             <h1 data-i18n>Notificações</h1>
             <ul class="list-config">
-                <li>Receba notificações que te interessem, onde quiser vê-las</li>
-                <li>Ao atualizar cada categoria, você verá as preferências que salvou anteriormente</li>
-                <li>Notificações relacionadas a atualizações de conta e comunicados necessários serão enviados</li>
-                <li>Poderá receber e-mails adicionais da Twitch</li>
-                <li>Poderá sempre usar o link de cancelamento incluído em cada e-mail para desativar notificações específicas</li>
+                <li data-i18n>Receba notificações que te interessem, onde quiser vê-las</li>
+                <li data-i18n>Ao atualizar cada categoria, você verá as preferências que salvou anteriormente</li>
+                <li data-i18n>Notificações relacionadas a atualizações de conta e comunicados necessários serão enviados</li>
+                <li data-i18n>Poderá receber e-mails adicionais da Twitch</li>
+                <li data-i18n>Poderá sempre usar o link de cancelamento incluído em cada e-mail para desativar notificações específicas</li>
             </ul>
             <br>
             <div class="not-box">
-                <h2>Notificações na Área de Trabalho</h2>
+                <h2 data-i18n>Notificações na Área de Trabalho</h2>
                 <div class="not-subbox">
-                    <span>Receba notificações no seu computador, mesmo quando não estiver na Twitch</span>
+                    <span data-i18n>Receba notificações no seu computador, mesmo quando não estiver na Twitch</span>
                     <span></span>
                     <label class="switch">
-                        <input type="checkbox" id="dark-theme">
+                        <input type="checkbox">
                         <span class="slider"></span>
                     </label>
                 </div>
             </div> <br>
-            div.not-box>
-           
+            <div id="expand-table">
+                <button id="not-btn-table">
+                    <div class="not-text-btn">
+                        <h2 data-i18n>Canais que você segue</h2>
+                        <p data-i18n>Novos conteúdos e atualizações de canais seguidos</p>
+                    </div>
+
+                </button>
+                <br>
+                <table id="not-table">
+                    <tr>
+                        <th class="first-column">Todas as notificações</th>
+                        <th>Na Twitch</th>
+                        <th>Disp. Móveis</th>
+                        <th>E-mail</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Ao vivo agora:</strong> quando um canal que você segue entrar ao vivo</td>
+                        <td>
+                            <label class="switch">
+                                <input type="checkbox">
+                                <span class="slider"></span>
+                            </label>
+                        </td>
+                        <td>
+                            <label class="switch">
+                                <input type="checkbox">
+                                <span class="slider"></span>
+                            </label>
+                        </td>
+                        <td>
+                            <label class="switch">
+                                <input type="checkbox">
+                                <span class="slider"></span>
+                            </label>
+                        </td>                           
+                    </tr>
+                    <tr>
+                        <td class="first-column"><strong>Fique em dia:</strong> nunca perca um momento - VODs populares, clipes e stories de streamers que você segue</td>
+                        <td>
+                            <label class="switch">
+                                <input type="checkbox">
+                                <span class="slider"></span>
+                            </label>
+                        </td>
+                        <td>
+                            <label class="switch">
+                                <input type="checkbox">
+                                <span class="slider"></span>
+                            </label>
+                        </td>
+                        <td>
+                            <label class="switch">
+                                <input type="checkbox">
+                                <span class="slider"></span>
+                            </label>
+                        </td>                           
+                    </tr>
+                    <tr>
+                        <td class="first-column"><strong>Atualizações para inscritos:</strong> quando houver atualizações referentes a canais nos quais você se inscreveu</td>
+                        <td>
+                            <label class="switch">
+                                <input type="checkbox">
+                                <span class="slider"></span>
+                            </label>
+                        </td>
+                        <td>
+                            <label class="switch">
+                                <input type="checkbox">
+                                <span class="slider"></span>
+                            </label>
+                        </td>
+                        <td>
+                            <label class="switch">
+                                <input type="checkbox">
+                                <span class="slider"></span>
+                            </label>
+                        </td>                           
+                    </tr>
+                </table>
+            </div>
         </section>
         <section id="con" class="section-config">
             <h1 data-i18n>Conexões</h1>

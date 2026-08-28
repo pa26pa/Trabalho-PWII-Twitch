@@ -1515,6 +1515,33 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    //aba de notificações
+    const btnTable = document.getElementById('not-btn-table');
+    if (btnTable) {
+        btnTable.addEventListener('click', () => {
+            const expandTable = document.getElementById('expand-table');          
+            expandTable.classList.toggle('open');
+        });
+    }
+    /*const questions = document.querySelectorAll(".question");
+
+    if (questions.length > 0) {
+        questions.forEach(btn => { 
+            btn.addEventListener('click', () => {
+                const item = btn.closest('.question-item');
+                const isOpen = item.classList.contains('open');
+
+                document.querySelectorAll('.question-item').forEach(a => {
+                    a.classList.remove('open');
+                });
+
+                if (!isOpen) {
+                    item.classList.add('open');
+                }
+            });
+        });
+    }*/
+
     //--------------perfil (meu canal)-------------------
     // UPLOAD DE FOTO DE PERFIL
     const uploadFoto = document.getElementById('upload-foto');
@@ -1940,7 +1967,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const questions = document.querySelectorAll(".question");
 
     if (questions.length > 0) {
-        questions.forEach(btn => {
+        questions.forEach(btn => { 
             btn.addEventListener('click', () => {
                 const item = btn.closest('.question-item');
                 const isOpen = item.classList.contains('open');
@@ -1952,8 +1979,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (!isOpen) {
                     item.classList.add('open');
                 }
-            })
-        })
+            });
+        });
     }
     document.addEventListener('click', (e) => {
         if (!e.target.closest('.question-item')) {

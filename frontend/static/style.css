@@ -865,6 +865,7 @@ a {text-decoration: none;}
     position: relative;
     width: 50px;
     height: 22px;
+    border: 1px solid green;
 }
 .switch input {display: none;}
 .slider {
@@ -874,6 +875,7 @@ a {text-decoration: none;}
     border-radius: 22px;
     cursor: pointer;
     transition: background 0.2s;
+    border: 1px solid red;
 }
 .slider:before {
     content: "";
@@ -1556,6 +1558,101 @@ a {text-decoration: none;}
 .not-subbox .slider {
     border: 1px solid #3B2B4F;
 }
+
+/*expandindo a tabela de notificações*/
+#expand-table {
+    background-color: #DEC7FF;
+    font-size: 1em;
+}
+#not-btn-table {
+    display: flex;
+    width: 100%;
+    height: auto;
+    background: transparent;
+    border: 2px solid #48237F;
+    border-radius: 8px;
+    padding: 10px;
+    gap: 30px;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+#not-btn-table:hover {
+    background-color: #b891f1;
+}
+.not-text-btn {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+}
+.not-text-btn h2 {font-size: 1.2em;}
+#not-table, th, td {
+    border: 1px solid #48237F;
+    border-collapse: collapse;
+    padding: 8px;
+    text-align: center;
+}
+.first-column {width: 60%;}
+#not-table {
+    display: none;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s ease, padding 0.35s ease;
+    padding: 0 20px;
+    width: 100%;
+    border-radius: 8px;
+    border: 2px solid #48237F;
+    font-size: 1em;
+}
+#expand-table.open #not-table {
+    max-height: 300px; /* valor maior que qualquer resposta que você vai colocar */
+    padding: 15px 20px 10px;
+}
+#expand-table.open #not-table {
+    display: table;
+    transition: all 0.8s ease;
+}
+#not-table .switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 22px;
+    flex-shrink: 0;
+}
+
+#not-table .switch input { display: none; }
+
+#not-table .slider {
+    position: absolute;
+    inset: 0;
+    width: auto;  /* remove o width fixo que estava quebrando */
+    height: auto; /* remove o height fixo que estava quebrando */
+    background: #F4ECFF;
+    border-radius: 22px;
+    cursor: pointer;
+    transition: background 0.2s;
+    border: 2px solid #9147FF; /* borda pra ficar visível na tabela */
+}
+
+#not-table .slider:before {
+    content: "";
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 12px;
+    height: 12px;
+    background: #9147FF;
+    border-radius: 50%;
+    transition: transform 0.2s;
+}
+
+#not-table .switch input:checked + .slider { background: #9147FF; }
+#not-table .switch input:checked + .slider::before {
+    transform: translateX(26px);
+    background: #F4ECFF;
+}
+
 
 /* ------ MEU CANAL -----------*/
 .container-perfil {
