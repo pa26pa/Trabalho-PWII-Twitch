@@ -865,7 +865,6 @@ a {text-decoration: none;}
     position: relative;
     width: 50px;
     height: 22px;
-    border: 1px solid green;
 }
 .switch input {display: none;}
 .slider {
@@ -875,7 +874,6 @@ a {text-decoration: none;}
     border-radius: 22px;
     cursor: pointer;
     transition: background 0.2s;
-    border: 1px solid red;
 }
 .slider:before {
     content: "";
@@ -1587,7 +1585,7 @@ a {text-decoration: none;}
     text-align: center;
 }
 .not-text-btn h2 {font-size: 1.2em;}
-#not-table, th, td {
+#not-table, .adjust-slider th, .adjust-slider td {
     border: 1px solid #48237F;
     border-collapse: collapse;
     padding: 8px;
@@ -1613,7 +1611,7 @@ a {text-decoration: none;}
     display: table;
     transition: all 0.8s ease;
 }
-#not-table .switch {
+.adjust-slider .switch {
     position: relative;
     display: inline-block;
     width: 50px;
@@ -1621,9 +1619,9 @@ a {text-decoration: none;}
     flex-shrink: 0;
 }
 
-#not-table .switch input { display: none; }
+.adjust-slider .switch input { display: none; }
 
-#not-table .slider {
+.adjust-slider .slider {
     position: absolute;
     inset: 0;
     width: auto;  /* remove o width fixo que estava quebrando */
@@ -1635,7 +1633,7 @@ a {text-decoration: none;}
     border: 2px solid #9147FF; /* borda pra ficar visível na tabela */
 }
 
-#not-table .slider:before {
+.adjust-slider .slider:before {
     content: "";
     position: absolute;
     top: 3px;
@@ -1647,11 +1645,64 @@ a {text-decoration: none;}
     transition: transform 0.2s;
 }
 
-#not-table .switch input:checked + .slider { background: #9147FF; }
-#not-table .switch input:checked + .slider::before {
+.adjust-slider .switch input:checked + .slider { background: #9147FF; }
+.adjust-slider .switch input:checked + .slider::before {
     transform: translateX(26px);
     background: #F4ECFF;
 }
+
+/*aba de conexões*/
+.con-box {
+    display: grid;
+    grid-template-columns: 20% 1fr;
+    place-items: center;
+    width: 100%;
+    height: auto;
+    border: 4px double #9147FF;
+    border-radius: 8px;
+    background-color: #F0E9FF;
+    padding: 10px;
+    gap: 10px;
+}
+.black-square {
+    width: 80px;
+    height: 80px;
+    background-color: black;
+    border-radius: 5px;
+}
+.con-text {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    border: none;
+    padding: 5px;
+    font-size: 1em;
+    gap: 5px;
+    align-items: center;
+}
+.con-text h2 {font-size: 1.4em;}
+.con-btn {
+    width: 100px;
+    height: 40px;
+    border-radius: 15px;
+}
+
+/*aba de preferências*/
+.pref-box {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: auto;
+    padding: 10px;
+    text-align: center;
+    border: 4px double #9147FF;
+    border-radius: 8px;
+    background-color: #F0E9FF;
+    font-size: 1em;
+}
+.pref-box h2 {font-size: 1.2em;}
+.pref-box p {font-size: 0.9em;}
+
 
 
 /* ------ MEU CANAL -----------*/
