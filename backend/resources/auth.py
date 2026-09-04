@@ -1456,4 +1456,39 @@ class validar_captcha(Resource):
                 'status':'error',
                 'mensagem':'captcha inválido'
             }, 403
+
+class preferencias(Resource):
+    def post(self):
+        token = request.headers.get("X-CSRFToken")
+                
+        check = check_csrf(token)
+        
+        if not check or check.get("status") == "error":
+            return {'status': 'error', 'mensagem' :check.get("mensagem")}
+        
+        data = request.get_json()
+        
+        dicionario = data.get('dicionario')
+        
+        session['preferencias'] = dicionario
+
+    def get(self):
+        token = request.headers.get("X-CSRFToken")
+                        
+        check = check_csrf(token)
+        
+        if not check or check.get("status") == "error":
+            return {'status': 'error', 'mensagem' :check.get("mensagem")}
+        
+        dicionario = 'padrão'
+        
+        if 'dicionario' in session:
+            dicionario = session['dicionario']
+        
+        
+        return {
+            'status':'success',
+            'mensagem':'Requisição do dicionario feita corretamente',
+            'dicionario': dicionario    
+        }, 200
         

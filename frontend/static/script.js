@@ -2089,6 +2089,84 @@ document.addEventListener('DOMContentLoaded', function () {
                 searchResults.appendChild(card);
             });
         }
+        
+        const pref_switches = document.querySelectorAll('[id^="pref-"]');
+        let dicionario = {};
+        console.log('1.');
+        async function carrregarGerarPreferencias() {
+            console.log('2.');
+            try {
+                const res = await fetch("http://127.0.0.1:5000/preferencias", {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": csrfToken
+                    }
+                }); 
+                const data = await res.json();
+                console.log('3.');
+                if (data !== 'padrão') {
+                    dicionario = data;
+                }
+                
+            } catch (error) {
+                // CORRIGIDO: Removido o data.status daqui para evitar travar o catch
+                mostrarToast('Erro ao carregar preferências', 'error');
+            }
+
+            console.log('4.');
+            
+            // CORRIGIDO: Modificado o argumento de 'swtich' para 'switchItem' para bater com as linhas abaixo
+            pref_switches.forEach((switchItem) => {
+
+                const id_switch = switchItem.id;
+                
+                // Se o dicionário que veio do Python tiver dados salvos para esse switch, ativa ele na tela
+                if (dicionario[id_switch] !== undefined) {
+                    switchItem.checked = dicionario[id_switch];
+                }
+
+                // Removido o 'async' desnecessário do forEach e mantido apenas no addEventListener
+                switchItem.addEventListener('change', async (event) => {
+                    console.log('5.');
+                    const clicado = event.target;
+                    const ativo = clicado.checked;
+
+                    dicionario[id_switch] = ativo;
+                    
+                    try {
+                        const res = await fetch("http://127.0.0.1:5000/preferencias", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "X-CSRFToken": csrfToken
+                            },
+                            body: JSON.stringify(dicionario)
+                        }); 
+                        const data = await res.json();
+                        mostrarToast(data.mensagem, data.status);
+                    } catch (error) {
+                        mostrarToast('Erro ao salvar switchs', 'error');
+                    }    
+                });
+            });
+        }
+
+        carrregarGerarPreferencias()
+
+        /* const pref_switch_sexual = document.getElementById('pref-nosexual');
+        const pref_switch_drogas = document.getElementById('pref-nodrogas');
+        const pref_switch_bet = document.getElementById('pref-nobet');
+        const pref_switch_violencia = document.getElementById('pref-noviolencia');
+        const pref_switch_xingamento = document.getElementById('pref-noxingamento');
+        const pref_switch_gameadulto = document.getElementById('pref-nogameadulto');
+        const pref_switch_politica = document.getElementById('pref-nopolitica');
+        const pref_switch_desfocar = document.getElementById('pref-desfocar');  */
+        
+        //const pref_switches = [
+        //    pref_switch_sexual, pref_switch_drogas, pref_switch_bet, pref_switch_violencia, pref_switch_xingamento, 
+        //    pref_switch_gameadulto, pref_switch_politica, pref_switch_desfocar 
+        //];
 
         function openOverlay() {
             searchOverlay.classList.add('show');
