@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', function () {
         csrfToken = data.csrf_token;
     }
 
+    carregarCsrf()
     // CONTROLE DE ESTADO LOGADO/DESLOGADO
     function mostrarLogado(nome) {
         // esconde elementos de deslogado, mostra de logado
@@ -82,7 +83,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 mostrarToast(data.mensagem, data.status)
                 return;
             } 
-            await carregarCsrf();
+            
             window.location.href = "/";
             mostrarDeslogado();
             if (dropdownMenu) dropdownMenu.classList.remove('show');
@@ -1803,6 +1804,8 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
         }
+        await carrregarGerarPreferencias('noti_switches');
+        await carrregarGerarPreferencias('pref_switches');
     }
 
     // ── LIVES: salvar e renderizar histórico no perfil ──
@@ -2452,7 +2455,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     window.addEventListener('resize', sincronizarAsideDropdown);
 
-    init();
+    
 
     // Captcha
     // FIX: o Google injeta o iframe do desafio direto no <body>, fora do
@@ -2617,6 +2620,20 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         }
 
+        /* const pref_switch_sexual = document.getElementById('pref-nosexual');
+        const pref_switch_drogas = document.getElementById('pref-nodrogas');
+        const pref_switch_bet = document.getElementById('pref-nobet');
+        const pref_switch_violencia = document.getElementById('pref-noviolencia');
+        const pref_switch_xingamento = document.getElementById('pref-noxingamento');
+        const pref_switch_gameadulto = document.getElementById('pref-nogameadulto');
+        const pref_switch_politica = document.getElementById('pref-nopolitica');
+        const pref_switch_desfocar = document.getElementById('pref-desfocar');  */
+        
+        //const pref_switches = [
+        //    pref_switch_sexual, pref_switch_drogas, pref_switch_bet, pref_switch_violencia, pref_switch_xingamento, 
+        //    pref_switch_gameadulto, pref_switch_politica, pref_switch_desfocar 
+        //];
+
         function openOverlay() {
             searchOverlay.classList.add('show');
             searchBackdrop.classList.add('show');
@@ -2655,4 +2672,93 @@ document.addEventListener('DOMContentLoaded', function () {
             searchInput.value = '';
         });
     }
+    
+
+    const noti_switches = document.querySelectorAll('[id^="noti-"]');
+    const pref_switches = document.querySelectorAll('[id^="pref-"]');
+    let dicionario = {};
+
+    const listona = {
+        'noti_switches' : noti_switches,
+        'pref_switches' : pref_switches
+    };
+
+    console.log('1.');
+    async function carrregarGerarPreferencias(nomeLista) {
+        
+        const lista = listona[nomeLista];
+
+        try {
+            const res = await fetch("http://127.0.0.1:5000/preferencias", {
+                method: "GET",
+                credentials: "include", // Mantém a sessão do Python ativa
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": csrfToken
+                }
+            }); 
+            const data = await res.json();
+            console.log('3.');
+        
+            if (data.status == 'success') {
+
+                const preferenciasSalvas = data.dicionario || {};
+                console.log("PREFERÊNCIAS RECEBIDAS NO JS:", preferenciasSalvas);
+                lista.forEach((switchItem) => {
+
+                    const id_switch = switchItem.id;
+
+                    if (preferenciasSalvas[id_switch] !== undefined) {
+                        dicionario[id_switch] = preferenciasSalvas[id_switch];
+                    } else {
+                        dicionario[id_switch] = false;
+                    }
+
+                    switchItem.checked = dicionario[id_switch];
+                
+                });
+            }
+            
+        } catch (error) {
+            console.error("Erro detalhado:", error);
+            mostrarToast('Erro ao carregar preferências', 'error');
+        }
+
+        console.log('4.');
+        
+        // Segundo loop original: Adiciona os escutadores de evento de forma isolada
+        lista.forEach((switchItem) => {
+            const id_switch = switchItem.id;
+            
+            // Garante que se o dado existir, ele força a marcação visual
+            if (dicionario[id_switch] !== undefined) {
+                switchItem.checked = dicionario[id_switch];
+            }
+
+            switchItem.addEventListener('change', async (event) => {
+                console.log('5.');
+                const clicado = event.target;
+                const ativo = clicado.checked;
+
+                // Altera apenas a chave do switch no dicionário
+                dicionario[id_switch] = ativo;
+                
+                try {
+                    await fetch("http://127.0.0.1:5000/preferencias", {
+                        method: "POST",
+                        credentials: "include", // Envia as credenciais no clique também
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRFToken": csrfToken
+                        },
+                        body: JSON.stringify(dicionario)
+                    }); 
+                } catch (error) {
+                    mostrarToast('Erro ao salvar switchs', 'error');
+                }    
+            });
+        });
+    }
+
+    init();
 });

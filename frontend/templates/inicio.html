@@ -521,6 +521,7 @@
 
         <script src="{{url_for('static', filename='tradutor.js')}}"></script>
         <script src="{{url_for('static', filename='script.js')}}"></script>
+        
         <!-- 
 create table streams(
 	id_stream int auto_increment primary key,
@@ -542,7 +543,8 @@ create table usuarios (
        senha varchar(500) not null,
        data_nascimento date not null,
        bio text,
-       foto_url text
+       foto_url text,
+       preferencias text
 );
 
 create table bloqueados (
