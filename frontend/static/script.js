@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', function () {
         csrfToken = data.csrf_token;
     }
 
+    carregarCsrf()
     // CONTROLE DE ESTADO LOGADO/DESLOGADO
     function mostrarLogado(nome) {
         // esconde elementos de deslogado, mostra de logado
@@ -82,7 +83,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 mostrarToast(data.mensagem, data.status)
                 return;
             } 
-            await carregarCsrf();
+            
             window.location.href = "/";
             mostrarDeslogado();
             if (dropdownMenu) dropdownMenu.classList.remove('show');
@@ -1788,6 +1789,8 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
         }
+        await carrregarGerarPreferencias('noti_switches');
+        await carrregarGerarPreferencias('pref_switches');
     }
 
     // ── LIVES: salvar e renderizar histórico no perfil ──
@@ -1925,7 +1928,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     window.addEventListener('resize', sincronizarAsideDropdown);
 
-    init();
+    
 
     // Captcha
     // FIX: o Google injeta o iframe do desafio direto no <body>, fora do
@@ -2089,70 +2092,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 searchResults.appendChild(card);
             });
         }
-        
-        const pref_switches = document.querySelectorAll('[id^="pref-"]');
-        let dicionario = {};
-        console.log('1.');
-        async function carrregarGerarPreferencias() {
-            console.log('2.');
-            try {
-                const res = await fetch("http://127.0.0.1:5000/preferencias", {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-CSRFToken": csrfToken
-                    }
-                }); 
-                const data = await res.json();
-                console.log('3.');
-                if (data !== 'padrão') {
-                    dicionario = data;
-                }
-                
-            } catch (error) {
-                // CORRIGIDO: Removido o data.status daqui para evitar travar o catch
-                mostrarToast('Erro ao carregar preferências', 'error');
-            }
-
-            console.log('4.');
-            
-            // CORRIGIDO: Modificado o argumento de 'swtich' para 'switchItem' para bater com as linhas abaixo
-            pref_switches.forEach((switchItem) => {
-
-                const id_switch = switchItem.id;
-                
-                // Se o dicionário que veio do Python tiver dados salvos para esse switch, ativa ele na tela
-                if (dicionario[id_switch] !== undefined) {
-                    switchItem.checked = dicionario[id_switch];
-                }
-
-                // Removido o 'async' desnecessário do forEach e mantido apenas no addEventListener
-                switchItem.addEventListener('change', async (event) => {
-                    console.log('5.');
-                    const clicado = event.target;
-                    const ativo = clicado.checked;
-
-                    dicionario[id_switch] = ativo;
-                    
-                    try {
-                        const res = await fetch("http://127.0.0.1:5000/preferencias", {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json",
-                                "X-CSRFToken": csrfToken
-                            },
-                            body: JSON.stringify(dicionario)
-                        }); 
-                        const data = await res.json();
-                        mostrarToast(data.mensagem, data.status);
-                    } catch (error) {
-                        mostrarToast('Erro ao salvar switchs', 'error');
-                    }    
-                });
-            });
-        }
-
-        carrregarGerarPreferencias()
 
         /* const pref_switch_sexual = document.getElementById('pref-nosexual');
         const pref_switch_drogas = document.getElementById('pref-nodrogas');
@@ -2206,4 +2145,93 @@ document.addEventListener('DOMContentLoaded', function () {
             searchInput.value = '';
         });
     }
+    
+
+    const noti_switches = document.querySelectorAll('[id^="noti-"]');
+    const pref_switches = document.querySelectorAll('[id^="pref-"]');
+    let dicionario = {};
+
+    const listona = {
+        'noti_switches' : noti_switches,
+        'pref_switches' : pref_switches
+    };
+
+    console.log('1.');
+    async function carrregarGerarPreferencias(nomeLista) {
+        
+        const lista = listona[nomeLista];
+
+        try {
+            const res = await fetch("http://127.0.0.1:5000/preferencias", {
+                method: "GET",
+                credentials: "include", // Mantém a sessão do Python ativa
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": csrfToken
+                }
+            }); 
+            const data = await res.json();
+            console.log('3.');
+        
+            if (data.status == 'success') {
+
+                const preferenciasSalvas = data.dicionario || {};
+                console.log("PREFERÊNCIAS RECEBIDAS NO JS:", preferenciasSalvas);
+                lista.forEach((switchItem) => {
+
+                    const id_switch = switchItem.id;
+
+                    if (preferenciasSalvas[id_switch] !== undefined) {
+                        dicionario[id_switch] = preferenciasSalvas[id_switch];
+                    } else {
+                        dicionario[id_switch] = false;
+                    }
+
+                    switchItem.checked = dicionario[id_switch];
+                
+                });
+            }
+            
+        } catch (error) {
+            console.error("Erro detalhado:", error);
+            mostrarToast('Erro ao carregar preferências', 'error');
+        }
+
+        console.log('4.');
+        
+        // Segundo loop original: Adiciona os escutadores de evento de forma isolada
+        lista.forEach((switchItem) => {
+            const id_switch = switchItem.id;
+            
+            // Garante que se o dado existir, ele força a marcação visual
+            if (dicionario[id_switch] !== undefined) {
+                switchItem.checked = dicionario[id_switch];
+            }
+
+            switchItem.addEventListener('change', async (event) => {
+                console.log('5.');
+                const clicado = event.target;
+                const ativo = clicado.checked;
+
+                // Altera apenas a chave do switch no dicionário
+                dicionario[id_switch] = ativo;
+                
+                try {
+                    await fetch("http://127.0.0.1:5000/preferencias", {
+                        method: "POST",
+                        credentials: "include", // Envia as credenciais no clique também
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRFToken": csrfToken
+                        },
+                        body: JSON.stringify(dicionario)
+                    }); 
+                } catch (error) {
+                    mostrarToast('Erro ao salvar switchs', 'error');
+                }    
+            });
+        });
+    }
+
+    init();
 });

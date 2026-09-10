@@ -35,6 +35,7 @@ from dotenv import load_dotenv
 from backend.database.connection import limiter
 from datetime import date
 from markupsafe import escape
+import json
 
 #carregando o .env
 load_dotenv()
@@ -1463,28 +1464,82 @@ class preferencias(Resource):
                 
         check = check_csrf(token)
         
+        con = connection()
+        cursor = con.cursor(pymysql.cursors.DictCursor)
+        
+        data = request.get_json()        
+        dicionario = json.dumps(data)
+        
         if not check or check.get("status") == "error":
-            return {'status': 'error', 'mensagem' :check.get("mensagem")}
+
+            return {'status': 'error', 'mensagem' :check.get("mensagem")}, 500
         
-        data = request.get_json()
+        if "usuario_id" not in session:
+            return {
+                'status':'error',
+                'mensagem':'É necessario estar logado para ter acesso a essa função'
+            }, 500
         
-        dicionario = data.get('dicionario')
+        id = session['usuario_id']
         
-        session['preferencias'] = dicionario
+        try:
+            query = """ update usuarios set preferencias = %s where id_usuario = %s"""
+            cursor.execute(query, (dicionario, id))        
+            con.commit()
+            cursor.close()
+            con.close()
+            
+        except Exception as e:
+            print(e)
+            return {
+                'status':'error',
+                'mensagem':'Erro interno'
+            }, 500
+        
+        return {
+            'status':'success',
+            'mensagem':'Preferencias salvas' 
+        }, 200
 
     def get(self):
         token = request.headers.get("X-CSRFToken")
                         
         check = check_csrf(token)
         
+        con = connection()
+        cursor = con.cursor(pymysql.cursors.DictCursor)
+        
         if not check or check.get("status") == "error":
-            return {'status': 'error', 'mensagem' :check.get("mensagem")}
+            return {'status': 'error', 'mensagem' :check.get("mensagem")}, 400
         
-        dicionario = 'padrão'
+        if "usuario_id" not in session:
+            return {
+                'status':'error',
+                'mensagem':'É necessario estar logado para ter acesso a essa função'
+            }, 500      
         
-        if 'dicionario' in session:
-            dicionario = session['dicionario']
+        try:
+            id = session["usuario_id"]
+                    
+            query = """select preferencias from usuarios where id_usuario = %s"""
+            cursor.execute(query,(id,))
+            resultado = cursor.fetchone()
+            cursor.close()
+            con.close()
+            
+            if not resultado or not resultado['preferencias']:
+                dicionario = {}
+            else:
+                print("RESULTADO DO BANCO:", resultado)
+                print("PREFERENCIAS DO BANCO:", resultado["preferencias"])
+                dicionario = json.loads(resultado["preferencias"])    
         
+        except Exception as e:
+            print(e)
+            return {
+                'status':'error',
+                'mensagem':'Erro interno'
+            }, 500
         
         return {
             'status':'success',
@@ -1492,3 +1547,4 @@ class preferencias(Resource):
             'dicionario': dicionario    
         }, 200
         
+    
