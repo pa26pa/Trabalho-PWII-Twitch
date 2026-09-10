@@ -262,47 +262,64 @@
                         <button class="btn-close-modal" data-modal="modal-6"><i class="fa-solid fa-x close-x"></i></button>
                     </div>
 
-                    <form action="" method="post" class="form-perfil">
-                        <label class="label-perfil" for="nome-live" data-i18n>Nome da Live</label>
-                        <input type="text" id="nome-live" name="nome-live"> <br><br>
+                    <form action="" method="post" class="form-perfil" id="form-live">
+                        <!-- thumbnail -->
+                        <div class="upload-foto-wrap">
+                            <input type="file" id="upload-thumb" accept="image/*" style="display:none;">
+                            <img src="" id="preview-thumb" alt="Capa do vídeo" class="preview-foto preview-thumb-live" style="background:#000;">
+                            <span class="upload-hint" data-i18n>Clique para adicionar uma capa</span>
+                        </div>
+
+                        <label class="label-perfil" for="nome-live" data-i18n>Nome do Vídeo</label>
+                        <input type="text" id="nome-live" name="nome-live" class="input-live">
+
                         <label class="label-perfil" for="descricao-live" data-i18n>Descrição</label>
-                        <textarea rows="4" cols="20" id="descricao-live"></textarea> <br>
+                        <textarea rows="3" id="descricao-live" class="textarea-live"></textarea>
 
-                        <label class="label-perfil" for="categoria-live" data-i18n>Escolha a Categoria:</label>
-
-                            <div class="select-custom" id="select-categorias">
-                                <button type="button" class="select-trigger" id="btn-select-cat">
-                                    <span id="select-placeholder">Selecione categorias...</span>
-                                    <i class="fa-solid fa-chevron-down select-arrow"></i>
-                                </button>
-                                <div class="select-dropdown" id="select-dropdown">
-                                    <div class="select-group-label">Jogos</div>
-                                    <label class="select-option"><input type="checkbox" value="acao-aventura"> Ação e Aventura</label>
-                                    <label class="select-option"><input type="checkbox" value="corrida"> Corrida</label>
-                                    <label class="select-option"><input type="checkbox" value="esporte"> Esportes</label>
-                                    <label class="select-option"><input type="checkbox" value="e-sports"> E-sports</label>
-                                    <label class="select-option"><input type="checkbox" value="estrategia"> Estratégia</label>
-                                    <label class="select-option"><input type="checkbox" value="fps-tiro"> FPS e Tiro</label>
-                                    <label class="select-option"><input type="checkbox" value="luta"> Luta</label>
-                                    <label class="select-option"><input type="checkbox" value="rpg"> RPG</label>
-                                    <label class="select-option"><input type="checkbox" value="terror"> Terror</label>
-                                    <div class="select-divider"></div>
-                                    <label class="select-option"><input type="checkbox" value="nao-jogo"> Outro</label>
-                                </div>
+                        <label class="label-perfil" data-i18n>Escolha a Categoria:</label>
+                        <div class="select-custom" id="select-categorias">
+                            <button type="button" class="select-trigger" id="btn-select-cat">
+                                <span id="select-placeholder">Selecione categorias...</span>
+                                <i class="fa-solid fa-chevron-down select-arrow"></i>
+                            </button>
+                            <div class="select-dropdown" id="select-dropdown">
+                                <div class="select-group-label">Jogos</div>
+                                <label class="select-option"><input type="checkbox" value="acao-aventura"> Ação e Aventura</label>
+                                <label class="select-option"><input type="checkbox" value="corrida"> Corrida</label>
+                                <label class="select-option"><input type="checkbox" value="esporte"> Esportes</label>
+                                <label class="select-option"><input type="checkbox" value="e-sports"> E-sports</label>
+                                <label class="select-option"><input type="checkbox" value="estrategia"> Estratégia</label>
+                                <label class="select-option"><input type="checkbox" value="fps-tiro"> FPS e Tiro</label>
+                                <label class="select-option"><input type="checkbox" value="luta"> Luta</label>
+                                <label class="select-option"><input type="checkbox" value="rpg"> RPG</label>
+                                <label class="select-option"><input type="checkbox" value="terror"> Terror</label>
+                                <div class="select-divider"></div>
+                                <label class="select-option"><input type="checkbox" value="nao-jogo"> Outro</label>
                             </div>
+                        </div>
+                        <div class="selected-tags" id="selected-tags"></div>
 
-                            <!-- tags das selecionadas -->
-                            <div class="selected-tags" id="selected-tags"></div>
-
-                            <label class="label-perfil" for="video-live" data-i18n>Vídeo da Live (opcional)</label>
-                            <input type="file" id="video-live" accept="video/*">
+                        <label class="label-perfil" data-i18n>Carregue seu vídeo</label>
+                        <div class="upload-video-wrap">
+                            <input type="file" id="video-live" accept="video/*" style="display:none;">
+                            <div class="upload-video-btns">
+                                <button type="button" id="btn-escolher-video" class="btn-upload-video">
+                                    <i class="fa-solid fa-upload"></i>
+                                    <span>Escolher arquivo</span>
+                                </button>
+                                <button type="button" class="btn-live-ao-vivo" id="btn-live-direto">
+                                    <i class="fa-solid fa-circle" style="color:red;font-size:0.7em;"></i>
+                                    Iniciar Live
+                                </button>
+                            </div>
+                            <span class="label-arquivo-escolhido" id="label-video-escolhido" style="display:none;"></span>
+                        </div>
 
                         <div class="box-btn-modal-perfil">
-                            <button type="button" class="btn-perfil" id="btn-iniciar-live" data-i18n>Iniciar Live</button>
+                            <button type="button" class="open-modal" id="btn-iniciar-live" data-i18n>Confirmar</button>
                             <button type="button" class="btn-close-modal btn-red open-modal" data-modal="modal-6" data-i18n>Cancelar</button>
                         </div>
                     </form>
-
                 </dialog>
             </div>
         </section>
@@ -330,10 +347,73 @@
 
         <section class="box-videos-perfil">
             <h2 data-i18n>Lives e Clipes</h2>
-            <div id="videos-perfil-grid">
-                <!-- preenchido pelo JS -->
-            </div>
+            <div id="videos-perfil-grid"><!-- preenchido pelo JS --></div>
         </section>
+
+        <!-- player expandido (overlay ao clicar no vídeo) -->
+        <div id="video-player-overlay" class="video-player-overlay"> 
+            <div class="video-player-box">
+                <button id="fechar-player" class="fechar-player">
+                    <i class="fa-solid fa-x" style="font-weight:bold;:hover{color: #e0d4f7;}"></i>
+                </button>
+                <div class="player-titulo-topo" id="player-titulo-topo"></div>
+                <div class="player-wrap-expanded" id="player-wrap-expanded">
+                    <video id="video-expandido" preload="metadata"></video>
+                    <div class="controls-expanded" id="controls-expanded">
+                        <input type="range" id="progress-exp" class="progress-exp" min="0" max="100" value="0" step="0.1">
+                        <div class="controls-row">
+                            <button class="ctrl-btn-exp" id="play-btn-exp">
+                                <i class="fa-solid fa-play" id="play-icon-exp"></i>
+                            </button>
+                            <div class="vol-wrap-exp">
+                                <button class="ctrl-btn-exp" id="mute-btn-exp">
+                                    <i class="fa-solid fa-volume-high" id="vol-icon-exp"></i>
+                                </button>
+                                <input type="range" id="vol-range-exp" min="0" max="100" value="80" class="vol-slider-exp">
+                            </div>
+                            <span class="time-label-exp" id="time-label-exp">0:00 / 0:00</span>
+                            <span class="player-titulo-controle" id="player-titulo-controle"></span>
+                            <button class="ctrl-btn-exp" id="fs-btn-exp">
+                                <i class="fa-solid fa-expand" id="fs-icon-exp"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- painel social abaixo do vídeo -->
+                <div class="player-info-panel">
+                    <p class="player-info-titulo" id="player-info-titulo"></p>
+                    <p class="player-info-cats"   id="player-info-cats"></p>
+                    <div class="player-canal-row">
+                        <img src="/static/user.png" class="player-canal-foto" id="player-canal-foto-img" alt="canal">
+                        <div class="player-canal-texto">
+                            <span class="player-canal-nome" id="player-canal-nome-text"></span>
+                            <span class="player-canal-data" id="player-info-data"></span>
+                        </div>
+                    </div>
+                    <div class="player-acoes">
+                        <button class="player-acao-btn" id="btn-curtir">
+                            <i class="fa-solid fa-heart"></i>
+                            <span id="count-curtidas">0</span>
+                        </button>
+                        <button class="player-acao-btn" id="btn-comentar">
+                            <i class="fa-solid fa-comment"></i> Comentar
+                        </button>
+                        <button class="player-acao-btn" id="btn-compartilhar">
+                            <i class="fa-solid fa-share-nodes"></i> Compartilhar
+                        </button>
+                    </div>
+                    <div class="player-comentarios">
+                        <h4>Comentários</h4>
+                        <div class="comentario-input-row">
+                            <input type="text" id="comentario-input" class="comentario-input" placeholder="Escreva um comentário...">
+                            <button class="comentario-enviar" id="comentario-enviar">Enviar</button>
+                        </div>
+                        <div class="comentarios-lista" id="comentarios-lista"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="{{url_for('static', filename='tradutor.js')}}"></script>
