@@ -13,7 +13,7 @@ import pymysql
 import random
 from flask import Flask, json
 from email_validator import EmailNotValidError, validate_email
-from datetime import datetime
+from datetime import datetime, date
 from dotenv import load_dotenv
 from supabase import create_client, Client
 from urllib.parse import urlparse
@@ -85,6 +85,12 @@ def email_valido(email):
     except EmailNotValidError:
         return False
 
+def data_semana(data):
+    hoje = date.today()
+    
+    diferenca = abs((data - hoje).days)
+    
+    return diferenca >= 7
 
 def data_valida(data):
     """
