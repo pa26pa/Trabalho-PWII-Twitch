@@ -1546,5 +1546,3 @@ class preferencias(Resource):
             'mensagem':'Requisição do dicionario feita corretamente',
             'dicionario': dicionario    
         }, 200
-        
-    
