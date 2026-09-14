@@ -478,7 +478,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // função para mascara do cpf, assim ele fica protegito 
     function mascara_CPF_config(cpf) {
         if (!cpf) return ;
-        return cpf.replace(/(\d{3})\.(\d{3})\.(\d{3})\-(\d{2})/, "$1.***.***-$4");
+        return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.***.***-$4");
     }
 
     function atualizarAvatarDropdown(fotoUrl) {
