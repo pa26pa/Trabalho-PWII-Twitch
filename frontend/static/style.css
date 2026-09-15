@@ -1673,11 +1673,11 @@ a {text-decoration: none;}
     inset: 0;
     width: auto;  /* remove o width fixo que estava quebrando */
     height: auto; /* remove o height fixo que estava quebrando */
-    background: var(--color4);
+    background: #F4ECFF;
     border-radius: 22px;
     cursor: pointer;
     transition: background 0.2s;
-    border: 2px solid var(--color3); /* borda pra ficar visível na tabela */
+    border: 2px solid #9147FF; /* borda pra ficar visível na tabela */
 }
 
 .adjust-slider .slider:before {
@@ -1687,15 +1687,15 @@ a {text-decoration: none;}
     left: 3px;
     width: 12px;
     height: 12px;
-    background: var(--color3);
+    background: #9147FF;
     border-radius: 50%;
     transition: transform 0.2s;
 }
 
-.adjust-slider .switch input:checked + .slider { background: var(--color3); }
+.adjust-slider .switch input:checked + .slider { background: #9147FF; }
 .adjust-slider .switch input:checked + .slider::before {
     transform: translateX(26px);
-    background: var(--color4);
+    background: #F4ECFF;
 }
 
 /*aba de conexões*/
@@ -2135,7 +2135,7 @@ a {text-decoration: none;}
 }
 .input-live, .textarea-live {
     width: 100% !important;
-    border: 2px solid var(--color2) !important;
+    border: 2px solid #DEC7FF !important;
     border-radius: 10px !important;
     padding: 10px !important;
     font-size: 1em;
@@ -2143,9 +2143,10 @@ a {text-decoration: none;}
     box-sizing: border-box;
     resize: vertical;
     height: auto !important;
+    background: var(--color10);
 }
 .input-live:focus, .textarea-live:focus {
-    border-color: var(--color3) !important;
+    border-color: #9147FF !important;
     outline: none;
 }
 #modal-6 .select-custom {
@@ -3238,7 +3239,7 @@ a {text-decoration: none;}
 }
 .box-videos-perfil h2 {
     font-size: 1.5em;
-    color: #48237F;
+    color: var(--color9);
     margin-bottom: 16px;
     font-weight: bold;
     border-bottom: 2px solid var(--color2);
@@ -3255,8 +3256,8 @@ a {text-decoration: none;}
     border: 3px solid var(--color2);
     border-radius: 10px;
     font-size: 0.9em;
-    color: #48237F;
-    background: #fff;
+    color: var(--color9);
+    background: var(--color10);
     cursor: pointer;
     margin-bottom: 8px;
 }

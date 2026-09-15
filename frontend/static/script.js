@@ -34,8 +34,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 avatarImg.remove();
                 // recria os dois ícones originais (hambúrguer + pessoinha)
                 btnDropdown.innerHTML = `
-                    <i class="fa-solid fa-bars menu-icon without-login" style="color: rgb(255, 255, 255);"></i>
-                    <i class="fa-solid fa-user with-login menu-icon" style="color: rgb(255, 255, 255);"></i>
+                    <i class="fa-solid fa-bars menu-icon without-login" style="color: var(--color10);"></i>
+                    <i class="fa-solid fa-user with-login menu-icon" style="color: var(--color10);"></i>
                 `;
             }
         }
@@ -2003,7 +2003,7 @@ document.addEventListener('DOMContentLoaded', function () {
         container.innerHTML = '';
 
         if (lives.length === 0) {
-            container.innerHTML = '<p style="color:#888;text-align:center;padding:20px;grid-column:1/-1;">Nenhuma live realizada ainda.</p>';
+            container.innerHTML = '<p style="color:var(--color16);text-align:center;padding:20px;grid-column:1/-1;">Nenhuma live realizada ainda.</p>';
             return;
         }
 
@@ -2101,7 +2101,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const cats = document.createElement('p');
             cats.className = 'video-card-categorias';
             cats.textContent = live.categorias?.join(' • ') || '';
-            cats.style.cssText = 'font-size:0.78em;color:#9147FF;';
+            cats.style.cssText = 'font-size:0.78em;color:var(--color3)';
 
             const nomeCanal = document.querySelector('.show_name')?.textContent || 'Meu Canal';
             const canal = document.createElement('p');
@@ -2428,7 +2428,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // Separador + título AO VIVO
         const hrLives = criarEl('hr', 'aside-migrado' + (logado ? '' : ' hidden-deslogado'));
         const tituloLives = criarEl('li', 'aside-migrado dropdown-section-title' + (logado ? '' : ' hidden-deslogado'));
-        tituloLives.innerHTML = '<span style="font-size:0.85em;color:#9147FF;font-weight:bold;">AO VIVO</span>';
+        tituloLives.innerHTML = '<span style="font-size:0.85em;color:var(--color3);font-weight:bold;">AO VIVO</span>';
         dropdownList.appendChild(hrLives);
         dropdownList.appendChild(tituloLives);
 
@@ -2437,7 +2437,7 @@ document.addEventListener('DOMContentLoaded', function () {
             li.innerHTML = `
                 <i class="fa-solid fa-circle" style="color:purple;font-size:1.1em;"></i>
                 <span style="flex:1;">${nome}</span>
-                <span style="font-size:0.8em;color:#888;">${views}</span>
+                <span style="font-size:0.8em;color:var(--color16);">${views}</span>
                 <i class="fa-solid fa-circle" style="color:red;font-size:0.4em;"></i>`;
             dropdownList.appendChild(li);
         });
@@ -2450,11 +2450,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const liConfig = criarEl('li', 'aside-migrado' + (logado ? '' : ' hidden-deslogado'));
         liConfig.innerHTML = `<a href="${configHref}" style="display:flex;align-items:center;gap:10px;color:inherit;width:100%;">
-            <i class="fa-solid fa-gear" style="font-size:1.2em;color:#9147FF;"></i><span>Configurações</span></a>`;
+            <i class="fa-solid fa-gear" style="font-size:1.2em;color:var(--color3);"></i><span>Configurações</span></a>`;
 
         const liAjuda = criarEl('li', 'aside-migrado');
         liAjuda.innerHTML = `<a href="${ajudaHref}" style="display:flex;align-items:center;gap:10px;color:inherit;width:100%;">
-            <i class="fa-regular fa-circle-question" style="font-size:1.2em;color:#9147FF;"></i><span>Ajuda</span></a>`;
+            <i class="fa-regular fa-circle-question" style="font-size:1.2em;color:var(--color3);"></i><span>Ajuda</span></a>`;
 
         dropdownList.appendChild(liConfig);
         dropdownList.appendChild(liAjuda);
