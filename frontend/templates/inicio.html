@@ -544,7 +544,9 @@ create table usuarios (
        data_nascimento date not null,
        bio text,
        foto_url text,
-       preferencias text
+       preferencias text,
+       data_editar_nome date,
+       data_editar_senha date
 );
 
 create table bloqueados (

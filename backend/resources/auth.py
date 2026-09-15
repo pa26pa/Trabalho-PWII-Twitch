@@ -17,7 +17,7 @@ import random
 import smtplib
 from email.message import EmailMessage
 import mimetypes
-from backend.database.connection import connection, supabase, acorda_cloudinary, email_valido, data_valida, carregar, salvar, cache_traducoes, file
+from backend.database.connection import connection, data_semana,supabase, acorda_cloudinary, email_valido, data_valida, carregar, salvar, cache_traducoes, file
 from backend.resources.seguranca import cpf_math_validate, cpf_real_or_not, captcha, check_csrf
 from backend.resources.email_code import send_code
 from datetime import date, datetime, timedelta
@@ -39,6 +39,8 @@ import json
 
 #carregando o .env
 load_dotenv()
+
+hoje = date.today()
 
 secret = os.getenv("CAPTCHA_SECRET")
 
@@ -920,15 +922,37 @@ class update_Password(Resource):
         
         id = session['usuario_id']
         
+        try:
+            qiqi = """select data_editar_senha from usuarios where id_usuario = %s"""
+            cursor.execute(qiqi,(id,))
+            datar = cursor.fetchone()
+        
+        except Exception as e:
+            print(e)
+            return {
+                'status':'error',  
+                'mensagem':'erro interno do sistema'
+            },500
+
+        if datar['data_editar_senha']:
+            diferenca = data_semana(datar['data_editar_senha'])
+            
+            if not diferenca:
+                return {
+                    'status':'error',
+                    'mensagem':'É necessario esperar no mínimo 7 dias entre uma edição de nome e outra'
+                }, 400
+        
+                
         nova = generate_password_hash(nova)
         query = """select senha from usuarios where id_usuario = %s"""
         cursor.execute(query, (id,))
         senha = cursor.fetchone()
         
         
-        if check_password_hash(senha['senha'], old):
-            a = """update usuarios set senha = %s where id_usuario = %s"""
-            cursor.execute(a,(nova,id))
+        if check_password_hash(senha['senha'], old):            
+            a = """update usuarios set senha = %s, data_editar_senha = %s where id_usuario = %s"""
+            cursor.execute(a,(nova,hoje,id))
             con.commit()
 
             return {
@@ -1223,6 +1247,27 @@ class editar_nome(Resource):
             
         id = session['usuario_id']
         
+        try:
+            aaa = """select data_editar_nome from usuarios where id_usuario = %s """
+            cursor.execute(aaa,(id,))
+            datar = cursor.fetchone()
+            
+        except Exception as e:
+            print(e)
+            return {
+                'status':'error',
+                'mensagem':'erro interno'
+            }, 500
+        
+        if datar['data_editar_nome']: 
+            diferenca = data_semana(datar['data_editar_nome'])
+        
+            if not diferenca:
+                return {
+                    'status':'error',
+                    'mensagem':'É necessario esperar no mínimo 7 dias entre uma edição de nome e outra'
+                }, 400
+        
         nome = data.get('nome')
         nome = str(escape(nome))
         
@@ -1238,7 +1283,9 @@ class editar_nome(Resource):
                     'mensagem':'esse nome de usuario já está sendo utilizado'
                 }, 400
             
-            
+        qqq = """update usuarios set data_editar_nome = %s where id_usuario = %s"""
+        cursor.execute(qqq,(hoje,id))
+        
         query = """update usuarios set user_name = %s where id_usuario = %s"""
         cursor.execute(query,(nome,id))
         
