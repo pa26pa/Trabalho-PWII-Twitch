@@ -1834,17 +1834,7 @@ document.addEventListener('DOMContentLoaded', function () {
         try { sessionStorage.setItem('witch_lives', JSON.stringify(lives)); } catch {}
     }
     
-    /*const _livesMemoria = [];
-
-    function getLives() {
-        return _livesMemoria;
-    }
-
-    function saveLives(lives) {
-        // mantém o array em memória — persiste enquanto a aba estiver aberta
-        _livesMemoria.length = 0;
-        lives.forEach(l => _livesMemoria.push(l));
-    }*/
+    //const _livesMemoria = []; kkkkkkkkkkkk
 
     // thumbnail da live
     const uploadThumb = document.getElementById('upload-thumb');
@@ -1885,9 +1875,33 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     const modal6 = document.getElementById('modal-6');
-    const btnIniciarLive = document.getElementById('btn-iniciar-live');
-    if (btnIniciarLive) {
-        btnIniciarLive.addEventListener('click', () => {
+    const btnUpload = document.getElementById('upload-video');
+    /*if (btnUpload) {
+        btnUpload.addEventListener('click', () => {
+            const nomeLive = document.getElementById('nome-live')?.value.trim();
+            const descLive = document.getElementById('descricao-live')?.value.trim();
+            const videoInput = document.getElementById('video-live');
+            const categorias = [...document.querySelectorAll('#select-dropdown input:checked')].map(cb => cb.value);
+
+            if (!nomeLive) { mostrarToast('Digite um nome para o vídeo!', 'error'); return; }
+            const videoFile = videoInput?.files[0];
+            if (!videoFile) { mostrarToast('Selecione um vídeo para upload!', 'error'); return; }
+
+            const salvarLive = (videoSrc, thumbSrc) => {
+                const lives = getLives();
+                saveLives(lives);
+                renderVideosPerfil();
+
+                thumbTemp = null; thumbFile = null;
+                const prevThumb = document.getElementById('preview-thumb');
+                if (prevThumb) { prevThumb.src = ''; prevThumb.style.backgroundColor = '#000'; prevThumb.classList.remove('tem-foto'); }
+                const labelArq = document.getElementById('label-video-escolhido');
+                if (labelArq) { labelArq.textContent = ''; labelArq.style.display = 'none'; }
+            }
+        });
+    }*/
+    if (btnUpload) {
+        btnUpload.addEventListener('click', () => {
             const nomeLive = document.getElementById('nome-live')?.value.trim();
             const descLive = document.getElementById('descricao-live')?.value.trim();
             const videoInput = document.getElementById('video-live');
@@ -1896,7 +1910,8 @@ document.addEventListener('DOMContentLoaded', function () {
             if (!nomeLive) { mostrarToast('Digite um nome para o vídeo!', 'error'); return; }
 
             const videoFile = videoInput?.files[0];
-
+            if (!videoFile) { mostrarToast('Selecione um vídeo para upload!', 'error'); return; }
+            
             const editandoId = modal6?.dataset.editandoId ? Number(modal6.dataset.editandoId) : null;
             const salvarLive = (videoSrc, thumbSrc) => {
                 const lives = getLives();
