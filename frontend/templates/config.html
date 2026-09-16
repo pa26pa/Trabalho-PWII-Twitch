@@ -45,29 +45,29 @@
 
                     <!-- banner roxo/pink degradê -->
                     <div class="turbo-banner">
-                        <h1 class="turbo-logo">Witch <span>TURBO</span></h1>
+                        <h1 class="turbo-logo" data-i18n>Witch <span>TURBO</span></h1>
                     </div>
 
                     <div class="turbo-body">
-                        <p class="turbo-price">
+                        <p class="turbo-price" data-i18n>
                             <s>R$ 26,99/mês</s> <strong>R$ 18,89/mês</strong> no primeiro mês
                         </p>
-                        <p class="turbo-sub">Renova automaticamente por R$ 26,99/mês depois disso.</p>
-                        <p class="turbo-headline">Apoie streamers sem interrupções.</p>
+                        <p class="turbo-sub" data-i18n>Renova automaticamente por R$ 26,99/mês depois disso.</p>
+                        <p class="turbo-headline" data-i18n>Apoie streamers sem interrupções.</p>
 
                         <div class="turbo-features">
                             <div class="turbo-feature">
                                 <i class="fa-solid fa-tv"></i>
                                 <div>
-                                    <strong>Assista sem anúncios</strong>
-                                    <p>Assista seus streamers favoritos sem anúncios em vídeo ou banners.</p>
+                                    <strong data-i18n>Assista sem anúncios</strong>
+                                    <p data-i18n>Assista seus streamers favoritos sem anúncios em vídeo ou banners.</p>
                                 </div>
                             </div>
                             <div class="turbo-feature">
                                 <i class="fa-solid fa-hard-drive"></i>
                                 <div>
-                                    <strong>Armazenamento expandido (60 dias)</strong>
-                                    <p>Armazene seus VODs por até 60 dias em vez de 14.</p>
+                                    <strong data-i18n>Armazenamento expandido (60 dias)</strong>
+                                    <p data-i18n>Armazene seus VODs por até 60 dias em vez de 14.</p>
                                 </div>
                             </div>
                         </div>
@@ -75,23 +75,23 @@
                         <div class="turbo-extras">
                             <div class="turbo-extra">
                                 <i class="fa-solid fa-comment"></i>
-                                <span>Distintivo de chat exclusivo</span>
+                                <span data-i18n>Distintivo de chat exclusivo</span>
                             </div>
                             <div class="turbo-extra">
                                 <i class="fa-solid fa-face-smile"></i>
-                                <span>Dois conjuntos de emotes adicionais</span>
+                                <span data-i18n>Dois conjuntos de emotes adicionais</span>
                             </div>
                             <div class="turbo-extra">
                                 <i class="fa-solid fa-palette"></i>
-                                <span>Cores personalizadas para nomes no chat</span>
+                                <span data-i18n>Cores personalizadas para nomes no chat</span>
                             </div>
                         </div>
 
                         <br><br>
-                        <p class="turbo-disclaimer">Cobrança mensal • Cancele a qualquer momento</p>                         
+                        <p class="turbo-disclaimer" data-i18n>Cobrança mensal • Cancele a qualquer momento</p>                         
                         <div class="turbo-btns">
-                            <button class="btn-turbo-gift">Presentear Turbo</button>
-                            <button class="btn-turbo-sub">Inscrever-se</button>
+                            <button class="btn-turbo-gift" data-i18n>Presentear Turbo</button>
+                            <button class="btn-turbo-sub" data-i18n>Inscrever-se</button>
                         </div>
                     </div>
                 </div>
@@ -124,21 +124,22 @@
 
                             <div id="language-submenu" class="submenu">
                                 <ul>
-                                    <li class="language-option" data-lang="pt" data-i18n>🇧🇷 Português</li>
-                                    <li class="language-option" data-lang="en" data-i18n>🇺🇸 English</li>
-                                    <li class="language-option" data-lang="es" data-i18n>🇪🇸 Español</li>
+                                    <li class="language-option" data-lang="pt">🇧🇷 Português</li>
+                                    <li class="language-option" data-lang="en">🇺🇸 English</li>
+                                    <li class="language-option" data-lang="es">🇪🇸 Español</li>
                                 </ul>
                             </div>
                         </li>
                         <hr>
-                        <li class="toggle-item">
+                        <li class="toggle-item adjust-slider">
                             <span data-i18n>Tema Escuro</span>
                             <label class="switch">
-                                <input type="checkbox" id="dark-theme">
+                                <input type="checkbox"id="dark-theme" class="btn-tema">
                                 <span class="slider"></span>
                             </label>
                         </li>
                         <hr>
+                        <hr class="aside-mobile-divider">
                         <li id="btn-logout" class="with-login" data-i18n>Sair</li>
                     </ul>
                 </div>
@@ -258,8 +259,7 @@
                     <button id="block-btn" class="open-modal" data-i18n>Bloquear</button>
                 </div>
                 <!--mensagem de erro-->
-                <p id="block-feedback"></p>
-                <ul id="block-effects">
+                <ul class="list-config">
                     <li data-i18n>Irá impedi-los de enviar mensagens privadas instantâneas para você</li>
                     <li data-i18n>Irá impedi-los de hospedá-lo</li>
                     <li data-i18n>Irá impedir que compre inscrições de presente para outros usuários no seu canal</li>
@@ -289,12 +289,232 @@
         </section>
         <section id="not" class="section-config">
             <h1 data-i18n>Notificações</h1>
+            <ul class="list-config">
+                <li data-i18n>Receba notificações que te interessem, onde quiser vê-las</li>
+                <li data-i18n>Ao atualizar cada categoria, você verá as preferências que salvou anteriormente</li>
+                <li data-i18n>Notificações relacionadas a atualizações de conta e comunicados necessários serão enviados</li>
+                <li data-i18n>Poderá receber e-mails adicionais da Twitch</li>
+                <li data-i18n>Poderá sempre usar o link de cancelamento incluído em cada e-mail para desativar notificações específicas</li>
+            </ul>
+            <br>
+            <div class="not-box adjust-slider">
+                <h2 data-i18n>Notificações na Área de Trabalho</h2>
+                <div class="not-subbox">
+                    <span data-i18n>Receba notificações no seu computador, mesmo quando não estiver na Twitch</span>
+                    <span></span>
+                    <label class="switch">
+                        <input id="noti-pc" type="checkbox">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div> <br>
+            <div id="expand-table">
+                <button id="not-btn-table">
+                    <div class="not-text-btn">
+                        <h2 data-i18n>Canais que você segue</h2>
+                        <p data-i18n>Novos conteúdos e atualizações de canais seguidos</p>
+                    </div>
+
+                </button>
+                <br>
+                <table id="not-table" class="adjust-slider">
+                    <tr>
+                        <th class="first-column" data-i18n>Todas as notificações</th>
+                        <th data-i18n>Na Twitch</th>
+                        <th data-i18n>Disp. Móveis</th>
+                        <th data-i18n>E-mail</th>
+                    </tr>
+                    <tr>
+                        <td data-i18n><strong>Ao vivo agora:</strong> quando um canal que você segue entrar ao vivo</td>
+                        <td>
+                            <label class="switch">
+                                <input id="noti-vivo-witch" type="checkbox">
+                                <span class="slider"></span>
+                            </label>
+                        </td>
+                        <td>
+                            <label class="switch">
+                                <input id="noti-vivo-moveis" type="checkbox">
+                                <span class="slider"></span>
+                            </label>
+                        </td>
+                        <td>
+                            <label class="switch">
+                                <input id="noti-vivo-email" type="checkbox">
+                                <span class="slider"></span>
+                            </label>
+                        </td>                           
+                    </tr>
+                    <tr>
+                        <td class="first-column" data-i18n><strong>Fique em dia:</strong> nunca perca um momento - VODs populares, clipes e stories de streamers que você segue</td>
+                        <td>
+                            <label class="switch">
+                                <input id="noti-dia-witch" type="checkbox">
+                                <span class="slider"></span>
+                            </label>
+                        </td>
+                        <td>
+                            <label class="switch">
+                                <input id="noti-dia-moveis" type="checkbox">
+                                <span class="slider"></span>
+                            </label>
+                        </td>
+                        <td>
+                            <label class="switch">
+                                <input id="noti-dia-email" type="checkbox">
+                                <span class="slider"></span>
+                            </label>
+                        </td>                           
+                    </tr>
+                    <tr>
+                        <td class="first-column" data-i18n><strong>Atualizações para inscritos:</strong> quando houver atualizações referentes a canais nos quais você se inscreveu</td>
+                        <td>
+                            <label class="switch">
+                                <input id="noti-atual-witch" type="checkbox">
+                                <span class="slider"></span>
+                            </label>
+                        </td>
+                        <td>
+                            <label class="switch">
+                                <input id="noti-atual-moveis" type="checkbox">
+                                <span class="slider"></span>
+                            </label>
+                        </td>
+                        <td>
+                            <label class="switch">
+                                <input id="noti-atual-email" type="checkbox">
+                                <span class="slider"></span>
+                            </label>
+                        </td>                           
+                    </tr>
+                </table>
+            </div>
         </section>
         <section id="con" class="section-config">
             <h1 data-i18n>Conexões</h1>
+            <p data-i18n>Gerencie seus serviços e contas conectadas</p>
+            <br>
+            <div class="con-box">
+                <div class="black-square" style="background-color: red"> </div>
+                <div class="con-text">
+                    <h2 data-i18n>Empresa 1.0</h2>
+                    <p data-i18n>Ao se conectar à empresa você tem vários benefícios e além disso, a Witch não compartilhará seus dados dessa empresa.</p>
+                    <button class="open-modal con-btn" data-i18n>Conectar</button>
+                </div>
+            </div>
+            <br>
+            <div class="con-box">
+                <div class="black-square" style="background-color: yellow;"> </div>
+                <div class="con-text">
+                    <h2 data-i18n>Empresa 2.0</h2>
+                    <p data-i18n>Ao se conectar à empresa você tem vários benefícios e além disso, a Witch não compartilhará seus dados dessa empresa.</p>
+                    <button class="open-modal con-btn" data-i18n>Conectar</button>
+                </div>
+            </div>
+            <br>
+            <div class="con-box">
+                <div class="black-square" style="background-color: green;"> </div>
+                <div class="con-text">
+                    <h2 data-i18n>Empresa 3.0</h2>
+                    <p data-i18n>Ao se conectar à empresa você tem vários benefícios e além disso, a Witch não compartilhará seus dados dessa empresa.</p>
+                    <button class="open-modal con-btn" data-i18n>Conectar</button>
+                </div>
+            </div>
+            <br>
+            <div class="con-box">
+                <div class="black-square" style="background-color: blue;"> </div>
+                <div class="con-text">
+                    <h2 data-i18n>Empresa 4.0</h2>
+                    <p data-i18n>Ao se conectar à empresa você tem vários benefícios e além disso, a Witch não compartilhará seus dados dessa empresa.</p>
+                    <button class="open-modal con-btn" data-i18n>Conectar</button>
+                </div>
+            </div>
+            <br>
         </section>
         <section id="pref" class="section-config">
             <h1 data-i18n>Preferências</h1>
+            <p data-i18n>Gerencie os tipos de conteúdo que você vê na Witch</p>
+            <br>
+            <div class="pref-box adjust-slider">
+                <h2 data-i18n>Oculte conteúdos com rótulos de classificação de conteúdo</h2>
+                <br>
+                <p data-i18n>Controle como o conteúdos marcados com rótulos de classificação de conteúdo são exibidos na Witch. Conteúdos de canais que você segue continuarão sendo exibidos.</p>
+                <br>
+                <table>
+                    <tr>
+                        <td>
+                            <label class="switch">
+                                <input type="checkbox" id="pref-nosexual">
+                                <span class="slider"></span>
+                            </label>
+                        </td>
+                        <td data-i18n>Ocultar temas sexuais</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <label class="switch">
+                                <input type="checkbox" id="pref-nodrogas" >
+                                <span class="slider"></span>
+                            </label>
+                        </td>
+                        <td data-i18n>Ocultar drogas, intoxicação ou uso excessivo de tabaco</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <label class="switch">
+                                <input type="checkbox"  id="pref-nobet">
+                                <span class="slider"></span>
+                            </label>
+                        </td>
+                        <td data-i18n>Ocultar jogos de azar</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <label class="switch">
+                                <input type="checkbox" id="pref-noviolencia">
+                                <span class="slider"></span>
+                            </label>
+                        </td>
+                        <td data-i18n>Ocultar representações violentas explícitas</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <label class="switch">
+                                <input type="checkbox" id="pref-noxingamento">
+                                <span class="slider"></span>
+                            </label>
+                        </td>
+                        <td data-i18n>Ocultar uso significativo de xingamentos</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <label class="switch">
+                                <input type="checkbox" id="pref-nogameadulto" >
+                                <span class="slider"></span>
+                            </label>
+                        </td>
+                        <td data-i18n>Ocultar jogos apenas para adultos</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <label class="switch">
+                                <input type="checkbox" id="pref-nopolitica" >
+                                <span class="slider"></span>
+                            </label>
+                        </td>
+                        <td data-i18n>Ocultar política e questões sociais delicadas</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <label class="switch">
+                                <input type="checkbox" id="pref-desfocar">
+                                <span class="slider"></span>
+                            </label>
+                        </td>
+                        <td data-i18n>Desfocar temas sexuais nas prévias em thumbnails quando rotulados como "Temas sexuais"</td>
+                    </tr>
+                </table>
+            </div>
         </section>
     </main>
 
@@ -316,4 +536,4 @@
     <script src="{{url_for('static', filename='tradutor.js')}}"></script>
     <script src="{{url_for('static', filename='script.js')}}"></script>
 </body>
-</html>>
+</html>

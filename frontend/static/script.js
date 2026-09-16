@@ -5,11 +5,12 @@ document.addEventListener('DOMContentLoaded', function () {
     // o token é necessário para proteger contra ataques CSRF, garantindo que as requisições venham de fontes confiáveis
     let csrfToken = null;
     async function carregarCsrf() {
-        const res = await fetch("/csrf-token");
+        const res = await fetch("http://127.0.0.1:5000/csrf-token");
         const data = await res.json();
         csrfToken = data.csrf_token;
     }
 
+    carregarCsrf()
     // CONTROLE DE ESTADO LOGADO/DESLOGADO
     function mostrarLogado(nome) {
         // esconde elementos de deslogado, mostra de logado
@@ -33,8 +34,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 avatarImg.remove();
                 // recria os dois ícones originais (hambúrguer + pessoinha)
                 btnDropdown.innerHTML = `
-                    <i class="fa-solid fa-bars menu-icon without-login" style="color: rgb(255, 255, 255);"></i>
-                    <i class="fa-solid fa-user with-login menu-icon" style="color: rgb(255, 255, 255);"></i>
+                    <i class="fa-solid fa-bars menu-icon without-login" style="color: var(--color10);"></i>
+                    <i class="fa-solid fa-user with-login menu-icon" style="color: var(--color10);"></i>
                 `;
             }
         }
@@ -44,7 +45,7 @@ document.addEventListener('DOMContentLoaded', function () {
     async function verificarSessao() {
 
         try {
-            const res = await fetch("/session", {
+            const res = await fetch("http://127.0.0.1:5000/session", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -71,7 +72,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const btnLogout = document.getElementById('btn-logout');
     if (btnLogout) {
         btnLogout.addEventListener('click', async () => {
-            const res = await fetch("/logout", {
+            const res = await fetch("http://127.0.0.1:5000/logout", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -82,7 +83,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 mostrarToast(data.mensagem, data.status)
                 return;
             } 
-            await carregarCsrf();
+            
             window.location.href = "/";
             mostrarDeslogado();
             if (dropdownMenu) dropdownMenu.classList.remove('show');
@@ -219,7 +220,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // reenvio — login
     if (otpLogin?.resendBtn) {
         otpLogin.resendBtn.addEventListener('click', () => {
-            fetch('/resend', { method: 'GET', headers: { 'Content-Type': 'application/json', "X-CSRFToken":csrfToken } })
+            fetch('http://127.0.0.1:5000/resend', { method: 'GET', headers: { 'Content-Type': 'application/json', "X-CSRFToken":csrfToken } })
             .then(r => r.json()).then(data => mostrarToast(data.mensagem, data.status));
         });
     }
@@ -227,7 +228,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // reenvio — excluir conta
     if (otpDelete?.resendBtn) {
         otpDelete.resendBtn.addEventListener('click', () => {
-            fetch('/resend', { method: 'GET', headers: { 'Content-Type': 'application/json' } })
+            fetch('http://127.0.0.1:5000/resend', { method: 'GET', headers: { 'Content-Type': 'application/json' } })
             .then(r => r.json()).then(data => mostrarToast(data.mensagem, data.status));
         });
     }
@@ -477,7 +478,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // função para mascara do cpf, assim ele fica protegito 
     function mascara_CPF_config(cpf) {
         if (!cpf) return ;
-        return cpf.replace(/(\d{3})\.(\d{3})\.(\d{3})\-(\d{2})/, "$1.***.***-$4");
+        return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.***.***-$4");
     }
 
     function atualizarAvatarDropdown(fotoUrl) {
@@ -589,12 +590,12 @@ document.addEventListener('DOMContentLoaded', function () {
             // CADASTRO
             if (form.classList.contains('sign')) {
                 if (document.getElementById('cadastro').offsetParent === null) return;
-                const captcha = grecaptcha.getResponse();
+                //const captcha = grecaptcha.getResponse();
 
-                if (captcha.length === 0) {
-                    mostrarToast('Por favor, marque a caixa "Não sou um robô"', 'error')
-                    return;
-                }
+                //if (captcha.length === 0) {
+                //    mostrarToast('Por favor, marque a caixa "Não sou um robô"', 'error')
+                //    return;
+                //}
                 
                 const dados = {
                     cpf: document.getElementById("cpf").value,
@@ -602,11 +603,11 @@ document.addEventListener('DOMContentLoaded', function () {
                     user_name: document.getElementById("user-cadastro").value,
                     data_nascimento: document.getElementById("data-nascimento").value,
                     senha: document.getElementById("senha").value,
-                    captcha: captcha
+                    //captcha: captcha
                 };
                 
                 
-                fetch("/signin", {
+                fetch("http://127.0.0.1:5000/signin", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -639,7 +640,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             senha: dados['senha']
                         };
 
-                        fetch("/login", {
+                        fetch("http://127.0.0.1:5000/login", {
                             method: "POST",
                             headers: {
                                 "Content-Type": "application/json",
@@ -677,7 +678,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     senha: document.getElementById('senha_login').value
                 }
 
-                fetch("/login", {
+                fetch("http://127.0.0.1:5000/login", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -704,7 +705,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     who: 'forgot_password'
                 };
                 console.log('aaa');
-                fetch("/forgot", {
+                fetch("http://127.0.0.1:5000/forgot", {
                     method: "POST",
                     headers: { "Content-Type": "application/json", "X-CSRFToken":csrfToken },
                     body: JSON.stringify(dados)
@@ -727,7 +728,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 const otp = form.closest('#modal-3') ? otpDelete : otpLogin;
                 const codigo = otp ? otp.getCode() : '';
 
-                fetch('/check_codigo', {
+                fetch('http://127.0.0.1:5000/check_codigo', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', "X-CSRFToken":csrfToken},
                     body: JSON.stringify({ codigo })
@@ -739,7 +740,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     if (form.closest('#modal-3')) {
                         // fluxo de excluir conta: valida código e deleta
-                        fetch('/delete', {
+                        fetch('http://127.0.0.1:5000/delete', {
                             method: 'DELETE',
                             headers: { 'Content-Type': 'application/json' }
                         })
@@ -762,7 +763,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     nova_senha: form.querySelector('.password2').value
                 }
 
-                fetch("/redefine_password", {
+                fetch("http://127.0.0.1:5000/redefine_password", {
                 method:"PUT",
                 headers: {
                     "Content-Type":"application/json",
@@ -795,7 +796,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     senha_antiga: form.querySelector('.password-atual').value
                 }
             
-                fetch("/update", {
+                fetch("http://127.0.0.1:5000/update", {
                 method:"PUT",
                 headers: {
                     "Content-Type":"application/json",
@@ -825,7 +826,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 who: 'delete_account'
             };
 
-            fetch("/forgot", {
+            fetch("http://127.0.0.1:5000/forgot", {
                 method: "POST",
                 headers: { "Content-Type": "application/json", "X-CSRFToken":csrfToken },
                 body: JSON.stringify(dados)
@@ -833,8 +834,11 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(res => res.json())
             .then(data => {
                 mostrarToast(data.mensagem, data.status);
+                
+                let delete_code = 'error';
 
                 if (data.status === 'success') {
+                    let delete_code = 'success';
                     wrapperDelete.style.display = 'none';
                     const insertCodeDelete = modal3 ? modal3.querySelector('#insert-code') : null;
                     if (insertCodeDelete) insertCodeDelete.style.display = 'flex';
@@ -848,7 +852,11 @@ document.addEventListener('DOMContentLoaded', function () {
     const btnDelete = document.querySelector(".btn-delete");
     if (btnDelete) {
         btnDelete.addEventListener("click", function() {
-        fetch("/delete", {
+        if (delete_code == 'error') {
+            return
+        }
+        
+        fetch("http://127.0.0.1:5000/delete", {
                 method:"DELETE",
                 headers: {
                     "Content-Type":"application/json",
@@ -936,7 +944,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 email: inputEmail.value,
                 who: 'forgot_password'
             };
-            fetch("/forgot", {
+            fetch("http://127.0.0.1:5000/forgot", {
                 method: "POST",
                 headers: { "Content-Type": "application/json", "X-CSRFToken": csrfToken },
                 body: JSON.stringify(dados)
@@ -966,28 +974,34 @@ document.addEventListener('DOMContentLoaded', function () {
                 modal.close();
                 // reseta modal-6 (live)
                 if (modalId === 'modal-6') {
-                    // limpa inputs de texto
-                    const nomeInput = document.getElementById('nome-live');
-                    const descInput = document.getElementById('descricao-live');
-                    if (nomeInput) nomeInput.value = '';
-                    if (descInput) descInput.value = '';
+                    const nomeInput  = document.getElementById('nome-live');
+                    const descInput  = document.getElementById('descricao-live');
+                    const labelArq   = document.getElementById('label-video-escolhido');
+                    const prevThumb  = document.getElementById('preview-thumb');
+                    const vidInput   = document.getElementById('video-live');
+                    const thumbInput = document.getElementById('upload-thumb');
 
-                    // desmarca todos os checkboxes do select
-                    const selectDrop = document.getElementById('select-dropdown');
-                    if (selectDrop) {
-                        selectDrop.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+                    if (nomeInput)  nomeInput.value  = '';
+                    if (descInput)  descInput.value  = '';
+                    if (vidInput)   vidInput.value   = '';
+                    if (thumbInput) thumbInput.value = '';
+                    if (labelArq)  { labelArq.textContent = ''; labelArq.style.display = 'none'; }
+                    if (prevThumb) {
+                        prevThumb.src = '';
+                        prevThumb.style.backgroundColor = '#000';
+                        prevThumb.classList.remove('tem-foto');
                     }
+                    thumbTemp = null;
+                    thumbFile = null;
 
-                    // limpa as tags e reseta o placeholder
+                    document.querySelectorAll('#select-dropdown input[type="checkbox"]').forEach(cb => cb.checked = false);
                     const tags = document.getElementById('selected-tags');
                     const ph   = document.getElementById('select-placeholder');
                     const btn  = document.getElementById('btn-select-cat');
-                    if (tags) tags.innerHTML = '';
-                    if (ph)   ph.textContent = 'Selecione categorias...';
-                    if (btn)  btn.classList.remove('open');
-
-                    // fecha o dropdown se estiver aberto
                     const dropEl = document.getElementById('select-dropdown');
+                    if (tags)  tags.innerHTML = '';
+                    if (ph)    ph.textContent = 'Selecione categorias...';
+                    if (btn)   btn.classList.remove('open');
                     if (dropEl) dropEl.classList.remove('open');
                 }
                 document.body.classList.remove('modal-open');
@@ -1011,16 +1025,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 const checkbox = document.getElementById('checkbox');
                 if (checkbox) checkbox.checked = false;
 
-                if (typeof grecaptcha !== 'undefined') {
-                    grecaptcha.reset();
-                }
+                //if (typeof grecaptcha !== 'undefined') {
+                //    grecaptcha.reset();
+                //}
             }
         });
     });
 
     // FLIP LOGIN ↔ CADASTRO — limpa inputs dos dois lados
     const checkbox = document.getElementById('checkbox');
-        let captchaRendered = false;
+        //let captchaRendered = false;
 
         if (checkbox) {
             checkbox.addEventListener('change', () => { 
@@ -1029,12 +1043,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 document.querySelectorAll('.input-erro').forEach(el => el.classList.remove('input-erro'));
 
                 // renderiza o captcha só quando o cadastro aparecer
-                if (checkbox.checked && !captchaRendered) {
-                    grecaptcha.render('recaptcha-container', {
-                        sitekey: '6LemWTAtAAAAAM2v-HHAGkaNtjG8vm-Huju47Nvs'
-                    });
-                    captchaRendered = true;
-                }
+                //if (checkbox.checked && !captchaRendered) {
+                //    grecaptcha.render('recaptcha-container', {
+                //        sitekey: '6LemWTAtAAAAAM2v-HHAGkaNtjG8vm-Huju47Nvs'
+                //    });
+                //    captchaRendered = true;
+                //}
             });
         }
 
@@ -1064,7 +1078,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         btnEntrar.disabled = true;
 
-        function checkLogin() {
+        function checkLogin() { 
             btnEntrar.disabled = !Array.from(camposLogin).every(i => i.value.trim() !== '');
         }
         camposLogin.forEach(i => i.addEventListener('input', checkLogin));
@@ -1150,6 +1164,24 @@ document.addEventListener('DOMContentLoaded', function () {
             arrowLanguage.forEach(arrow => arrow.style.transform = 'rotate(0deg)');
         });
     }      
+
+    const btnTema = document.querySelectorAll('.btn-tema');
+    if (btnTema) {
+        // aplica tema salvo ao carregar
+        const temaSalvo = localStorage.getItem('witch-tema') || 'claro';
+        document.documentElement.setAttribute('data-tema', temaSalvo === 'escuro' ? 'escuro' : '');
+        btnTema.forEach((btn) => {
+            btn.checked = temaSalvo === 'escuro';
+        });
+
+        btnTema.forEach((btn) => {
+            btn.addEventListener('change', () => {
+                const escuro = btn.checked;
+                document.documentElement.setAttribute('data-tema', escuro ? 'escuro' : '');
+                localStorage.setItem('witch-tema', escuro ? 'escuro' : 'claro');
+            });
+        });
+    }
 
     // Página Inicial - Em Alta (galeria de lives)
     const carouselHome = document.querySelector('.carousel-wrap');
@@ -1334,7 +1366,6 @@ document.addEventListener('DOMContentLoaded', function () {
     //ABA DE PRIVACIDADE (USERS BLOQUEADOS)
     const blockInput = document.getElementById('block-input');
     const blockBtn = document.getElementById('block-btn');
-    const blockFeedback = document.getElementById('block-feedback');
     const toggleBtn = document.getElementById('toggle-blocked');
     const toggleIcon = document.getElementById('toggle-icon');
     const listWrap = document.getElementById('blocked-list-wrap');
@@ -1393,7 +1424,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             const dados = {
                                 nome:usuario.nome
                             };
-                            const res = await fetch("/desbloquear", {
+                            const res = await fetch("http://127.0.0.1:5000/desbloquear", {
                             method: "POST",
                             headers: {
                                 "Content-Type": "application/json",
@@ -1402,14 +1433,15 @@ document.addEventListener('DOMContentLoaded', function () {
                             body: JSON.stringify(dados)
                             }); 
                             const data = await res.json();
-
-                            blockFeedback.textContent = data.mensagem;
+                            
+                            mostrarToast(data.mensagem, data.status);
 
                             blockUsers.splice(i, 1);//remove do array
                             renderTable();//reenderiza a table
                             updateHeight();//ajusta tamanho do dropdown
+
                         } catch {
-                            blockFeedback.textContent = 'Erro ao desbloquear usuário';
+                            mostrarToast('Erro ao desbloquear usuário', data.status);
                         }       
                     });
                 });
@@ -1440,8 +1472,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
             const nome = blockInput.value.trim();
 
-            blockFeedback.textContent = '';
-
             if (!nome) return;
 
             // verifica se já está bloqueado
@@ -1450,7 +1480,7 @@ document.addEventListener('DOMContentLoaded', function () {
             );
 
             if (alreadyExists) {
-                blockFeedback.textContent = 'Esse usuário já está bloqueado';
+                mostrarToast('Esse usuário já está bloqueado', 'error');
                 return;
             }
 
@@ -1464,7 +1494,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     data: today
                 };
 
-                const res = await fetch("/bloquear", {
+                const res = await fetch("http://127.0.0.1:5000/bloquear", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -1472,14 +1502,15 @@ document.addEventListener('DOMContentLoaded', function () {
                     },
                     body: JSON.stringify(dados)
                 });
-
-                const data = await res.json();
-
                 
+                
+                const data = await res.json();
+                
+                mostrarToast(data.mensagem,data.status);
 
                 if (data.existe) {
 
-
+                        
                     blockUsers.push({
                         nome: nome,
                         data: today
@@ -1494,24 +1525,47 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
 
                 } else {
-                    blockFeedback.textContent = 'Usuário não encontrado';
+                    mostrarToast('Usuário não encontrado','error');
                 }
 
             } catch (erro) {
-
-                
-
-                blockFeedback.textContent =
-                    'Erro ao verificar. Tente novamente';
+                mostrarToast('Erro ao verificar. Tente novamente','error');
 
             } finally {
 
-                // SEMPRE executa
+                // sempre executa
                 blockBtn.disabled = false;
                 blockBtn.textContent = 'Bloquear';
             }
         });
     }
+
+    //aba de notificações
+    const btnTable = document.getElementById('not-btn-table');
+    if (btnTable) {
+        btnTable.addEventListener('click', () => {
+            const expandTable = document.getElementById('expand-table');          
+            expandTable.classList.toggle('open');
+        });
+    }
+    /*const questions = document.querySelectorAll(".question");
+
+    if (questions.length > 0) {
+        questions.forEach(btn => { 
+            btn.addEventListener('click', () => {
+                const item = btn.closest('.question-item');
+                const isOpen = item.classList.contains('open');
+
+                document.querySelectorAll('.question-item').forEach(a => {
+                    a.classList.remove('open');
+                });
+
+                if (!isOpen) {
+                    item.classList.add('open');
+                }
+            });
+        });
+    }*/
 
     //--------------perfil (meu canal)-------------------
     // UPLOAD DE FOTO DE PERFIL
@@ -1522,19 +1576,28 @@ document.addEventListener('DOMContentLoaded', function () {
     const btnEditar = document.getElementById('btn-editar');
     if (btnEditar) {
         btnEditar.addEventListener('click', () => {
-            fetch("/session", { method: "GET", headers: { "Content-Type": "application/json", "X-CSRFToken": csrfToken } })
+            fetch("/session", {
+                method: "POST", // FIX: era GET, mas a rota é POST
+                headers: { "Content-Type": "application/json", "X-CSRFToken": csrfToken }
+            })
             .then(res => res.json())
             .then(data => {
-                const inputNome = document.getElementById('name-user');
-                const inputBio  = document.getElementById('bio-user');
+                if (!data.logado) return;
+                const inputNome   = document.getElementById('name-user');
+                const inputBio    = document.getElementById('bio-user');
                 const previewFoto = document.getElementById('preview-foto');
 
                 if (inputNome) inputNome.value = data.name || '';
                 if (inputBio)  inputBio.value  = data.bio  || '';
 
                 if (previewFoto) {
-                    previewFoto.src = data.foto || '/static/user.png';
-                    previewFoto.classList.toggle('tem-foto', !!data.foto);
+                    if (data.foto) {
+                        previewFoto.src = data.foto;
+                        previewFoto.classList.add('tem-foto');
+                    } else {
+                        previewFoto.src = '/static/user.png';
+                        previewFoto.classList.remove('tem-foto');
+                    }
                 }
             });
         });
@@ -1573,7 +1636,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             try {
                 if (fotoTemp != null) {
-                    const res = await fetch('/salvar_foto', {
+                    const res = await fetch('http://127.0.0.1:5000/salvar_foto', {
                         method: 'POST',
                         headers: {
                             "X-CSRFToken":csrfToken
@@ -1600,7 +1663,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     nome: novoNome
                 };
 
-                const res_ = await fetch('/editar_nome', {
+                const res_ = await fetch('http://127.0.0.1:5000/editar_nome', {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
@@ -1617,7 +1680,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     bio: novaBio
                 };
 
-                const resp = await fetch('/editar_bio', {
+                const resp = await fetch('http://127.0.0.1:5000/editar_bio', {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
@@ -1743,7 +1806,7 @@ document.addEventListener('DOMContentLoaded', function () {
         await verificarSessao();
 
         if (document.getElementById('block-btn')) {
-            fetch('/bloqueados', {
+            fetch('http://127.0.0.1:5000/bloqueados', {
             method:"GET",
             headers: {
                 "Content-Type": "application/json",
@@ -1759,6 +1822,8 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
         }
+        await carrregarGerarPreferencias('noti_switches');
+        await carrregarGerarPreferencias('pref_switches');
     }
 
     // ── LIVES: salvar e renderizar histórico no perfil ──
@@ -1768,42 +1833,181 @@ document.addEventListener('DOMContentLoaded', function () {
     function saveLives(lives) {
         try { sessionStorage.setItem('witch_lives', JSON.stringify(lives)); } catch {}
     }
+    
+    //const _livesMemoria = []; kkkkkkkkkkkk
 
-    const btnIniciarLive = document.getElementById('btn-iniciar-live');
-    if (btnIniciarLive) {
-        btnIniciarLive.addEventListener('click', () => {
-            const nomeLive  = document.getElementById('nome-live')?.value.trim();
-            const descLive  = document.getElementById('descricao-live')?.value.trim();
+    // thumbnail da live
+    const uploadThumb = document.getElementById('upload-thumb');
+    const previewThumb = document.getElementById('preview-thumb');
+    let thumbTemp = null;
+    let thumbFile = null;
+
+    if (uploadThumb && previewThumb) {
+        previewThumb.addEventListener('click', () => uploadThumb.click());
+        uploadThumb.addEventListener('change', (e) => {
+            const arquivo = e.target.files[0];
+            if (!arquivo || !arquivo.type.startsWith('image/')) return;
+            thumbFile = arquivo;
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                thumbTemp = ev.target.result;
+                previewThumb.src = thumbTemp;
+                previewThumb.classList.add('tem-foto');
+            };
+            reader.readAsDataURL(arquivo);
+        });
+    }
+
+    // botão de escolher vídeo
+    const btnEscolherVideo = document.getElementById('btn-escolher-video');
+    const videoLiveInput   = document.getElementById('video-live');
+    const labelVideoEscolhido = document.getElementById('label-video-escolhido');
+    if (btnEscolherVideo && videoLiveInput) {
+        btnEscolherVideo.addEventListener('click', () => videoLiveInput.click());
+        videoLiveInput.addEventListener('change', () => {
+            const f = videoLiveInput.files[0];
+            const labelArquivo = document.getElementById('label-video-escolhido');
+            if (f && labelArquivo) {
+                labelArquivo.textContent = f.name;
+                labelArquivo.style.display = 'block';
+            }
+        });
+    }
+
+    const modal6 = document.getElementById('modal-6');
+    const btnUpload = document.getElementById('upload-video');
+    /*if (btnUpload) {
+        btnUpload.addEventListener('click', () => {
+            const nomeLive = document.getElementById('nome-live')?.value.trim();
+            const descLive = document.getElementById('descricao-live')?.value.trim();
             const videoInput = document.getElementById('video-live');
             const categorias = [...document.querySelectorAll('#select-dropdown input:checked')].map(cb => cb.value);
 
-            if (!nomeLive) { mostrarToast('Digite um nome para a live!', 'error'); return; }
+            if (!nomeLive) { mostrarToast('Digite um nome para o vídeo!', 'error'); return; }
+            const videoFile = videoInput?.files[0];
+            if (!videoFile) { mostrarToast('Selecione um vídeo para upload!', 'error'); return; }
 
-            const finalizar = (src) => {
+            const salvarLive = (videoSrc, thumbSrc) => {
                 const lives = getLives();
-                lives.unshift({
-                    id: Date.now(),
-                    titulo: nomeLive,
-                    descricao: descLive || '',
-                    categorias,
-                    src,
-                    data: new Date().toLocaleDateString('pt-BR')
-                });
                 saveLives(lives);
                 renderVideosPerfil();
-                const modal6 = document.getElementById('modal-6');
-                if (modal6) { modal6.close(); document.body.classList.remove('modal-open'); }
-                mostrarToast('Live salva!', 'success');
-            };
+
+                thumbTemp = null; thumbFile = null;
+                const prevThumb = document.getElementById('preview-thumb');
+                if (prevThumb) { prevThumb.src = ''; prevThumb.style.backgroundColor = '#000'; prevThumb.classList.remove('tem-foto'); }
+                const labelArq = document.getElementById('label-video-escolhido');
+                if (labelArq) { labelArq.textContent = ''; labelArq.style.display = 'none'; }
+            }
+        });
+    }*/
+    if (btnUpload) {
+        btnUpload.addEventListener('click', () => {
+            const nomeLive = document.getElementById('nome-live')?.value.trim();
+            const descLive = document.getElementById('descricao-live')?.value.trim();
+            const videoInput = document.getElementById('video-live');
+            const categorias = [...document.querySelectorAll('#select-dropdown input:checked')].map(cb => cb.value);
+
+            if (!nomeLive) { mostrarToast('Digite um nome para o vídeo!', 'error'); return; }
 
             const videoFile = videoInput?.files[0];
-            if (videoFile) {
-                const reader = new FileReader();
-                reader.onload = (ev) => finalizar(ev.target.result);
-                reader.readAsDataURL(videoFile);
+            if (!videoFile) { mostrarToast('Selecione um vídeo para upload!', 'error'); return; }
+            
+            const editandoId = modal6?.dataset.editandoId ? Number(modal6.dataset.editandoId) : null;
+            const salvarLive = (videoSrc, thumbSrc) => {
+                const lives = getLives();
+
+                if (editandoId) {
+                    // FIX: edição — sobrescreve o vídeo existente
+                    const idx = lives.findIndex(l => l.id === editandoId);
+                    if (idx !== -1) {
+                        lives[idx].titulo    = nomeLive;
+                        lives[idx].descricao = descLive || '';
+                        lives[idx].categorias = categorias;
+                        if (thumbSrc) lives[idx].thumb = thumbSrc;
+                        if (videoSrc) lives[idx].src   = videoSrc;
+                    }
+                    if (modal6) delete modal6.dataset.editandoId;
+                } else {
+                    // novo vídeo
+                    lives.unshift({
+                        id: Date.now(),
+                        titulo: nomeLive,
+                        descricao: descLive || '',
+                        categorias,
+                        src: videoSrc,
+                        thumb: thumbSrc || '',
+                        data: new Date().toLocaleDateString('pt-BR'),
+                        views: 0,
+                        curtidas: 0,
+                        comentarios: [],
+                        aoVivo: false
+                    });
+                }
+
+                saveLives(lives);
+                renderVideosPerfil();
+                if (modal6) { modal6.close(); document.body.classList.remove('modal-open'); }
+                mostrarToast(editandoId ? 'Vídeo atualizado!' : 'Vídeo salvo!', 'success');
+
+                thumbTemp = null; thumbFile = null;
+                const prevThumb = document.getElementById('preview-thumb');
+                if (prevThumb) { prevThumb.src = ''; prevThumb.style.backgroundColor = '#000'; prevThumb.classList.remove('tem-foto'); }
+                const labelArq = document.getElementById('label-video-escolhido');
+                if (labelArq) { labelArq.textContent = ''; labelArq.style.display = 'none'; }
+            };
+
+            // FIX: usa blob URL para vídeo — muito mais rápido e sem limite de tamanho
+            const videoSrc = videoFile ? URL.createObjectURL(videoFile) : '';
+
+            if (thumbFile) {
+                const rThumb = new FileReader();
+                rThumb.onload = (et) => salvarLive(videoSrc, et.target.result);
+                rThumb.readAsDataURL(thumbFile);
             } else {
-                finalizar('');
+                salvarLive(videoSrc, '');
             }
+
+            // lê o vídeo se houver, senão salva com src vazio
+            const lerThumb = (videoSrc) => {
+                if (thumbFile) {
+                    const rThumb = new FileReader();
+                    rThumb.onload = (et) => salvarLive(videoSrc, et.target.result);
+                    rThumb.readAsDataURL(thumbFile);
+                } else {
+                    salvarLive(videoSrc, '');
+                }
+            };
+
+            if (videoFile) {
+                const rVideo = new FileReader();
+                rVideo.onload = (ev) => lerThumb(ev.target.result);
+                rVideo.onerror = () => mostrarToast('Erro ao ler o vídeo.', 'error');
+                rVideo.readAsDataURL(videoFile);
+            } else {
+                // permite salvar sem vídeo (ex: só live)
+                lerThumb('');
+            }
+        });
+    }
+
+    function formatarTempo(s) {
+        const m = Math.floor(s / 60);
+        const seg = Math.floor(s % 60).toString().padStart(2, '0');
+        return `${m}:${seg}`;
+    }
+
+    function criarClipe(live) {
+        if (!live.src) { mostrarToast('Nenhum vídeo para criar clipe.', 'error'); return; }
+
+        // cria um vídeo temporário para capturar os primeiros 60s
+        const vidTemp = document.createElement('video');
+        vidTemp.src = live.src;
+        vidTemp.muted = true;
+
+        vidTemp.addEventListener('loadedmetadata', () => {
+            const duracao = Math.min(vidTemp.duration, 60);
+            mostrarToast(`Clipe de ${Math.round(duracao)}s criado! (simulação — requer backend para corte real)`, 'success');
+            // Em produção: enviar live.src + tempo início/fim para o backend cortar com ffmpeg
         });
     }
 
@@ -1812,28 +2016,416 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!container) return;
         const lives = getLives();
         container.innerHTML = '';
+
         if (lives.length === 0) {
-            container.innerHTML = '<p style="color:#888;text-align:center;padding:20px;grid-column:1/-1;">Nenhuma live realizada ainda.</p>';
+            container.innerHTML = '<p style="color:var(--color16);text-align:center;padding:20px;grid-column:1/-1;">Nenhuma live realizada ainda.</p>';
             return;
         }
+
         lives.forEach(live => {
             const card = document.createElement('div');
-            card.className = 'video-card';
-            card.innerHTML = `
-                <div class="video-thumb">
-                    ${live.src
-                        ? `<video src="${live.src}" preload="metadata"></video>`
-                        : `<div style="width:100%;height:100%;background:#2a1a4a;display:flex;align-items:center;justify-content:center;">
-                            <i class="fa-solid fa-video" style="font-size:2em;color:#9147FF;"></i>
-                        </div>`}
-                    <span class="thumb-views">${live.data}</span>
-                </div>
-                <p class="thumb-title">${live.titulo}</p>
-                <p class="thumb-user">${live.categorias.join(', ') || 'Sem categoria'}</p>
+            card.className = 'video-card-perfil';
+
+            const thumbDiv = document.createElement('div');
+            thumbDiv.className = 'video-thumb-perfil';
+
+            const vid = document.createElement('video');
+            vid.preload = 'metadata';
+            vid.muted = true;
+            vid.loop  = true;
+            if (live.src) vid.src = live.src;
+            thumbDiv.appendChild(vid);
+
+            if (live.thumb) {
+                const capa = document.createElement('img');
+                capa.src = live.thumb;
+                capa.className = 'thumb-cover';
+                capa.alt = live.titulo;
+                thumbDiv.appendChild(capa);
+            }
+
+            if (live.aoVivo) {
+                const badge = document.createElement('span');
+                badge.className = 'thumb-badge-live';
+                badge.textContent = 'AO VIVO';
+                thumbDiv.appendChild(badge);
+            }
+
+            const views = document.createElement('span');
+            views.className = 'thumb-views-perfil';
+            views.textContent = `${live.views} visualizações`;
+            thumbDiv.appendChild(views);
+
+            const progWrap = document.createElement('div');
+            progWrap.className = 'thumb-progress-wrap';
+            const progFill = document.createElement('div');
+            progFill.className = 'thumb-progress-fill';
+            progWrap.appendChild(progFill);
+            thumbDiv.appendChild(progWrap);
+
+            let rafId;
+            thumbDiv.addEventListener('mouseenter', () => {
+                if (!live.src) return;
+                vid.play().catch(() => {});
+                const tick = () => {
+                    if (vid.duration) progFill.style.width = (vid.currentTime / vid.duration * 100) + '%';
+                    rafId = requestAnimationFrame(tick);
+                };
+                rafId = requestAnimationFrame(tick);
+            });
+            thumbDiv.addEventListener('mouseleave', () => {
+                vid.pause(); vid.currentTime = 0;
+                progFill.style.width = '0%';
+                cancelAnimationFrame(rafId);
+            });
+            let isDragging = false;
+
+            const moverBarra = (e) => {
+                const rect = progWrap.getBoundingClientRect();
+                const pct = Math.min(Math.max((e.clientX - rect.left) / rect.width, 0), 1);
+                if (vid.duration) {
+                    vid.currentTime = pct * vid.duration;
+                    progFill.style.width = (pct * 100) + '%';
+                }
+            };
+
+            progWrap.addEventListener('mousedown', e => {
+                e.stopPropagation();
+                isDragging = true;
+                moverBarra(e);
+            });
+            document.addEventListener('mousemove', e => {
+                if (isDragging) moverBarra(e);
+            });
+            document.addEventListener('mouseup', () => {
+                isDragging = false;
+            });
+            progWrap.addEventListener('click', e => {
+                e.stopPropagation();
+            });
+            thumbDiv.addEventListener('click', e => {
+                if (progWrap.contains(e.target)) return;
+                abrirPlayerExpandido(live);
+            });
+
+            // info abaixo — com botão de 3 pontos
+            const titulo = document.createElement('p');
+            titulo.className = 'video-card-titulo';
+            titulo.textContent = live.titulo;
+
+            const cats = document.createElement('p');
+            cats.className = 'video-card-categorias';
+            cats.textContent = live.categorias?.join(' • ') || '';
+            cats.style.cssText = 'font-size:0.78em;color:var(--color3)';
+
+            const nomeCanal = document.querySelector('.show_name')?.textContent || 'Meu Canal';
+            const canal = document.createElement('p');
+            canal.className = 'video-card-canal';
+            canal.textContent = nomeCanal;
+
+            const dataEl = document.createElement('p');
+            dataEl.className = 'video-card-info';
+            dataEl.textContent = live.data;
+
+            // linha inferior com data + botão 3 pontos
+            const infoRow = document.createElement('div');
+            infoRow.style.cssText = 'display:flex;justify-content:space-between;align-items:center;';
+
+            const btnOpcoes = document.createElement('button');
+            btnOpcoes.className = 'btn-opcoes-video';
+            btnOpcoes.innerHTML = '<i class="fa-solid fa-ellipsis-vertical"></i>';
+            btnOpcoes.title = 'Opções';
+
+            // menu de opções
+            const menuOpcoes = document.createElement('div');
+            menuOpcoes.className = 'menu-opcoes-video';
+            menuOpcoes.innerHTML = `
+                <button class="opcao-video" data-acao="excluir">
+                    <i class="fa-solid fa-trash"></i> Excluir
+                </button>
+                <button class="opcao-video" data-acao="editar">
+                    <i class="fa-solid fa-pen"></i> Editar
+                </button>
+                <button class="opcao-video" data-acao="salvar">
+                    <i class="fa-solid fa-download"></i> Salvar vídeo
+                </button>
+                <button class="opcao-video" data-acao="clipe">
+                    <i class="fa-solid fa-scissors"></i> Criar clipe (60s)
+                </button>
             `;
+
+            // abre/fecha o menu
+            btnOpcoes.addEventListener('click', e => {
+                e.stopPropagation();
+                // fecha todos os outros menus abertos
+                document.querySelectorAll('.menu-opcoes-video.show').forEach(m => {
+                    if (m !== menuOpcoes) m.classList.remove('show');
+                });
+                menuOpcoes.classList.toggle('show');
+            });
+
+            // ações do menu
+            menuOpcoes.querySelectorAll('.opcao-video').forEach(btn => {
+                btn.addEventListener('click', e => {
+                    e.stopPropagation();
+                    const acao = btn.dataset.acao;
+
+                    if (acao === 'excluir') {
+                        if (!confirm(`Excluir "${live.titulo}"?`)) return;
+                        const lives = getLives();
+                        const idx = lives.findIndex(l => l.id === live.id);
+                        if (idx !== -1) { lives.splice(idx, 1); saveLives(lives); }
+                        renderVideosPerfil();
+
+                    } else if (acao === 'editar') {
+                        // abre modal-6 preenchido com os dados do vídeo
+                        if (!modal6) return;
+                        document.getElementById('nome-live').value      = live.titulo;
+                        document.getElementById('descricao-live').value = live.descricao || '';
+                        // marca as categorias salvas
+                        document.querySelectorAll('#select-dropdown input[type="checkbox"]').forEach(cb => {
+                            cb.checked = live.categorias?.includes(cb.value) || false;
+                        });
+                        // atualiza as tags visíveis
+                        const tags = document.getElementById('selected-tags');
+                        const ph   = document.getElementById('select-placeholder');
+                        if (tags) {
+                            tags.innerHTML = '';
+                            (live.categorias || []).forEach(val => {
+                                const label = document.querySelector(`#select-dropdown input[value="${val}"]`)
+                                    ?.closest('label')?.textContent.trim() || val;
+                                const tag = document.createElement('div');
+                                tag.className = 'tag';
+                                tag.innerHTML = `<span>${label}</span><button type="button"><i class="fa-solid fa-xmark"></i></button>`;
+                                tag.querySelector('button').addEventListener('click', () => {
+                                    document.querySelector(`#select-dropdown input[value="${val}"]`).checked = false;
+                                    tag.remove();
+                                });
+                                tags.appendChild(tag);
+                            });
+                            if (ph) ph.textContent = live.categorias?.length
+                                ? `${live.categorias.length} selecionada${live.categorias.length > 1 ? 's' : ''}`
+                                : 'Selecione categorias...';
+                        }
+                        // thumbnail
+                        const prevThumb = document.getElementById('preview-thumb');
+                        if (prevThumb && live.thumb) {
+                            prevThumb.src = live.thumb;
+                            prevThumb.classList.add('tem-foto');
+                        }
+                        // marca o id para sobrescrever ao confirmar
+                        modal6.dataset.editandoId = live.id;
+                        modal6.showModal();
+                        document.body.classList.add('modal-open');
+
+                    } else if (acao === 'salvar') {
+                        if (!live.src) { mostrarToast('Nenhum vídeo disponível para download.', 'error'); return; }
+                        const a = document.createElement('a');
+                        a.href     = live.src;
+                        a.download = `${live.titulo}.mp4`;
+                        a.click();
+
+                    } else if (acao === 'clipe') {
+                        criarClipe(live);
+                    }
+
+                    menuOpcoes.classList.remove('show');
+                });
+            });
+
+            // fecha ao clicar fora
+            document.addEventListener('click', () => menuOpcoes.classList.remove('show'));
+
+            infoRow.appendChild(dataEl);
+            infoRow.appendChild(btnOpcoes);
+
+            // wrapper relativo para posicionar o menu
+            const opcWrapper = document.createElement('div');
+            opcWrapper.style.cssText = 'position:relative;';
+            opcWrapper.appendChild(btnOpcoes);
+            opcWrapper.appendChild(menuOpcoes);
+
+            card.append(thumbDiv, titulo, cats, canal, infoRow, opcWrapper);
             container.appendChild(card);
         });
     }
+
+    // player expandido
+    function abrirPlayerExpandido(live) {
+        const overlay    = document.getElementById('video-player-overlay');
+        const videoEl    = document.getElementById('video-expandido');
+        const tituloTop  = document.getElementById('player-titulo-topo');
+        const tituloCtrl = document.getElementById('player-titulo-controle');
+        const progWrap   = document.getElementById('progress-wrap-exp');
+        const progFill   = document.getElementById('progress-fill-exp');
+        const playBtn    = document.getElementById('play-btn-exp');
+        const playIcon   = document.getElementById('play-icon-exp');
+        const muteBtn    = document.getElementById('mute-btn-exp');
+        const volIcon    = document.getElementById('vol-icon-exp');
+        const volRange   = document.getElementById('vol-range-exp');
+        const timeLabel  = document.getElementById('time-label-exp');
+        const fsBtn      = document.getElementById('fs-btn-exp');
+        const fsIcon     = document.getElementById('fs-icon-exp');
+        const fecharBtn  = document.getElementById('fechar-player');
+
+        // vídeo
+        videoEl.src    = live.src || '';
+        videoEl.volume = 0.8;
+        videoEl.muted  = false;
+        volRange.value = 80;
+        tituloTop.textContent  = live.titulo;
+        tituloCtrl.textContent = live.titulo;
+
+        // painel de info
+        document.getElementById('player-info-titulo').textContent = live.titulo;
+        document.getElementById('player-info-cats').textContent   = live.categorias?.join(' • ') || '';
+        document.getElementById('player-info-data').textContent   = live.data;
+
+        const nomeCanal = document.querySelector('.show_name')?.textContent || 'Meu Canal';
+        const fotoCanal = document.querySelector('.photo-user')?.src || '/static/user.png';
+        document.getElementById('player-canal-nome-text').textContent = nomeCanal;
+        document.getElementById('player-canal-foto-img').src          = fotoCanal;
+
+        // curtidas
+        const btnCurtir     = document.getElementById('btn-curtir');
+        const countCurtidas = document.getElementById('count-curtidas');
+        btnCurtir.classList.remove('ativo');
+        countCurtidas.textContent = live.curtidas || 0;
+
+        btnCurtir.onclick = () => {
+            const lives = getLives();
+            const idx = lives.findIndex(l => l.id === live.id);
+            if (idx === -1) return;
+            if (btnCurtir.classList.contains('ativo')) {
+                lives[idx].curtidas = Math.max(0, (lives[idx].curtidas || 1) - 1);
+                btnCurtir.classList.remove('ativo');
+            } else {
+                lives[idx].curtidas = (lives[idx].curtidas || 0) + 1;
+                btnCurtir.classList.add('ativo');
+            }
+            countCurtidas.textContent = lives[idx].curtidas;
+            live.curtidas = lives[idx].curtidas;
+            saveLives(lives);
+        };
+
+        // compartilhar
+        document.getElementById('btn-compartilhar').onclick = () => {
+            navigator.clipboard?.writeText(window.location.href)
+                .then(() => mostrarToast('Link copiado!', 'success'))
+                .catch(()  => mostrarToast('Não foi possível copiar.', 'error'));
+        };
+
+        // comentar — foca no input
+        document.getElementById('btn-comentar').onclick = () => {
+            document.getElementById('comentario-input').focus();
+        };
+
+        // comentários salvos
+        const listaComent = document.getElementById('comentarios-lista');
+        listaComent.innerHTML = '';
+        (live.comentarios || []).forEach(c => adicionarComentarioDOM(c.autor, c.texto, c.foto));
+
+        const inputComent = document.getElementById('comentario-input');
+        const btnEnviar   = document.getElementById('comentario-enviar');
+        inputComent.value = '';
+
+        const enviarComentario = () => {
+            const texto = inputComent.value.trim();
+            if (!texto) return;
+            const nomeUser = document.querySelector('.show_name')?.textContent || 'Você';
+            const fotoUser = document.querySelector('.photo-user')?.src || '/static/user.png';
+            adicionarComentarioDOM(nomeUser, texto, fotoUser);
+            const lives = getLives();
+            const idx = lives.findIndex(l => l.id === live.id);
+            if (idx !== -1) {
+                if (!lives[idx].comentarios) lives[idx].comentarios = [];
+                lives[idx].comentarios.push({ autor: nomeUser, texto, foto: fotoUser });
+                saveLives(lives);
+            }
+            inputComent.value = '';
+        };
+
+        btnEnviar.onclick         = enviarComentario;
+        inputComent.onkeydown     = e => { if (e.key === 'Enter') enviarComentario(); };
+
+        // abre overlay
+        overlay.classList.add('show');
+        document.body.classList.add('modal-open');
+        if (live.src) { videoEl.play().catch(() => {}); playIcon.className = 'fa-solid fa-pause'; }
+
+        playBtn.onclick  = () => {
+            if (videoEl.paused) { videoEl.play(); playIcon.className = 'fa-solid fa-pause'; }
+            else { videoEl.pause(); playIcon.className = 'fa-solid fa-play'; }
+        };
+        videoEl.onclick  = () => playBtn.onclick();
+
+        const progressBar = document.getElementById('progress-exp');
+
+        // zera ao abrir
+        progressBar.value = 0;
+
+        // atualiza a barra conforme o vídeo avança
+        const tick = () => {
+            if (videoEl.duration) {
+                progressBar.value = (videoEl.currentTime / videoEl.duration) * 100;
+                timeLabel.textContent = `${formatarTempo(videoEl.currentTime)} / ${formatarTempo(videoEl.duration)}`;
+            }
+            rafId = requestAnimationFrame(tick);
+        };
+        rafId = requestAnimationFrame(tick);
+
+        // usuário arrasta a barra
+        progressBar.addEventListener('input', () => {
+            if (videoEl.duration) {
+                videoEl.currentTime = (progressBar.value / 100) * videoEl.duration;
+            }
+        });
+
+        muteBtn.onclick  = () => {
+            videoEl.muted = !videoEl.muted;
+            volIcon.className = videoEl.muted ? 'fa-solid fa-volume-xmark' : 'fa-solid fa-volume-high';
+            volRange.value    = videoEl.muted ? 0 : videoEl.volume * 100;
+        };
+        volRange.oninput = () => {
+            videoEl.volume = volRange.value / 100;
+            videoEl.muted  = +volRange.value === 0;
+            volIcon.className = +volRange.value === 0 ? 'fa-solid fa-volume-xmark'
+                : +volRange.value < 50 ? 'fa-solid fa-volume-low'
+                : 'fa-solid fa-volume-high';
+        };
+
+        const playerBox = document.querySelector('.player-wrap-expanded');
+        fsBtn.onclick = () => {
+            if (!document.fullscreenElement) { playerBox.requestFullscreen?.(); fsIcon.className = 'fa-solid fa-compress'; }
+            else { document.exitFullscreen?.(); fsIcon.className = 'fa-solid fa-expand'; }
+        };
+
+        const fechar = () => {
+            videoEl.pause(); videoEl.src = '';
+            overlay.classList.remove('show');
+            document.body.classList.remove('modal-open');
+            cancelAnimationFrame(rafId);
+            playIcon.className = 'fa-solid fa-play';
+        };
+        fecharBtn.onclick = fechar;
+        overlay.onclick   = e => { if (e.target === overlay) fechar(); };
+    }
+
+    function adicionarComentarioDOM(autor, texto, foto) {
+        const lista = document.getElementById('comentarios-lista');
+        if (!lista) return;
+        const item = document.createElement('div');
+        item.className = 'comentario-item';
+        item.innerHTML = `
+            <img src="${foto}" class="comentario-foto" alt="${autor}">
+            <div class="comentario-corpo">
+                <span class="comentario-autor">${autor}</span>
+                <span class="comentario-texto">${texto}</span>
+            </div>`;
+        lista.appendChild(item);
+        lista.scrollTop = lista.scrollHeight;
+    }
+
     renderVideosPerfil();
 
     // ── ASIDE → DROPDOWN em telas < 1024px ──
@@ -1851,7 +2443,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // Separador + título AO VIVO
         const hrLives = criarEl('hr', 'aside-migrado' + (logado ? '' : ' hidden-deslogado'));
         const tituloLives = criarEl('li', 'aside-migrado dropdown-section-title' + (logado ? '' : ' hidden-deslogado'));
-        tituloLives.innerHTML = '<span style="font-size:0.85em;color:#9147FF;font-weight:bold;">AO VIVO</span>';
+        tituloLives.innerHTML = '<span style="font-size:0.85em;color:var(--color3);font-weight:bold;">AO VIVO</span>';
         dropdownList.appendChild(hrLives);
         dropdownList.appendChild(tituloLives);
 
@@ -1860,7 +2452,7 @@ document.addEventListener('DOMContentLoaded', function () {
             li.innerHTML = `
                 <i class="fa-solid fa-circle" style="color:purple;font-size:1.1em;"></i>
                 <span style="flex:1;">${nome}</span>
-                <span style="font-size:0.8em;color:#888;">${views}</span>
+                <span style="font-size:0.8em;color:var(--color16);">${views}</span>
                 <i class="fa-solid fa-circle" style="color:red;font-size:0.4em;"></i>`;
             dropdownList.appendChild(li);
         });
@@ -1873,11 +2465,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const liConfig = criarEl('li', 'aside-migrado' + (logado ? '' : ' hidden-deslogado'));
         liConfig.innerHTML = `<a href="${configHref}" style="display:flex;align-items:center;gap:10px;color:inherit;width:100%;">
-            <i class="fa-solid fa-gear" style="font-size:1.2em;color:#9147FF;"></i><span>Configurações</span></a>`;
+            <i class="fa-solid fa-gear" style="font-size:1.2em;color:var(--color3);"></i><span>Configurações</span></a>`;
 
         const liAjuda = criarEl('li', 'aside-migrado');
         liAjuda.innerHTML = `<a href="${ajudaHref}" style="display:flex;align-items:center;gap:10px;color:inherit;width:100%;">
-            <i class="fa-regular fa-circle-question" style="font-size:1.2em;color:#9147FF;"></i><span>Ajuda</span></a>`;
+            <i class="fa-regular fa-circle-question" style="font-size:1.2em;color:var(--color3);"></i><span>Ajuda</span></a>`;
 
         dropdownList.appendChild(liConfig);
         dropdownList.appendChild(liAjuda);
@@ -1896,7 +2488,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     window.addEventListener('resize', sincronizarAsideDropdown);
 
-    init();
+    
 
     // Captcha
     // FIX: o Google injeta o iframe do desafio direto no <body>, fora do
@@ -1905,32 +2497,301 @@ document.addEventListener('DOMContentLoaded', function () {
     // o mesmo top layer do dialog (acima do ::backdrop, acima de tudo).
     const modal1 = document.getElementById('modal-1');
 
-    const recaptchaObserver = new MutationObserver(() => {
-        if (!modal1 || !modal1.open) return;
+    //const recaptchaObserver = new MutationObserver(() => {
+        //if (!modal1 || !modal1.open) return;
 
-        document.querySelectorAll('body > div').forEach(div => {
+        //document.querySelectorAll('body > div').forEach(div => {
             // ignora o próprio dialog e qualquer wrapper já processado
-            if (div === modal1 || div.dataset.recaptchaMoved === 'true') return;
+            //if (div === modal1 || div.dataset.recaptchaMoved === 'true') return;
 
-            const isRecaptchaDiv = div.querySelector('iframe[src*="recaptcha"]');
-            if (isRecaptchaDiv) {
-                div.classList.add('recaptcha-challenge-wrapper');
-                div.dataset.recaptchaMoved = 'true'; // FIX: evita reprocessar o mesmo div em loop
-                modal1.appendChild(div);
+            //const isRecaptchaDiv = div.querySelector('iframe[src*="recaptcha"]');
+            //if (isRecaptchaDiv) {
+            //    div.classList.add('recaptcha-challenge-wrapper');
+                //div.dataset.recaptchaMoved = 'true'; // FIX: evita reprocessar o mesmo div em loop
+                //modal1.appendChild(div);
 
                 // FIX: quando o iframe do desafio for removido pelo Google
                 // (resolveu o captcha ou fechou), some o wrapper inteiro
-                const innerObserver = new MutationObserver(() => {
-                    if (!div.querySelector('iframe[src*="recaptcha"]')) {
-                        div.remove();
-                        innerObserver.disconnect();
-                    }
+                //const innerObserver = new MutationObserver(() => {
+                //    if (!div.querySelector('iframe[src*="recaptcha"]')) {
+                //        div.remove();
+                //        innerObserver.disconnect();
+                //    }
+                //});
+                //innerObserver.observe(div, { childList: true, subtree: true });
+            //}
+        //});
+    //});
+
+    //recaptchaObserver.observe(document.body, { childList: true });
+
+    //----------AJUDA-----------
+    //extensão pra mostrar resposta da dúvida frequente
+    const questions = document.querySelectorAll(".question");
+
+    if (questions.length > 0) {
+        questions.forEach(btn => { 
+            btn.addEventListener('click', () => {
+                const item = btn.closest('.question-item');
+                const isOpen = item.classList.contains('open');
+
+                document.querySelectorAll('.question-item').forEach(a => {
+                    a.classList.remove('open');
                 });
-                innerObserver.observe(div, { childList: true, subtree: true });
-            }
+
+                if (!isOpen) {
+                    item.classList.add('open');
+                }
+            });
         });
+    }
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.question-item')) {
+            document.querySelectorAll('.question-item').forEach(i => {
+                i.classList.remove('open');
+            });
+        }
     });
 
-    recaptchaObserver.observe(document.body, { childList: true });
+    //barra de pesquisa com overlay e histórico
+    const searchInput = document.getElementById('help-search');
+    const searchOverlay = document.getElementById('search-overlay');
+    const searchHistorico = document.getElementById('search-historico');
+    const searchHistoricoList = document.getElementById('search-historico-list');
+    const searchResults = document.getElementById('search-results');
 
+    //cria backdrop dinâmico 
+    const searchBackdrop = document.createElement('div');
+    searchBackdrop.id = 'search-backdrop';
+    document.body.appendChild(searchBackdrop);
+
+    if (searchInput && searchOverlay) {
+        //lê os artigoas como fonte de dados
+        const artigos = Array.from(document.querySelectorAll('.artigo')).map(el => ({
+            titulo: el.dataset.titulo,
+            tags: el.dataset.tags,
+            html: el.innerHTML
+        }));
+
+        //histórico salvo no localstorage
+        const HISTORICO_KEY = 'witch_search_historico';
+
+        function getHistorico() {
+            try {return JSON.parse(localStorage.getItem(HISTORICO_KEY) || '[]');}
+            catch {return [];}
+        }
+
+        function saveHistorico(term) {
+            let h = getHistorico().filter(t => t.toLowerCase() !== term.toLowerCase());
+            h.unshift(term); //add no inicio
+            h = h.slice(0, 5); //mostra apenas as últimas 5 pesquisas
+            localStorage.setItem(HISTORICO_KEY, JSON.stringify(h));
+        }
+
+        function renderHistorico() {
+            const h = getHistorico();
+            searchHistoricoList.innerHTML = '';
+
+            if (h.length === 0) {
+                searchHistorico.style.display = 'none';
+                return;
+            }
+
+            searchHistorico.style.display = 'block';
+            h.forEach(term => {
+                const li = document.createElement('li');
+                li.innerHTML = `<i class="fa-solid fa-clock-rotate-left"></i> ${term}`;
+                li.addEventListener('click', () => {
+                    searchInput.value = term;
+                    filtrar(term);
+                    saveHistorico(term);
+                });
+                searchHistoricoList.appendChild(li);
+            });
+        }
+
+        function filtrar(query) {
+            searchResults.innerHTML = '';
+            searchHistorico.style.display = 'none';
+
+            const q = query.trim().toLowerCase();
+
+            if (!q) {
+                renderHistorico();
+                return;
+            }
+
+            const founds = artigos.filter(a =>
+                a.titulo.toLowerCase().includes(q) ||
+                a.tags.toLowerCase().includes(q)
+            );
+
+            if (founds.length === 0) {
+                searchResults.innerHTML = `<p class="search-vazio">Nenhum resultado para "<strong>${query}</strong>"</p>`;
+                return;
+            }
+
+            founds.forEach(artigo => {
+                const card = document.createElement('div');
+                card.className = 'result-card';
+                card.innerHTML = `
+                    <button class="result-btn">
+                        <span>${artigo.titulo}</span>
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </button>
+                    <div class="result-content">${artigo.html}</div>
+                `;
+
+                //expansão dentro dos resultados
+                card.querySelector('.result-btn').addEventListener('click', () => {
+                    const isOpen = card.classList.contains('open');
+                    searchResults.querySelectorAll('.result-card').forEach(c => c.classList.remove('open'));
+                    if (!isOpen) card.classList.add('open');
+                });
+
+                searchResults.appendChild(card);
+            });
+        }
+
+        /* const pref_switch_sexual = document.getElementById('pref-nosexual');
+        const pref_switch_drogas = document.getElementById('pref-nodrogas');
+        const pref_switch_bet = document.getElementById('pref-nobet');
+        const pref_switch_violencia = document.getElementById('pref-noviolencia');
+        const pref_switch_xingamento = document.getElementById('pref-noxingamento');
+        const pref_switch_gameadulto = document.getElementById('pref-nogameadulto');
+        const pref_switch_politica = document.getElementById('pref-nopolitica');
+        const pref_switch_desfocar = document.getElementById('pref-desfocar');  */
+        
+        //const pref_switches = [
+        //    pref_switch_sexual, pref_switch_drogas, pref_switch_bet, pref_switch_violencia, pref_switch_xingamento, 
+        //    pref_switch_gameadulto, pref_switch_politica, pref_switch_desfocar 
+        //];
+
+        function openOverlay() {
+            searchOverlay.classList.add('show');
+            searchBackdrop.classList.add('show');
+        }
+
+        function closeOverlay() {
+            searchOverlay.classList.remove('show');
+            searchBackdrop.classList.remove('show');
+            searchResults.innerHTML = '';
+            renderHistorico();
+        }
+
+        //abre overlay quando focar no input de pesquisa
+        searchInput.addEventListener('focus', () => {
+            renderHistorico();
+            openOverlay();
+        });
+
+        //filtra artigos enquanto digita
+        searchInput.addEventListener('input', () => {
+            filtrar(searchInput.value);
+        });
+
+        //salva no histórico quando preessionar Enter
+        searchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && searchInput.value.trim()) {
+                saveHistorico(searchInput.value.trim());
+                renderHistorico();
+            }
+        });
+
+        //fecha ao clicar no backdrop
+        searchBackdrop.addEventListener('click', () => {
+            closeOverlay();
+            searchInput.blur();
+            searchInput.value = '';
+        });
+    }
+    
+
+    const noti_switches = document.querySelectorAll('[id^="noti-"]');
+    const pref_switches = document.querySelectorAll('[id^="pref-"]');
+    let dicionario = {};
+
+    const listona = {
+        'noti_switches' : noti_switches,
+        'pref_switches' : pref_switches
+    };
+
+    console.log('1.');
+    async function carrregarGerarPreferencias(nomeLista) {
+        
+        const lista = listona[nomeLista];
+
+        try {
+            const res = await fetch("http://127.0.0.1:5000/preferencias", {
+                method: "GET",
+                credentials: "include", // Mantém a sessão do Python ativa
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": csrfToken
+                }
+            }); 
+            const data = await res.json();
+            console.log('3.');
+        
+            if (data.status == 'success') {
+
+                const preferenciasSalvas = data.dicionario || {};
+                console.log("PREFERÊNCIAS RECEBIDAS NO JS:", preferenciasSalvas);
+                lista.forEach((switchItem) => {
+
+                    const id_switch = switchItem.id;
+
+                    if (preferenciasSalvas[id_switch] !== undefined) {
+                        dicionario[id_switch] = preferenciasSalvas[id_switch];
+                    } else {
+                        dicionario[id_switch] = false;
+                    }
+
+                    switchItem.checked = dicionario[id_switch];
+                
+                });
+            }
+            
+        } catch (error) {
+            console.error("Erro detalhado:", error);
+            mostrarToast('Erro ao carregar preferências', 'error');
+        }
+
+        console.log('4.');
+        
+        // Segundo loop original: Adiciona os escutadores de evento de forma isolada
+        lista.forEach((switchItem) => {
+            const id_switch = switchItem.id;
+            
+            // Garante que se o dado existir, ele força a marcação visual
+            if (dicionario[id_switch] !== undefined) {
+                switchItem.checked = dicionario[id_switch];
+            }
+
+            switchItem.addEventListener('change', async (event) => {
+                console.log('5.');
+                const clicado = event.target;
+                const ativo = clicado.checked;
+
+                // Altera apenas a chave do switch no dicionário
+                dicionario[id_switch] = ativo;
+                
+                try {
+                    await fetch("http://127.0.0.1:5000/preferencias", {
+                        method: "POST",
+                        credentials: "include", // Envia as credenciais no clique também
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRFToken": csrfToken
+                        },
+                        body: JSON.stringify(dicionario)
+                    }); 
+                } catch (error) {
+                    mostrarToast('Erro ao salvar switchs', 'error');
+                }    
+            });
+        });
+    }
+
+    init();
 });

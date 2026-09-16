@@ -17,7 +17,7 @@ import random
 import smtplib
 from email.message import EmailMessage
 import mimetypes
-from backend.database.connection import connection, supabase, acorda_cloudinary, email_valido, data_valida, carregar, salvar, cache_traducoes, file
+from backend.database.connection import connection, data_semana,supabase, acorda_cloudinary, email_valido, data_valida, carregar, salvar, cache_traducoes, file
 from backend.resources.seguranca import cpf_math_validate, cpf_real_or_not, captcha, check_csrf
 from backend.resources.email_code import send_code
 from datetime import date, datetime, timedelta
@@ -35,9 +35,12 @@ from dotenv import load_dotenv
 from backend.database.connection import limiter
 from datetime import date
 from markupsafe import escape
+import json
 
 #carregando o .env
 load_dotenv()
+
+hoje = date.today()
 
 secret = os.getenv("CAPTCHA_SECRET")
 
@@ -78,14 +81,14 @@ class signin(Resource):
         if not check or check.get("status") == "error":
             return {'status': 'error', 'mensagem' : check.get("mensagem")}
         
-        captcha_enviado = data.get('captcha')
-        captcha_valido = captcha(captcha_enviado)
+        #captcha_enviado = data.get('captcha')
+        #captcha_valido = captcha(captcha_enviado)
         
-        if captcha_valido['status'] == 'error':
-            return {
-                'status':'error',
-                'mensagem':'captcha inválido'
-            }, 403
+        #if captcha_valido['status'] == 'error':
+        #    return {
+        #        'status':'error',
+        #        'mensagem':'captcha inválido'
+        #    }, 403
             
         cpf = str(data.get('cpf'))
         cpf = cpf.strip()
@@ -818,6 +821,7 @@ class delete_Account(Resource):
             Retornos: 
                 400 = Usuário não está logado
                 200 = Conta excluida com sucesso
+                500 = Erro interno ao tentar excluir conta
         """
         
         token = request.headers.get("X-CSRFToken")
@@ -837,36 +841,40 @@ class delete_Account(Resource):
             }, 400
         id = session['usuario_id']
         
-        a = """delete from bloqueados where id_bloqueador = %s or id_bloqueado = %s"""
-        cursor.execute(a, (id,id))
-        con.commit()
-        
-        query = """delete from usuarios where id_usuario = %s """
-        cursor.execute(query, (id,))
-        
-        con.commit()
-        
-        ab = """delete from streams where id_streamer = %s"""
-        cursor.execute(ab, (id,))
+        try: 
+            a = """delete from bloqueados where id_bloqueador = %s or id_bloqueado = %s"""
+            cursor.execute(a, (id,id))
+            
+            ab = """delete from streams where id_streamer = %s"""
+            cursor.execute(ab, (id,))
 
-        con.commit()
+            ac = """delete from subs where id_usuario = %s or id_streamer = %s"""
+            cursor.execute(ac, (id,))
 
-        ac = """delete from subs where id_usuario = %s or id_streamer = %s"""
-        cursor.execute(ac, (id,))
-        con.commit()
 
-        ad = """delete from tipo_sub where id_criador = %s"""
-        cursor.execute(ad, (id,))
-        con.commit()
+            ad = """delete from tipo_sub where id_criador = %s"""
+            cursor.execute(ad, (id,))
 
-        ae = """delete from seguidores where id_seguido = %s or id_seguidor = %s"""
-        cursor.execute(ae, (id,))
-        con.commit()
+
+            ae = """delete from seguidores where id_seguido = %s or id_seguidor = %s"""
+            cursor.execute(ae, (id,))
+
+            
+            query = """delete from usuarios where id_usuario = %s """
+            cursor.execute(query, (id,))
+            
+            con.commit()
+            session.clear()
+            
+            cursor.close()
+            con.close()
         
-        session.clear()
-        
-        cursor.close()
-        con.close()
+        except Exception as e:
+            con.rollback()
+            return {
+                'status':'error',
+                'mensagem':'Erro interno ao tentar deletar conta'
+            }, 500
         
         return {
             'status':'success',
@@ -914,15 +922,37 @@ class update_Password(Resource):
         
         id = session['usuario_id']
         
+        try:
+            qiqi = """select data_editar_senha from usuarios where id_usuario = %s"""
+            cursor.execute(qiqi,(id,))
+            datar = cursor.fetchone()
+        
+        except Exception as e:
+            print(e)
+            return {
+                'status':'error',  
+                'mensagem':'erro interno do sistema'
+            },500
+
+        if datar['data_editar_senha']:
+            diferenca = data_semana(datar['data_editar_senha'])
+            
+            if not diferenca:
+                return {
+                    'status':'error',
+                    'mensagem':'É necessario esperar no mínimo 7 dias entre uma edição de nome e outra'
+                }, 400
+        
+                
         nova = generate_password_hash(nova)
         query = """select senha from usuarios where id_usuario = %s"""
         cursor.execute(query, (id,))
         senha = cursor.fetchone()
         
         
-        if check_password_hash(senha['senha'], old):
-            a = """update usuarios set senha = %s where id_usuario = %s"""
-            cursor.execute(a,(nova,id))
+        if check_password_hash(senha['senha'], old):            
+            a = """update usuarios set senha = %s, data_editar_senha = %s where id_usuario = %s"""
+            cursor.execute(a,(nova,hoje,id))
             con.commit()
 
             return {
@@ -1217,6 +1247,27 @@ class editar_nome(Resource):
             
         id = session['usuario_id']
         
+        try:
+            aaa = """select data_editar_nome from usuarios where id_usuario = %s """
+            cursor.execute(aaa,(id,))
+            datar = cursor.fetchone()
+            
+        except Exception as e:
+            print(e)
+            return {
+                'status':'error',
+                'mensagem':'erro interno'
+            }, 500
+        
+        if datar['data_editar_nome']: 
+            diferenca = data_semana(datar['data_editar_nome'])
+        
+            if not diferenca:
+                return {
+                    'status':'error',
+                    'mensagem':'É necessario esperar no mínimo 7 dias entre uma edição de nome e outra'
+                }, 400
+        
         nome = data.get('nome')
         nome = str(escape(nome))
         
@@ -1232,7 +1283,9 @@ class editar_nome(Resource):
                     'mensagem':'esse nome de usuario já está sendo utilizado'
                 }, 400
             
-            
+        qqq = """update usuarios set data_editar_nome = %s where id_usuario = %s"""
+        cursor.execute(qqq,(hoje,id))
+        
         query = """update usuarios set user_name = %s where id_usuario = %s"""
         cursor.execute(query,(nome,id))
         
@@ -1451,4 +1504,92 @@ class validar_captcha(Resource):
                 'status':'error',
                 'mensagem':'captcha inválido'
             }, 403
+
+class preferencias(Resource):
+    def post(self):
+        token = request.headers.get("X-CSRFToken")
+                
+        check = check_csrf(token)
         
+        con = connection()
+        cursor = con.cursor(pymysql.cursors.DictCursor)
+        
+        data = request.get_json()        
+        dicionario = json.dumps(data)
+        
+        if not check or check.get("status") == "error":
+
+            return {'status': 'error', 'mensagem' :check.get("mensagem")}, 500
+        
+        if "usuario_id" not in session:
+            return {
+                'status':'error',
+                'mensagem':'É necessario estar logado para ter acesso a essa função'
+            }, 500
+        
+        id = session['usuario_id']
+        
+        try:
+            query = """ update usuarios set preferencias = %s where id_usuario = %s"""
+            cursor.execute(query, (dicionario, id))        
+            con.commit()
+            cursor.close()
+            con.close()
+            
+        except Exception as e:
+            print(e)
+            return {
+                'status':'error',
+                'mensagem':'Erro interno'
+            }, 500
+        
+        return {
+            'status':'success',
+            'mensagem':'Preferencias salvas' 
+        }, 200
+
+    def get(self):
+        token = request.headers.get("X-CSRFToken")
+                        
+        check = check_csrf(token)
+        
+        con = connection()
+        cursor = con.cursor(pymysql.cursors.DictCursor)
+        
+        if not check or check.get("status") == "error":
+            return {'status': 'error', 'mensagem' :check.get("mensagem")}, 400
+        
+        if "usuario_id" not in session:
+            return {
+                'status':'error',
+                'mensagem':'É necessario estar logado para ter acesso a essa função'
+            }, 500      
+        
+        try:
+            id = session["usuario_id"]
+                    
+            query = """select preferencias from usuarios where id_usuario = %s"""
+            cursor.execute(query,(id,))
+            resultado = cursor.fetchone()
+            cursor.close()
+            con.close()
+            
+            if not resultado or not resultado['preferencias']:
+                dicionario = {}
+            else:
+                print("RESULTADO DO BANCO:", resultado)
+                print("PREFERENCIAS DO BANCO:", resultado["preferencias"])
+                dicionario = json.loads(resultado["preferencias"])    
+        
+        except Exception as e:
+            print(e)
+            return {
+                'status':'error',
+                'mensagem':'Erro interno'
+            }, 500
+        
+        return {
+            'status':'success',
+            'mensagem':'Requisição do dicionario feita corretamente',
+            'dicionario': dicionario    
+        }, 200

@@ -1,7 +1,7 @@
 let csrfToken = null;
 
 async function carregarCsrf() {
-    const res = await fetch("/csrf-token");
+    const res = await fetch("http://127.0.0.1:5000/csrf-token");
     const data = await res.json();
     csrfToken = data.csrf_token;
 }
@@ -19,7 +19,7 @@ function cadastrar() {
         senha: document.getElementById("senha_cadastro").value
     };
 
-    fetch("/signin", {
+    fetch("http://127.0.0.1:5000/signin", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -39,7 +39,7 @@ function login() {
         senha: document.getElementById("senha_login").value
     };
 
-    fetch("/login", {
+    fetch("http://127.0.0.1:5000/login", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -58,7 +58,7 @@ function forgot() {
         email_forgot: document.getElementById("email_forgot").value
     };
 
-    fetch("/forgot", {
+    fetch("http://127.0.0.1:5000/forgot", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -77,7 +77,7 @@ function check_codigo() {
         codigo: document.getElementById("codigo_check_codigo").value
     };
 
-    fetch("/check_codigo", {
+    fetch("http://127.0.0.1:5000/check_codigo", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -93,7 +93,7 @@ function check_codigo() {
 
 function resend_code() {
 
-    fetch("/resend", {
+    fetch("http://127.0.0.1:5000/resend", {
         method:"POST", 
         headers: {
             "Content-Type":"application/json",
@@ -111,7 +111,7 @@ function redefine_password() {
         nova_senha: document.getElementById("nova_senha_redefine_password").value
     };
 
-    fetch("/redefine_password", {
+    fetch("http://127.0.0.1:5000/redefine_password", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -130,7 +130,7 @@ function pesquisa() {
         pesquisa: document.getElementById("pesquisa").value,
     };
 
-    fetch("/search", {
+    fetch("http://127.0.0.1:5000/search", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -152,7 +152,7 @@ function pesquisa() {
 };
 
 function deletar() {
-    fetch("/delete", {
+    fetch("http://127.0.0.1:5000/delete", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -182,7 +182,7 @@ function enviar_foto() {
     formData.append("foto", foto);
     formData.append("tipo", "foto");
 
-    fetch("/salvar_foto", {
+    fetch("http://127.0.0.1:5000/salvar_foto", {
         method: "POST",
         body: formData,
         headers : {
@@ -216,7 +216,7 @@ function enviar_video() {
     formData.append("descrisao", descrisao);
     formData.append("categoria", categoria);
 
-    fetch("/salvar_video", {
+    fetch("http://127.0.0.1:5000/salvar_video", {
         method: "POST",
         body: formData,
         headers:{
