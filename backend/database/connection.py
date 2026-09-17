@@ -33,7 +33,6 @@ key = os.getenv("SUPABASE_KEY")
 
 supabase: Client = create_client(url,key)
 
-bd_password = os.getenv("MYSQL_ROOT_PASSWORD")
 email_password = os.getenv("EMAIL_PASSWORD")
 
 
@@ -53,6 +52,7 @@ def connection():
     """
         Função responsável por fazer inicializar a conexão com o MySQL do railway
     """
+    bd_password = os.getenv("MYSQL_ROOT_PASSWORD")
     return pymysql.connect (
         port=3306,
         host='mysql.railway.internal',
