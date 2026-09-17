@@ -58,7 +58,7 @@ def connection():
         host='mysql.railway.internal',
         #host='localhost',
         user='root',
-        password=bd_password,
+        password=MYSQLPASSWORD,
         database='railway',
         #database='twitch',
         cursorclass=pymysql.cursors.Cursor
