@@ -33,7 +33,7 @@ key = os.getenv("SUPABASE_KEY")
 
 supabase: Client = create_client(url,key)
 
-bd_password = os.getenv("DB_PASSWORD")
+bd_password = os.getenv("MYSQLPASSWORD")
 email_password = os.getenv("EMAIL_PASSWORD")
 
 
@@ -58,7 +58,7 @@ def connection():
         host='mysql.railway.internal',
         #host='localhost',
         user='root',
-        password=MYSQLPASSWORD,
+        password=bd_password,
         database='railway',
         #database='twitch',
         cursorclass=pymysql.cursors.Cursor
