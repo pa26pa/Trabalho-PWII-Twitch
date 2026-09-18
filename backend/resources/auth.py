@@ -1319,7 +1319,7 @@ class salvar_video(Resource):
             categoria = str(escape(request.form["categoria"]))
             titulo = str(escape(request.form["titulo"]))
             descrisao = str(escape(request.form["descrisao"]))
-            id = 1#session['usuario_id']
+            id = 1 #session['usuario_id']
             
             print("files:", request.files) 
             print("form:", request.form)
