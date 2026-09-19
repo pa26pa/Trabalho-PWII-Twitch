@@ -23,6 +23,8 @@ from backend.resources.email_code import send_code
 from datetime import date, datetime, timedelta
 from email_validator import validate_email, EmailNotValidError
 from deep_translator import GoogleTranslator
+import logging
+from deep_translator.exceptions import TooManyRequests
 import time
 from uuid import uuid4
 from datetime import date
@@ -752,60 +754,54 @@ class block_code(Resource):
             'mensagem':'Seu código espirou'
         }, 200
         
-class translate(Resource):
-    """
-        Endpoint Responsável por traduzir o site
-    """
+class traduzir(Resource):
     def post(self):
-        """
-            Traduz o site
-            
-            Validações: 
-                Token('X-CSRFToken')
-            
-            Retorno:
-                200 = Traduzido com sucesso
-        """
-        token = request.headers.get("X-CSRFToken")
-        
-        check = check_csrf(token)
-        
-        if not check or check.get("status") == "error":
-            return {'status': 'error', 'mensagem' :check.get("mensagem")}
-        
-        data = request.json
-        lingua = data['lang']
-        textos = data['textos']
+        import logging
+        from deep_translator.exceptions import TooManyRequests
 
-        traducoes = []
-        textos_para_traduzir = []
-        indices_para_traduzir = []
+        data = request.get_json() or {}
+        lingua = data.get('lingua', 'pt')
+        textos_para_traduzir = data.get('textos', [])
 
+        if not textos_para_traduzir:
+            return {'status': 'success', 'traducoes': []}, 200
 
-        for i, texto in enumerate(textos):
-            chave = f"{texto}_{lingua}"
-            if chave in cache_traducoes:
-                traducoes.append(cache_traducoes[chave]) 
+        if lingua == 'pt':
+            return {'status': 'success', 'traducoes': textos_para_traduzir}, 200
+
+        cache_atual = carregar()
+        novas_traducoes = []
+        houve_mudanca = False
+
+        if lingua not in cache_atual:
+            cache_atual[lingua] = {}
+
+        for texto in textos_para_traduzir:
+            texto_str = str(texto).strip()
+            if not texto_str:
+                novas_traducoes.append("")
+                continue
+
+            if texto_str in cache_atual[lingua]:
+                novas_traducoes.append(cache_atual[lingua][texto_str])
             else:
-                traducoes.append(None)
-                textos_para_traduzir.append(texto)
-                indices_para_traduzir.append(i)
+                try:
+                    traduzido = GoogleTranslator(source='pt', target=lingua).translate(texto_str)
+                    cache_atual[lingua][texto_str] = traduzido
+                    novas_traducoes.append(traduzido)
+                    houve_mudanca = True
+                    time.sleep(0.2)
+                except TooManyRequests:
+                    logging.warning(f"Google Rate Limit para: '{texto_str}'. Mantendo original.")
+                    novas_traducoes.append(texto_str)
+                except Exception as e:
+                    logging.error(f"Erro na tradução de '{texto_str}': {e}")
+                    novas_traducoes.append(texto_str)
 
-        if textos_para_traduzir:
-            novas = GoogleTranslator(source='pt', target=lingua).translate_batch(textos_para_traduzir)
-            
-            for i, (texto, traducao) in enumerate(zip(textos_para_traduzir, novas)):
-                chave = f"{texto}_{lingua}"
-                cache_traducoes[chave] = traducao  
-                traducoes[indices_para_traduzir[i]] = traducao
-            
-            salvar(cache_traducoes)  
+        if houve_mudanca:
+            salvar(cache_atual)
 
-        return {
-            'status': 'success',
-            'mensagem': 'tradução feita com sucesso',
-            'traducoes': traducoes
-        }, 200           
+        return {'status': 'success', 'traducoes': novas_traducoes}, 200       
 
 class delete_Account(Resource):
     """
