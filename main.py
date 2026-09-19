@@ -98,7 +98,7 @@ api.add_resource(translate,'/traduzir')
 
 api.add_resource(preferencias,'/preferencias')
 
-api.add_resorce(parametros, '/parametros')
+api.add_resource(parametros, '/parametros')
 
 
 # É só pra garantir que só se pode rodar ele pela main
