@@ -216,7 +216,7 @@ function enviar_video() {
     formData.append("descrisao", descrisao);
     formData.append("categoria", categoria);
 
-    fetch("http://127.0.0.1:5000/salvar_video", {
+    fetch("/salvar_video", {
         method: "POST",
         body: formData,
         headers:{

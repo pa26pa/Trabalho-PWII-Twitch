@@ -22,9 +22,9 @@ import cloudinary
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 
-limiter = Limiter(
-    key_func=get_remote_address
-)
+#limiter = Limiter(
+#    key_func=get_remote_address
+#)
 
 load_dotenv()
 
@@ -33,7 +33,6 @@ key = os.getenv("SUPABASE_KEY")
 
 supabase: Client = create_client(url,key)
 
-bd_password = os.getenv("DB_PASSWORD")
 email_password = os.getenv("EMAIL_PASSWORD")
 
 
@@ -53,14 +52,21 @@ def connection():
     """
         Função responsável por fazer inicializar a conexão com o MySQL do railway
     """
+    
+    port = int(os.getenv("PORT"))
+    host = os.getenv("MYSQLHOST")
+    user = os.getenv("MYSQLUSER")
+    password = os.getenv("MYSQL_ROOT_PASSWORD")
+    database = os.getenv("MYSQL_DATABASE")
+    
     return pymysql.connect (
-        #port=3306,
-        #host='mysql.railway.internal',
-        host='localhost',
-        user='root',
-        password=bd_password,
-        #database='railway',
-        database='twitch',
+        port=port,
+        host=host,
+        #host='localhost',
+        user=user,
+        password=password,
+        database=database,
+        #database='twitch',
         cursorclass=pymysql.cursors.Cursor
     )
 
@@ -119,6 +125,7 @@ def carregar():
 def salvar(cache):
     with open(file, 'w', encoding='utf-8') as f:
         json.dump(cache, f, ensure_ascii=False, indent=2)
+
 
 # def url(url):
 #     path = urlparse(url).path

@@ -1,6 +1,6 @@
 from flask import Flask, render_template
 from flask_restful import Api, Resource
-from backend.resources.auth import update_Password, preferencias,signin, login, salvar_foto, bloqueados, salvar_video, editar_bio, editar_nome, forgot,redefine_password,delete_Account,bloquear, logout,desbloquear, check_login , search,translate, resend_code, check_codigo, google
+from backend.resources.auth import update_Password, parametros, preferencias,signin, login, salvar_foto, bloqueados, salvar_video, editar_bio, editar_nome, forgot,redefine_password,delete_Account,bloquear, logout,desbloquear, check_login , search,translate, resend_code, check_codigo, google
 from dotenv import load_dotenv
 from authlib.integrations.flask_client import OAuth
 import os
@@ -27,7 +27,7 @@ app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 api = Api(app)
 oauth = OAuth(app)
 
-limiter.init_app(app)
+#limiter.init_app(app)
 
 MultiPartParser.max_form_memory_size = 500 * 1024 * 1024
 
@@ -98,9 +98,17 @@ api.add_resource(translate,'/traduzir')
 
 api.add_resource(preferencias,'/preferencias')
 
+api.add_resource(parametros, '/parametros')
+
 
 # É só pra garantir que só se pode rodar ele pela main
+#if __name__ == "__main__":
+#    port = int(os.environ.get("PORT", 5000))
+#    app.run(host="0.0.0.0", port=port)
+
 if __name__ == "__main__":
-    #port = int(os.environ.get("PORT", 5000))
-    #app.run(host="0.0.0.0", port=port)
-    app.run(debug=True)
+    app.run(
+        host="127.0.0.1",
+        port=5000,
+        debug=True
+    )
