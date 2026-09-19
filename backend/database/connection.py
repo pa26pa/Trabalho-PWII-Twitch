@@ -52,14 +52,20 @@ def connection():
     """
         Função responsável por fazer inicializar a conexão com o MySQL do railway
     """
-    bd_password = os.getenv("MYSQL_ROOT_PASSWORD")
+    
+    port = os.getenv("PORT")
+    host = os.getenv("MYSQLHOST")
+    user = os.getenv("MYSQLUSER")
+    password = os.getenv("MYSQL_ROOT_PASSWORD")
+    database = os.getenv("MYSQL_DATABASE")
+    
     return pymysql.connect (
-        port=3306,
-        host='mysql.railway.internal',
+        port=port,
+        host=host,
         #host='localhost',
-        user='root',
-        password=bd_password,
-        database='railway',
+        user=user,
+        password=password,
+        database=database,
         #database='twitch',
         cursorclass=pymysql.cursors.Cursor
     )

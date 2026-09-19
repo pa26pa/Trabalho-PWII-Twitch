@@ -1,11 +1,25 @@
 //DOMContentLoaded garante que o script só rode depois de todo o HTML estar carregado
 document.addEventListener('DOMContentLoaded', function () {
 
+    let base_url = "";
+    
+    try {
+        const res = await 
+        fetch("http://127.0.0.1:5000/parametros", {
+            signal: AbortSignal.timeout(2000) 
+        });
+        if (res.status == "success") {
+            base_url = "http://127.0.0.1:5000";
+        }
+    } catch {
+        base_url = "";
+    }
+
     // CARREGAMENTO DO CSRF TOKEN 
     // o token é necessário para proteger contra ataques CSRF, garantindo que as requisições venham de fontes confiáveis
     let csrfToken = null;
     async function carregarCsrf() {
-        const res = await fetch("/csrf-token");
+        const res = await fetch(base_url + "/csrf-token");
         const data = await res.json();
         csrfToken = data.csrf_token;
     }
@@ -45,7 +59,7 @@ document.addEventListener('DOMContentLoaded', function () {
     async function verificarSessao() {
 
         try {
-            const res = await fetch("/session", {
+            const res = await fetch(base_url +"/session", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -72,7 +86,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const btnLogout = document.getElementById('btn-logout');
     if (btnLogout) {
         btnLogout.addEventListener('click', async () => {
-            const res = await fetch("/logout", {
+            const res = await fetch(base_url +"/logout", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -220,7 +234,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // reenvio — login
     if (otpLogin?.resendBtn) {
         otpLogin.resendBtn.addEventListener('click', () => {
-            fetch('/resend', { method: 'GET', headers: { 'Content-Type': 'application/json', "X-CSRFToken":csrfToken } })
+            fetch(base_url +'/resend', { method: 'GET', headers: { 'Content-Type': 'application/json', "X-CSRFToken":csrfToken } })
             .then(r => r.json()).then(data => mostrarToast(data.mensagem, data.status));
         });
     }
@@ -228,7 +242,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // reenvio — excluir conta
     if (otpDelete?.resendBtn) {
         otpDelete.resendBtn.addEventListener('click', () => {
-            fetch('/resend', { method: 'GET', headers: { 'Content-Type': 'application/json' } })
+            fetch(base_url +'/resend', { method: 'GET', headers: { 'Content-Type': 'application/json' } })
             .then(r => r.json()).then(data => mostrarToast(data.mensagem, data.status));
         });
     }
@@ -607,7 +621,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 };
                 
                 
-                fetch("/signin", {
+                fetch(base_url +"/signin", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -640,7 +654,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             senha: dados['senha']
                         };
 
-                        fetch("/login", {
+                        fetch(base_url +"/login", {
                             method: "POST",
                             headers: {
                                 "Content-Type": "application/json",
@@ -678,7 +692,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     senha: document.getElementById('senha_login').value
                 }
 
-                fetch("/login", {
+                fetch(base_url +"/login", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -705,7 +719,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     who: 'forgot_password'
                 };
                 console.log('aaa');
-                fetch("/forgot", {
+                fetch(base_url +"/forgot", {
                     method: "POST",
                     headers: { "Content-Type": "application/json", "X-CSRFToken":csrfToken },
                     body: JSON.stringify(dados)
@@ -728,7 +742,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 const otp = form.closest('#modal-3') ? otpDelete : otpLogin;
                 const codigo = otp ? otp.getCode() : '';
 
-                fetch('/check_codigo', {
+                fetch(base_url +"/check_codigo", {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', "X-CSRFToken":csrfToken},
                     body: JSON.stringify({ codigo })
@@ -740,7 +754,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     if (form.closest('#modal-3')) {
                         // fluxo de excluir conta: valida código e deleta
-                        fetch('/delete', {
+                        fetch(base_url +"/delete", {
                             method: 'DELETE',
                             headers: { 'Content-Type': 'application/json' }
                         })
@@ -763,7 +777,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     nova_senha: form.querySelector('.password2').value
                 }
 
-                fetch("/redefine_password", {
+                fetch(base_url +"/redefine_password", {
                 method:"PUT",
                 headers: {
                     "Content-Type":"application/json",
@@ -796,7 +810,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     senha_antiga: form.querySelector('.password-atual').value
                 }
             
-                fetch("/update", {
+                fetch(base_url +"/update", {
                 method:"PUT",
                 headers: {
                     "Content-Type":"application/json",
@@ -826,7 +840,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 who: 'delete_account'
             };
 
-            fetch("/forgot", {
+            fetch(base_url +"/forgot", {
                 method: "POST",
                 headers: { "Content-Type": "application/json", "X-CSRFToken":csrfToken },
                 body: JSON.stringify(dados)
@@ -856,7 +870,7 @@ document.addEventListener('DOMContentLoaded', function () {
             return
         }
         
-        fetch("/delete", {
+        fetch(base_url +"/delete", {
                 method:"DELETE",
                 headers: {
                     "Content-Type":"application/json",
@@ -944,7 +958,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 email: inputEmail.value,
                 who: 'forgot_password'
             };
-            fetch("/forgot", {
+            fetch(base_url +"/forgot", {
                 method: "POST",
                 headers: { "Content-Type": "application/json", "X-CSRFToken": csrfToken },
                 body: JSON.stringify(dados)
@@ -1424,7 +1438,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             const dados = {
                                 nome:usuario.nome
                             };
-                            const res = await fetch("/desbloquear", {
+                            const res = await fetch(base_url +"/desbloquear", {
                             method: "POST",
                             headers: {
                                 "Content-Type": "application/json",
@@ -1494,7 +1508,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     data: today
                 };
 
-                const res = await fetch("/bloquear", {
+                const res = await fetch(base_url +"/bloquear", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -1576,7 +1590,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const btnEditar = document.getElementById('btn-editar');
     if (btnEditar) {
         btnEditar.addEventListener('click', () => {
-            fetch("/session", {
+            fetch(base_url +"/session", {
                 method: "POST", // FIX: era GET, mas a rota é POST
                 headers: { "Content-Type": "application/json", "X-CSRFToken": csrfToken }
             })
@@ -1636,7 +1650,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             try {
                 if (fotoTemp != null) {
-                    const res = await fetch('/salvar_foto', {
+                    const res = await fetch(base_url +'/salvar_foto', {
                         method: 'POST',
                         headers: {
                             "X-CSRFToken":csrfToken
@@ -1663,7 +1677,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     nome: novoNome
                 };
 
-                const res_ = await fetch('/editar_nome', {
+                const res_ = await fetch(base_url +'/editar_nome', {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
@@ -1680,7 +1694,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     bio: novaBio
                 };
 
-                const resp = await fetch('/editar_bio', {
+                const resp = await fetch(base_url +'/editar_bio', {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
@@ -1806,7 +1820,7 @@ document.addEventListener('DOMContentLoaded', function () {
         await verificarSessao();
 
         if (document.getElementById('block-btn')) {
-            fetch('/bloqueados', {
+            fetch(base_url +'/bloqueados', {
             method:"GET",
             headers: {
                 "Content-Type": "application/json",
@@ -2722,7 +2736,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const lista = listona[nomeLista];
 
         try {
-            const res = await fetch("/preferencias", {
+            const res = await fetch(base_url +"/preferencias", {
                 method: "GET",
                 credentials: "include", // Mantém a sessão do Python ativa
                 headers: {
@@ -2777,7 +2791,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 dicionario[id_switch] = ativo;
                 
                 try {
-                    await fetch("/preferencias", {
+                    await fetch(base_url +"/preferencias", {
                         method: "POST",
                         credentials: "include", // Envia as credenciais no clique também
                         headers: {

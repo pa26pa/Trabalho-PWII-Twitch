@@ -1593,3 +1593,10 @@ class preferencias(Resource):
             'mensagem':'Requisição do dicionario feita corretamente',
             'dicionario': dicionario    
         }, 200
+    
+class parametros(Resource):
+    def get(self):
+        return {
+            "status":"success",
+            "mensagem":"url correta"
+        },200
