@@ -67,6 +67,8 @@ def connection():
         password=password,
         database=database,
         #database='twitch',
+        connect_timeout=5,  # 5 segundos para tentar conectar antes de desistir
+        read_timeout=5, 
         cursorclass=pymysql.cursors.Cursor
     )
 
