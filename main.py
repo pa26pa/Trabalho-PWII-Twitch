@@ -4,11 +4,11 @@ from backend.resources.auth import update_Password, parametros, preferencias,sig
 from dotenv import load_dotenv
 from authlib.integrations.flask_client import OAuth
 import os
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
+#from flask_limiter import Limiter
+#from flask_limiter.util import get_remote_address
 from flask_wtf.csrf import generate_csrf
 from datetime import timedelta
-from backend.database.connection import limiter
+#from backend.database.connection import limiter
 from werkzeug.exceptions import RequestEntityTooLarge
 from werkzeug.formparser import MultiPartParser
 
