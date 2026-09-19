@@ -9,8 +9,8 @@
 
 from flask import Flask, Blueprint,render_template, request, flash, redirect, url_for, session, make_response
 from flask_restful import Api, Resource
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
+#from flask_limiter import Limiter
+#from flask_limiter.util import get_remote_address
 from werkzeug.security import generate_password_hash, check_password_hash 
 import pymysql
 import random
@@ -180,7 +180,7 @@ class login(Resource):
     """
         Endpoint responsável pela autentificação do usuário
     """
-    decorators = [limiter.limit("10 per minute")] # define um limite de utilizações desse endpoint
+    #decorators = [limiter.limit("10 per minute")] # define um limite de utilizações desse endpoint
     
     def post(self):
         """
