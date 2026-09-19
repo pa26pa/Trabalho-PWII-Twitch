@@ -1912,6 +1912,38 @@ document.addEventListener('DOMContentLoaded', function () {
                 const labelArq = document.getElementById('label-video-escolhido');
                 if (labelArq) { labelArq.textContent = ''; labelArq.style.display = 'none'; }
             }
+
+            // FIX: usa blob URL para vídeo — muito mais rápido e sem limite de tamanho
+            const videoSrc = videoFile ? URL.createObjectURL(videoFile) : '';
+
+            if (thumbFile) {
+                const rThumb = new FileReader();
+                rThumb.onload = (et) => salvarLive(videoSrc, et.target.result);
+                rThumb.readAsDataURL(thumbFile);
+            } else {
+                salvarLive(videoSrc, '');
+            }
+
+            // lê o vídeo se houver, senão salva com src vazio
+            const lerThumb = (videoSrc) => {
+                if (thumbFile) {
+                    const rThumb = new FileReader();
+                    rThumb.onload = (et) => salvarLive(videoSrc, et.target.result);
+                    rThumb.readAsDataURL(thumbFile);
+                } else {
+                    salvarLive(videoSrc, '');
+                }
+            };
+
+            if (videoFile) {
+                const rVideo = new FileReader();
+                rVideo.onload = (ev) => lerThumb(ev.target.result);
+                rVideo.onerror = () => mostrarToast('Erro ao ler o vídeo.', 'error');
+                rVideo.readAsDataURL(videoFile);
+            } else {
+                // permite salvar sem vídeo (ex: só live)
+                lerThumb('');
+            }
         });
     }*/
     if (btnUpload) {
@@ -2132,7 +2164,7 @@ document.addEventListener('DOMContentLoaded', function () {
             cats.textContent = live.categorias?.join(' • ') || '';
             cats.style.cssText = 'font-size:0.78em;color:var(--color3)';
 
-            const nomeCanal = document.querySelector('.show_name')?.textContent || 'Meu Canal';
+            const nomeCanal = document.querySelector('.show_name')?.textContent || 'Canal desconhecido';
             const canal = document.createElement('p');
             canal.className = 'video-card-canal';
             canal.textContent = nomeCanal;
