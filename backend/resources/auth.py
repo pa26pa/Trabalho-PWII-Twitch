@@ -754,7 +754,7 @@ class block_code(Resource):
             'mensagem':'Seu código espirou'
         }, 200
         
-class transalate(Resource):
+class translate(Resource):
     def post(self):
         import logging
         from deep_translator.exceptions import TooManyRequests
