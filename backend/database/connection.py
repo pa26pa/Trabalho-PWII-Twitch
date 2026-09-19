@@ -53,7 +53,7 @@ def connection():
         Função responsável por fazer inicializar a conexão com o MySQL do railway
     """
     
-    port = os.getenv("PORT")
+    port = int(os.getenv("PORT"))
     host = os.getenv("MYSQLHOST")
     user = os.getenv("MYSQLUSER")
     password = os.getenv("MYSQL_ROOT_PASSWORD")
