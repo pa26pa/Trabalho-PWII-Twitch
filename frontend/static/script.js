@@ -1,19 +1,6 @@
 //DOMContentLoaded garante que o script só rode depois de todo o HTML estar carregado
 document.addEventListener('DOMContentLoaded', function () {
-
-    let base_url = "";
-    
-    try {
-        const res = await 
-        fetch("http://127.0.0.1:5000/parametros", {
-            signal: AbortSignal.timeout(2000) 
-        });
-        if (res.status == "success") {
-            base_url = "http://127.0.0.1:5000";
-        }
-    } catch {
-        base_url = "";
-    }
+    base_url = "";
 
     // CARREGAMENTO DO CSRF TOKEN 
     // o token é necessário para proteger contra ataques CSRF, garantindo que as requisições venham de fontes confiáveis
