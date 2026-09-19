@@ -27,7 +27,7 @@ app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 api = Api(app)
 oauth = OAuth(app)
 
-limiter.init_app(app)
+#limiter.init_app(app)
 
 MultiPartParser.max_form_memory_size = 500 * 1024 * 1024
 
