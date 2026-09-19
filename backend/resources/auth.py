@@ -34,7 +34,7 @@ import cloudinary.uploader
 import requests
 import os
 from dotenv import load_dotenv
-from backend.database.connection import limiter
+#from backend.database.connection import limiter
 from datetime import date
 from markupsafe import escape
 import json
