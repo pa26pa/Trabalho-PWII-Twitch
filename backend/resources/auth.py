@@ -46,7 +46,7 @@ hoje = date.today()
 
 secret = os.getenv("CAPTCHA_SECRET")
 
-extensoes_permitidas = {'jpg','jpeg','png','gif','mp4','webm'}
+extensoes_permitidas = {'jpg','jpeg','png','gif','mp4','webm','mov'}
 
 #chamando função para poder inserir videos e imagens no cloudnary
 acorda_cloudinary()
@@ -1294,81 +1294,129 @@ class editar_nome(Resource):
             'mensagem':'bio mudada com sucesso'
         }, 200
         
-class salvar_video(Resource):
-    def post(self):
-        print("content-type:", request.content_type)
-        print("content-length:", request.content_length)
-        token = request.headers.get("X-CSRFToken")
-        print("token:", token)
-        
-        check = check_csrf(token)
-        
-        if not check or check.get("status") == "error":
-            return {'status': 'error', 'mensagem' :check.get("mensagem")}, 400
-        
+class videos(Resource):
+    def get(self):
         con = connection()
         cursor = con.cursor(pymysql.cursors.DictCursor)
-        
+
         try:
-            request.max_content_length = None
-            video = request.files["arquivo"]
-            categoria = str(escape(request.form["categoria"]))
+            id_streamer = session.get('usuario_id')
+            if not id_streamer:
+                return {"status": "error", "mensagem": "Usuário não autenticado"}, 401
+
+            query = """select id_stream, categoria, titulo, descrisao, video_url, data_upload, capa
+                       from streams where id_streamer = %s order by data_upload desc;"""
+            cursor.execute(query, (id_streamer,))
+            rows = cursor.fetchall()
+
+            videos = []
+            for row in rows:
+                videos.append({
+                    "id_stream": row["id_stream"],
+                    "titulo": row["titulo"],
+                    "descricao": row["descrisao"],
+                    "categorias": json.loads(row["categoria"]) if row["categoria"] else [],
+                    "src": row["video_url"],
+                    "thumb": row["capa"],
+                    "data": row["data_upload"].strftime("%d/%m/%Y"),
+                    "views": 0,
+                    "curtidas": 0,
+                    "comentarios": [],
+                    "aoVivo": False
+                })
+
+            return {"status": "success", "videos": videos}, 200
+
+        except Exception as e:
+            print("erro:", str(e))
+            return {"status": "error", "mensagem": "Erro ao buscar vídeos"}, 500
+
+        finally:
+            cursor.close()
+            con.close() 
+                  
+class salvar_video(Resource):
+    def post(self):
+        token = request.headers.get("X-CSRFToken")
+        check = check_csrf(token)
+        if not check or check.get("status") == "error":
+            return {'status': 'error', 'mensagem': check.get("mensagem")}, 400
+
+        con = connection()
+        cursor = con.cursor(pymysql.cursors.DictCursor)
+
+        try:
+            video = request.files.get("arquivo")
+            try:
+                categoria_lista = json.loads(request.form["categoria"])
+                if not isinstance(categoria_lista, list):
+                    raise ValueError
+            except (ValueError, KeyError):
+                return {'status': 'error', 'mensagem': 'categoria inválida'}, 400
+
+            categoria = json.dumps(categoria_lista)
             titulo = str(escape(request.form["titulo"]))
             descrisao = str(escape(request.form["descrisao"]))
-            id = 1 #session['usuario_id']
-            
-            print("files:", request.files) 
-            print("form:", request.form)
-            print("video:", video)
-            print("categoria:", categoria)
-            print("titulo:", titulo)
-            print("descrisao:", descrisao)
+            id = session['usuario_id']
             data = date.today()
-            
+
             if not video:
-                print("video n chegou")
-                return {
-                    'status':'error',
-                    'mensagem':'Nenhum arquivo foi enviado'
-                }, 400
-        
-        except Exception as e:
-            print("erro",str(e))
-            return {"status":"error"},500
+                return {'status': 'error', 'mensagem': 'Nenhum arquivo foi enviado'}, 400
+
+            ext = video.filename.rsplit('.', 1)[-1].lower()
+            if ext not in extensoes_permitidas:
+                return {'status': 'error', 'mensagem': 'esse formato não é permitido'}, 400
             
-        ext = video.filename.rsplit('.', 1)[-1].lower()
-        
-        if ext not in extensoes_permitidas:
-            return {
-                'status':'error',
-                'mensagem':'esse formato não é permitido'
-            }, 400
-        
-        nome = f'{uuid4()}.{ext}'
-        
-        try:
-            resposta = cloudinary.uploader.upload(video.stream,
-                resource_type = "video",
-                public_id=nome)
+            capa = request.files.get("capa")
+            thumb_url = ""
+            if capa and capa.filename:
+                ext_capa = capa.filename.rsplit('.', 1)[-1].lower()
+                if ext_capa not in extensoes_permitidas:
+                    return {
+                        'status':'error',
+                        'mensagem':'Esse fomato de imagem n é permitido'
+                    }
+                
+                nome_capa = f'{uuid4()}.{ext_capa}'
+                
+                try:
+                    resposta_capa = cloudinary.uploader.upload(
+                        capa.stream,
+                        resource_type="image",
+                        public_id=nome_capa
+                    )
+                    thumb_url = resposta_capa["secure_url"]
+                
+                except Exception as e:
+                    print(e)
+                    return {
+                        'status':'error',
+                        'mensagem':"erro ao salvar capa"
+                    }, 500
+                
+            nome = f'{uuid4()}.{ext}'
+            resposta = cloudinary.uploader.upload_large(video.stream, resource_type="video", public_id=nome)
             url = resposta["secure_url"]
-        
-        except Exception as e:
-            print("exception: ", str(e))
+
+            query = """insert into streams (categoria, titulo, descrisao, video_url, data_upload, id_streamer, capa) values (%s,%s,%s,%s,%s,%s,%s);"""
+            cursor.execute(query, (categoria, titulo, descrisao, url, data, id, thumb_url))
+            con.commit()
+
+            novo_id = cursor.lastrowid
+
             return {
-                "status":"error",
-                "mensagem":"Não foi possivel salvar o video no cloudinary"
-            },400 
-        
-        query = """insert into streams (categoria, titulo, descrisao, video_url, data_upload, id_streamer) values (%s,%s,%s,%s,%s,%s);"""
-        cursor.execute(query,(categoria,titulo,descrisao,url,data,id))
-        con.commit()
-        cursor.close()
-        con.close()
-        
-        return {
-            "status":"success",
-            "mensagem":"video foi salvo com sucesso"
-        }, 200
+                "status": "success",
+                "mensagem": "video foi salvo com sucesso",
+                "id_stream": novo_id
+            }, 200
+
+        except Exception as e:
+            print("erro:", str(e))
+            return {"status": "error", "mensagem": "Erro ao salvar vídeo"}, 500
+
+        finally:
+            cursor.close()
+            con.close()
     
 class salvar_foto(Resource):
     """
