@@ -1862,7 +1862,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     async function buscarViews(idStream) {
         try {
-            const res = await fetch(base_url + "/views?id_stream=" + idStream, {
+            const res = await fetch(base_url + "/view?id_stream=" + idStream, {
                 method: "GET",
                 headers: { "X-CSRFToken": csrfToken },
                 credentials: "include"
@@ -1877,7 +1877,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     async function curtirVideo(idStream) {
         try {
-            const res = await fetch(base_url + "/curtir", {
+            const res = await fetch(base_url + "/curtidas", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -2365,6 +2365,7 @@ document.addEventListener('DOMContentLoaded', function () {
             document.body.classList.remove('modal-open');
             cancelAnimationFrame(rafId);
             playIcon.className = 'fa-solid fa-play';
+            renderVideosPerfil(); 
         };
         fecharBtn.onclick = fechar;
         overlay.onclick = e => { if (e.target === overlay) fechar(); };

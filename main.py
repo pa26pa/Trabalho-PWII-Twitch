@@ -100,8 +100,8 @@ api.add_resource(preferencias,'/preferencias')
 
 api.add_resource(parametros, '/parametros')
 api.add_resource(videos, '/videos')
-api.add_resource(curtidas, '/curtir')
-api.add_resource(views, '/views')
+api.add_resource(curtidas, '/curtidas')
+api.add_resource(views, '/view')
 
 # É só pra garantir que só se pode rodar ele pela main
 #if __name__ == "__main__":
