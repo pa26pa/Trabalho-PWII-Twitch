@@ -718,6 +718,114 @@ class search(Resource):
             'resultado':f'{usuarios},{streams}'
         }, 200
 
+class inscritos(Resource):
+    def get(self):
+        token = request.headers.get("X-CSRFToken")
+                
+        check = check_csrf(token)
+            
+        if not check or check.get("status") == "error":
+            return {'status': 'error', 'mensagem' :check.get("mensagem")}
+        
+        data = request.get_json()
+        
+        con = connection()
+        cursor = con.cursor(pymysql.cursors.DictCursor)
+
+        id = escape(request.form["id"])
+
+        try:     
+            query = """select count(*) id_inscrição from seguidores where id_seguido = %s"""
+            cursor.execute(query, (id,))
+            seguidores = cursor.fetchone()
+
+            query2 = """select count(*) id_inscrição from seguidores ehre id_seguidor = %s"""
+            cursor.execute(query2,(id,))
+            seguindo = cursor.fetchone()
+
+        except Exception as e:
+            print(e)
+            return {
+                'status':'error',
+                'mensagem':'Erro ao buscar dados no MYSQL'
+            }, 400
+
+        return {
+            'status':'success',
+            'mensagem':'Informações buscadas com sucesso',
+            'seguidores':seguidores,
+            'seguindo':seguindo
+        }
+        
+class views(Resource):
+    def post(self):
+        token = request.headers.get("X-CSRFToken")
+                        
+        check = check_csrf(token)
+            
+        if not check or check.get("status") == "error":
+            return {'status': 'error', 'mensagem' :check.get("mensagem")}
+        
+        data = request.get_json()
+        
+        con = connection()
+        cursor = con.cursor(pymysql.cursors.DictCursor)
+
+        id = escape(request.form["id"])
+
+        try:
+            query = """select count(id_views) from views where id_stream = %s """
+            cursor.execute(query, (id,))
+            views = cursor.fetchone()
+        except Exception as e:
+            print(e)
+            return {
+                'status':'error',
+                'mensagem':'erro ao buscar dados'
+            }, 400
+
+        return {
+            'status':'success',
+            'mensagem':'yey ao buscar dados',
+            'views': views
+        }, 400
+
+class views(Resource):
+    def post(self):
+        token = request.headers.get("X-CSRFToken")
+                        
+        check = check_csrf(token)
+            
+        if not check or check.get("status") == "error":
+            return {'status': 'error', 'mensagem' :check.get("mensagem")}
+        
+        data = request.get_json()
+        
+        con = connection()
+        cursor = con.cursor(pymysql.cursors.DictCursor)
+
+        id = escape(request.form["id"])
+
+        try:
+            query = """select count(id_curitidas) from curtidas where id_stream = %s """
+            cursor.execute(query, (id,))
+            curtidas = cursor.fetchone()
+        except Exception as e:
+            print(e)
+            return {
+                'status':'error',
+                'mensagem':'erro ao buscar dados'
+            }, 400
+
+        return {
+            'status':'success',
+            'mensagem':'yey ao buscar dados',
+            'views': curtidas
+        }, 400
+        
+
+
+
 class block_code(Resource):
     """
         Endpoint responsável por anular o código salvo na session
