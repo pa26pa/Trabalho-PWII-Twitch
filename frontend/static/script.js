@@ -1827,468 +1827,565 @@ document.addEventListener('DOMContentLoaded', function () {
         await carrregarGerarPreferencias('pref_switches');
     }
 
-// ── LIVES: salvar e renderizar histórico no perfil ──
-async function getLives() {
-    try {
-        const res = await fetch(base_url + "/videos", {
-            method: "GET",
-            headers: { "X-CSRFToken": csrfToken },
-            credentials: "include"
-        });
-        if (!res.ok) throw new Error("Erro ao buscar as lives");
-        const data = await res.json();
-        console.log("LIVES RECEBIDAS DA API:", data.videos);
-        return data.videos || [];
-    } catch (error) {
-        console.error("Erro ao pegar videos:", error);
-        return [];
-    }
-}
-
-// referências de DOM usadas pelos handlers abaixo — precisam vir ANTES de serem usadas
-const modal6 = document.getElementById('modal-6');
-const btnUpload = document.getElementById('upload-video');
-
-// thumbnail da live
-const uploadThumb = document.getElementById('upload-thumb');
-const previewThumb = document.getElementById('preview-thumb');
-let thumbTemp = null;
-let thumbFile = null;
-
-if (uploadThumb && previewThumb) {
-    previewThumb.addEventListener('click', () => uploadThumb.click());
-    uploadThumb.addEventListener('change', (e) => {
-        const arquivo = e.target.files[0];
-        if (!arquivo || !arquivo.type.startsWith('image/')) return;
-        thumbFile = arquivo;
-        console.log(thumbFile)
-        console.log("thumb file sendo guardada corretamente na variavel")
-        const reader = new FileReader();
-        reader.onload = (ev) => {
-            thumbTemp = ev.target.result;
-            previewThumb.src = thumbTemp;
-            previewThumb.classList.add('tem-foto');
-        };
-        reader.readAsDataURL(arquivo);
-    });
-}
-
-// botão de escolher vídeo
-const btnEscolherVideo = document.getElementById('btn-escolher-video');
-const videoLiveInput   = document.getElementById('video-live');
-if (btnEscolherVideo && videoLiveInput) {
-    btnEscolherVideo.addEventListener('click', () => videoLiveInput.click());
-    videoLiveInput.addEventListener('change', () => {
-        const f = videoLiveInput.files[0];
-        const labelArquivo = document.getElementById('label-video-escolhido');
-        if (f && labelArquivo) {
-            labelArquivo.textContent = f.name;
-            labelArquivo.style.display = 'block';
+    // ── LIVES: salvar e renderizar histórico no perfil ──
+    async function getLives() {
+        try {
+            const res = await fetch(base_url + "/videos", {
+                method: "GET",
+                headers: { "X-CSRFToken": csrfToken },
+                credentials: "include"
+            });
+            if (!res.ok) throw new Error("Erro ao buscar as lives");
+            const data = await res.json();
+            console.log("LIVES RECEBIDAS DA API:", data.videos);
+            return data.videos || [];
+        } catch (error) {
+            console.error("Erro ao pegar videos:", error);
+            return [];
         }
-    });
-}
-
-// salvar vídeo — único handler, chama de fato o backend
-const salvarLive = async () => {
-    const nomeLive = document.getElementById('nome-live')?.value.trim();
-    const descLive = document.getElementById('descricao-live')?.value.trim();
-    const videoInput = document.getElementById('video-live');
-    const videoFile = videoInput?.files[0];
-    const categorias = [...document.querySelectorAll('#select-dropdown input:checked')].map(cb => cb.value);
-
-    if (!nomeLive) { mostrarToast('Digite um nome para o vídeo!', 'error'); return; }
-    if (!videoFile) { mostrarToast('Selecione um vídeo para upload!', 'error'); return; }
-
-    const limitebytes = 100 * 1024 * 1024;
-    if (videoFile.size > limitebytes) {
-        mostrarToast('O video é maior que 100MB. Escolha um arquivo menor', 'error');
-        return;
-    }
-    const formData = new FormData();
-    formData.append("arquivo", videoFile);
-    formData.append("titulo", nomeLive);
-    formData.append("descrisao", descLive || "");
-    formData.append("categoria", JSON.stringify(categorias));
-    
-    if (thumbFile) {
-        console.log(thumbFile)
-        console.log("thumb file sendo enviada para python")
-        formData.append("capa", thumbFile);
     }
 
-    try {
-        const res = await fetch(base_url + "/salvar_video", {
-            method: "POST",
-            headers: { "X-CSRFToken": csrfToken },
-            credentials: "include",
-            body: formData
+    async function buscarCurtidas(idStream) {
+        try {
+            const res = await fetch(base_url + "/curtidas?id_stream=" + idStream, {
+                method: "GET",
+                headers: { "X-CSRFToken": csrfToken },
+                credentials: "include"
+            });
+            if (!res.ok) throw new Error("Erro ao buscar curtidas");
+            return await res.json();
+        } catch (error) {
+            console.error("Erro ao buscar curtidas:", error);
+            return null;
+        }
+    }
+
+    async function buscarViews(idStream) {
+        try {
+            const res = await fetch(base_url + "/views?id_stream=" + idStream, {
+                method: "GET",
+                headers: { "X-CSRFToken": csrfToken },
+                credentials: "include"
+            });
+            if (!res.ok) throw new Error("Erro ao buscar views");
+            return await res.json();
+        } catch (error) {
+            console.error("Erro ao buscar views:", error);
+            return null;
+        }
+    }
+
+    async function curtirVideo(idStream) {
+        try {
+            const res = await fetch(base_url + "/curtir", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": csrfToken
+                },
+                credentials: "include",
+                body: JSON.stringify({ id_stream: idStream })
+            });
+
+            const data = await res.json();
+            if (!res.ok || data.status === "error") {
+                mostrarToast(data.mensagem || "Erro ao curtir.", "error");
+                return null;
+            }
+
+            return data; // { curtido: true/false, total_curtidas: N }
+
+        } catch (error) {
+            console.error("Erro ao curtir:", error);
+            mostrarToast("Erro ao curtir.", "error");
+            return null;
+        }
+    }
+
+    async function registrarView(idStream) {
+        try {
+            await fetch(base_url + "/view", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": csrfToken
+                },
+                credentials: "include",
+                body: JSON.stringify({ id_stream: idStream })
+            });
+        } catch (error) {
+            console.error("Erro ao registrar view:", error);
+        }
+    }
+
+    // referências de DOM usadas pelos handlers abaixo — precisam vir ANTES de serem usadas
+    const modal6 = document.getElementById('modal-6');
+    const btnUpload = document.getElementById('upload-video');
+
+    // thumbnail da live
+    const uploadThumb = document.getElementById('upload-thumb');
+    const previewThumb = document.getElementById('preview-thumb');
+    let thumbTemp = null;
+    let thumbFile = null;
+
+    if (uploadThumb && previewThumb) {
+        previewThumb.addEventListener('click', () => uploadThumb.click());
+        uploadThumb.addEventListener('change', (e) => {
+            const arquivo = e.target.files[0];
+            if (!arquivo || !arquivo.type.startsWith('image/')) return;
+            thumbFile = arquivo;
+            console.log(thumbFile)
+            console.log("thumb file sendo guardada corretamente na variavel")
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                thumbTemp = ev.target.result;
+                previewThumb.src = thumbTemp;
+                previewThumb.classList.add('tem-foto');
+            };
+            reader.readAsDataURL(arquivo);
         });
+    }
 
-        const data = await res.json();
-        console.log("RESPOSTA AO SALVAR:", data);
+    // botão de escolher vídeo
+    const btnEscolherVideo = document.getElementById('btn-escolher-video');
+    const videoLiveInput   = document.getElementById('video-live');
+    if (btnEscolherVideo && videoLiveInput) {
+        btnEscolherVideo.addEventListener('click', () => videoLiveInput.click());
+        videoLiveInput.addEventListener('change', () => {
+            const f = videoLiveInput.files[0];
+            const labelArquivo = document.getElementById('label-video-escolhido');
+            if (f && labelArquivo) {
+                labelArquivo.textContent = f.name;
+                labelArquivo.style.display = 'block';
+            }
+        });
+    }
 
-        if (!res.ok || data.status === "error") {
-            mostrarToast(data.mensagem || "Erro ao salvar vídeo.", "error");
+    // salvar vídeo — único handler, chama de fato o backend
+    const salvarLive = async () => {
+        const nomeLive = document.getElementById('nome-live')?.value.trim();
+        const descLive = document.getElementById('descricao-live')?.value.trim();
+        const videoInput = document.getElementById('video-live');
+        const videoFile = videoInput?.files[0];
+        const categorias = [...document.querySelectorAll('#select-dropdown input:checked')].map(cb => cb.value);
+
+        if (!nomeLive) { mostrarToast('Digite um nome para o vídeo!', 'error'); return; }
+        if (!videoFile) { mostrarToast('Selecione um vídeo para upload!', 'error'); return; }
+
+        const limitebytes = 100 * 1024 * 1024;
+        if (videoFile.size > limitebytes) {
+            mostrarToast('O video é maior que 100MB. Escolha um arquivo menor', 'error');
+            return;
+        }
+        const formData = new FormData();
+        formData.append("arquivo", videoFile);
+        formData.append("titulo", nomeLive);
+        formData.append("descrisao", descLive || "");
+        formData.append("categoria", JSON.stringify(categorias));
+        
+        if (thumbFile) {
+            console.log(thumbFile)
+            console.log("thumb file sendo enviada para python")
+            formData.append("capa", thumbFile);
+        }
+
+        try {
+            const res = await fetch(base_url + "/salvar_video", {
+                method: "POST",
+                headers: { "X-CSRFToken": csrfToken },
+                credentials: "include",
+                body: formData
+            });
+
+            const data = await res.json();
+            console.log("RESPOSTA AO SALVAR:", data);
+
+            if (!res.ok || data.status === "error") {
+                mostrarToast(data.mensagem || "Erro ao salvar vídeo.", "error");
+                return;
+            }
+
+            mostrarToast("Vídeo salvo!", "success");
+            await renderVideosPerfil();
+
+            if (modal6) {
+                modal6.close();
+                document.body.classList.remove("modal-open");
+            }
+
+            thumbTemp = null; thumbFile = null;
+            const prevThumb = document.getElementById('preview-thumb');
+            if (prevThumb) { prevThumb.src = ''; prevThumb.style.backgroundColor = '#000'; prevThumb.classList.remove('tem-foto'); }
+            const labelArq = document.getElementById('label-video-escolhido');
+            if (labelArq) { labelArq.textContent = ''; labelArq.style.display = 'none'; }
+
+        } catch (error) {
+            console.error("Erro ao salvar vídeo:", error);
+            mostrarToast("Erro ao salvar vídeo.", "error");
+        }
+    };
+
+    if (btnUpload) {
+        btnUpload.addEventListener('click', salvarLive);
+    }
+
+    function formatarTempo(s) {
+        const m = Math.floor(s / 60);
+        const seg = Math.floor(s % 60).toString().padStart(2, '0');
+        return `${m}:${seg}`;
+    }
+
+    function criarClipe(live) {
+        if (!live.src) { mostrarToast('Nenhum vídeo para criar clipe.', 'error'); return; }
+        const vidTemp = document.createElement('video');
+        vidTemp.src = live.src;
+        vidTemp.muted = true;
+        vidTemp.addEventListener('loadedmetadata', () => {
+            const duracao = Math.min(vidTemp.duration, 60);
+            mostrarToast(`Clipe de ${Math.round(duracao)}s criado! (simulação — requer backend para corte real)`, 'success');
+        });
+    }
+
+    async function renderVideosPerfil() {
+        const container = document.getElementById('videos-perfil-grid');
+        if (!container) return;
+        const lives = await getLives();
+        container.innerHTML = '';
+
+        if (lives.length === 0) {
+            container.innerHTML = '<p style="color:var(--color16);text-align:center;padding:20px;grid-column:1/-1;">Nenhuma live realizada ainda.</p>';
             return;
         }
 
-        mostrarToast("Vídeo salvo!", "success");
-        await renderVideosPerfil();
+        lives.forEach(async live => {
+            const dadosViews = await buscarViews(live.id_stream);
+            if (dadosViews) live.views = dadosViews.total_views;
 
-        if (modal6) {
-            modal6.close();
-            document.body.classList.remove("modal-open");
-        }
+            const card = document.createElement('div');
+            card.className = 'video-card-perfil';
 
-        thumbTemp = null; thumbFile = null;
-        const prevThumb = document.getElementById('preview-thumb');
-        if (prevThumb) { prevThumb.src = ''; prevThumb.style.backgroundColor = '#000'; prevThumb.classList.remove('tem-foto'); }
-        const labelArq = document.getElementById('label-video-escolhido');
-        if (labelArq) { labelArq.textContent = ''; labelArq.style.display = 'none'; }
+            const thumbDiv = document.createElement('div');
+            thumbDiv.className = 'video-thumb-perfil';
 
-    } catch (error) {
-        console.error("Erro ao salvar vídeo:", error);
-        mostrarToast("Erro ao salvar vídeo.", "error");
+            const vid = document.createElement('video');
+            vid.preload = 'metadata';
+            vid.muted = true;
+            vid.loop  = true;
+            if (live.src) vid.src = live.src;
+            thumbDiv.appendChild(vid);
+
+            if (live.thumb) {
+                const capa = document.createElement('img');
+                capa.src = live.thumb;
+                capa.className = 'thumb-cover';
+                capa.alt = live.titulo;
+                thumbDiv.appendChild(capa);
+            }
+
+            if (live.aoVivo) {
+                const badge = document.createElement('span');
+                badge.className = 'thumb-badge-live';
+                badge.textContent = 'AO VIVO';
+                thumbDiv.appendChild(badge);
+            }
+
+            const views = document.createElement('span');
+            views.className = 'thumb-views-perfil';
+            views.textContent = `${live.views} visualizações`;
+            thumbDiv.appendChild(views);
+
+            const progWrap = document.createElement('div');
+            progWrap.className = 'thumb-progress-wrap';
+            const progFill = document.createElement('div');
+            progFill.className = 'thumb-progress-fill';
+            progWrap.appendChild(progFill);
+            thumbDiv.appendChild(progWrap);
+
+            let rafId;
+            thumbDiv.addEventListener('mouseenter', () => {
+                if (!live.src) return;
+                vid.play().catch(() => {});
+                const tick = () => {
+                    if (vid.duration) progFill.style.width = (vid.currentTime / vid.duration * 100) + '%';
+                    rafId = requestAnimationFrame(tick);
+                };
+                rafId = requestAnimationFrame(tick);
+            });
+            thumbDiv.addEventListener('mouseleave', () => {
+                vid.pause(); vid.currentTime = 0;
+                progFill.style.width = '0%';
+                cancelAnimationFrame(rafId);
+            });
+
+            let isDragging = false;
+            const moverBarra = (e) => {
+                const rect = progWrap.getBoundingClientRect();
+                const pct = Math.min(Math.max((e.clientX - rect.left) / rect.width, 0), 1);
+                if (vid.duration) {
+                    vid.currentTime = pct * vid.duration;
+                    progFill.style.width = (pct * 100) + '%';
+                }
+            };
+            progWrap.addEventListener('mousedown', e => { e.stopPropagation(); isDragging = true; moverBarra(e); });
+            document.addEventListener('mousemove', e => { if (isDragging) moverBarra(e); });
+            document.addEventListener('mouseup', () => { isDragging = false; });
+            progWrap.addEventListener('click', e => e.stopPropagation());
+            thumbDiv.addEventListener('click', e => {
+                if (progWrap.contains(e.target)) return;
+                abrirPlayerExpandido(live);
+            });
+
+            const titulo = document.createElement('p');
+            titulo.className = 'video-card-titulo';
+            titulo.textContent = live.titulo;
+
+            const cats = document.createElement('p');
+            cats.className = 'video-card-categorias';
+            cats.textContent = live.categorias?.join(' • ') || '';
+            cats.style.cssText = 'font-size:0.78em;color:var(--color3)';
+
+            const nomeCanal = document.querySelector('.show_name')?.textContent || 'Canal desconhecido';
+            const canal = document.createElement('p');
+            canal.className = 'video-card-canal';
+            canal.textContent = nomeCanal;
+
+            const dataEl = document.createElement('p');
+            dataEl.className = 'video-card-info';
+            dataEl.textContent = live.data;
+
+            const infoRow = document.createElement('div');
+            infoRow.style.cssText = 'display:flex;justify-content:space-between;align-items:center;';
+
+            const btnOpcoes = document.createElement('button');
+            btnOpcoes.className = 'btn-opcoes-video';
+            btnOpcoes.innerHTML = '<i class="fa-solid fa-ellipsis-vertical"></i>';
+            btnOpcoes.title = 'Opções';
+
+            const menuOpcoes = document.createElement('div');
+            menuOpcoes.className = 'menu-opcoes-video';
+            menuOpcoes.innerHTML = `
+                <button class="opcao-video" data-acao="excluir"><i class="fa-solid fa-trash"></i> Excluir</button>
+                <button class="opcao-video" data-acao="editar"><i class="fa-solid fa-pen"></i> Editar</button>
+                <button class="opcao-video" data-acao="salvar"><i class="fa-solid fa-download"></i> Salvar vídeo</button>
+                <button class="opcao-video" data-acao="clipe"><i class="fa-solid fa-scissors"></i> Criar clipe (60s)</button>
+            `;
+
+            btnOpcoes.addEventListener('click', e => {
+                e.stopPropagation();
+                document.querySelectorAll('.menu-opcoes-video.show').forEach(m => {
+                    if (m !== menuOpcoes) m.classList.remove('show');
+                });
+                menuOpcoes.classList.toggle('show');
+            });
+
+            menuOpcoes.querySelectorAll('.opcao-video').forEach(btn => {
+                btn.addEventListener('click', e => {
+                    e.stopPropagation();
+                    const acao = btn.dataset.acao;
+
+                    if (acao === 'excluir') {
+                        // TODO: precisa de endpoint DELETE no backend — ainda não existe
+                        mostrarToast('Excluir ainda não está disponível.', 'error');
+
+                    } else if (acao === 'editar') {
+                        // TODO: precisa de endpoint de UPDATE no backend — ainda não existe
+                        mostrarToast('Editar ainda não está disponível.', 'error');
+
+                    } else if (acao === 'salvar') {
+                        if (!live.src) { mostrarToast('Nenhum vídeo disponível para download.', 'error'); return; }
+                        const a = document.createElement('a');
+                        a.href = live.src;
+                        a.download = `${live.titulo}.mp4`;
+                        a.click();
+
+                    } else if (acao === 'clipe') {
+                        criarClipe(live);
+                    }
+
+                    menuOpcoes.classList.remove('show');
+                });
+            });
+
+            document.addEventListener('click', () => menuOpcoes.classList.remove('show'));
+
+            infoRow.appendChild(dataEl);
+            infoRow.appendChild(btnOpcoes);
+
+            const opcWrapper = document.createElement('div');
+            opcWrapper.style.cssText = 'position:relative;';
+            opcWrapper.appendChild(btnOpcoes);
+            opcWrapper.appendChild(menuOpcoes);
+
+            card.append(thumbDiv, titulo, cats, canal, infoRow, opcWrapper);
+            container.appendChild(card);
+        });
     }
-};
 
-if (btnUpload) {
-    btnUpload.addEventListener('click', salvarLive);
-}
+    // player expandido
+    function abrirPlayerExpandido(live) {
+        const overlay    = document.getElementById('video-player-overlay');
+        const videoEl    = document.getElementById('video-expandido');
+        const tituloTop  = document.getElementById('player-titulo-topo');
+        const tituloCtrl = document.getElementById('player-titulo-controle');
+        const playBtn    = document.getElementById('play-btn-exp');
+        const playIcon   = document.getElementById('play-icon-exp');
+        const muteBtn    = document.getElementById('mute-btn-exp');
+        const volIcon    = document.getElementById('vol-icon-exp');
+        const volRange   = document.getElementById('vol-range-exp');
+        const timeLabel  = document.getElementById('time-label-exp');
+        const fsBtn      = document.getElementById('fs-btn-exp');
+        const fsIcon     = document.getElementById('fs-icon-exp');
+        const fecharBtn  = document.getElementById('fechar-player');
 
-function formatarTempo(s) {
-    const m = Math.floor(s / 60);
-    const seg = Math.floor(s % 60).toString().padStart(2, '0');
-    return `${m}:${seg}`;
-}
+        videoEl.src    = live.src || '';
+        videoEl.volume = 0.8;
+        videoEl.muted  = false;
+        volRange.value = 80;
+        tituloTop.textContent  = live.titulo;
+        tituloCtrl.textContent = live.titulo;
 
-function criarClipe(live) {
-    if (!live.src) { mostrarToast('Nenhum vídeo para criar clipe.', 'error'); return; }
-    const vidTemp = document.createElement('video');
-    vidTemp.src = live.src;
-    vidTemp.muted = true;
-    vidTemp.addEventListener('loadedmetadata', () => {
-        const duracao = Math.min(vidTemp.duration, 60);
-        mostrarToast(`Clipe de ${Math.round(duracao)}s criado! (simulação — requer backend para corte real)`, 'success');
-    });
-}
+        document.getElementById('player-info-titulo').textContent = live.titulo;
+        document.getElementById('player-info-cats').textContent   = live.categorias?.join(' • ') || '';
+        document.getElementById('player-info-data').textContent   = live.data;
 
-async function renderVideosPerfil() {
-    const container = document.getElementById('videos-perfil-grid');
-    if (!container) return;
-    const lives = await getLives();
-    container.innerHTML = '';
+        const nomeCanal = document.querySelector('.show_name')?.textContent || 'Meu Canal';
+        const fotoCanal = document.querySelector('.photo-user')?.src || '/static/user.png';
+        document.getElementById('player-canal-nome-text').textContent = nomeCanal;
+        document.getElementById('player-canal-foto-img').src          = fotoCanal;
 
-    if (lives.length === 0) {
-        container.innerHTML = '<p style="color:var(--color16);text-align:center;padding:20px;grid-column:1/-1;">Nenhuma live realizada ainda.</p>';
-        return;
-    }
+        const btnCurtir     = document.getElementById('btn-curtir');
+        const countCurtidas = document.getElementById('count-curtidas');
+        buscarCurtidas(live.id_stream).then(dados => {
+            if (!dados) return;
+            btnCurtir.classList.toggle('ativo', dados.curtido);
+            countCurtidas.textContent = dados.total_curtidas;
+        });
 
-    lives.forEach(live => {
-        const card = document.createElement('div');
-        card.className = 'video-card-perfil';
+        btnCurtir.onclick = async () => {
+            const resposta = await curtirVideo(live.id_stream);
+            if (!resposta) {
+                return;
+            }
 
-        const thumbDiv = document.createElement('div');
-        thumbDiv.className = 'video-thumb-perfil';
+            btnCurtir.classList.toggle('ativo', resposta.curtido);
+            countCurtidas.textContent = resposta.total_curtidas;
+            live.curtidas = resposta.total_curtidas;
+            
+        };
 
-        const vid = document.createElement('video');
-        vid.preload = 'metadata';
-        vid.muted = true;
-        vid.loop  = true;
-        if (live.src) vid.src = live.src;
-        thumbDiv.appendChild(vid);
+        buscarCurtidas(live.id_stream).then(dados => {
+            if (!dados) return;
+            btnCurtir.classList.toggle('ativo', dados.curtido);
+            countCurtidas.textContent = dados.total_curtidas;
+        });
 
-        if (live.thumb) {
-            const capa = document.createElement('img');
-            capa.src = live.thumb;
-            capa.className = 'thumb-cover';
-            capa.alt = live.titulo;
-            thumbDiv.appendChild(capa);
+        document.getElementById('btn-compartilhar').onclick = () => {
+            navigator.clipboard?.writeText(window.location.href)
+                .then(() => mostrarToast('Link copiado!', 'success'))
+                .catch(()  => mostrarToast('Não foi possível copiar.', 'error'));
+        };
+
+        document.getElementById('btn-comentar').onclick = () => {
+            document.getElementById('comentario-input').focus();
+        };
+
+        const listaComent = document.getElementById('comentarios-lista');
+        listaComent.innerHTML = '';
+        (live.comentarios || []).forEach(c => adicionarComentarioDOM(c.autor, c.texto, c.foto));
+
+        const inputComent = document.getElementById('comentario-input');
+        const btnEnviar   = document.getElementById('comentario-enviar');
+        inputComent.value = '';
+
+        const enviarComentario = () => {
+            const texto = inputComent.value.trim();
+            if (!texto) return;
+            // TODO: precisa de endpoint de comentário no backend — ainda não existe
+            mostrarToast('Comentar ainda não está disponível.', 'error');
+            inputComent.value = '';
+        };
+
+        btnEnviar.onclick     = enviarComentario;
+        inputComent.onkeydown = e => { if (e.key === 'Enter') enviarComentario(); };
+
+        overlay.classList.add('show');
+        document.body.classList.add('modal-open');
+        if (live.src) {
+            videoEl.play().catch(() => {}); 
+            playIcon.className = 'fa-solid fa-pause'; 
+            registrarView(live.id_stream);
+            
         }
 
-        if (live.aoVivo) {
-            const badge = document.createElement('span');
-            badge.className = 'thumb-badge-live';
-            badge.textContent = 'AO VIVO';
-            thumbDiv.appendChild(badge);
-        }
+        playBtn.onclick = () => {
+            if (videoEl.paused) { videoEl.play(); playIcon.className = 'fa-solid fa-pause'; }
+            else { videoEl.pause(); playIcon.className = 'fa-solid fa-play'; }
+        };
+        videoEl.onclick = () => playBtn.onclick();
 
-        const views = document.createElement('span');
-        views.className = 'thumb-views-perfil';
-        views.textContent = `${live.views} visualizações`;
-        thumbDiv.appendChild(views);
-
-        const progWrap = document.createElement('div');
-        progWrap.className = 'thumb-progress-wrap';
-        const progFill = document.createElement('div');
-        progFill.className = 'thumb-progress-fill';
-        progWrap.appendChild(progFill);
-        thumbDiv.appendChild(progWrap);
+        const progressBar = document.getElementById('progress-exp');
+        progressBar.value = 0;
 
         let rafId;
-        thumbDiv.addEventListener('mouseenter', () => {
-            if (!live.src) return;
-            vid.play().catch(() => {});
-            const tick = () => {
-                if (vid.duration) progFill.style.width = (vid.currentTime / vid.duration * 100) + '%';
-                rafId = requestAnimationFrame(tick);
-            };
-            rafId = requestAnimationFrame(tick);
-        });
-        thumbDiv.addEventListener('mouseleave', () => {
-            vid.pause(); vid.currentTime = 0;
-            progFill.style.width = '0%';
-            cancelAnimationFrame(rafId);
-        });
-
-        let isDragging = false;
-        const moverBarra = (e) => {
-            const rect = progWrap.getBoundingClientRect();
-            const pct = Math.min(Math.max((e.clientX - rect.left) / rect.width, 0), 1);
-            if (vid.duration) {
-                vid.currentTime = pct * vid.duration;
-                progFill.style.width = (pct * 100) + '%';
+        const tick = () => {
+            if (videoEl.duration) {
+                progressBar.value = (videoEl.currentTime / videoEl.duration) * 100;
+                timeLabel.textContent = `${formatarTempo(videoEl.currentTime)} / ${formatarTempo(videoEl.duration)}`;
             }
+            rafId = requestAnimationFrame(tick);
         };
-        progWrap.addEventListener('mousedown', e => { e.stopPropagation(); isDragging = true; moverBarra(e); });
-        document.addEventListener('mousemove', e => { if (isDragging) moverBarra(e); });
-        document.addEventListener('mouseup', () => { isDragging = false; });
-        progWrap.addEventListener('click', e => e.stopPropagation());
-        thumbDiv.addEventListener('click', e => {
-            if (progWrap.contains(e.target)) return;
-            abrirPlayerExpandido(live);
-        });
-
-        const titulo = document.createElement('p');
-        titulo.className = 'video-card-titulo';
-        titulo.textContent = live.titulo;
-
-        const cats = document.createElement('p');
-        cats.className = 'video-card-categorias';
-        cats.textContent = live.categorias?.join(' • ') || '';
-        cats.style.cssText = 'font-size:0.78em;color:var(--color3)';
-
-        const nomeCanal = document.querySelector('.show_name')?.textContent || 'Canal desconhecido';
-        const canal = document.createElement('p');
-        canal.className = 'video-card-canal';
-        canal.textContent = nomeCanal;
-
-        const dataEl = document.createElement('p');
-        dataEl.className = 'video-card-info';
-        dataEl.textContent = live.data;
-
-        const infoRow = document.createElement('div');
-        infoRow.style.cssText = 'display:flex;justify-content:space-between;align-items:center;';
-
-        const btnOpcoes = document.createElement('button');
-        btnOpcoes.className = 'btn-opcoes-video';
-        btnOpcoes.innerHTML = '<i class="fa-solid fa-ellipsis-vertical"></i>';
-        btnOpcoes.title = 'Opções';
-
-        const menuOpcoes = document.createElement('div');
-        menuOpcoes.className = 'menu-opcoes-video';
-        menuOpcoes.innerHTML = `
-            <button class="opcao-video" data-acao="excluir"><i class="fa-solid fa-trash"></i> Excluir</button>
-            <button class="opcao-video" data-acao="editar"><i class="fa-solid fa-pen"></i> Editar</button>
-            <button class="opcao-video" data-acao="salvar"><i class="fa-solid fa-download"></i> Salvar vídeo</button>
-            <button class="opcao-video" data-acao="clipe"><i class="fa-solid fa-scissors"></i> Criar clipe (60s)</button>
-        `;
-
-        btnOpcoes.addEventListener('click', e => {
-            e.stopPropagation();
-            document.querySelectorAll('.menu-opcoes-video.show').forEach(m => {
-                if (m !== menuOpcoes) m.classList.remove('show');
-            });
-            menuOpcoes.classList.toggle('show');
-        });
-
-        menuOpcoes.querySelectorAll('.opcao-video').forEach(btn => {
-            btn.addEventListener('click', e => {
-                e.stopPropagation();
-                const acao = btn.dataset.acao;
-
-                if (acao === 'excluir') {
-                    // TODO: precisa de endpoint DELETE no backend — ainda não existe
-                    mostrarToast('Excluir ainda não está disponível.', 'error');
-
-                } else if (acao === 'editar') {
-                    // TODO: precisa de endpoint de UPDATE no backend — ainda não existe
-                    mostrarToast('Editar ainda não está disponível.', 'error');
-
-                } else if (acao === 'salvar') {
-                    if (!live.src) { mostrarToast('Nenhum vídeo disponível para download.', 'error'); return; }
-                    const a = document.createElement('a');
-                    a.href = live.src;
-                    a.download = `${live.titulo}.mp4`;
-                    a.click();
-
-                } else if (acao === 'clipe') {
-                    criarClipe(live);
-                }
-
-                menuOpcoes.classList.remove('show');
-            });
-        });
-
-        document.addEventListener('click', () => menuOpcoes.classList.remove('show'));
-
-        infoRow.appendChild(dataEl);
-        infoRow.appendChild(btnOpcoes);
-
-        const opcWrapper = document.createElement('div');
-        opcWrapper.style.cssText = 'position:relative;';
-        opcWrapper.appendChild(btnOpcoes);
-        opcWrapper.appendChild(menuOpcoes);
-
-        card.append(thumbDiv, titulo, cats, canal, infoRow, opcWrapper);
-        container.appendChild(card);
-    });
-}
-
-// player expandido
-function abrirPlayerExpandido(live) {
-    const overlay    = document.getElementById('video-player-overlay');
-    const videoEl    = document.getElementById('video-expandido');
-    const tituloTop  = document.getElementById('player-titulo-topo');
-    const tituloCtrl = document.getElementById('player-titulo-controle');
-    const playBtn    = document.getElementById('play-btn-exp');
-    const playIcon   = document.getElementById('play-icon-exp');
-    const muteBtn    = document.getElementById('mute-btn-exp');
-    const volIcon    = document.getElementById('vol-icon-exp');
-    const volRange   = document.getElementById('vol-range-exp');
-    const timeLabel  = document.getElementById('time-label-exp');
-    const fsBtn      = document.getElementById('fs-btn-exp');
-    const fsIcon     = document.getElementById('fs-icon-exp');
-    const fecharBtn  = document.getElementById('fechar-player');
-
-    videoEl.src    = live.src || '';
-    videoEl.volume = 0.8;
-    videoEl.muted  = false;
-    volRange.value = 80;
-    tituloTop.textContent  = live.titulo;
-    tituloCtrl.textContent = live.titulo;
-
-    document.getElementById('player-info-titulo').textContent = live.titulo;
-    document.getElementById('player-info-cats').textContent   = live.categorias?.join(' • ') || '';
-    document.getElementById('player-info-data').textContent   = live.data;
-
-    const nomeCanal = document.querySelector('.show_name')?.textContent || 'Meu Canal';
-    const fotoCanal = document.querySelector('.photo-user')?.src || '/static/user.png';
-    document.getElementById('player-canal-nome-text').textContent = nomeCanal;
-    document.getElementById('player-canal-foto-img').src          = fotoCanal;
-
-    const btnCurtir     = document.getElementById('btn-curtir');
-    const countCurtidas = document.getElementById('count-curtidas');
-    btnCurtir.classList.remove('ativo');
-    countCurtidas.textContent = live.curtidas || 0;
-
-    btnCurtir.onclick = () => {
-        // TODO: precisa de endpoint de curtir no backend — ainda não existe
-        mostrarToast('Curtir ainda não está disponível.', 'error');
-    };
-
-    document.getElementById('btn-compartilhar').onclick = () => {
-        navigator.clipboard?.writeText(window.location.href)
-            .then(() => mostrarToast('Link copiado!', 'success'))
-            .catch(()  => mostrarToast('Não foi possível copiar.', 'error'));
-    };
-
-    document.getElementById('btn-comentar').onclick = () => {
-        document.getElementById('comentario-input').focus();
-    };
-
-    const listaComent = document.getElementById('comentarios-lista');
-    listaComent.innerHTML = '';
-    (live.comentarios || []).forEach(c => adicionarComentarioDOM(c.autor, c.texto, c.foto));
-
-    const inputComent = document.getElementById('comentario-input');
-    const btnEnviar   = document.getElementById('comentario-enviar');
-    inputComent.value = '';
-
-    const enviarComentario = () => {
-        const texto = inputComent.value.trim();
-        if (!texto) return;
-        // TODO: precisa de endpoint de comentário no backend — ainda não existe
-        mostrarToast('Comentar ainda não está disponível.', 'error');
-        inputComent.value = '';
-    };
-
-    btnEnviar.onclick     = enviarComentario;
-    inputComent.onkeydown = e => { if (e.key === 'Enter') enviarComentario(); };
-
-    overlay.classList.add('show');
-    document.body.classList.add('modal-open');
-    if (live.src) { videoEl.play().catch(() => {}); playIcon.className = 'fa-solid fa-pause'; }
-
-    playBtn.onclick = () => {
-        if (videoEl.paused) { videoEl.play(); playIcon.className = 'fa-solid fa-pause'; }
-        else { videoEl.pause(); playIcon.className = 'fa-solid fa-play'; }
-    };
-    videoEl.onclick = () => playBtn.onclick();
-
-    const progressBar = document.getElementById('progress-exp');
-    progressBar.value = 0;
-
-    let rafId;
-    const tick = () => {
-        if (videoEl.duration) {
-            progressBar.value = (videoEl.currentTime / videoEl.duration) * 100;
-            timeLabel.textContent = `${formatarTempo(videoEl.currentTime)} / ${formatarTempo(videoEl.duration)}`;
-        }
         rafId = requestAnimationFrame(tick);
-    };
-    rafId = requestAnimationFrame(tick);
 
-    progressBar.addEventListener('input', () => {
-        if (videoEl.duration) videoEl.currentTime = (progressBar.value / 100) * videoEl.duration;
-    });
+        progressBar.addEventListener('input', () => {
+            if (videoEl.duration) videoEl.currentTime = (progressBar.value / 100) * videoEl.duration;
+        });
 
-    muteBtn.onclick = () => {
-        videoEl.muted = !videoEl.muted;
-        volIcon.className = videoEl.muted ? 'fa-solid fa-volume-xmark' : 'fa-solid fa-volume-high';
-        volRange.value = videoEl.muted ? 0 : videoEl.volume * 100;
-    };
-    volRange.oninput = () => {
-        videoEl.volume = volRange.value / 100;
-        videoEl.muted  = +volRange.value === 0;
-        volIcon.className = +volRange.value === 0 ? 'fa-solid fa-volume-xmark'
-            : +volRange.value < 50 ? 'fa-solid fa-volume-low'
-            : 'fa-solid fa-volume-high';
-    };
+        muteBtn.onclick = () => {
+            videoEl.muted = !videoEl.muted;
+            volIcon.className = videoEl.muted ? 'fa-solid fa-volume-xmark' : 'fa-solid fa-volume-high';
+            volRange.value = videoEl.muted ? 0 : videoEl.volume * 100;
+        };
+        volRange.oninput = () => {
+            videoEl.volume = volRange.value / 100;
+            videoEl.muted  = +volRange.value === 0;
+            volIcon.className = +volRange.value === 0 ? 'fa-solid fa-volume-xmark'
+                : +volRange.value < 50 ? 'fa-solid fa-volume-low'
+                : 'fa-solid fa-volume-high';
+        };
 
-    const playerBox = document.querySelector('.player-wrap-expanded');
-    fsBtn.onclick = () => {
-        if (!document.fullscreenElement) { playerBox.requestFullscreen?.(); fsIcon.className = 'fa-solid fa-compress'; }
-        else { document.exitFullscreen?.(); fsIcon.className = 'fa-solid fa-expand'; }
-    };
+        const playerBox = document.querySelector('.player-wrap-expanded');
+        fsBtn.onclick = () => {
+            if (!document.fullscreenElement) { playerBox.requestFullscreen?.(); fsIcon.className = 'fa-solid fa-compress'; }
+            else { document.exitFullscreen?.(); fsIcon.className = 'fa-solid fa-expand'; }
+        };
 
-    const fechar = () => {
-        videoEl.pause(); videoEl.src = '';
-        overlay.classList.remove('show');
-        document.body.classList.remove('modal-open');
-        cancelAnimationFrame(rafId);
-        playIcon.className = 'fa-solid fa-play';
-    };
-    fecharBtn.onclick = fechar;
-    overlay.onclick = e => { if (e.target === overlay) fechar(); };
-}
+        const fechar = () => {
+            videoEl.pause(); videoEl.src = '';
+            overlay.classList.remove('show');
+            document.body.classList.remove('modal-open');
+            cancelAnimationFrame(rafId);
+            playIcon.className = 'fa-solid fa-play';
+        };
+        fecharBtn.onclick = fechar;
+        overlay.onclick = e => { if (e.target === overlay) fechar(); };
+    }
 
-function adicionarComentarioDOM(autor, texto, foto) {
-    const lista = document.getElementById('comentarios-lista');
-    if (!lista) return;
-    const item = document.createElement('div');
-    item.className = 'comentario-item';
-    item.innerHTML = `
-        <img src="${foto}" class="comentario-foto" alt="${autor}">
-        <div class="comentario-corpo">
-            <span class="comentario-autor">${autor}</span>
-            <span class="comentario-texto">${texto}</span>
-        </div>`;
-    lista.appendChild(item);
-    lista.scrollTop = lista.scrollHeight;
-}
+    function adicionarComentarioDOM(autor, texto, foto) {
+        const lista = document.getElementById('comentarios-lista');
+        if (!lista) return;
+        const item = document.createElement('div');
+        item.className = 'comentario-item';
+        item.innerHTML = `
+            <img src="${foto}" class="comentario-foto" alt="${autor}">
+            <div class="comentario-corpo">
+                <span class="comentario-autor">${autor}</span>
+                <span class="comentario-texto">${texto}</span>
+            </div>`;
+        lista.appendChild(item);
+        lista.scrollTop = lista.scrollHeight;
+    }
 
-renderVideosPerfil();
+    renderVideosPerfil();
 
     // ── ASIDE → DROPDOWN em telas < 1024px ──
     // sincroniza o conteúdo do aside para dentro do dropdown

@@ -17,7 +17,7 @@ import random
 import smtplib
 from email.message import EmailMessage
 import mimetypes
-from backend.database.connection import database,connection, data_semana,supabase, acorda_cloudinary, email_valido, data_valida, carregar, salvar, cache_traducoes, file
+from backend.database.connection import connection, data_semana,supabase, acorda_cloudinary, email_valido, data_valida, carregar, salvar, cache_traducoes, file
 from backend.resources.seguranca import cpf_math_validate, cpf_real_or_not, captcha, check_csrf
 from backend.resources.email_code import send_code
 from datetime import date, datetime, timedelta
@@ -739,7 +739,7 @@ class inscritos(Resource):
             cursor.execute(query, (id,))
             seguidores = cursor.fetchone()
 
-            query2 = """select count(*) id_inscrição from seguidores ehre id_seguidor = %s"""
+            query2 = """select count(*) id_inscrição from seguidores where id_seguidor = %s"""
             cursor.execute(query2,(id,))
             seguindo = cursor.fetchone()
 
@@ -756,8 +756,7 @@ class inscritos(Resource):
             'seguidores':seguidores,
             'seguindo':seguindo
         }
-        
-class views(Resource):
+    
     def post(self):
         token = request.headers.get("X-CSRFToken")
                         
@@ -771,60 +770,213 @@ class views(Resource):
         con = connection()
         cursor = con.cursor(pymysql.cursors.DictCursor)
 
-        id = escape(request.form["id"])
-
+        id_stream = escape(request.form["id_stream"])
+        id_user = escape(request.form["id_user"])
+        id_user = data.get('id_user')
+        if not id_user:
+            if not 'usuario_id' in session:
+                return {
+                    'status':'error',
+                    'mensagem':'...'
+                }
+            id_user = session('usuario_id')
+            
+        data = date.today()
+        
         try:
-            query = """select count(id_views) from views where id_stream = %s """
-            cursor.execute(query, (id,))
-            views = cursor.fetchone()
+            query = """insert into curtidas (id_user,id_stream,data_view) values (%s,%s,%s)"""
+            cursor.execute(query,(id_user,id_stream,data))
+            cursor.commit()
+            
         except Exception as e:
             print(e)
             return {
                 'status':'error',
-                'mensagem':'erro ao buscar dados'
+                'mensagem':'Não foi possivel curtit'
             }, 400
-
+        
         return {
             'status':'success',
-            'mensagem':'yey ao buscar dados',
-            'views': views
+            'mensagem':'Foi possivel Curtir'
         }, 400
 
-class views(Resource):
-    def post(self):
-        token = request.headers.get("X-CSRFToken")
-                        
-        check = check_csrf(token)
-            
-        if not check or check.get("status") == "error":
-            return {'status': 'error', 'mensagem' :check.get("mensagem")}
-        
-        data = request.get_json()
-        
+class curtidas(Resource):
+    def get(self):
+        id_user = session.get('usuario_id')
+        if not id_user:
+            return {'status': 'error', 'mensagem': 'Usuário não autenticado'}, 401
+
+        id_stream = request.args.get("id_stream", type=int)
+        if not id_stream:
+            return {'status': 'error', 'mensagem': 'id_stream é obrigatório'}, 400
+
         con = connection()
         cursor = con.cursor(pymysql.cursors.DictCursor)
 
-        id = escape(request.form["id"])
+        try:
+            cursor.execute(
+                "select count(*) as total from curtidas where id_stream = %s",
+                (id_stream,)
+            )
+            total = cursor.fetchone()["total"]
+
+            cursor.execute(
+                "select exists(select 1 from curtidas where id_stream = %s and id_user = %s) as ja_curtiu",
+                (id_stream, id_user)
+            )
+            ja_curtiu = bool(cursor.fetchone()["ja_curtiu"])
+
+            return {
+                'status': 'success',
+                'total_curtidas': total,
+                'curtido': ja_curtiu
+            }, 200
+
+        except Exception as e:
+            print(e)
+            return {'status': 'error', 'mensagem': 'erro ao buscar dados'}, 500
+
+        finally:
+            cursor.close()
+            con.close()
+        
+    def post(self):
+        token = request.headers.get("X-CSRFToken")
+        check = check_csrf(token)
+        if not check or check.get("status") == "error":
+            return {'status': 'error', 'mensagem': check.get("mensagem")}, 400
+
+        data = request.get_json()
+        id_stream = data.get('id_stream')
+        id_user = session.get('usuario_id')
+
+        if not id_user:
+            return {'status': 'error', 'mensagem': 'Usuário não autenticado'}, 401
+        if not id_stream:
+            return {'status': 'error', 'mensagem': 'id_stream é obrigatório'}, 400
+
+        con = connection()
+        cursor = con.cursor(pymysql.cursors.DictCursor)
 
         try:
-            query = """select count(id_curitidas) from curtidas where id_stream = %s """
-            cursor.execute(query, (id,))
-            curtidas = cursor.fetchone()
+            cursor.execute(
+                "select * from curtidas where id_user = %s and id_stream = %s",
+                (id_user, id_stream)
+            )
+            ja_curtiu = cursor.fetchone()
+
+            if ja_curtiu:
+                # já curtiu → remove (toggle pra "descurtir")
+                cursor.execute(
+                    "delete from curtidas where id_user = %s and id_stream = %s",
+                    (id_user, id_stream)
+                )
+                curtido_agora = False
+            else:
+                # não curtiu ainda → insere
+                cursor.execute(
+                    "insert into curtidas (id_user, id_stream, data_curtida) values (%s, %s, %s)",
+                    (id_user, id_stream, date.today())
+                )
+                curtido_agora = True
+
+            con.commit()
+
+            cursor.execute(
+                "select count(*) as total from curtidas where id_stream = %s",
+                (id_stream,)
+            )
+            total = cursor.fetchone()["total"]
+
+            return {
+                'status': 'success',
+                'curtido': curtido_agora,
+                'total_curtidas': total
+            }, 200
+
+        except Exception as e:
+            print(e)
+            return {'status': 'error', 'mensagem': 'Não foi possível curtir'}, 500
+
+        finally:
+            cursor.close()
+            con.close()
+                
+class views(Resource):
+    def get(self):
+        id_user = session.get('usuario_id')
+        if not id_user:
+            return {'status': 'error', 'mensagem': 'Usuário não autenticado'}, 401
+
+        id_stream = request.args.get("id_stream", type=int)
+        if not id_stream:
+            return {'status': 'error', 'mensagem': 'id_stream é obrigatório'}, 400
+
+        con = connection()
+        cursor = con.cursor(pymysql.cursors.DictCursor)
+
+        try:
+            cursor.execute(
+                "select count(*) as total from views where id_stream = %s",
+                (id_stream,)
+            )
+            total = cursor.fetchone()["total"]
+
+            return {
+                'status': 'success',
+                'total_views': total
+            }, 200
+
+        except Exception as e:
+            print(e)
+            return {'status': 'error', 'mensagem': 'erro ao buscar dados'}, 500
+
+        finally:
+            cursor.close()
+            con.close()
+        
+    def post(self):
+        token = request.headers.get("X-CSRFToken")
+                                
+        check = check_csrf(token)
+        
+        data = request.get_json()
+        
+        if not check or check.get("status") == "error":
+            return {'status': 'error', 'mensagem' :check.get("mensagem")}
+        
+        con = connection()
+        cursor = con.cursor(pymysql.cursors.DictCursor)
+        
+        id_stream = data.get('id_stream')
+        id_user = data.get('id_user')
+        if not id_user:
+            if not 'usuario_id' in session:
+                return {
+                    'status':'error',
+                    'mensagem':'...'
+                }
+            id_user = session.get('usuario_id')
+        
+        data = date.today()
+            
+        try:
+            query = """insert into views (id_user,id_stream,data_view) values (%s,%s,%s)"""
+            cursor.execute(query,(id_user,id_stream,data))
+            con.commit()
+            
         except Exception as e:
             print(e)
             return {
                 'status':'error',
-                'mensagem':'erro ao buscar dados'
+                'mensagem':'Não foi possivel curtit'
             }, 400
-
+        
         return {
             'status':'success',
-            'mensagem':'yey ao buscar dados',
-            'views': curtidas
-        }, 400
-        
-
-
+            'mensagem':'Foi possivel Curtir'
+        }, 200
+    
 
 class block_code(Resource):
     """

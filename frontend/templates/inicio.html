@@ -603,7 +603,7 @@ create table curtidas(
 	id_curtida int auto_increment unique,
     id_user int,
     id_stream int,
-    data_view date,
+    data_curtida date,
     
     foreign key (id_user) references usuarios(id_usuario),
     foreign key (id_stream) references streams(id_stream)
