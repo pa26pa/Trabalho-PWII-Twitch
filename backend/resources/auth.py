@@ -945,43 +945,40 @@ class delete_Account(Resource):
             }, 400
         id = session['usuario_id']
 
-        try:
-            query = """select column_name from %s.columns where table schema = %s and colum_name like 'id_%'""
+        try: 
+            a = """delete from bloqueados where id_bloqueador = %s or id_bloqueado = %s"""
+            cursor.execute(a, (id,id))
+            
+            ab = """delete from streams where id_streamer = %s"""
+            cursor.execute(ab, (id,))
+
+            ac = """delete from subs where id_usuario = %s or id_streamer = %s"""
+            cursor.execute(ac, (id,))
+
+
+            ad = """delete from tipo_sub where id_criador = %s"""
+            cursor.execute(ad, (id,))
+
+
+            ae = """delete from seguidores where id_seguido = %s or id_seguidor = %s"""
+            cursor.execute(ae, (id,))
+
+            
+            query = """delete from usuarios where id_usuario = %s """
+            cursor.execute(query, (id,))
+            
+            con.commit()
+            session.clear()
+            
+            cursor.close()
+            con.close()
         
-        # try: 
-        #     a = """delete from bloqueados where id_bloqueador = %s or id_bloqueado = %s"""
-        #     cursor.execute(a, (id,id))
-            
-        #     ab = """delete from streams where id_streamer = %s"""
-        #     cursor.execute(ab, (id,))
-
-        #     ac = """delete from subs where id_usuario = %s or id_streamer = %s"""
-        #     cursor.execute(ac, (id,))
-
-
-        #     ad = """delete from tipo_sub where id_criador = %s"""
-        #     cursor.execute(ad, (id,))
-
-
-        #     ae = """delete from seguidores where id_seguido = %s or id_seguidor = %s"""
-        #     cursor.execute(ae, (id,))
-
-            
-        #     query = """delete from usuarios where id_usuario = %s """
-        #     cursor.execute(query, (id,))
-            
-        #     con.commit()
-        #     session.clear()
-            
-        #     cursor.close()
-        #     con.close()
-        
-        # except Exception as e:
-        #     con.rollback()
-        #     return {
-        #         'status':'error',
-        #         'mensagem':'Erro interno ao tentar deletar conta'
-        #     }, 500
+        except Exception as e:
+            con.rollback()
+            return {
+                'status':'error',
+                'mensagem':'Erro interno ao tentar deletar conta'
+            }, 500
         
         return {
             'status':'success',
@@ -1318,6 +1315,7 @@ class editar_bio(Resource):
             'status':'success',
             'mensagem':'bio mudada com sucesso'
         }, 200
+        
 class editar_nome(Resource):
     """
         Endpoint responsável por editar o nome

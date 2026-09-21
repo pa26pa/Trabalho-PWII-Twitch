@@ -596,17 +596,17 @@ create table views(
     data_view date,
     
     foreign key (id_user) references usuarios(id_usuario),
-    foreign key (id_stream) references usuarios(id_stream)
+    foreign key (id_stream) references streams(id_stream)
 );
 
 create table curtidas(
-	id_curitida int auto_increment unique,
+	id_curtida int auto_increment unique,
     id_user int,
     id_stream int,
     data_view date,
     
     foreign key (id_user) references usuarios(id_usuario),
-    foreign key (id_user) references usuarios(id_usuario)
+    foreign key (id_stream) references streams(id_stream)
 );-->
     </body>
 </html>
