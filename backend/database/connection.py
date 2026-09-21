@@ -36,6 +36,7 @@ supabase: Client = create_client(url,key)
 bd_password = os.getenv("MYSQL_ROOT_PASSWORD")
 email_password = os.getenv("EMAIL_PASSWORD")
 
+database = 'twitch'
 
 def acorda_cloudinary ():
     """
@@ -60,7 +61,7 @@ def connection():
         user='root',
         password=bd_password,
         #database='railway',
-        database='twitch',
+        database=database
         cursorclass=pymysql.cursors.Cursor
     )
 

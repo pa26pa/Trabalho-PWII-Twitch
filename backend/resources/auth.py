@@ -17,7 +17,7 @@ import random
 import smtplib
 from email.message import EmailMessage
 import mimetypes
-from backend.database.connection import connection, data_semana,supabase, acorda_cloudinary, email_valido, data_valida, carregar, salvar, cache_traducoes, file
+from backend.database.connection import database,connection, data_semana,supabase, acorda_cloudinary, email_valido, data_valida, carregar, salvar, cache_traducoes, file
 from backend.resources.seguranca import cpf_math_validate, cpf_real_or_not, captcha, check_csrf
 from backend.resources.email_code import send_code
 from datetime import date, datetime, timedelta
@@ -944,41 +944,44 @@ class delete_Account(Resource):
                 "mensagem":"Você precisa estar logado para deletar sua conta"
             }, 400
         id = session['usuario_id']
+
+        try:
+            query = """select column_name from %s.columns where table schema = %s and colum_name like 'id_%'""
         
-        try: 
-            a = """delete from bloqueados where id_bloqueador = %s or id_bloqueado = %s"""
-            cursor.execute(a, (id,id))
+        # try: 
+        #     a = """delete from bloqueados where id_bloqueador = %s or id_bloqueado = %s"""
+        #     cursor.execute(a, (id,id))
             
-            ab = """delete from streams where id_streamer = %s"""
-            cursor.execute(ab, (id,))
+        #     ab = """delete from streams where id_streamer = %s"""
+        #     cursor.execute(ab, (id,))
 
-            ac = """delete from subs where id_usuario = %s or id_streamer = %s"""
-            cursor.execute(ac, (id,))
-
-
-            ad = """delete from tipo_sub where id_criador = %s"""
-            cursor.execute(ad, (id,))
+        #     ac = """delete from subs where id_usuario = %s or id_streamer = %s"""
+        #     cursor.execute(ac, (id,))
 
 
-            ae = """delete from seguidores where id_seguido = %s or id_seguidor = %s"""
-            cursor.execute(ae, (id,))
+        #     ad = """delete from tipo_sub where id_criador = %s"""
+        #     cursor.execute(ad, (id,))
+
+
+        #     ae = """delete from seguidores where id_seguido = %s or id_seguidor = %s"""
+        #     cursor.execute(ae, (id,))
 
             
-            query = """delete from usuarios where id_usuario = %s """
-            cursor.execute(query, (id,))
+        #     query = """delete from usuarios where id_usuario = %s """
+        #     cursor.execute(query, (id,))
             
-            con.commit()
-            session.clear()
+        #     con.commit()
+        #     session.clear()
             
-            cursor.close()
-            con.close()
+        #     cursor.close()
+        #     con.close()
         
-        except Exception as e:
-            con.rollback()
-            return {
-                'status':'error',
-                'mensagem':'Erro interno ao tentar deletar conta'
-            }, 500
+        # except Exception as e:
+        #     con.rollback()
+        #     return {
+        #         'status':'error',
+        #         'mensagem':'Erro interno ao tentar deletar conta'
+        #     }, 500
         
         return {
             'status':'success',
