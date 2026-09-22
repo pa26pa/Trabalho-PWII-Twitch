@@ -324,6 +324,7 @@ class check_login(Resource):
                 'status': 'success',
                 'mensagem': 'Logado',
                 'logado': 'true',
+                'id':session['usuario_id'],
                 'foto': info_usuario['foto_url'],
                 'bio': info_usuario['bio'],
                 'email': info_usuario['email'],
@@ -718,6 +719,225 @@ class search(Resource):
             'resultado':f'{usuarios},{streams}'
         }, 200
 
+class inscritos(Resource):
+    def post(self):
+        token = request.headers.get("X-CSRFToken")
+                
+        check = check_csrf(token)
+            
+        if not check or check.get("status") == "error":
+            return {'status': 'error', 'mensagem' :check.get("mensagem")}
+        
+        data = request.get_json()
+        
+        con = connection()
+        cursor = con.cursor(pymysql.cursors.DictCursor)
+
+        id = data.get('id')
+
+        try:     
+            query = """select count(*) as total from seguidores where id_seguido = %s"""
+            cursor.execute(query, (id,))
+            seguidores = cursor.fetchone()["total"]
+
+            query2 = """select count(*) as total from seguidores where id_seguidor = %s"""
+            cursor.execute(query2,(id,))
+            seguindo = cursor.fetchone()["total"]
+
+        except Exception as e:
+            print(e)
+            return {
+                'status':'error',
+                'mensagem':'Erro ao buscar dados no MYSQL'
+            }, 400
+
+        return {
+            'status':'success',
+            'mensagem':'Informações buscadas com sucesso',
+            'seguidores':seguidores,
+            'seguindo':seguindo
+        }, 200
+    
+    
+
+class curtidas(Resource):
+    def get(self):
+        id_user = session.get('usuario_id')
+        if not id_user:
+            return {'status': 'error', 'mensagem': 'Usuário não autenticado'}, 401
+
+        id_stream = request.args.get("id_stream", type=int)
+        if not id_stream:
+            return {'status': 'error', 'mensagem': 'id_stream é obrigatório'}, 400
+
+        con = connection()
+        cursor = con.cursor(pymysql.cursors.DictCursor)
+
+        try:
+            cursor.execute(
+                "select count(*) as total from curtidas where id_stream = %s",
+                (id_stream,)
+            )
+            total = cursor.fetchone()["total"]
+
+            cursor.execute(
+                "select exists(select 1 from curtidas where id_stream = %s and id_user = %s) as ja_curtiu",
+                (id_stream, id_user)
+            )
+            ja_curtiu = bool(cursor.fetchone()["ja_curtiu"])
+
+            return {
+                'status': 'success',
+                'total_curtidas': total,
+                'curtido': ja_curtiu
+            }, 200
+
+        except Exception as e:
+            print(e)
+            return {'status': 'error', 'mensagem': 'erro ao buscar dados'}, 500
+
+        finally:
+            cursor.close()
+            con.close()
+        
+    def post(self):
+        token = request.headers.get("X-CSRFToken")
+        check = check_csrf(token)
+        if not check or check.get("status") == "error":
+            return {'status': 'error', 'mensagem': check.get("mensagem")}, 400
+
+        data = request.get_json()
+        id_stream = data.get('id_stream')
+        id_user = session.get('usuario_id')
+
+        if not id_user:
+            return {'status': 'error', 'mensagem': 'Usuário não autenticado'}, 401
+        if not id_stream:
+            return {'status': 'error', 'mensagem': 'id_stream é obrigatório'}, 400
+
+        con = connection()
+        cursor = con.cursor(pymysql.cursors.DictCursor)
+
+        try:
+            cursor.execute(
+                "select * from curtidas where id_user = %s and id_stream = %s",
+                (id_user, id_stream)
+            )
+            ja_curtiu = cursor.fetchone()
+
+            if ja_curtiu:
+                # já curtiu → remove (toggle pra "descurtir")
+                cursor.execute(
+                    "delete from curtidas where id_user = %s and id_stream = %s",
+                    (id_user, id_stream)
+                )
+                curtido_agora = False
+            else:
+                # não curtiu ainda → insere
+                cursor.execute(
+                    "insert into curtidas (id_user, id_stream, data_curtida) values (%s, %s, %s)",
+                    (id_user, id_stream, date.today())
+                )
+                curtido_agora = True
+
+            con.commit()
+
+            cursor.execute(
+                "select count(*) as total from curtidas where id_stream = %s",
+                (id_stream,)
+            )
+            total = cursor.fetchone()["total"]
+
+            return {
+                'status': 'success',
+                'curtido': curtido_agora,
+                'total_curtidas': total
+            }, 200
+
+        except Exception as e:
+            print(e)
+            return {'status': 'error', 'mensagem': 'Não foi possível curtir'}, 500
+
+        finally:
+            cursor.close()
+            con.close()
+                
+class views(Resource):
+    def get(self):
+        id_user = session.get('usuario_id')
+        if not id_user:
+            return {'status': 'error', 'mensagem': 'Usuário não autenticado'}, 401
+
+        id_stream = request.args.get("id_stream", type=int)
+        if not id_stream:
+            return {'status': 'error', 'mensagem': 'id_stream é obrigatório'}, 400
+
+        con = connection()
+        cursor = con.cursor(pymysql.cursors.DictCursor)
+
+        try:
+            cursor.execute(
+                "select count(*) as total from views where id_stream = %s",
+                (id_stream,)
+            )
+            total = cursor.fetchone()["total"]
+
+            return {
+                'status': 'success',
+                'total_views': total
+            }, 200
+
+        except Exception as e:
+            print(e)
+            return {'status': 'error', 'mensagem': 'erro ao buscar dados'}, 500
+
+        finally:
+            cursor.close()
+            con.close()
+        
+    def post(self):
+        token = request.headers.get("X-CSRFToken")
+                                
+        check = check_csrf(token)
+        
+        data = request.get_json()
+        
+        if not check or check.get("status") == "error":
+            return {'status': 'error', 'mensagem' :check.get("mensagem")}
+        
+        con = connection()
+        cursor = con.cursor(pymysql.cursors.DictCursor)
+        
+        id_stream = data.get('id_stream')
+        id_user = data.get('id_user')
+        if not id_user:
+            if not 'usuario_id' in session:
+                return {
+                    'status':'error',
+                    'mensagem':'...'
+                }
+            id_user = session.get('usuario_id')
+        
+        data = date.today()
+            
+        try:
+            query = """insert into views (id_user,id_stream,data_view) values (%s,%s,%s)"""
+            cursor.execute(query,(id_user,id_stream,data))
+            con.commit()
+            
+        except Exception as e:
+            print(e)
+            return {
+                'status':'error',
+                'mensagem':'Não foi possivel curtit'
+            }, 400
+        
+        return {
+            'status':'success',
+            'mensagem':'Foi possivel Curtir'
+        }, 200
+    
+
 class block_code(Resource):
     """
         Endpoint responsável por anular o código salvo na session
@@ -836,7 +1056,7 @@ class delete_Account(Resource):
                 "mensagem":"Você precisa estar logado para deletar sua conta"
             }, 400
         id = session['usuario_id']
-        
+
         try: 
             a = """delete from bloqueados where id_bloqueador = %s or id_bloqueado = %s"""
             cursor.execute(a, (id,id))
@@ -1207,6 +1427,7 @@ class editar_bio(Resource):
             'status':'success',
             'mensagem':'bio mudada com sucesso'
         }, 200
+        
 class editar_nome(Resource):
     """
         Endpoint responsável por editar o nome
