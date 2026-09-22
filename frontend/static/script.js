@@ -59,6 +59,7 @@ document.addEventListener('DOMContentLoaded', function () {
             if (data.logado) {
                 mostrarLogado(data.name);
                 info_user(data);
+                incritos_info(data.id);
             } else {
                 mostrarDeslogado();
             }
@@ -454,6 +455,18 @@ document.addEventListener('DOMContentLoaded', function () {
         mostra.textContent = cpf;
     }
 
+    function show_seguindo(seguindo) {
+        const mostra = document.getElementById('show_seguindo')
+        //if (!seguindo || !mostra) console.log('ta parando aqui'); return ;
+        mostra.textContent = seguindo;
+    }
+
+    function show_seguidores(seguidores) {
+        const mostra = document.getElementById('show_seguidores')
+        //if (!seguidores || !mostra) return ;
+        mostra.textContent = seguidores;
+    }
+
     // função para mostrar nome
     function info_user_name(user_name) {
         const mostra = document.querySelectorAll('.show_name');
@@ -524,6 +537,29 @@ document.addEventListener('DOMContentLoaded', function () {
             }
             atualizarAvatarDropdown(data.foto);
         }
+    }
+
+    function incritos_info(id_user) {
+        const dado = {
+            id: id_user 
+        };
+
+        fetch(base_url +"/inscritos", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": csrfToken
+            },
+            body: JSON.stringify(dado)
+        })
+        .then(async res => {
+            const data = await res.json();
+            if (data.status !== 'success') return; 
+            console.log(data.seguidores);
+            show_seguidores(data.seguidores);
+            show_seguindo(data.seguindo);
+            
+        })
     }
 
     // FUNÇÃO PARA FECHAR MODAL E RESETAR FORMULÁRIO

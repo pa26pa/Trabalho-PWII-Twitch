@@ -324,6 +324,7 @@ class check_login(Resource):
                 'status': 'success',
                 'mensagem': 'Logado',
                 'logado': 'true',
+                'id':session['usuario_id'],
                 'foto': info_usuario['foto_url'],
                 'bio': info_usuario['bio'],
                 'email': info_usuario['email'],
@@ -719,7 +720,7 @@ class search(Resource):
         }, 200
 
 class inscritos(Resource):
-    def get(self):
+    def post(self):
         token = request.headers.get("X-CSRFToken")
                 
         check = check_csrf(token)
@@ -732,16 +733,16 @@ class inscritos(Resource):
         con = connection()
         cursor = con.cursor(pymysql.cursors.DictCursor)
 
-        id = escape(request.form["id"])
+        id = data.get('id')
 
         try:     
-            query = """select count(*) id_inscrição from seguidores where id_seguido = %s"""
+            query = """select count(*) as total from seguidores where id_seguido = %s"""
             cursor.execute(query, (id,))
-            seguidores = cursor.fetchone()
+            seguidores = cursor.fetchone()["total"]
 
-            query2 = """select count(*) id_inscrição from seguidores where id_seguidor = %s"""
+            query2 = """select count(*) as total from seguidores where id_seguidor = %s"""
             cursor.execute(query2,(id,))
-            seguindo = cursor.fetchone()
+            seguindo = cursor.fetchone()["total"]
 
         except Exception as e:
             print(e)
@@ -755,50 +756,9 @@ class inscritos(Resource):
             'mensagem':'Informações buscadas com sucesso',
             'seguidores':seguidores,
             'seguindo':seguindo
-        }
+        }, 200
     
-    def post(self):
-        token = request.headers.get("X-CSRFToken")
-                        
-        check = check_csrf(token)
-            
-        if not check or check.get("status") == "error":
-            return {'status': 'error', 'mensagem' :check.get("mensagem")}
-        
-        data = request.get_json()
-        
-        con = connection()
-        cursor = con.cursor(pymysql.cursors.DictCursor)
-
-        id_stream = escape(request.form["id_stream"])
-        id_user = escape(request.form["id_user"])
-        id_user = data.get('id_user')
-        if not id_user:
-            if not 'usuario_id' in session:
-                return {
-                    'status':'error',
-                    'mensagem':'...'
-                }
-            id_user = session('usuario_id')
-            
-        data = date.today()
-        
-        try:
-            query = """insert into curtidas (id_user,id_stream,data_view) values (%s,%s,%s)"""
-            cursor.execute(query,(id_user,id_stream,data))
-            cursor.commit()
-            
-        except Exception as e:
-            print(e)
-            return {
-                'status':'error',
-                'mensagem':'Não foi possivel curtit'
-            }, 400
-        
-        return {
-            'status':'success',
-            'mensagem':'Foi possivel Curtir'
-        }, 400
+    
 
 class curtidas(Resource):
     def get(self):
