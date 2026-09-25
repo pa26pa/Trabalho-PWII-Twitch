@@ -526,6 +526,7 @@
 create table streams(
 	id_stream int auto_increment primary key,
     categoria varchar(100),
+    capa text,
     titulo text,
     descrisao text,
     video_url text,
@@ -605,6 +606,18 @@ create table curtidas(
     id_stream int,
     data_curtida date,
     
+    foreign key (id_user) references usuarios(id_usuario),
+    foreign key (id_stream) references streams(id_stream)
+);
+
+create table comentarios(
+	id_comentario int auto_increment primary key,
+	id_stream int,
+    id_user int,
+    comentario text,
+    data_comentario datetime not null default current_timestamp,
+    
+    index idx_stream_data (id_stream, data_comentario),
     foreign key (id_user) references usuarios(id_usuario),
     foreign key (id_stream) references streams(id_stream)
 );-->
