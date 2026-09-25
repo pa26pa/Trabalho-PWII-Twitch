@@ -1855,7 +1855,6 @@ document.addEventListener('DOMContentLoaded', function () {
         .then(data => {
             console.log('aaaaaaaaa:(')
             if (data.bloqueados) {
-                console.log('aaaa:)')
                 blockUsers = data.bloqueados
             }
         });
@@ -1874,7 +1873,6 @@ document.addEventListener('DOMContentLoaded', function () {
             });
             if (!res.ok) throw new Error("Erro ao buscar as lives");
             const data = await res.json();
-            console.log("LIVES RECEBIDAS DA API:", data.videos);
             return data.videos || [];
         } catch (error) {
             console.error("Erro ao pegar videos:", error);
@@ -1937,6 +1935,86 @@ document.addEventListener('DOMContentLoaded', function () {
             mostrarToast("Erro ao curtir.", "error");
             return null;
         }
+    }
+
+    async function buscarComentarios(idStream) {
+        try {
+            const res = await fetch(base_url + "/comentarios?id_stream=" + idStream, {
+            method: "GET",
+            headers: { "X-CSRFToken": csrfToken },
+            credentials: "include"
+        });
+        if (!res.ok) throw new Error("Erro ao buscar comentários");
+        const data = await res.json();
+        return data.comentarios || [];
+        } catch (error) {
+            console.error("Erro ao buscar comentários:", error);
+            return [];
+        }
+    }
+
+    async function enviarComentarioAPI(idStream, texto) {
+        try {
+            const res = await fetch(base_url + "/comentarios", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": csrfToken
+                },
+                credentials: "include",
+                body: JSON.stringify({ id_stream: idStream, texto })
+            });
+            const data = await res.json();
+            if (!res.ok || data.status === "error") {
+                mostrarToast(data.mensagem, "error");
+                return null;
+            }
+            return data.comentario;
+        } catch (error) {
+            mostrarToast("Erro ao comentar.", "error");
+            return null;
+        }
+    }
+
+    function adicionarComentarioDOM(c) {
+        const lista = document.getElementById('comentarios-lista');
+        if (!lista) return;
+
+        const item = document.createElement('div');
+        item.className = 'comentario-item';
+
+        const img = document.createElement('img');
+        img.className = 'comentario-foto';
+        img.src = c.foto_url || '/static/user.png';
+        img.alt = c.autor;
+
+        const corpo = document.createElement('div');
+        corpo.className = 'comentario-corpo';
+
+        // nome + data na mesma linha
+        const cabecalho = document.createElement('div');
+        cabecalho.className = 'comentario-cabecalho';
+
+        const autor = document.createElement('span');
+        autor.className = 'comentario-autor';
+        autor.textContent = c.autor;
+
+        const d = new Date(c.criado_em);
+        const quando = document.createElement('small');
+        quando.className = 'comentario-data';
+        quando.textContent = `${d.toLocaleDateString('pt-BR')} às ${d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
+
+        cabecalho.append(autor, quando);
+
+        const texto = document.createElement('span');
+        texto.className = 'comentario-texto';
+        texto.textContent = c.texto;
+        texto.style.display = 'block';
+
+        corpo.append(cabecalho, texto);
+        item.append(img, corpo);
+        lista.appendChild(item);
+        lista.scrollTop = lista.scrollHeight;
     }
 
     async function registrarView(idStream) {
@@ -2331,18 +2409,27 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const listaComent = document.getElementById('comentarios-lista');
         listaComent.innerHTML = '';
-        (live.comentarios || []).forEach(c => adicionarComentarioDOM(c.autor, c.texto, c.foto));
+        buscarComentarios(live.id_stream).then(lista => {
+            live.comentarios = lista;
+            lista.forEach(c => adicionarComentarioDOM(c));
+        });
 
         const inputComent = document.getElementById('comentario-input');
         const btnEnviar   = document.getElementById('comentario-enviar');
         inputComent.value = '';
 
-        const enviarComentario = () => {
+        const enviarComentario = async () => {
             const texto = inputComent.value.trim();
             if (!texto) return;
-            // TODO: precisa de endpoint de comentário no backend — ainda não existe
-            mostrarToast('Comentar ainda não está disponível.', 'error');
-            inputComent.value = '';
+
+            btnEnviar.disabled = true;
+            const novo = await enviarComentarioAPI(live.id_stream, texto);
+            btnEnviar.disabled = false;
+
+            if (novo) {
+                adicionarComentarioDOM(novo);
+                inputComent.value = '';
+            }
         };
 
         btnEnviar.onclick     = enviarComentario;
@@ -2409,21 +2496,6 @@ document.addEventListener('DOMContentLoaded', function () {
         };
         fecharBtn.onclick = fechar;
         overlay.onclick = e => { if (e.target === overlay) fechar(); };
-    }
-
-    function adicionarComentarioDOM(autor, texto, foto) {
-        const lista = document.getElementById('comentarios-lista');
-        if (!lista) return;
-        const item = document.createElement('div');
-        item.className = 'comentario-item';
-        item.innerHTML = `
-            <img src="${foto}" class="comentario-foto" alt="${autor}">
-            <div class="comentario-corpo">
-                <span class="comentario-autor">${autor}</span>
-                <span class="comentario-texto">${texto}</span>
-            </div>`;
-        lista.appendChild(item);
-        lista.scrollTop = lista.scrollHeight;
     }
 
     renderVideosPerfil();

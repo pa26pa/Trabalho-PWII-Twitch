@@ -3273,6 +3273,21 @@ a {text-decoration: none;}
 }
 #video-live:focus { border-color: var(--color3); outline: none; }
 
+.comentario-cabecalho {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+}
+
+.comentario-autor {
+    font-weight: 600;
+}
+
+.comentario-data {
+    color: var(--color16, #999);
+    font-size: 0.78em;
+}
+
 /* Itens migrados só aparecem em <1024px */
 @media (min-width: 1024px) {
     .aside-migrado { display: none !important; }
