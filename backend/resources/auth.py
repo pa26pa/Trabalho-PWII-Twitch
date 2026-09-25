@@ -937,8 +937,101 @@ class views(Resource):
             'mensagem':'Foi possivel Curtir'
         }, 200
     
+class comentarios(Resource):
+    def post(self):
+        token = request.headers.get("X-CSRFToken")
+        check = check_csrf(token)
+        if not check or check.get("status") == "error":
+            return {'status': 'error', 'mensagem': 'CSRF inválido'}, 403
 
+        data = request.get_json()
+        id_stream = data.get('id_stream')
+        texto = (data.get('texto') or '').strip()
+
+        if not id_stream or not texto or len(texto) > 500:
+            return {'status': 'error', 'mensagem': 'Comentário inválido'}, 400
+
+        id_user = session.get('usuario_id')
+        if not id_user:
+            return {'status': 'error', 'mensagem': 'Faça login para comentar'}, 401
+
+        con = connection()
+        cursor = con.cursor(pymysql.cursors.DictCursor)
+        try:
+            cursor.execute(
+                "insert into comentarios (id_stream, id_user, comentario) values (%s, %s, %s)",
+                (id_stream, id_user, texto)
+            )
+            id_novo = cursor.lastrowid
+
+            cursor.execute("""
+                select c.id_comentario,
+                       c.comentario as texto,
+                       c.data_comentario as criado_em,
+                       u.user_name as autor,
+                       u.foto_url
+                from comentarios c
+                join usuarios u on u.id_usuario = c.id_user
+                where c.id_comentario = %s
+            """, (id_novo,))
+            novo = cursor.fetchone()
+            con.commit()
+
+        except Exception as e:
+            con.rollback()
+            print(e)
+            return {
+                'status': 'error', 'mensagem': 'Não foi possível comentar'
+            }, 400
+
+        finally:
+            cursor.close()
+            con.close()
+
+        novo['criado_em'] = novo['criado_em'].isoformat()
+        return {'status': 'success', 'comentario': novo}, 200
+    
+    def get(self):
+        id_stream = request.args.get("id_stream", type=int)
+        if not id_stream:
+            return {'status': 'error', 'mensagem': 'id_stream obrigatório'}, 400
+
+        con = connection()
+        cursor = con.cursor(pymysql.cursors.DictCursor)
+        try:
+            cursor.execute("""
+                select c.id_comentario,
+                       c.comentario as texto,
+                       c.data_comentario as criado_em,
+                       u.user_name as autor,
+                       u.foto_url
+                from comentarios c
+                join usuarios u on u.id_usuario = c.id_user
+                where c.id_stream = %s
+                order by c.data_comentario asc
+                limit 100
+            """, (id_stream,))
+            lista = cursor.fetchall()
+
+        except Exception as e:
+            print(e)
+            return {'status': 'error', 'mensagem': 'Não foi possível acessar comentários'}, 400
+
+        finally:
+            cursor.close()
+            con.close()
+
+        for c in lista:
+            c['criado_em'] = c['criado_em'].isoformat()
+
+        return {
+            'status': 'success',
+            'mensagem':'Comentarios pegos com sucesso',
+            'comentarios': lista
+        }, 200
+        
 class block_code(Resource):
+        
     """
         Endpoint responsável por anular o código salvo na session
     """
@@ -1039,13 +1132,6 @@ class delete_Account(Resource):
                 200 = Conta excluida com sucesso
                 500 = Erro interno ao tentar excluir conta
         """
-        
-        token = request.headers.get("X-CSRFToken")
-        
-        check = check_csrf(token)
-        
-        if not check or check.get("status") == "error":
-            return {'status': 'error', 'mensagem' :check.get("mensagem")}
         
         con = connection()
         cursor = con.cursor(pymysql.cursors.DictCursor)
