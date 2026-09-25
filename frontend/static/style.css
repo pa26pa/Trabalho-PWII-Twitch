@@ -119,6 +119,11 @@ body {
     background-color: var(--color4);
     transition: all 0.8s ease;
 }
+.search-bar input:focus {
+    border-radius: 12px;
+    border: 1px solid var(--color3);
+    box-shadow: 0 0 10px 1px var(--color3);
+}
 .search-icon {
     display: flex;
     align-items: center;
@@ -409,6 +414,7 @@ h2 {
     color: var(--color4);
     font-size: 1.4em;
     border: 2px solid var(--color4);
+    transition: all 0.3s ease;
 }
 .wrapper .btn-wrapper:hover {
     background-color: var(--color11);
@@ -536,7 +542,7 @@ h2 {
     justify-content: space-between;
     transition: background 0.3s ease;
 }
-.logins:hover {background-color: rgb(212, 212, 212);}
+.logins:hover {background-color: rgb(212, 212, 212); color: #000;}
 #icon-google {width: 20px; height: 20px; margin-right: 10px;}
 #icon-amazon {width: 35px; height: 15px; margin-right: 10px;}
 
@@ -1039,7 +1045,7 @@ a {text-decoration: none;}
     position: absolute;
     bottom: 48px; /* acima dos controles */
     right: 12px;
-    color: rgba(255,255,255,0.9);
+    color: var(--color10);
     font-size: 13px;
     text-shadow: 0 1px 3px rgba(0,0,0,0.8);
 }
@@ -1114,7 +1120,7 @@ a {text-decoration: none;}
 
 /* label de tempo */
 .time-label {
-    color: rgba(255,255,255,0.75);
+    color: var(--color4);
     font-size: 12px;
     white-space: nowrap;
     min-width: 36px;
@@ -1500,6 +1506,7 @@ a {text-decoration: none;}
     border: 1px solid var(--color13);
     border-radius: 8px;
     font-size: 0.9em;
+    background: transparent;
 }
 #block-input:focus {
     border-color: var(--color3);
@@ -1822,7 +1829,7 @@ a {text-decoration: none;}
     transition: all 0.3s ease;
 }
 .btn-perfil:hover {
-    color: var(--color4);
+    color: #F4ECFF;
     background-color: var(--color3);
 }
 #nome-usuario, .social-perfil span {font-size: 1.5em; font-weight: bold;}
@@ -1861,6 +1868,7 @@ a {text-decoration: none;}
 #modal-4 {
     width: min(480px, 92vw);
     max-height: 90vh;
+    height: auto;
     overflow-y: auto;
     overflow-x: hidden;
     padding: 0;
@@ -1910,9 +1918,10 @@ a {text-decoration: none;}
 .form-perfil input, .form-perfil textarea {
     width: 90%;
     height: 40px;
-    border: 3px solid var(--color2);
+    border: 3px solid #DEC7FF;
     border-radius: 10px;
     padding: 5px;
+    background: transparent;
 }
 .form-perfil textarea {height: 80px;}
 .form-perfil .label-perfil {align-items: left; margin-left: 5px;}
@@ -2359,9 +2368,9 @@ a {text-decoration: none;}
     position: absolute;
     bottom: 10px;
     right: 8px;
-    color: rgba(255,255,255,0.9);
+    color: var(--color10);
     font-size: 0.8em;
-    text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+    text-shadow: 0 1px 3px var(--color8);
     z-index: 3;
 }
 .video-card-titulo {
@@ -2473,7 +2482,7 @@ a {text-decoration: none;}
 .fechar-player:hover { background: rgba(145,71,255,0.85); color: var(--color7); font-weight: bold;}
 
 .player-titulo-topo {
-    background: var(--color19);
+    background: #1A1A2E;
     color: var(--color7);
     font-size: 1.5em; font-weight: bold;
     padding: 14px 16px 8px;
@@ -2544,9 +2553,9 @@ a {text-decoration: none;}
 }
 .vol-wrap-exp { display: flex; align-items: center; gap: 4px; }
 .vol-slider-exp { width: 70px; accent-color: var(--color3); cursor: pointer; }
-.time-label-exp { color: rgba(255,255,255,0.8); font-size: 0.8em; white-space: nowrap; margin-left: 4px; }
+.time-label-exp { color: var(--color10); font-size: 0.8em; white-space: nowrap; margin-left: 4px; }
 .player-titulo-controle {
-    flex: 1; color: rgba(255,255,255,0.7); font-size: 0.82em;
+    flex: 1; color: var(--color4); font-size: 0.82em;
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center;
 }
 
@@ -2590,11 +2599,12 @@ a {text-decoration: none;}
 }
 .player-acao-btn:hover,
 .player-acao-btn.ativo {
-    background: var(--color3); color: var(--color10);
+    background: var(--color3); color: #fff;
 }
 .player-acao-btn:hover i,
-.player-acao-btn.ativo i {
-    color: var(--color10);
+.player-acao-btn.ativo i,
+.player-acao-btn:active i {
+    color: red;
 }
 
 .player-comentarios { display: flex; flex-direction: column; gap: 10px; }
@@ -2604,18 +2614,18 @@ a {text-decoration: none;}
 }
 .comentario-input-row { display: flex; gap: 8px; align-items: center; }
 .comentario-input {
-    flex: 1;
+    flex: 1; background: transparent;
     border: 2px solid var(--color2); border-radius: 20px;
     padding: 8px 14px; font-size: 0.9em; outline: none; color: var(--color14);
 }
 .comentario-input:focus { border-color: var(--color3); }
 .comentario-enviar {
-    background: var(--color3); color: var(--color10);
+    background: var(--color3); color: #fff;
     border: none; border-radius: 20px;
     padding: 8px 16px; font-weight: bold;
     cursor: pointer; transition: background 0.2s; white-space: nowrap;
 }
-.comentario-enviar:hover { background: var(--color6); }
+.comentario-enviar:hover { background: var(--color6); color: #000; }
 .comentarios-lista {
     display: flex; flex-direction: column; gap: 8px;
     max-height: 200px; overflow-y: auto;
