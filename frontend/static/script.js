@@ -59,6 +59,7 @@ document.addEventListener('DOMContentLoaded', function () {
             if (data.logado) {
                 mostrarLogado(data.name);
                 info_user(data);
+                incritos_info(data.id);
             } else {
                 mostrarDeslogado();
             }
@@ -454,6 +455,18 @@ document.addEventListener('DOMContentLoaded', function () {
         mostra.textContent = cpf;
     }
 
+    function show_seguindo(seguindo) {
+        const mostra = document.getElementById('show_seguindo')
+        //if (!seguindo || !mostra) console.log('ta parando aqui'); return ;
+        mostra.textContent = seguindo;
+    }
+
+    function show_seguidores(seguidores) {
+        const mostra = document.getElementById('show_seguidores')
+        //if (!seguidores || !mostra) return ;
+        mostra.textContent = seguidores;
+    }
+
     // função para mostrar nome
     function info_user_name(user_name) {
         const mostra = document.querySelectorAll('.show_name');
@@ -524,6 +537,29 @@ document.addEventListener('DOMContentLoaded', function () {
             }
             atualizarAvatarDropdown(data.foto);
         }
+    }
+
+    function incritos_info(id_user) {
+        const dado = {
+            id: id_user 
+        };
+
+        fetch(base_url +"/inscritos", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": csrfToken
+            },
+            body: JSON.stringify(dado)
+        })
+        .then(async res => {
+            const data = await res.json();
+            if (data.status !== 'success') return; 
+            console.log(data.seguidores);
+            show_seguidores(data.seguidores);
+            show_seguindo(data.seguindo);
+            
+        })
     }
 
     // FUNÇÃO PARA FECHAR MODAL E RESETAR FORMULÁRIO
@@ -1828,14 +1864,99 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // ── LIVES: salvar e renderizar histórico no perfil ──
-    function getLives() {
-        try { return JSON.parse(sessionStorage.getItem('witch_lives') || '[]'); } catch { return []; }
+    async function getLives() {
+        try {
+            const res = await fetch(base_url + "/videos", {
+                method: "GET",
+                headers: { "X-CSRFToken": csrfToken },
+                credentials: "include"
+            });
+            if (!res.ok) throw new Error("Erro ao buscar as lives");
+            const data = await res.json();
+            console.log("LIVES RECEBIDAS DA API:", data.videos);
+            return data.videos || [];
+        } catch (error) {
+            console.error("Erro ao pegar videos:", error);
+            return [];
+        }
     }
-    function saveLives(lives) {
-        try { sessionStorage.setItem('witch_lives', JSON.stringify(lives)); } catch {}
+
+    async function buscarCurtidas(idStream) {
+        try {
+            const res = await fetch(base_url + "/curtidas?id_stream=" + idStream, {
+                method: "GET",
+                headers: { "X-CSRFToken": csrfToken },
+                credentials: "include"
+            });
+            if (!res.ok) throw new Error("Erro ao buscar curtidas");
+            return await res.json();
+        } catch (error) {
+            console.error("Erro ao buscar curtidas:", error);
+            return null;
+        }
     }
-    
-    //const _livesMemoria = []; kkkkkkkkkkkk
+
+    async function buscarViews(idStream) {
+        try {
+            const res = await fetch(base_url + "/view?id_stream=" + idStream, {
+                method: "GET",
+                headers: { "X-CSRFToken": csrfToken },
+                credentials: "include"
+            });
+            if (!res.ok) throw new Error("Erro ao buscar views");
+            return await res.json();
+        } catch (error) {
+            console.error("Erro ao buscar views:", error);
+            return null;
+        }
+    }
+
+    async function curtirVideo(idStream) {
+        try {
+            const res = await fetch(base_url + "/curtidas", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": csrfToken
+                },
+                credentials: "include",
+                body: JSON.stringify({ id_stream: idStream })
+            });
+
+            const data = await res.json();
+            if (!res.ok || data.status === "error") {
+                mostrarToast(data.mensagem || "Erro ao curtir.", "error");
+                return null;
+            }
+
+            return data; // { curtido: true/false, total_curtidas: N }
+
+        } catch (error) {
+            console.error("Erro ao curtir:", error);
+            mostrarToast("Erro ao curtir.", "error");
+            return null;
+        }
+    }
+
+    async function registrarView(idStream) {
+        try {
+            await fetch(base_url + "/view", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": csrfToken
+                },
+                credentials: "include",
+                body: JSON.stringify({ id_stream: idStream })
+            });
+        } catch (error) {
+            console.error("Erro ao registrar view:", error);
+        }
+    }
+
+    // referências de DOM usadas pelos handlers abaixo — precisam vir ANTES de serem usadas
+    const modal6 = document.getElementById('modal-6');
+    const btnUpload = document.getElementById('upload-video');
 
     // thumbnail da live
     const uploadThumb = document.getElementById('upload-thumb');
@@ -1849,6 +1970,8 @@ document.addEventListener('DOMContentLoaded', function () {
             const arquivo = e.target.files[0];
             if (!arquivo || !arquivo.type.startsWith('image/')) return;
             thumbFile = arquivo;
+            console.log(thumbFile)
+            console.log("thumb file sendo guardada corretamente na variavel")
             const reader = new FileReader();
             reader.onload = (ev) => {
                 thumbTemp = ev.target.result;
@@ -1862,7 +1985,6 @@ document.addEventListener('DOMContentLoaded', function () {
     // botão de escolher vídeo
     const btnEscolherVideo = document.getElementById('btn-escolher-video');
     const videoLiveInput   = document.getElementById('video-live');
-    const labelVideoEscolhido = document.getElementById('label-video-escolhido');
     if (btnEscolherVideo && videoLiveInput) {
         btnEscolherVideo.addEventListener('click', () => videoLiveInput.click());
         videoLiveInput.addEventListener('change', () => {
@@ -1875,152 +1997,72 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    const modal6 = document.getElementById('modal-6');
-    const btnUpload = document.getElementById('upload-video');
-    /*if (btnUpload) {
-        btnUpload.addEventListener('click', () => {
-            const nomeLive = document.getElementById('nome-live')?.value.trim();
-            const descLive = document.getElementById('descricao-live')?.value.trim();
-            const videoInput = document.getElementById('video-live');
-            const categorias = [...document.querySelectorAll('#select-dropdown input:checked')].map(cb => cb.value);
+    // salvar vídeo — único handler, chama de fato o backend
+    const salvarLive = async () => {
+        const nomeLive = document.getElementById('nome-live')?.value.trim();
+        const descLive = document.getElementById('descricao-live')?.value.trim();
+        const videoInput = document.getElementById('video-live');
+        const videoFile = videoInput?.files[0];
+        const categorias = [...document.querySelectorAll('#select-dropdown input:checked')].map(cb => cb.value);
 
-            if (!nomeLive) { mostrarToast('Digite um nome para o vídeo!', 'error'); return; }
-            const videoFile = videoInput?.files[0];
-            if (!videoFile) { mostrarToast('Selecione um vídeo para upload!', 'error'); return; }
+        if (!nomeLive) { mostrarToast('Digite um nome para o vídeo!', 'error'); return; }
+        if (!videoFile) { mostrarToast('Selecione um vídeo para upload!', 'error'); return; }
 
-            const salvarLive = (videoSrc, thumbSrc) => {
-                const lives = getLives();
-                saveLives(lives);
-                renderVideosPerfil();
+        const limitebytes = 100 * 1024 * 1024;
+        if (videoFile.size > limitebytes) {
+            mostrarToast('O video é maior que 100MB. Escolha um arquivo menor', 'error');
+            return;
+        }
+        const formData = new FormData();
+        formData.append("arquivo", videoFile);
+        formData.append("titulo", nomeLive);
+        formData.append("descrisao", descLive || "");
+        formData.append("categoria", JSON.stringify(categorias));
+        
+        if (thumbFile) {
+            console.log(thumbFile)
+            console.log("thumb file sendo enviada para python")
+            formData.append("capa", thumbFile);
+        }
 
-                thumbTemp = null; thumbFile = null;
-                const prevThumb = document.getElementById('preview-thumb');
-                if (prevThumb) { prevThumb.src = ''; prevThumb.style.backgroundColor = '#000'; prevThumb.classList.remove('tem-foto'); }
-                const labelArq = document.getElementById('label-video-escolhido');
-                if (labelArq) { labelArq.textContent = ''; labelArq.style.display = 'none'; }
+        try {
+            const res = await fetch(base_url + "/salvar_video", {
+                method: "POST",
+                headers: { "X-CSRFToken": csrfToken },
+                credentials: "include",
+                body: formData
+            });
+
+            const data = await res.json();
+            console.log("RESPOSTA AO SALVAR:", data);
+
+            if (!res.ok || data.status === "error") {
+                mostrarToast(data.mensagem || "Erro ao salvar vídeo.", "error");
+                return;
             }
 
-            // FIX: usa blob URL para vídeo — muito mais rápido e sem limite de tamanho
-            const videoSrc = videoFile ? URL.createObjectURL(videoFile) : '';
+            mostrarToast("Vídeo salvo!", "success");
+            await renderVideosPerfil();
 
-            if (thumbFile) {
-                const rThumb = new FileReader();
-                rThumb.onload = (et) => salvarLive(videoSrc, et.target.result);
-                rThumb.readAsDataURL(thumbFile);
-            } else {
-                salvarLive(videoSrc, '');
+            if (modal6) {
+                modal6.close();
+                document.body.classList.remove("modal-open");
             }
 
-            // lê o vídeo se houver, senão salva com src vazio
-            const lerThumb = (videoSrc) => {
-                if (thumbFile) {
-                    const rThumb = new FileReader();
-                    rThumb.onload = (et) => salvarLive(videoSrc, et.target.result);
-                    rThumb.readAsDataURL(thumbFile);
-                } else {
-                    salvarLive(videoSrc, '');
-                }
-            };
+            thumbTemp = null; thumbFile = null;
+            const prevThumb = document.getElementById('preview-thumb');
+            if (prevThumb) { prevThumb.src = ''; prevThumb.style.backgroundColor = '#000'; prevThumb.classList.remove('tem-foto'); }
+            const labelArq = document.getElementById('label-video-escolhido');
+            if (labelArq) { labelArq.textContent = ''; labelArq.style.display = 'none'; }
 
-            if (videoFile) {
-                const rVideo = new FileReader();
-                rVideo.onload = (ev) => lerThumb(ev.target.result);
-                rVideo.onerror = () => mostrarToast('Erro ao ler o vídeo.', 'error');
-                rVideo.readAsDataURL(videoFile);
-            } else {
-                // permite salvar sem vídeo (ex: só live)
-                lerThumb('');
-            }
-        });
-    }*/
+        } catch (error) {
+            console.error("Erro ao salvar vídeo:", error);
+            mostrarToast("Erro ao salvar vídeo.", "error");
+        }
+    };
+
     if (btnUpload) {
-        btnUpload.addEventListener('click', () => {
-            const nomeLive = document.getElementById('nome-live')?.value.trim();
-            const descLive = document.getElementById('descricao-live')?.value.trim();
-            const videoInput = document.getElementById('video-live');
-            const categorias = [...document.querySelectorAll('#select-dropdown input:checked')].map(cb => cb.value);
-
-            if (!nomeLive) { mostrarToast('Digite um nome para o vídeo!', 'error'); return; }
-
-            const videoFile = videoInput?.files[0];
-            if (!videoFile) { mostrarToast('Selecione um vídeo para upload!', 'error'); return; }
-            
-            const editandoId = modal6?.dataset.editandoId ? Number(modal6.dataset.editandoId) : null;
-            const salvarLive = (videoSrc, thumbSrc) => {
-                const lives = getLives();
-
-                if (editandoId) {
-                    // FIX: edição — sobrescreve o vídeo existente
-                    const idx = lives.findIndex(l => l.id === editandoId);
-                    if (idx !== -1) {
-                        lives[idx].titulo    = nomeLive;
-                        lives[idx].descricao = descLive || '';
-                        lives[idx].categorias = categorias;
-                        if (thumbSrc) lives[idx].thumb = thumbSrc;
-                        if (videoSrc) lives[idx].src   = videoSrc;
-                    }
-                    if (modal6) delete modal6.dataset.editandoId;
-                } else {
-                    // novo vídeo
-                    lives.unshift({
-                        id: Date.now(),
-                        titulo: nomeLive,
-                        descricao: descLive || '',
-                        categorias,
-                        src: videoSrc,
-                        thumb: thumbSrc || '',
-                        data: new Date().toLocaleDateString('pt-BR'),
-                        views: 0,
-                        curtidas: 0,
-                        comentarios: [],
-                        aoVivo: false
-                    });
-                }
-
-                saveLives(lives);
-                renderVideosPerfil();
-                if (modal6) { modal6.close(); document.body.classList.remove('modal-open'); }
-                mostrarToast(editandoId ? 'Vídeo atualizado!' : 'Vídeo salvo!', 'success');
-
-                thumbTemp = null; thumbFile = null;
-                const prevThumb = document.getElementById('preview-thumb');
-                if (prevThumb) { prevThumb.src = ''; prevThumb.style.backgroundColor = '#000'; prevThumb.classList.remove('tem-foto'); }
-                const labelArq = document.getElementById('label-video-escolhido');
-                if (labelArq) { labelArq.textContent = ''; labelArq.style.display = 'none'; }
-            };
-
-            // FIX: usa blob URL para vídeo — muito mais rápido e sem limite de tamanho
-            const videoSrc = videoFile ? URL.createObjectURL(videoFile) : '';
-
-            if (thumbFile) {
-                const rThumb = new FileReader();
-                rThumb.onload = (et) => salvarLive(videoSrc, et.target.result);
-                rThumb.readAsDataURL(thumbFile);
-            } else {
-                salvarLive(videoSrc, '');
-            }
-
-            // lê o vídeo se houver, senão salva com src vazio
-            const lerThumb = (videoSrc) => {
-                if (thumbFile) {
-                    const rThumb = new FileReader();
-                    rThumb.onload = (et) => salvarLive(videoSrc, et.target.result);
-                    rThumb.readAsDataURL(thumbFile);
-                } else {
-                    salvarLive(videoSrc, '');
-                }
-            };
-
-            if (videoFile) {
-                const rVideo = new FileReader();
-                rVideo.onload = (ev) => lerThumb(ev.target.result);
-                rVideo.onerror = () => mostrarToast('Erro ao ler o vídeo.', 'error');
-                rVideo.readAsDataURL(videoFile);
-            } else {
-                // permite salvar sem vídeo (ex: só live)
-                lerThumb('');
-            }
-        });
+        btnUpload.addEventListener('click', salvarLive);
     }
 
     function formatarTempo(s) {
@@ -2031,23 +2073,19 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function criarClipe(live) {
         if (!live.src) { mostrarToast('Nenhum vídeo para criar clipe.', 'error'); return; }
-
-        // cria um vídeo temporário para capturar os primeiros 60s
         const vidTemp = document.createElement('video');
         vidTemp.src = live.src;
         vidTemp.muted = true;
-
         vidTemp.addEventListener('loadedmetadata', () => {
             const duracao = Math.min(vidTemp.duration, 60);
             mostrarToast(`Clipe de ${Math.round(duracao)}s criado! (simulação — requer backend para corte real)`, 'success');
-            // Em produção: enviar live.src + tempo início/fim para o backend cortar com ffmpeg
         });
     }
 
-    function renderVideosPerfil() {
+    async function renderVideosPerfil() {
         const container = document.getElementById('videos-perfil-grid');
         if (!container) return;
-        const lives = getLives();
+        const lives = await getLives();
         container.innerHTML = '';
 
         if (lives.length === 0) {
@@ -2055,7 +2093,10 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
-        lives.forEach(live => {
+        lives.forEach(async live => {
+            const dadosViews = await buscarViews(live.id_stream);
+            if (dadosViews) live.views = dadosViews.total_views;
+
             const card = document.createElement('div');
             card.className = 'video-card-perfil';
 
@@ -2111,8 +2152,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 progFill.style.width = '0%';
                 cancelAnimationFrame(rafId);
             });
-            let isDragging = false;
 
+            let isDragging = false;
             const moverBarra = (e) => {
                 const rect = progWrap.getBoundingClientRect();
                 const pct = Math.min(Math.max((e.clientX - rect.left) / rect.width, 0), 1);
@@ -2121,27 +2162,15 @@ document.addEventListener('DOMContentLoaded', function () {
                     progFill.style.width = (pct * 100) + '%';
                 }
             };
-
-            progWrap.addEventListener('mousedown', e => {
-                e.stopPropagation();
-                isDragging = true;
-                moverBarra(e);
-            });
-            document.addEventListener('mousemove', e => {
-                if (isDragging) moverBarra(e);
-            });
-            document.addEventListener('mouseup', () => {
-                isDragging = false;
-            });
-            progWrap.addEventListener('click', e => {
-                e.stopPropagation();
-            });
+            progWrap.addEventListener('mousedown', e => { e.stopPropagation(); isDragging = true; moverBarra(e); });
+            document.addEventListener('mousemove', e => { if (isDragging) moverBarra(e); });
+            document.addEventListener('mouseup', () => { isDragging = false; });
+            progWrap.addEventListener('click', e => e.stopPropagation());
             thumbDiv.addEventListener('click', e => {
                 if (progWrap.contains(e.target)) return;
                 abrirPlayerExpandido(live);
             });
 
-            // info abaixo — com botão de 3 pontos
             const titulo = document.createElement('p');
             titulo.className = 'video-card-titulo';
             titulo.textContent = live.titulo;
@@ -2160,7 +2189,6 @@ document.addEventListener('DOMContentLoaded', function () {
             dataEl.className = 'video-card-info';
             dataEl.textContent = live.data;
 
-            // linha inferior com data + botão 3 pontos
             const infoRow = document.createElement('div');
             infoRow.style.cssText = 'display:flex;justify-content:space-between;align-items:center;';
 
@@ -2169,92 +2197,40 @@ document.addEventListener('DOMContentLoaded', function () {
             btnOpcoes.innerHTML = '<i class="fa-solid fa-ellipsis-vertical"></i>';
             btnOpcoes.title = 'Opções';
 
-            // menu de opções
             const menuOpcoes = document.createElement('div');
             menuOpcoes.className = 'menu-opcoes-video';
             menuOpcoes.innerHTML = `
-                <button class="opcao-video" data-acao="excluir">
-                    <i class="fa-solid fa-trash"></i> Excluir
-                </button>
-                <button class="opcao-video" data-acao="editar">
-                    <i class="fa-solid fa-pen"></i> Editar
-                </button>
-                <button class="opcao-video" data-acao="salvar">
-                    <i class="fa-solid fa-download"></i> Salvar vídeo
-                </button>
-                <button class="opcao-video" data-acao="clipe">
-                    <i class="fa-solid fa-scissors"></i> Criar clipe (60s)
-                </button>
+                <button class="opcao-video" data-acao="excluir"><i class="fa-solid fa-trash"></i> Excluir</button>
+                <button class="opcao-video" data-acao="editar"><i class="fa-solid fa-pen"></i> Editar</button>
+                <button class="opcao-video" data-acao="salvar"><i class="fa-solid fa-download"></i> Salvar vídeo</button>
+                <button class="opcao-video" data-acao="clipe"><i class="fa-solid fa-scissors"></i> Criar clipe (60s)</button>
             `;
 
-            // abre/fecha o menu
             btnOpcoes.addEventListener('click', e => {
                 e.stopPropagation();
-                // fecha todos os outros menus abertos
                 document.querySelectorAll('.menu-opcoes-video.show').forEach(m => {
                     if (m !== menuOpcoes) m.classList.remove('show');
                 });
                 menuOpcoes.classList.toggle('show');
             });
 
-            // ações do menu
             menuOpcoes.querySelectorAll('.opcao-video').forEach(btn => {
                 btn.addEventListener('click', e => {
                     e.stopPropagation();
                     const acao = btn.dataset.acao;
 
                     if (acao === 'excluir') {
-                        if (!confirm(`Excluir "${live.titulo}"?`)) return;
-                        const lives = getLives();
-                        const idx = lives.findIndex(l => l.id === live.id);
-                        if (idx !== -1) { lives.splice(idx, 1); saveLives(lives); }
-                        renderVideosPerfil();
+                        // TODO: precisa de endpoint DELETE no backend — ainda não existe
+                        mostrarToast('Excluir ainda não está disponível.', 'error');
 
                     } else if (acao === 'editar') {
-                        // abre modal-6 preenchido com os dados do vídeo
-                        if (!modal6) return;
-                        document.getElementById('nome-live').value      = live.titulo;
-                        document.getElementById('descricao-live').value = live.descricao || '';
-                        // marca as categorias salvas
-                        document.querySelectorAll('#select-dropdown input[type="checkbox"]').forEach(cb => {
-                            cb.checked = live.categorias?.includes(cb.value) || false;
-                        });
-                        // atualiza as tags visíveis
-                        const tags = document.getElementById('selected-tags');
-                        const ph   = document.getElementById('select-placeholder');
-                        if (tags) {
-                            tags.innerHTML = '';
-                            (live.categorias || []).forEach(val => {
-                                const label = document.querySelector(`#select-dropdown input[value="${val}"]`)
-                                    ?.closest('label')?.textContent.trim() || val;
-                                const tag = document.createElement('div');
-                                tag.className = 'tag';
-                                tag.innerHTML = `<span>${label}</span><button type="button"><i class="fa-solid fa-xmark"></i></button>`;
-                                tag.querySelector('button').addEventListener('click', () => {
-                                    document.querySelector(`#select-dropdown input[value="${val}"]`).checked = false;
-                                    tag.remove();
-                                });
-                                tags.appendChild(tag);
-                            });
-                            if (ph) ph.textContent = live.categorias?.length
-                                ? `${live.categorias.length} selecionada${live.categorias.length > 1 ? 's' : ''}`
-                                : 'Selecione categorias...';
-                        }
-                        // thumbnail
-                        const prevThumb = document.getElementById('preview-thumb');
-                        if (prevThumb && live.thumb) {
-                            prevThumb.src = live.thumb;
-                            prevThumb.classList.add('tem-foto');
-                        }
-                        // marca o id para sobrescrever ao confirmar
-                        modal6.dataset.editandoId = live.id;
-                        modal6.showModal();
-                        document.body.classList.add('modal-open');
+                        // TODO: precisa de endpoint de UPDATE no backend — ainda não existe
+                        mostrarToast('Editar ainda não está disponível.', 'error');
 
                     } else if (acao === 'salvar') {
                         if (!live.src) { mostrarToast('Nenhum vídeo disponível para download.', 'error'); return; }
                         const a = document.createElement('a');
-                        a.href     = live.src;
+                        a.href = live.src;
                         a.download = `${live.titulo}.mp4`;
                         a.click();
 
@@ -2266,13 +2242,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 });
             });
 
-            // fecha ao clicar fora
             document.addEventListener('click', () => menuOpcoes.classList.remove('show'));
 
             infoRow.appendChild(dataEl);
             infoRow.appendChild(btnOpcoes);
 
-            // wrapper relativo para posicionar o menu
             const opcWrapper = document.createElement('div');
             opcWrapper.style.cssText = 'position:relative;';
             opcWrapper.appendChild(btnOpcoes);
@@ -2289,8 +2263,6 @@ document.addEventListener('DOMContentLoaded', function () {
         const videoEl    = document.getElementById('video-expandido');
         const tituloTop  = document.getElementById('player-titulo-topo');
         const tituloCtrl = document.getElementById('player-titulo-controle');
-        const progWrap   = document.getElementById('progress-wrap-exp');
-        const progFill   = document.getElementById('progress-fill-exp');
         const playBtn    = document.getElementById('play-btn-exp');
         const playIcon   = document.getElementById('play-icon-exp');
         const muteBtn    = document.getElementById('mute-btn-exp');
@@ -2301,7 +2273,6 @@ document.addEventListener('DOMContentLoaded', function () {
         const fsIcon     = document.getElementById('fs-icon-exp');
         const fecharBtn  = document.getElementById('fechar-player');
 
-        // vídeo
         videoEl.src    = live.src || '';
         videoEl.volume = 0.8;
         videoEl.muted  = false;
@@ -2309,7 +2280,6 @@ document.addEventListener('DOMContentLoaded', function () {
         tituloTop.textContent  = live.titulo;
         tituloCtrl.textContent = live.titulo;
 
-        // painel de info
         document.getElementById('player-info-titulo').textContent = live.titulo;
         document.getElementById('player-info-cats').textContent   = live.categorias?.join(' • ') || '';
         document.getElementById('player-info-data').textContent   = live.data;
@@ -2319,41 +2289,42 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('player-canal-nome-text').textContent = nomeCanal;
         document.getElementById('player-canal-foto-img').src          = fotoCanal;
 
-        // curtidas
         const btnCurtir     = document.getElementById('btn-curtir');
         const countCurtidas = document.getElementById('count-curtidas');
-        btnCurtir.classList.remove('ativo');
-        countCurtidas.textContent = live.curtidas || 0;
+        buscarCurtidas(live.id_stream).then(dados => {
+            if (!dados) return;
+            btnCurtir.classList.toggle('ativo', dados.curtido);
+            countCurtidas.textContent = dados.total_curtidas;
+        });
 
-        btnCurtir.onclick = () => {
-            const lives = getLives();
-            const idx = lives.findIndex(l => l.id === live.id);
-            if (idx === -1) return;
-            if (btnCurtir.classList.contains('ativo')) {
-                lives[idx].curtidas = Math.max(0, (lives[idx].curtidas || 1) - 1);
-                btnCurtir.classList.remove('ativo');
-            } else {
-                lives[idx].curtidas = (lives[idx].curtidas || 0) + 1;
-                btnCurtir.classList.add('ativo');
+        btnCurtir.onclick = async () => {
+            const resposta = await curtirVideo(live.id_stream);
+            if (!resposta) {
+                return;
             }
-            countCurtidas.textContent = lives[idx].curtidas;
-            live.curtidas = lives[idx].curtidas;
-            saveLives(lives);
+
+            btnCurtir.classList.toggle('ativo', resposta.curtido);
+            countCurtidas.textContent = resposta.total_curtidas;
+            live.curtidas = resposta.total_curtidas;
+            
         };
 
-        // compartilhar
+        buscarCurtidas(live.id_stream).then(dados => {
+            if (!dados) return;
+            btnCurtir.classList.toggle('ativo', dados.curtido);
+            countCurtidas.textContent = dados.total_curtidas;
+        });
+
         document.getElementById('btn-compartilhar').onclick = () => {
             navigator.clipboard?.writeText(window.location.href)
                 .then(() => mostrarToast('Link copiado!', 'success'))
                 .catch(()  => mostrarToast('Não foi possível copiar.', 'error'));
         };
 
-        // comentar — foca no input
         document.getElementById('btn-comentar').onclick = () => {
             document.getElementById('comentario-input').focus();
         };
 
-        // comentários salvos
         const listaComent = document.getElementById('comentarios-lista');
         listaComent.innerHTML = '';
         (live.comentarios || []).forEach(c => adicionarComentarioDOM(c.autor, c.texto, c.foto));
@@ -2365,39 +2336,33 @@ document.addEventListener('DOMContentLoaded', function () {
         const enviarComentario = () => {
             const texto = inputComent.value.trim();
             if (!texto) return;
-            const nomeUser = document.querySelector('.show_name')?.textContent || 'Você';
-            const fotoUser = document.querySelector('.photo-user')?.src || '/static/user.png';
-            adicionarComentarioDOM(nomeUser, texto, fotoUser);
-            const lives = getLives();
-            const idx = lives.findIndex(l => l.id === live.id);
-            if (idx !== -1) {
-                if (!lives[idx].comentarios) lives[idx].comentarios = [];
-                lives[idx].comentarios.push({ autor: nomeUser, texto, foto: fotoUser });
-                saveLives(lives);
-            }
+            // TODO: precisa de endpoint de comentário no backend — ainda não existe
+            mostrarToast('Comentar ainda não está disponível.', 'error');
             inputComent.value = '';
         };
 
-        btnEnviar.onclick         = enviarComentario;
-        inputComent.onkeydown     = e => { if (e.key === 'Enter') enviarComentario(); };
+        btnEnviar.onclick     = enviarComentario;
+        inputComent.onkeydown = e => { if (e.key === 'Enter') enviarComentario(); };
 
-        // abre overlay
         overlay.classList.add('show');
         document.body.classList.add('modal-open');
-        if (live.src) { videoEl.play().catch(() => {}); playIcon.className = 'fa-solid fa-pause'; }
+        if (live.src) {
+            videoEl.play().catch(() => {}); 
+            playIcon.className = 'fa-solid fa-pause'; 
+            registrarView(live.id_stream);
+            
+        }
 
-        playBtn.onclick  = () => {
+        playBtn.onclick = () => {
             if (videoEl.paused) { videoEl.play(); playIcon.className = 'fa-solid fa-pause'; }
             else { videoEl.pause(); playIcon.className = 'fa-solid fa-play'; }
         };
-        videoEl.onclick  = () => playBtn.onclick();
+        videoEl.onclick = () => playBtn.onclick();
 
         const progressBar = document.getElementById('progress-exp');
-
-        // zera ao abrir
         progressBar.value = 0;
 
-        // atualiza a barra conforme o vídeo avança
+        let rafId;
         const tick = () => {
             if (videoEl.duration) {
                 progressBar.value = (videoEl.currentTime / videoEl.duration) * 100;
@@ -2407,17 +2372,14 @@ document.addEventListener('DOMContentLoaded', function () {
         };
         rafId = requestAnimationFrame(tick);
 
-        // usuário arrasta a barra
         progressBar.addEventListener('input', () => {
-            if (videoEl.duration) {
-                videoEl.currentTime = (progressBar.value / 100) * videoEl.duration;
-            }
+            if (videoEl.duration) videoEl.currentTime = (progressBar.value / 100) * videoEl.duration;
         });
 
-        muteBtn.onclick  = () => {
+        muteBtn.onclick = () => {
             videoEl.muted = !videoEl.muted;
             volIcon.className = videoEl.muted ? 'fa-solid fa-volume-xmark' : 'fa-solid fa-volume-high';
-            volRange.value    = videoEl.muted ? 0 : videoEl.volume * 100;
+            volRange.value = videoEl.muted ? 0 : videoEl.volume * 100;
         };
         volRange.oninput = () => {
             videoEl.volume = volRange.value / 100;
@@ -2439,9 +2401,10 @@ document.addEventListener('DOMContentLoaded', function () {
             document.body.classList.remove('modal-open');
             cancelAnimationFrame(rafId);
             playIcon.className = 'fa-solid fa-play';
+            renderVideosPerfil(); 
         };
         fecharBtn.onclick = fechar;
-        overlay.onclick   = e => { if (e.target === overlay) fechar(); };
+        overlay.onclick = e => { if (e.target === overlay) fechar(); };
     }
 
     function adicionarComentarioDOM(autor, texto, foto) {

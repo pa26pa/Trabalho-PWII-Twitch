@@ -529,7 +529,7 @@ create table streams(
     titulo text,
     descrisao text,
     video_url text,
-    data_updoad datetime,
+    data_upload datetime,
     id_streamer int,
     
     foreign key (id_streamer) references usuarios(id_usuario) 
@@ -587,6 +587,26 @@ create table subs (
     foreign key (id_usuario) references usuarios(id_usuario),
     foreign key (id_tipo_sub) references usuarios(id_sub_criada),
     foreign key (id_streamer) references usuarios(id_usuario)
+);
+
+create table views(
+	id_view int auto_increment unique,
+    id_user int,
+    id_stream int,
+    data_view date,
+    
+    foreign key (id_user) references usuarios(id_usuario),
+    foreign key (id_stream) references streams(id_stream)
+);
+
+create table curtidas(
+	id_curtida int auto_increment unique,
+    id_user int,
+    id_stream int,
+    data_curtida date,
+    
+    foreign key (id_user) references usuarios(id_usuario),
+    foreign key (id_stream) references streams(id_stream)
 );-->
     </body>
 </html>
