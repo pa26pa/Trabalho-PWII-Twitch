@@ -1841,6 +1841,7 @@ document.addEventListener('DOMContentLoaded', function () {
         await carregarCsrf();
        // mostrarDeslogado()
         await verificarSessao();
+        renderVideosNaHome();
 
         if (document.getElementById('block-btn')) {
             fetch(base_url +'/bloqueados', {
@@ -2185,12 +2186,18 @@ document.addEventListener('DOMContentLoaded', function () {
             canal.className = 'video-card-canal';
             canal.textContent = nomeCanal;
 
+            // linha com data + 3 pontos
+            const infoRow = document.createElement('div');
+            infoRow.style.cssText = 'display:flex;justify-content:space-between;align-items:center;width:100%;';
+
             const dataEl = document.createElement('p');
             dataEl.className = 'video-card-info';
             dataEl.textContent = live.data;
+            dataEl.style.margin = '0';
 
-            const infoRow = document.createElement('div');
-            infoRow.style.cssText = 'display:flex;justify-content:space-between;align-items:center;';
+            // wrapper relativo para posicionar o menu
+            const opcWrapper = document.createElement('div');
+            opcWrapper.style.cssText = 'position:relative;flex-shrink:0;';
 
             const btnOpcoes = document.createElement('button');
             btnOpcoes.className = 'btn-opcoes-video';
@@ -2205,6 +2212,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 <button class="opcao-video" data-acao="salvar"><i class="fa-solid fa-download"></i> Salvar vídeo</button>
                 <button class="opcao-video" data-acao="clipe"><i class="fa-solid fa-scissors"></i> Criar clipe (60s)</button>
             `;
+
+            opcWrapper.appendChild(btnOpcoes);
+            opcWrapper.appendChild(menuOpcoes);
+
+            infoRow.appendChild(dataEl);
+            infoRow.appendChild(opcWrapper);
+
+            // monta o card — data e 3 pontos ficam juntos na infoRow
+            card.append(thumbDiv, titulo, cats, canal, infoRow);
+            container.appendChild(card);
 
             btnOpcoes.addEventListener('click', e => {
                 e.stopPropagation();
@@ -2241,19 +2258,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     menuOpcoes.classList.remove('show');
                 });
             });
-
-            document.addEventListener('click', () => menuOpcoes.classList.remove('show'));
-
-            infoRow.appendChild(dataEl);
-            infoRow.appendChild(btnOpcoes);
-
-            const opcWrapper = document.createElement('div');
-            opcWrapper.style.cssText = 'position:relative;';
-            opcWrapper.appendChild(btnOpcoes);
-            opcWrapper.appendChild(menuOpcoes);
-
-            card.append(thumbDiv, titulo, cats, canal, infoRow, opcWrapper);
-            container.appendChild(card);
         });
     }
 
@@ -2787,6 +2791,71 @@ document.addEventListener('DOMContentLoaded', function () {
                 }    
             });
         });
+    }
+
+    //função para passar os vídeos dos usuários para a tela inicial
+    function renderVideosNaHome() {
+        const lives = getLives();
+        if (lives.length === 0) return;
+
+        // ── EM ALTA: os 3 com mais visualizações ──
+        const emAlta = document.getElementById('grid-em-alta');
+        if (emAlta) {
+            const top3 = [...lives].sort((a, b) => (b.views || 0) - (a.views || 0)).slice(0, 3);
+            top3.forEach(live => emAlta.appendChild(criarCardHome(live)));
+        }
+
+        // ── SEÇÕES POR CATEGORIA ──
+        // mapeamento: valor do checkbox → id do grid no HTML
+        const mapaGrids = {
+            'ação&aventura': 'grid-acao-aventura',
+            'corrida':       'grid-corrida',
+            'esporte':       'grid-esporte',
+            'e-sports':      'grid-e-sport',
+            'estratégia':    'grid-estrategia',
+            'FPS&tiro':      'grid-fps-tiro',
+            'luta':          'grid-luta',
+            'RPG':           'grid-rpg',
+            'terror':        'grid-terror',
+            '+18':           'grid-18',
+            'não-jogo':      'grid-outros',
+        };
+
+        lives.forEach(live => {
+            (live.categorias || []).forEach(cat => {
+                const gridId = mapaGrids[cat];
+                if (!gridId) return;
+                const grid = document.getElementById(gridId);
+                // evita duplicar se a live tem 2 categorias no mesmo grid
+                if (grid && !grid.querySelector(`[data-live-id="${live.id}"]`)) {
+                    const card = criarCardHome(live);
+                    card.dataset.liveId = live.id;
+                    grid.appendChild(card);
+                }
+            });
+        });
+    }
+
+    function criarCardHome(live) {
+        const card = document.createElement('div');
+        card.className = 'video-card';
+        card.style.cursor = 'pointer';
+        card.innerHTML = `
+            <div class="video-thumb" style="position:relative;aspect-ratio:16/9;background:#1a1a2e;border-radius:12px;overflow:hidden;">
+                ${live.aoVivo ? '<span class="badge-live">AO VIVO</span>' : ''}
+                ${live.thumb
+                    ? `<img src="${live.thumb}" style="width:100%;height:100%;object-fit:cover;" alt="${live.titulo}">`
+                    : `<video src="${live.src || ''}" preload="metadata" style="width:100%;height:100%;object-fit:cover;"></video>`
+                }
+                <span class="thumb-views" style="position:absolute;bottom:8px;right:8px;color:#fff;font-size:0.8em;text-shadow:0 1px 3px rgba(0,0,0,0.8);">
+                    ${live.views || 0} views
+                </span>
+            </div>
+            <p class="thumb-title">${live.titulo}</p>
+            <p class="thumb-user" style="color:#9147FF;">${live.canal || ''}</p>
+        `;
+        card.addEventListener('click', () => abrirPlayerExpandido(live));
+        return card;
     }
 
     init();
