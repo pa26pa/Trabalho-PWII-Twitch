@@ -2867,8 +2867,8 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     //função para passar os vídeos dos usuários para a tela inicial
-    function renderVideosNaHome() {
-        const lives = getLives();
+    async function renderVideosNaHome() {
+        const lives = await getLives();
         if (lives.length === 0) return;
 
         // ── EM ALTA: os 3 com mais visualizações ──

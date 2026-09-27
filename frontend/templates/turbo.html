@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Witch | Entrar com Google</title>
+    <link rel="icon" type="image/x-icon" href="{{url_for('static', filename='witch.png')}}">
+    <style>
+        body {
+            display: flex;
+            height: 100vh;
+            justify-content: center;
+            align-items: center;
+        }
+        .pagamento-turbo {
+            display: flex;
+            background-color: white;
+            height: max-content;
+            width: max-content;
+            padding: 20px;
+            align-items: center;
+            border-radius: 25px;
+            box-shadow: 0 0 25px 5px rgba(145,71,255, 0.5);
+        }
+        .pagamento-turbo form {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+        }
+        .pagamento-turbo input {
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        .pagamento-turbo input:focus {
+            outline: none;
+            border-color: #9147FF;
+            box-shadow: 0 0 5px #9147FF;
+        }
+        .pagamento-turbo button {
+            background-color: #9147FF;
+            color: white;
+            border: 2px solid #6d38bd;
+            padding: 10px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .pagamento-turbo button:hover {
+            background-color: #6d38bd;
+        }
+        .box-terms {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+        .box-terms #checkbox-accept {
+            width: 15px;
+            height: 15px;
+        }
+        .box-terms #label-terms, .box-terms a {font-size: 0.9em;}
+        .box-terms a {
+            text-decoration: underline;
+            color: black;
+        }
+        .box-terms label {margin-top: 2%;}
+        #erroIdade {
+            display: none;
+            color: black;
+            text-align: center;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="pagamento-turbo">
+        <form action="#">
+            <label for="user" data-i18n>Usuário</label>
+            <input type="text" id="user-cadastro" name="user" required><br>
+            <label for="cpf" data-i18n>CPF</label>
+            <input type="text" id="cpf" name="cpf" pattern="\d{3}\.\d{3}\.\d{3}-\d{2}" required><br>
+            <label for="data_nascimento" data-i18n>Data de Nascimento</label>
+            <input type="text" id="data-nascimento" name="data_nascimento" pattern="\d{2}\/\d{2}\/\d{4}" required>
+            <p id="erroIdade" data-i18n>Deve ser maior de 18 anos</p><br>
+            <div class="box-terms">
+                <input type="checkbox" id="checkbox-accept" name="check">
+                <label for="check" id="label-terms">Concordo com os <a href="{{url_for('static', filename='termos.pdf')}}" target="_blank">Termos de Política e Privacidade</a></label>
+            </div><br>
+            <button type="submit">Comprar Turbo</button>
+        </form>
+    </div>
+    <script>
+        const cpfInput = document.getElementById('cpf');
+        if (cpfInput) {
+            cpfInput.addEventListener('input', function (maskCpf) {
+                let mc = maskCpf.target.value.replace(/\D/g, '');
+                if (mc.length > 11) mc = mc.slice(0, 11);//remove qualquer caractere que não seja um dígito e limita a 11 dígitos (tamanho do CPF)
+                mc = mc.replace(/^(\d{3})(\d)/, '$1.$2');//adiciona um ponto após os primeiros 3 dígitos
+                mc = mc.replace(/(\d{3})(\d)/, '$1.$2');//adiciona um ponto após os próximos 3 dígitos
+                mc = mc.replace(/(\d{3})(\d{1,2})$/, '$1-$2');//adiciona um hífen antes dos últimos 2 dígitos
+                maskCpf.target.value = mc;//atualiza o valor do input com a máscara aplicada
+            });
+        }
+        // MÁSCARA DATA DE NASCIMENTO
+        const nascInput = document.getElementById('data-nascimento');
+        if (nascInput) {
+            nascInput.addEventListener('input', function (maskNasc) {
+                let mn = maskNasc.target.value.replace(/\D/g, '');
+                if (mn.length > 8) mn = mn.slice(0, 8);
+                mn = mn.replace(/^(\d{2})(\d)/, '$1/$2');
+                mn = mn.replace(/(\d{2})(\d)/, '$1/$2');
+                mn = mn.replace(/(\d{4})(\d)/, '$1/$2');
+                maskNasc.target.value = mn;
+            });
+        }
+        // LIMITES DE IDADE
+        const erroIdade = document.getElementById('erroIdade');
+        function calcularIdade() {
+            if (!nascInput || !erroIdade) return null;
+            const valor = nascInput.value;
+            if (!/^\d{2}\/\d{2}\/\d{4}$/.test(valor)) return null;//verifica se a data está no formato DD/MM/AAAA, retornando null se não estiver
+            const [dia, mes, ano] = valor.split('/').map(Number);//divide a data em dia, mês e ano, convertendo cada parte para número
+            //split('/') é usado para dividir a string da data em um array de três partes (dia, mês e ano) usando a barra como separador
+            //map(Number) é usado para converter cada parte da data de string para número, permitindo cálculos posteriores
+            const nascimento = new Date(ano, mes - 1, dia);//cria um objeto Date para a data de nascimento, ajustando o mês (mes - 1) porque os meses em JavaScript são indexados a partir de 0 (0 = janeiro, 1 = fevereiro, etc.)
+            const hoje = new Date();//cria um objeto Date para a data atual
+            let idade = hoje.getFullYear() - nascimento.getFullYear();//calcula a idade básica subtraindo o ano de nascimento do ano atual
+            const m = hoje.getMonth() - nascimento.getMonth();//calcula a diferença de meses entre a data atual e a data de nascimento
+            if (m < 0 || (m === 0 && hoje.getDate() < nascimento.getDate())) idade--;//ajusta a idade se o mês atual for anterior ao mês de nascimento ou se for o mesmo mês mas o dia atual for anterior ao dia de nascimento
+            return idade;//retorna a idade calculada, ou null se a data de nascimento for inválida ou não estiver no formato correto
+        }
+
+        //função para validar a idade do usuário, exibindo uma mensagem de erro se for menor de 18 anos e aplicando uma classe de erro ao input
+        function validarIdade() {
+            let valorIdade = calcularIdade();//chama a função calcularIdade para obter a idade do usuário com base na data de nascimento inserida
+            if (valorIdade === null) return false;
+            if (valorIdade < 18) {
+                erroIdade.style.display = 'block';
+                nascInput.classList.add('input-erro');
+                return false;
+            }
+            erroIdade.style.display = 'none';
+            nascInput.classList.remove('input-erro');
+            return true;
+        }
+
+        if (nascInput && erroIdade) {
+            nascInput.addEventListener('blur', validarIdade);
+            nascInput.addEventListener('input', () => {
+                erroIdade.style.display = 'none';
+                nascInput.classList.remove('input-erro');
+            });
+        }
+    </script>
+</body>
+</html>
