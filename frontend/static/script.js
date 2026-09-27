@@ -2041,19 +2041,22 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    document.getElementById('btn-bits').onclick = () => {
-        if (!usuarioLogado) {
-            mostrarToast('Você precisa estar logado para doar bits.', 'error');
-            return;
-        }
-        const wrap = document.querySelector('.player-wrap-expanded');
-        const anim = document.createElement('div');
-        anim.className = 'bits-animacao';
-        anim.innerHTML = `<i class="fa-solid fa-gem"></i><span>Você acaba de doar bits!</span>`;
-        wrap.appendChild(anim);
-        anim.addEventListener('animationend', () => anim.remove());
-        mostrarToast('Você acaba de doar bits', 'success');
-    };
+    const btnBits = document.getElementById('btn-bits');
+    if (btnBits) {
+        btnBits.addEventListener('click', () => {
+            if (!usuarioLogado) {
+                mostrarToast('Você precisa estar logado para doar bits.', 'error');
+                return;
+            }
+            const wrap = document.querySelector('.player-wrap-expanded');
+            const anim = document.createElement('div');
+            anim.className = 'bits-animacao';
+            anim.innerHTML = `<i class="fa-solid fa-gem"></i><span>Você acaba de doar bits!</span>`;
+            wrap.appendChild(anim);
+            anim.addEventListener('animationend', () => anim.remove());
+            mostrarToast('Você acaba de doar bits', 'success');
+        });
+    }
 
     // referências de DOM usadas pelos handlers abaixo — precisam vir ANTES de serem usadas
     const modal6 = document.getElementById('modal-6');
@@ -2364,7 +2367,7 @@ document.addEventListener('DOMContentLoaded', function () {
         overlay.onclick = e => { if (e.target === overlay) fechar(); };
     }
 
-    // ── ASIDE → DROPDOWN em telas < 1024px ──
+    // ── ASIDE → DROPDOWN em telas < 1280px ──
     // sincroniza o conteúdo do aside para dentro do dropdown
     function sincronizarAsideDropdown() {
         const dropdownList = document.querySelector('#dropdown-menu ul');
@@ -2372,7 +2375,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         dropdownList.querySelectorAll('.aside-migrado').forEach(el => el.remove());
 
-        if (window.innerWidth >= 1024) return;
+        if (window.innerWidth >= 1280) return;
 
         const logado = document.querySelector('.with-login')?.style.display !== 'none';
 
