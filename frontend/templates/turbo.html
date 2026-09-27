@@ -77,10 +77,9 @@
     </style>
 </head>
 <body>
+    <p>Continuar cadastro com google</p>
     <div class="pagamento-turbo">
-        <form action="#">
-            <label for="user" data-i18n>Usuário</label>
-            <input type="text" id="user-cadastro" name="user" required><br>
+        <form id='form-completar-google' action="#">
             <label for="cpf" data-i18n>CPF</label>
             <input type="text" id="cpf" name="cpf" pattern="\d{3}\.\d{3}\.\d{3}-\d{2}" required><br>
             <label for="data_nascimento" data-i18n>Data de Nascimento</label>
@@ -90,10 +89,21 @@
                 <input type="checkbox" id="checkbox-accept" name="check">
                 <label for="check" id="label-terms">Concordo com os <a href="{{url_for('static', filename='termos.pdf')}}" target="_blank">Termos de Política e Privacidade</a></label>
             </div><br>
-            <button type="submit">Comprar Turbo</button>
+            <button type="submit">Cadastrar</button>
         </form>
     </div>
     <script>
+        base_url = "http://127.0.0.1:5000";
+
+        let csrfToken = null;
+        async function carregarCsrf() {
+            const res = await fetch(base_url + "/csrf-token");
+            const data = await res.json();
+            csrfToken = data.csrf_token;
+        }
+
+        carregarCsrf()
+
         const cpfInput = document.getElementById('cpf');
         if (cpfInput) {
             cpfInput.addEventListener('input', function (maskCpf) {
@@ -155,6 +165,27 @@
                 nascInput.classList.remove('input-erro');
             });
         }
+
+        form_google = document.getElementById('form-completar-google'); 
+        if (form_google) {
+            form_google.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const dados = {
+                    cpf: document.getElementById('cpf').value,
+                    data_nascimento: document.getElementById('data-nascimento').value
+                };
+                const res = await fetch(base_url + '/zerar_cadastro_google', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken },
+                    body: JSON.stringify(dados)
+                });
+                const data = await res.json();
+                if (data.status === 'error') { mostrarToast(data.mensagem, 'error'); return; }
+                window.location.href = '/';
+            });
+        }
+
     </script>
+    <script src="{{url_for('static', filename='script.js')}}"></script>
 </body>
 </html>
