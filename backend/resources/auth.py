@@ -1983,7 +1983,7 @@ class zerar_cadastro_google(Resource):
         
         pendente = session['google_pendente']
         email = pendente['email']
-        user_name = str(escape(pendente['name']))
+        user_name = str(escape(pendente['nome']))
         foto = pendente.get('foto')
         
         con = connection()
@@ -2002,7 +2002,7 @@ class zerar_cadastro_google(Resource):
         
         try:
             queryy = """insert into usuarios (cpf,email,user_name,senha,data_nascimento,foto_url) values (%s,%s,%s,%s,%s,%s)"""
-            cursor.execute(queryy,(cpf,email,user_name,senha_hash,data_formatada,foto))
+            cursor.execute(queryy,(cpf_limpo,email,user_name,senha_hash,data_formatada,foto))
             con.commit()
             novo_id = cursor.lastrowid
         
