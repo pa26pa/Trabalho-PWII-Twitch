@@ -625,98 +625,100 @@ class redefine_password(Resource):
         }, 405
 
 class subscribe(Resource):
-    """
-        Endpoint responsável pelo processo de inscrição 
-    """
     def post(self):
-        """
-            Inscreve o usuário em algum canal
-            
-            Validações:
-                Token('X-CSRFToken'), sessão existente
-                
-            Retornos:
-                400 = Usuário não está logado
-                200 = Incrição feita com sucesso
-        """
-        
         token = request.headers.get("X-CSRFToken")
-        
         check = check_csrf(token)
-        
         if not check or check.get("status") == "error":
-            return {'status': 'error', 'mensagem' :check.get("mensagem")}
-        
+            return {'status': 'error', 'mensagem': check.get("mensagem")}, 400
+
+        if 'usuario_id' not in session:
+            return {'status': 'error', 'mensagem': 'Você precisa estar logado pra se inscrever'}, 400
+
         data = request.get_json()
-        
-        con = connection()
-        cursor = con.cursor()
-        
-        id_criador = data.get('criador')
-        
-        if not session['usuario_id']:
-            cursor.close()
-            con.close()
-            return {
-                'status':'error',
-                'mensagem':'Você precisa estar logado pra se inscrever'
-            }, 400
-            
-        insert = """insert into seguidores (id_seguidor,id_seguido) values (%s,%s)"""
-        cursor.execute(insert,(session['usuario_id'],id_criador))
-        con.commit()
-        
-        return {
-            'status':'success',
-            'mensagem':'Você se inscreveu'
-        }, 200
-        
-class search(Resource):
-    """
-        Endpoint responsável pela pesquisa de informações
-    """
-    def post(self):
-        """
-            Retira as informações do Banco de Dados
-            
-            Validações: 
-                Token('X-CSRFToken')
-                
-            Retornos: 
-                200 =Informações retiradas com sucesso
-        """
-        
-        token = request.headers.get("X-CSRFToken")
-        
-        check = check_csrf(token)
-        
-        if not check or check.get("status") == "error":
-            return {'status': 'error', 'mensagem' :check.get("mensagem")}
-        
-        data = request.get_json()
-        
         con = connection()
         cursor = con.cursor(pymysql.cursors.DictCursor)
+
+        id_criador = data.get('criador')
+        id_seguidor = session['usuario_id']
+
+        if str(id_criador) == str(id_seguidor):
+            cursor.close(); con.close()
+            return {'status': 'error', 'mensagem': 'Você não pode seguir seu próprio canal'}, 400
+
+        try:
+            cursor.execute("select 1 from seguidores where id_seguidor = %s and id_seguido = %s", (id_seguidor, id_criador))
+            ja_segue = cursor.fetchone()
+
+            if ja_segue:
+                cursor.execute("delete from seguidores where id_seguidor = %s and id_seguido = %s", (id_seguidor, id_criador))
+                con.commit()
+                return {'status': 'success', 'mensagem': 'Você deixou de seguir', 'seguindo': False}, 200
+
+            cursor.execute("insert into seguidores (id_seguidor,id_seguido) values (%s,%s)", (id_seguidor, id_criador))
+            con.commit()
+            return {'status': 'success', 'mensagem': 'Você se inscreveu', 'seguindo': True}, 200
+
+        except Exception as e:
+            print(e)
+            return {'status': 'error', 'mensagem': 'Erro ao seguir'}, 500
+
+        finally:
+            cursor.close()
+            con.close()
         
-        #fetchall
-        
-        pesquisa = data.get('pesquisa')
+class search(Resource):
+    def post(self):
+        token = request.headers.get("X-CSRFToken")
+        check = check_csrf(token)
+        if not check or check.get("status") == "error":
+            return {'status': 'error', 'mensagem': check.get("mensagem")}, 400
+
+        data = request.get_json()
+        pesquisa = (data.get('pesquisa') or '').strip()
+
+        con = connection()
+        cursor = con.cursor(pymysql.cursors.DictCursor)
+
+        if not pesquisa:
+            cursor.close(); con.close()
+            return {'status': 'success', 'mensagem': 'Pesquisa vazia', 'canais': [], 'videos': []}, 200
+
         p = f"%{pesquisa}%"
-        
-        query1 = """select id_usuario, user_name, 'streamer' as tipo from usuarios where user_name like %s """
-        cursor.execute(query1,(p,))
-        usuarios = cursor.fetchall()
-        
-        
-        query2 = """select id_stream, categoria, titulo, id_streamer, 'stream' as tipo from streams where titulo like %s or categoria like %s"""
-        cursor.execute(query2,(pesquisa,pesquisa))
-        streams = cursor.fetchall()
-        
-        return {
-            'status':'success',
-            'mensagem':'Resultados da pesquisa',
-            'resultado':f'{usuarios},{streams}'
-        }, 200
+
+        try:
+            cursor.execute("""select id_usuario, user_name, foto_url
+                               from usuarios
+                               where user_name like %s
+                               limit 10""", (p,))
+            canais = cursor.fetchall()
+
+            cursor.execute("""select s.id_stream, s.titulo, s.descrisao, s.categoria,
+                                      s.video_url, s.data_upload, s.capa,
+                                      s.id_streamer, u.user_name as canal, u.foto_url as canal_foto
+                               from streams s
+                               join usuarios u on u.id_usuario = s.id_streamer
+                               where s.titulo like %s or s.categoria like %s
+                               limit 10""", (p, p))
+            videos = cursor.fetchall()
+
+            for v in videos:
+                v['categoria'] = json.loads(v['categoria']) if v['categoria'] else []
+                v['data_upload'] = v['data_upload'].strftime('%d/%m/%Y') if v['data_upload'] else ''
+
+            return {
+                'status': 'success',
+                'mensagem': 'Resultados da pesquisa',
+                'canais': canais,
+                'videos': videos
+            }, 200
+
+        except Exception as e:
+            print(e)
+            return {'status': 'error', 'mensagem': 'Erro ao pesquisar'}, 500
+
+        finally:
+            cursor.close()
+            con.close()
 
 class inscritos(Resource):
     def post(self):

@@ -1,6 +1,7 @@
 //DOMContentLoaded garante que o script só rode depois de todo o HTML estar carregado
 document.addEventListener('DOMContentLoaded', function () {
-    base_url = "http://127.0.0.1:5000/";
+    base_url = "http://127.0.0.1:5000";
+    let usuarioLogado = false;
 
     // CARREGAMENTO DO CSRF TOKEN 
     // o token é necessário para proteger contra ataques CSRF, garantindo que as requisições venham de fontes confiáveis
@@ -57,14 +58,17 @@ document.addEventListener('DOMContentLoaded', function () {
             const data = await res.json();
 
             if (data.logado) {
+                usuarioLogado = true;
                 mostrarLogado(data.name);
                 info_user(data);
                 incritos_info(data.id);
             } else {
+                usuarioLogado = false
                 mostrarDeslogado();
             }
 
         } catch (err) {
+            usuarioLogado = false;
             console.error(err);
             mostrarDeslogado();
         }
@@ -457,13 +461,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function show_seguindo(seguindo) {
         const mostra = document.getElementById('show_seguindo');
-        //if (!seguindo || !mostra) console.log('ta parando aqui'); return ;
+        if (!mostra) return;
         mostra.textContent = seguindo;
     }
 
     function show_seguidores(seguidores) {
         const mostra = document.getElementById('show_seguidores');
-        //if (!seguidores || !mostra) return ;
+        if (!mostra) return;
         mostra.textContent = seguidores;
     }
 
@@ -2037,6 +2041,20 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    document.getElementById('btn-bits').onclick = () => {
+        if (!usuarioLogado) {
+            mostrarToast('Você precisa estar logado para doar bits.', 'error');
+            return;
+        }
+        const wrap = document.querySelector('.player-wrap-expanded');
+        const anim = document.createElement('div');
+        anim.className = 'bits-animacao';
+        anim.innerHTML = `<i class="fa-solid fa-gem"></i><span>Você acaba de doar bits!</span>`;
+        wrap.appendChild(anim);
+        anim.addEventListener('animationend', () => anim.remove());
+        mostrarToast('Você acaba de doar bits', 'success');
+    };
+
     // referências de DOM usadas pelos handlers abaixo — precisam vir ANTES de serem usadas
     const modal6 = document.getElementById('modal-6');
     const btnUpload = document.getElementById('upload-video');
@@ -2213,8 +2231,8 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('player-info-cats').textContent   = live.categorias?.join(' • ') || '';
         document.getElementById('player-info-data').textContent   = live.data;
 
-        const nomeCanal = document.querySelector('.show_name')?.textContent || 'Meu Canal';
-        const fotoCanal = document.querySelector('.photo-user')?.src || '/static/user.png';
+        const nomeCanal = live.canal || 'Canal desconhecido';
+        const fotoCanal = live.canal_foto || '/static/user.png';
         document.getElementById('player-canal-nome-text').textContent = nomeCanal;
         document.getElementById('player-canal-foto-img').src          = fotoCanal;
 
@@ -2245,9 +2263,10 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
         document.getElementById('btn-compartilhar').onclick = () => {
-            navigator.clipboard?.writeText(window.location.href)
-                .then(() => mostrarToast('Link copiado!', 'success'))
-                .catch(()  => mostrarToast('Não foi possível copiar.', 'error'));
+            const linkVideo = live.src || window.location.href;
+            navigator.clipboard?.writeText(linkVideo)
+                .then(() => mostrarToast('Link do vídeo copiado!', 'success'))
+                .catch(() => mostrarToast('Não foi possível copiar.', 'error'));
         };
 
         document.getElementById('btn-comentar').onclick = () => {
@@ -2339,13 +2358,11 @@ document.addEventListener('DOMContentLoaded', function () {
             document.body.classList.remove('modal-open');
             cancelAnimationFrame(rafId);
             playIcon.className = 'fa-solid fa-play';
-            renderVideosPerfil(); 
+            renderVideosPerfil(idPerfilAtual); 
         };
         fecharBtn.onclick = fechar;
         overlay.onclick = e => { if (e.target === overlay) fechar(); };
     }
-
-    renderVideosPerfil();
 
     // ── ASIDE → DROPDOWN em telas < 1024px ──
     // sincroniza o conteúdo do aside para dentro do dropdown
@@ -2712,6 +2729,194 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    // barra de pesquisa funioical em todas as páginas
+    // BUSCA DE CANAIS E VÍDEOS (barra do header, #search)
+    const canalSearchInput = document.getElementById('search');
+    if (canalSearchInput) {
+        const canalOverlay = document.createElement('div');
+        canalOverlay.className = 'canal-search-overlay';
+        canalOverlay.innerHTML = `
+            <div class="canal-search-historico">
+                <p class="search-label" data-i18n>Pesquisas recentes</p>
+                <ul class="canal-search-historico-list"></ul>
+            </div>
+            <div class="canal-search-results"></div>
+        `;
+        document.body.appendChild(canalOverlay); // ← FIX: escapa do stacking context do #header
+
+        const canalHistoricoBox  = canalOverlay.querySelector('.canal-search-historico');
+        const canalHistoricoList = canalOverlay.querySelector('.canal-search-historico-list');
+        const canalResultsBox    = canalOverlay.querySelector('.canal-search-results');
+
+        const canalBackdrop = document.createElement('div');
+        canalBackdrop.className = 'canal-search-backdrop';
+        document.body.appendChild(canalBackdrop);
+
+        // ← FIX: calcula a posição do dropdown manualmente, já que agora ele
+        // não está mais dentro de .search-bar (position:relative deixou de valer)
+        function posicionarCanalOverlay() {
+            const rect = canalSearchInput.closest('.search-bar').getBoundingClientRect();
+            canalOverlay.style.top = (rect.bottom + 8) + 'px';
+            canalOverlay.style.left = rect.left + 'px';
+            canalOverlay.style.width = rect.width + 'px';
+        }
+
+        const CANAL_HISTORICO_KEY = 'witch_canal_search_historico';
+
+        function getCanalHistorico() {
+            try { return JSON.parse(localStorage.getItem(CANAL_HISTORICO_KEY) || '[]'); }
+            catch { return []; }
+        }
+        function saveCanalHistorico(term) {
+            let h = getCanalHistorico().filter(t => t.toLowerCase() !== term.toLowerCase());
+            h.unshift(term);
+            h = h.slice(0, 5);
+            localStorage.setItem(CANAL_HISTORICO_KEY, JSON.stringify(h));
+        }
+        function renderCanalHistorico() {
+            const h = getCanalHistorico();
+            canalHistoricoList.innerHTML = '';
+            if (h.length === 0) { canalHistoricoBox.style.display = 'none'; return; }
+            canalHistoricoBox.style.display = 'block';
+            h.forEach(term => {
+                const li = document.createElement('li');
+                li.innerHTML = `<i class="fa-solid fa-clock-rotate-left"></i> ${term}`;
+                li.addEventListener('click', () => {
+                    canalSearchInput.value = term;
+                    buscarCanaisVideos(term);
+                });
+                canalHistoricoList.appendChild(li);
+            });
+        }
+
+        function abrirOverlayCanal() {
+            posicionarCanalOverlay(); // ← FIX: reposiciona toda vez que abre
+            canalOverlay.classList.add('show');
+            canalBackdrop.classList.add('show');
+        }
+        function fecharOverlayCanal() {
+            canalOverlay.classList.remove('show');
+            canalBackdrop.classList.remove('show');
+            canalResultsBox.innerHTML = '';
+            renderCanalHistorico();
+        }
+
+        let debounceBusca;
+        async function buscarCanaisVideos(termo) {
+            canalHistoricoBox.style.display = 'none';
+            canalResultsBox.innerHTML = '<p class="search-vazio">Buscando...</p>';
+
+            try {
+                const res = await fetch(base_url + "/search", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json", "X-CSRFToken": csrfToken },
+                    body: JSON.stringify({ pesquisa: termo })
+                });
+                const data = await res.json();
+                canalResultsBox.innerHTML = '';
+
+                if (data.status !== 'success' || (data.canais.length === 0 && data.videos.length === 0)) {
+                    canalResultsBox.innerHTML = `<p class="search-vazio">Nenhum resultado para "<strong>${termo}</strong>"</p>`;
+                    return;
+                }
+
+                data.canais.forEach(canal => {
+                    const item = document.createElement('div');
+                    item.className = 'canal-search-item';
+                    item.innerHTML = `
+                        <span class="canal-search-tipo tipo-canal">Canal</span>
+                        <span class="canal-search-nome">${canal.user_name}</span>
+                    `;
+                    item.addEventListener('click', () => {
+                        saveCanalHistorico(termo);
+                        fecharOverlayCanal();
+                        canalSearchInput.value = '';
+                        irParaPerfil(canal.id_usuario, canal.user_name, canal.foto_url);
+                    });
+                    canalResultsBox.appendChild(item);
+                });
+
+                data.videos.forEach(video => {
+                    const item = document.createElement('div');
+                    item.className = 'canal-search-item';
+                    item.innerHTML = `
+                        <span class="canal-search-tipo tipo-video">Vídeo</span>
+                        <span class="canal-search-nome">${video.titulo}</span>
+                        <span class="canal-search-canal">${video.canal}</span>
+                    `;
+                    item.addEventListener('click', () => {
+                        saveCanalHistorico(termo);
+                        abrirVideoDaBusca(video);
+                    });
+                    canalResultsBox.appendChild(item);
+                });
+
+            } catch (error) {
+                console.error(error);
+                canalResultsBox.innerHTML = '<p class="search-vazio">Erro ao pesquisar.</p>';
+            }
+        }
+
+        function abrirVideoDaBusca(video) {
+            const live = {
+                id_stream: video.id_stream,
+                titulo: video.titulo,
+                categorias: video.categoria || [],
+                src: video.video_url,
+                thumb: video.capa,
+                data: video.data_upload,
+                id_streamer: video.id_streamer,
+                canal: video.canal,
+                canal_foto: video.canal_foto
+            };
+
+            if (document.getElementById('video-player-overlay')) {
+                fecharOverlayCanal();
+                canalSearchInput.value = '';
+                abrirPlayerExpandido(live);
+            } else {
+                fecharOverlayCanal();
+                canalSearchInput.value = '';
+                irParaPerfil(video.id_streamer, video.canal, video.canal_foto);
+            }
+        }
+
+        canalSearchInput.addEventListener('focus', () => {
+            renderCanalHistorico();
+            abrirOverlayCanal();
+        });
+
+        canalSearchInput.addEventListener('input', () => {
+            clearTimeout(debounceBusca);
+            const termo = canalSearchInput.value.trim();
+            if (!termo) { canalResultsBox.innerHTML = ''; renderCanalHistorico(); return; }
+            debounceBusca = setTimeout(() => buscarCanaisVideos(termo), 300);
+        });
+
+        canalSearchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && canalSearchInput.value.trim()) {
+                clearTimeout(debounceBusca);
+                const termo = canalSearchInput.value.trim();
+                saveCanalHistorico(termo);
+                buscarCanaisVideos(termo);
+            }
+        });
+
+        canalBackdrop.addEventListener('click', () => {
+            fecharOverlayCanal();
+            canalSearchInput.blur();
+            canalSearchInput.value = '';
+        });
+
+        // ← FIX: reposiciona se a janela mudar de tamanho ou rolar enquanto aberto
+        window.addEventListener('resize', () => {
+            if (canalOverlay.classList.contains('show')) posicionarCanalOverlay();
+        });
+        window.addEventListener('scroll', () => {
+            if (canalOverlay.classList.contains('show')) posicionarCanalOverlay();
+        }, true);
+    }
+
     //função para passar os vídeos dos usuários para a tela inicial
     async function getLivesHome() {
         try {
@@ -2848,17 +3053,19 @@ document.addEventListener('DOMContentLoaded', function () {
         const titulo = document.createElement('p');
         titulo.className = 'video-card-titulo';
         titulo.textContent = live.titulo;
+        titulo.style.cssText = 'font-size:1.1em;';
 
         const cats = document.createElement('p');
         cats.className = 'video-card-categorias';
         cats.textContent = live.categorias?.join(' • ') || '';
-        cats.style.cssText = 'font-size:0.78em;color:var(--color3)';
+        cats.style.cssText = 'font-size:0.9em;color:#9147FF';
 
         const nomeCanal = live.canal || document.querySelector('.show_name')?.textContent || 'Canal desconhecido';
         const canal = document.createElement('p');
         canal.className = 'video-card-canal';
         canal.textContent = nomeCanal;
         canal.style.cursor = 'pointer';
+        canal.style.cssText = 'font-size:0.9em;font-weight:bold;color:#9147FF';
         canal.addEventListener('click', e => {
             e.stopPropagation();
             if (live.id_streamer) irParaPerfil(live.id_streamer, live.canal, live.canal_foto);
@@ -2871,6 +3078,7 @@ document.addEventListener('DOMContentLoaded', function () {
         dataEl.className = 'video-card-info';
         dataEl.textContent = live.data;
         dataEl.style.margin = '0';
+        dataEl.style.cssText = 'font-size:0.9em;';
         infoRow.appendChild(dataEl);
 
         // menu de opções (editar/excluir/salvar/clipe) só aparece no SEU PRÓPRIO canal
@@ -2926,13 +3134,20 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // detecta se é o próprio perfil ou de outra pessoa
+    let idPerfilAtual = null; // null = próprio perfil; id = perfil visitado
     async function iniciarPerfil() {
+        const container = document.getElementById('videos-perfil-grid');
+        if (!container) return; // página não é a de perfil
+
         const params = new URLSearchParams(window.location.search);
         const idParam = params.get('id');
 
-        if (!idParam) return; // sem ?id= na URL -> é o próprio perfil, segue o fluxo normal que já existe
+        if (!idParam) {
+            idPerfilAtual = null;
+            await renderVideosPerfil();
+            return;
+        }
 
-        // confere se o id da URL não é o do próprio usuário logado
         const res = await fetch(base_url + "/session", {
             method: "POST",
             headers: { "Content-Type": "application/json", "X-CSRFToken": csrfToken }
@@ -2940,11 +3155,13 @@ document.addEventListener('DOMContentLoaded', function () {
         const sessao = await res.json();
 
         if (sessao.logado && String(sessao.id) === String(idParam)) {
-            // é o próprio perfil, só que acessado via link -> limpa a URL e segue normal
             window.history.replaceState({}, '', '/perfil');
+            idPerfilAtual = null;
+            await renderVideosPerfil();
             return;
         }
 
+        idPerfilAtual = idParam;
         ativarModoVisitante(idParam, params.get('nome'), params.get('foto'));
     }
 
@@ -2961,7 +3178,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         montarBotoesSociais(idVisitado);
-        carregarSeguidoresDe(idVisitado);
+        incritos_info(idVisitado);
         renderVideosPerfil(idVisitado); // reaproveita a função que você já tem
     }
 
@@ -2974,7 +3191,7 @@ document.addEventListener('DOMContentLoaded', function () {
             <button class="btn-perfil" id="btn-sub-visitante">Sub</button>
         `;
 
-        document.getElementById('btn-seguir-visitante').addEventListener('click', async () => {
+        document.getElementById('btn-seguir-visitante').addEventListener('click', async (e) => {
             const res = await fetch(base_url + "/subscribe", {
                 method: "POST",
                 headers: { "Content-Type": "application/json", "X-CSRFToken": csrfToken },
@@ -2982,7 +3199,10 @@ document.addEventListener('DOMContentLoaded', function () {
             });
             const data = await res.json();
             mostrarToast(data.mensagem, data.status);
-            if (data.status !== 'error') carregarSeguidoresDe(idVisitado);
+            if (data.status !== 'error') {
+                e.target.textContent = data.seguindo ? 'Seguindo' : 'Seguir';
+                incritos_info(idVisitado);
+            }
         });
     }
 
@@ -3029,7 +3249,50 @@ document.addEventListener('DOMContentLoaded', function () {
     document.querySelector('form').addEventListener('submit', function(e) {
         e.preventDefault(); // Evita o envio do formulário
         alert('Compra realizada com sucesso!');
+        fecharModal(form);
     });
 
     init();
 });
+/*
+class subscribe(Resource):
+    def post(self):
+        token = request.headers.get("X-CSRFToken")
+        check = check_csrf(token)
+        if not check or check.get("status") == "error":
+            return {'status': 'error', 'mensagem': check.get("mensagem")}, 400
+
+        if 'usuario_id' not in session:
+            return {'status': 'error', 'mensagem': 'Você precisa estar logado pra se inscrever'}, 400
+
+        data = request.get_json()
+        con = connection()
+        cursor = con.cursor(pymysql.cursors.DictCursor)
+
+        id_criador = data.get('criador')
+        id_seguidor = session['usuario_id']
+
+        if str(id_criador) == str(id_seguidor):
+            cursor.close(); con.close()
+            return {'status': 'error', 'mensagem': 'Você não pode seguir seu próprio canal'}, 400
+
+        try:
+            cursor.execute("select 1 from seguidores where id_seguidor = %s and id_seguido = %s", (id_seguidor, id_criador))
+            ja_segue = cursor.fetchone()
+
+            if ja_segue:
+                cursor.execute("delete from seguidores where id_seguidor = %s and id_seguido = %s", (id_seguidor, id_criador))
+                con.commit()
+                return {'status': 'success', 'mensagem': 'Você deixou de seguir', 'seguindo': False}, 200
+
+            cursor.execute("insert into seguidores (id_seguidor,id_seguido) values (%s,%s)", (id_seguidor, id_criador))
+            con.commit()
+            return {'status': 'success', 'mensagem': 'Você se inscreveu', 'seguindo': True}, 200
+
+        except Exception as e:
+            print(e)
+            return {'status': 'error', 'mensagem': 'Erro ao seguir'}, 500
+
+        finally:
+            cursor.close()
+            con.close()*/
