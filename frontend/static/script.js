@@ -1,8 +1,8 @@
 //DOMContentLoaded garante que o script só rode depois de todo o HTML estar carregado
 document.addEventListener('DOMContentLoaded', function () {
-    base_url = "http://127.0.0.1:5000";
+    base_url = "";
     let usuarioLogado = false;
-
+    let meuUserId = null;
     // CARREGAMENTO DO CSRF TOKEN 
     // o token é necessário para proteger contra ataques CSRF, garantindo que as requisições venham de fontes confiáveis
     let csrfToken = null;
@@ -59,11 +59,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
             if (data.logado) {
                 usuarioLogado = true;
+                meuUserId = data.id;
                 mostrarLogado(data.name);
                 info_user(data);
                 incritos_info(data.id);
             } else {
                 usuarioLogado = false
+                meuUserId = null;
                 mostrarDeslogado();
             }
 
@@ -473,7 +475,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // função para mostrar nome
     function info_user_name(user_name) {
-        const mostra = document.querySelectorAll('.show_name');
+        const mostra = document.querySelectorAll('.show_name:not(#nome-dropdown)');
         if (!user_name || !mostra) return ;
         mostra.forEach(mostra => {
             mostra.textContent = user_name;
@@ -1881,7 +1883,14 @@ document.addEventListener('DOMContentLoaded', function () {
             });
             if (!res.ok) throw new Error("Erro ao buscar as lives");
             const data = await res.json();
-            return data.videos || [];
+            const videos = data.videos || [];
+            await Promise.all(videos.map(async (live) => {
+                if (!live.canal_foto && live.id_streamer) {
+                    const fotoUrl = await getFotoStreamerCache(live.id_streamer);
+                    if (fotoUrl) live.canal_foto = fotoUrl;
+                }
+            }));
+            return videos;
         } catch (error) {
             console.error("Erro ao pegar videos:", error);
             return [];
@@ -1919,28 +1928,34 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     async function foto_streamer(idStreamer) {
+        if (!idStreamer) return null;
         try {
-            const res = await fetch(base_url + "/foto_streamer", {
+            const res = await fetch(base_url + "/foto_streamer", {   // ← vírgula adicionada
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                     "X-CSRFToken": csrfToken
                 },
                 credentials: "include",
-                body: JSON.stringify({ id_stream: idStreamer })
+                body: JSON.stringify({ id_streamer: idStreamer })
             });
-
             const data = await res.json();
-            if (!res.ok || data.status === "error") {
-                mostrarToast(data.mensagem || "Erro ao curtir.", "error");
-                return null;
-            }
-
-            return data.foto_url; // { curtido: true/false, total_curtidas: N }
-
+            if (data.mensagem !== "success") return null;
+            return data.foto_url;
         } catch (error) {
+            console.error("Erro ao buscar foto do streamer:", error);
             return null;
         }
+    }
+
+    // cache simples pra não repetir a mesma busca várias vezes
+    const cacheFotoStreamer = {};
+    async function getFotoStreamerCache(idStreamer) {
+        if (!idStreamer) return null;
+        if (cacheFotoStreamer[idStreamer] !== undefined) return cacheFotoStreamer[idStreamer];
+        const foto = await foto_streamer(idStreamer);
+        cacheFotoStreamer[idStreamer] = foto;
+        return foto;
     }
 
     async function curtirVideo(idStream) {
@@ -2171,7 +2186,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
             mostrarToast("Vídeo salvo!", "success");
-            await renderVideosPerfil();
+            await renderVideosPerfil(meuUserId, true);
 
             if (modal6) {
                 modal6.close();
@@ -2211,7 +2226,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    async function renderVideosPerfil(idUsuario) {
+    async function renderVideosPerfil(idUsuario, isOwnProfile = false) {
         const container = document.getElementById('videos-perfil-grid');
         if (!container) return;
         const lives = await getLives(idUsuario);
@@ -2225,9 +2240,7 @@ document.addEventListener('DOMContentLoaded', function () {
         lives.forEach(async live => {
             const dadosViews = await buscarViews(live.id_stream);
             if (dadosViews) live.views = dadosViews.total_views;
-
-            // menu de opções só aparece no SEU PRÓPRIO canal (sem idUsuario = é você mesmo)
-            const card = criarVideoCard(live, { mostrarOpcoes: !idUsuario });
+            const card = criarVideoCard(live, { mostrarOpcoes: isOwnProfile }); // ← troca !idUsuario por isOwnProfile
             container.appendChild(card);
         });
     }
@@ -2263,6 +2276,14 @@ document.addEventListener('DOMContentLoaded', function () {
         const fotoCanal = live.canal_foto || '/static/user.png';
         document.getElementById('player-canal-nome-text').textContent = nomeCanal;
         document.getElementById('player-canal-foto-img').src          = fotoCanal;
+        if (!live.canal_foto && live.id_streamer) {
+            getFotoStreamerCache(live.id_streamer).then(fotoUrl => {
+                if (fotoUrl) {
+                    live.canal_foto = fotoUrl;
+                    document.getElementById('player-canal-foto-img').src = fotoUrl;
+                }
+            });
+        }
 
         const btnCurtir     = document.getElementById('btn-curtir');
         const countCurtidas = document.getElementById('count-curtidas');
@@ -2386,7 +2407,7 @@ document.addEventListener('DOMContentLoaded', function () {
             document.body.classList.remove('modal-open');
             cancelAnimationFrame(rafId);
             playIcon.className = 'fa-solid fa-play';
-            renderVideosPerfil(idPerfilAtual); 
+            renderVideosPerfil(idPerfilAtual ?? meuUserId, idPerfilAtual == null); 
         };
         fecharBtn.onclick = fechar;
         overlay.onclick = e => { if (e.target === overlay) fechar(); };
@@ -2955,7 +2976,14 @@ document.addEventListener('DOMContentLoaded', function () {
             });
             if (!res.ok) throw new Error("Erro ao buscar vídeos da home");
             const data = await res.json();
-            return data.videos || [];
+            const videos = data.videos || [];
+            await Promise.all(videos.map(async (live) => {
+                if (!live.canal_foto && live.id_streamer) {
+                    const fotoUrl = await getFotoStreamerCache(live.id_streamer);
+                    if (fotoUrl) live.canal_foto = fotoUrl;
+                }
+            }));
+            return videos;
         } catch (error) {
             console.error(error);
             return [];
@@ -3089,12 +3117,21 @@ document.addEventListener('DOMContentLoaded', function () {
         cats.style.cssText = 'font-size:0.9em;color:#9147FF';
 
         const nomeCanal = live.canal || document.querySelector('.show_name')?.textContent || 'Canal desconhecido';
+        const canalWrap = document.createElement('div');
+        canalWrap.style.cssText = 'display:flex;align-items:center;gap:6px;cursor:pointer;';
+
+        const canalFotoImg = document.createElement('img');
+        canalFotoImg.src = live.canal_foto || '/static/user.png';
+        canalFotoImg.alt = nomeCanal;
+        canalFotoImg.style.cssText = 'width:20px;height:20px;border-radius:50%;object-fit:cover;flex-shrink:0;';
+
         const canal = document.createElement('p');
         canal.className = 'video-card-canal';
         canal.textContent = nomeCanal;
-        canal.style.cursor = 'pointer';
-        canal.style.cssText = 'font-size:0.9em;font-weight:bold;color:#9147FF';
-        canal.addEventListener('click', e => {
+        canal.style.cssText = 'font-size:0.9em;font-weight:bold;color:#9147FF;margin:0;';
+
+        canalWrap.append(canalFotoImg, canal);
+        canalWrap.addEventListener('click', e => {
             e.stopPropagation();
             if (live.id_streamer) irParaPerfil(live.id_streamer, live.canal, live.canal_foto);
         });
@@ -3157,7 +3194,7 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         }
 
-        card.append(thumbDiv, titulo, cats, canal, infoRow);
+        card.append(thumbDiv, titulo, cats, canalWrap, infoRow);
         return card;
     }
 
@@ -3165,16 +3202,10 @@ document.addEventListener('DOMContentLoaded', function () {
     let idPerfilAtual = null; // null = próprio perfil; id = perfil visitado
     async function iniciarPerfil() {
         const container = document.getElementById('videos-perfil-grid');
-        if (!container) return; // página não é a de perfil
+        if (!container) return;
 
         const params = new URLSearchParams(window.location.search);
         const idParam = params.get('id');
-
-        if (!idParam) {
-            idPerfilAtual = null;
-            await renderVideosPerfil();
-            return;
-        }
 
         const res = await fetch(base_url + "/session", {
             method: "POST",
@@ -3182,10 +3213,18 @@ document.addEventListener('DOMContentLoaded', function () {
         });
         const sessao = await res.json();
 
+        if (!idParam) {
+            idPerfilAtual = null;
+            if (sessao.logado) {
+                await renderVideosPerfil(sessao.id, true); // ← id explícito
+            }
+            return;
+        }
+
         if (sessao.logado && String(sessao.id) === String(idParam)) {
             window.history.replaceState({}, '', '/perfil');
             idPerfilAtual = null;
-            await renderVideosPerfil();
+            await renderVideosPerfil(sessao.id, true);
             return;
         }
 
@@ -3193,22 +3232,41 @@ document.addEventListener('DOMContentLoaded', function () {
         ativarModoVisitante(idParam, params.get('nome'), params.get('foto'));
     }
 
-    function ativarModoVisitante(idVisitado, nome, foto) {
-        // esconde os botões que só fazem sentido pro dono da conta
-        document.getElementById('btn-editar')?.style.setProperty('display', 'none');
-        document.getElementById('btn-start-live')?.style.setProperty('display', 'none');
+    async function ativarModoVisitante(idVisitado, nome, foto) {
+    document.getElementById('btn-editar')?.style.setProperty('display', 'none');
+    document.getElementById('btn-start-live')?.style.setProperty('display', 'none');
 
-        // nome e foto chegam via URL (vieram do clique no card, sem precisar de backend novo)
-        if (nome) document.querySelectorAll('.show_name').forEach(el => el.textContent = decodeURIComponent(nome));
-        if (foto) {
-            const fotoEl = document.querySelector('.photo-user');
-            if (fotoEl) fotoEl.src = decodeURIComponent(foto);
-        }
-
-        montarBotoesSociais(idVisitado);
-        incritos_info(idVisitado);
-        renderVideosPerfil(idVisitado); // reaproveita a função que você já tem
+    document.getElementById('titulo-canal')?.style.setProperty('display', 'none');
+    
+    const fotoEl = document.querySelector('.photo-user');
+    if (fotoEl) {
+        fotoEl.src = '/static/user.png';
+        fotoEl.classList.remove('tem-foto');
     }
+
+    if (nome) {
+        document.querySelectorAll('.show_name:not(#nome-dropdown)').forEach(el => {
+            el.textContent = decodeURIComponent(nome);
+        });
+    }
+
+    if (foto) {
+        if (fotoEl) {
+            fotoEl.src = decodeURIComponent(foto);
+            fotoEl.classList.add('tem-foto');
+        }
+    } else {
+        const fotoUrl = await getFotoStreamerCache(idVisitado);
+        if (fotoUrl && fotoEl) {
+            fotoEl.src = fotoUrl;
+            fotoEl.classList.add('tem-foto');
+        }
+    }
+
+    montarBotoesSociais(idVisitado);
+    incritos_info(idVisitado);
+    renderVideosPerfil(idVisitado, false);
+}
 
     function montarBotoesSociais(idVisitado) {
         const container = document.getElementById('botoes-sociais-perfil');
