@@ -6,7 +6,6 @@
     Seguranças: 
         Proteção contra Captcha inválido, validação de token enviado pelo JS e futuramente válidação de CPF válido
 """
-
 from flask import Flask, Blueprint,render_template, request, flash, redirect, url_for, session, make_response
 from flask_restful import Api, Resource
 #from flask_limiter import Limiter
