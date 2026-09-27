@@ -73,6 +73,14 @@ def perfil():
 def turbo():
     return render_template("turbo.html")
 
+@app.route("/seguindo")
+def seguindo():
+    return render_template("seguindo.html")
+
+@app.route("/explorar")
+def explorar():
+    return render_template("explorar.html")
+
 @app.errorhandler(RequestEntityTooLarge)
 def handle_large_file(e):
     return {'status': 'error', 'mensagem': 'Arquivo muito grande'}, 413

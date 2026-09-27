@@ -2760,7 +2760,10 @@ document.addEventListener('DOMContentLoaded', function () {
     // barra de pesquisa funioical em todas as páginas
     // BUSCA DE CANAIS E VÍDEOS (barra do header, #search)
     const canalSearchInput = document.getElementById('search');
-    if (canalSearchInput) {
+    const configMain = document.getElementById('config-main');
+    if (canalSearchInput && configMain) {
+        setupConfigSearch(canalSearchInput, configMain);
+    } else if (canalSearchInput) {
         const canalOverlay = document.createElement('div');
         canalOverlay.className = 'canal-search-overlay';
         canalOverlay.innerHTML = `
@@ -2943,6 +2946,104 @@ document.addEventListener('DOMContentLoaded', function () {
         window.addEventListener('scroll', () => {
             if (canalOverlay.classList.contains('show')) posicionarCanalOverlay();
         }, true);
+    }
+
+    // pesquisa das configurações (ctrl+F)
+    function setupConfigSearch(input, container) {
+        let matches = [];
+        let currentIndex = -1;
+
+        const counter = document.createElement('span');
+        counter.className = 'config-search-count';
+        input.closest('.search-bar').appendChild(counter);
+
+        function limparHighlights() {
+            container.querySelectorAll('mark.config-search-mark').forEach(mark => {
+                const parent = mark.parentNode;
+                parent.replaceChild(document.createTextNode(mark.textContent), mark);
+                parent.normalize();
+            });
+        }
+
+        function destacar(termo) {
+            limparHighlights();
+            matches = [];
+            currentIndex = -1;
+            if (!termo) { atualizarContador(); return; }
+
+            const termoLower = termo.toLowerCase();
+            const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT, {
+                acceptNode(node) {
+                    if (!node.textContent.trim()) return NodeFilter.FILTER_REJECT;
+                    if (node.parentElement.closest('script, style, mark')) return NodeFilter.FILTER_REJECT;
+                    return NodeFilter.FILTER_ACCEPT;
+                }
+            });
+
+            const nodes = [];
+            let node;
+            while (node = walker.nextNode()) nodes.push(node);
+
+            nodes.forEach(textNode => {
+                const texto = textNode.textContent;
+                const textoLower = texto.toLowerCase();
+                let idx = textoLower.indexOf(termoLower);
+                if (idx === -1) return;
+
+                const frag = document.createDocumentFragment();
+                let lastIndex = 0;
+                while (idx !== -1) {
+                    frag.appendChild(document.createTextNode(texto.slice(lastIndex, idx)));
+                    const mark = document.createElement('mark');
+                    mark.className = 'config-search-mark';
+                    mark.textContent = texto.slice(idx, idx + termo.length);
+                    frag.appendChild(mark);
+                    matches.push(mark);
+                    lastIndex = idx + termo.length;
+                    idx = textoLower.indexOf(termoLower, lastIndex);
+                }
+                frag.appendChild(document.createTextNode(texto.slice(lastIndex)));
+                textNode.parentNode.replaceChild(frag, textNode);
+            });
+
+            if (matches.length > 0) irParaResultado(0);
+            atualizarContador();
+        }
+
+        function atualizarContador() {
+            counter.textContent = matches.length ? `${currentIndex + 1} de ${matches.length}`
+                : (input.value ? '0 de 0' : '');
+        }
+
+        function irParaResultado(i) {
+            if (matches.length === 0) return;
+            if (currentIndex >= 0) matches[currentIndex].classList.remove('config-search-mark-ativo');
+            currentIndex = (i + matches.length) % matches.length;
+            matches[currentIndex].classList.add('config-search-mark-ativo');
+
+            // abre a aba de configuração onde o resultado está, se ela não estiver visível
+            const secao = matches[currentIndex].closest('.section-config');
+            if (secao && !secao.classList.contains('active')) {
+                configNav.forEach(l => l.classList.remove('active'));
+                configSections.forEach(s => s.classList.remove('active'));
+                secao.classList.add('active');
+                const link = document.querySelector(`.nav-config a[data-target="${secao.id}"]`);
+                if (link) link.classList.add('active');
+            }
+
+            matches[currentIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
+            atualizarContador();
+        }
+
+        input.addEventListener('input', () => destacar(input.value.trim()));
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                if (matches.length === 0) return;
+                if (e.shiftKey) irParaResultado(currentIndex - 1);
+                else irParaResultado(currentIndex + 1);
+            }
+        });
     }
 
     //função para passar os vídeos dos usuários para a tela inicial
@@ -3248,9 +3349,11 @@ document.addEventListener('DOMContentLoaded', function () {
         btnTurbo.addEventListener('click', () => {
             const turboModal = document.querySelector('.turbo-modal');
             const pagTurbo = document.querySelector('.pagamento-turbo');
+            const modal = document.getElementById('modal-5');
 
             turboModal.style.display = 'none';
             pagTurbo.style.display = 'flex';
+            modal.style.background = 'transparent';
         });
     });
 
