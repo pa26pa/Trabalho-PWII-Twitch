@@ -1611,21 +1611,14 @@ class videos(Resource):
         
         try:
             if not id_streamer:
-                query = """select s.id_stream, s.categoria, s.titulo, s.descrisao, s.video_url, s.data_upload, s.capa,
-                                  s.id_streamer, u.user_name as canal, u.foto_url as canal_foto
-                           from streams s
-                           join usuarios u on u.id_usuario = s.id_streamer
-                           order by s.data_upload desc;"""
-                cursor.execute(query)
+                query = """select id_stream, categoria, titulo, descrisao, video_url, data_upload, capa from streams order by data_upload desc;"""
+
+                cursor.execute(query,)
                 rows = cursor.fetchall()
-            else:
-                query = """select s.id_stream, s.categoria, s.titulo, s.descrisao, s.video_url, s.data_upload, s.capa,
-                                  s.id_streamer, u.user_name as canal, u.foto_url as canal_foto
-                           from streams s
-                           join usuarios u on u.id_usuario = s.id_streamer
-                           where s.id_streamer = %s
-                           order by s.data_upload desc;"""
-                cursor.execute(query, (id_streamer,))
+
+            if id_streamer:
+                query = """select id_stream, categoria, titulo, descrisao, video_url, data_upload, capa from streams where id_streamer = %s order by data_upload desc;"""
+                cursor.execute(query,)
                 rows = cursor.fetchall()
             
             videos = []
@@ -1638,9 +1631,6 @@ class videos(Resource):
                     "src": row["video_url"],
                     "thumb": row["capa"],
                     "data": row["data_upload"].strftime("%d/%m/%Y"),
-                    "id_streamer": row["id_streamer"],
-                    "canal": row["canal"],
-                    "canal_foto": row["canal_foto"],
                     "views": 0,
                     "curtidas": 0,
                     "comentarios": [],
@@ -1655,7 +1645,8 @@ class videos(Resource):
 
         finally:
             cursor.close()
-            con.close()                 
+            con.close() 
+                 
 class salvar_video(Resource):
     def post(self):
         token = request.headers.get("X-CSRFToken")
@@ -2126,6 +2117,6 @@ class foto_streamer(Resource):
         return {
             'status': 'success', 
             'mensagem': 'Foi possivel encontrar dados',
-            'foto_url': foto['foto_url']
+            'foto_url': foto
         }, 200
             
