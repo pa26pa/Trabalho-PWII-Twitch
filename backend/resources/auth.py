@@ -1605,18 +1605,20 @@ class videos(Resource):
         con = connection()
         cursor = con.cursor(pymysql.cursors.DictCursor)
         
-        id_streamer = request.args.get('id_usuario', type=int) or session.get('usuario_id')
+        id_streamer = request.args.get('id_usuario', type=int)
         
         try:
-            
             if not id_streamer:
-                return {"status": "error", "mensagem": "Usuário não autenticado"}, 401
+                query = """select id_stream, categoria, titulo, descrisao, video_url, data_upload, capa from streams order by data_upload desc;"""
 
-            query = """select id_stream, categoria, titulo, descrisao, video_url, data_upload, capa
-                       from streams where id_streamer = %s order by data_upload desc;"""
-            cursor.execute(query, (id_streamer,))
-            rows = cursor.fetchall()
+                cursor.execute(query,)
+                rows = cursor.fetchall()
 
+            if id_streamer:
+                query = """select id_stream, categoria, titulo, descrisao, video_url, data_upload, capa from streams where id_streamer = %s order by data_upload desc;"""
+                cursor.execute(query,)
+                rows = cursor.fetchall()
+            
             videos = []
             for row in rows:
                 videos.append({
