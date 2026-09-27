@@ -1605,9 +1605,11 @@ class videos(Resource):
     def get(self):
         con = connection()
         cursor = con.cursor(pymysql.cursors.DictCursor)
-
+        
+        id_streamer = request.args.get('id_usuario', type=int) or session.get('usuario_id')
+        
         try:
-            id_streamer = session.get('usuario_id')
+            
             if not id_streamer:
                 return {"status": "error", "mensagem": "Usuário não autenticado"}, 401
 
@@ -1641,7 +1643,7 @@ class videos(Resource):
         finally:
             cursor.close()
             con.close() 
-                  
+                 
 class salvar_video(Resource):
     def post(self):
         token = request.headers.get("X-CSRFToken")
@@ -1951,3 +1953,74 @@ class parametros(Resource):
             "status":"success",
             "mensagem":"url correta"
         },200
+    
+class zerar_cadastro_google(Resource):
+    def post(self):
+        if 'google_pendente' not in session:
+            return {
+                'status':'error',
+                'mensagem':'Sessão expirada'
+            }
+        
+        token = request.headers.get("X-CSRFToken")
+        check = check_csrf(token)
+        if not check or check.get("status") == "error":
+            return {'status': 'error', 'mensagem': check.get("mensagem")}, 400
+
+        data = request.get_json()
+        cpf = str(data.get('cpf'))
+        cpf = cpf.strip()
+        cpf_limpo = cpf.replace(".","").replace("-","")
+        
+        data_nascimento = data.get('data_nascimento')
+        data_formatada = data_valida(data_nascimento)
+        if not data_formatada:
+            return {
+                'status':'error',
+                'mensagem':'erro interno'
+            }, 500
+        
+        pendente = session['google_pendente']
+        email = pendente['email']
+        user_name = str(escape(pendente['name']))
+        foto = pendente.get('foto')
+        
+        con = connection()
+        cursor = con.cursor()
+        
+        query = 'select id_usuario from usuarios where cpf = %s'                
+        cursor.execute(query,(cpf,))
+        usuario = cursor.fetchone()
+        if usuario:
+            return {
+                'status':'error',
+                'mensagem':'Já existe uma conta'
+            }
+        
+        senha_hash = generate_password_hash(os.urandom(24).hex())
+        
+        try:
+            queryy = """insert into usuarios (cpf,email,user_name,senha,data_nascimento,foto_url) values (%s,%s,%s,%s,%s,%s)"""
+            cursor.execute(queryy,(cpf,email,user_name,senha_hash,data_formatada,foto))
+            con.commit()
+            novo_id = cursor.lastrowid
+        
+        except Exception as e:
+            print(e)
+            return {
+                'status': 'error', 
+                'mensagem': 'Erro ao criar conta'
+            }, 400
+        
+        finally:
+            cursor.close()
+            con.close()
+        
+        session['usuario_id'] = novo_id
+        session.pop('google_pendente', None)
+        
+        return {
+            'status':'success',
+            'mensagem':'Cadastro finalizado'
+        }, 200
+        
