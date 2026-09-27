@@ -1918,6 +1918,31 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    async function foto_streamer(idStreamer) {
+        try {
+            const res = await fetch(base_url + "/foto_streamer", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": csrfToken
+                },
+                credentials: "include",
+                body: JSON.stringify({ id_stream: idStreamer })
+            });
+
+            const data = await res.json();
+            if (!res.ok || data.status === "error") {
+                mostrarToast(data.mensagem || "Erro ao curtir.", "error");
+                return null;
+            }
+
+            return data.foto_url; // { curtido: true/false, total_curtidas: N }
+
+        } catch (error) {
+            return null;
+        }
+    }
+
     async function curtirVideo(idStream) {
         try {
             const res = await fetch(base_url + "/curtidas", {

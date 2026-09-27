@@ -2026,4 +2026,97 @@ class zerar_cadastro_google(Resource):
             'status':'success',
             'mensagem':'Cadastro finalizado'
         }, 200
+
+class deletar_video(Resource):
+    def delete():
+        token = request.headers.get("X-CSRFToken")
         
+                     
+        check = check_csrf(token)
+        if not check or check.get("status") == "error":
+            return {'status': 'error', 'mensagem': check.get("mensagem")}, 400
+        
+        con = connection()
+        cursor = con.cursor(pymysql.cursors.DictCursor)
+        
+        data = request.get_json()
+        
+        id_stream = data.get('id_stream')
+        
+        video_url = "https://cloudinary.com"
+        parte_final = video_url.split("/upload/")[-1]
+
+        if parte_final.startswith("v"):
+            parte_final = parte_final.split("/", 1)[1]
+
+        public_id = parte_final.rsplit(".", 1)[0]
+        
+        resultado = cloudinary.uploader.destroy(public_id, resource_type="video")
+        
+        try:
+            query_streams = """delete from streams where id_stream = %s"""
+            query_curtidas = """delete from curtidas where id_stream = %s"""
+            query_views = """delete from views where id_stream = %s"""
+            query_comentarios = """delete from comentarios where id_stream = %s"""
+            cursor.execute(query_streams,(id_stream,))
+            con.commit()
+            cursor.execute(query_curtidas,(id_stream,))
+            con.commit()
+            cursor.execute(query_views,(id_stream,))
+            con.commit()
+            cursor.execute(query_comentarios,(id_stream,))
+            con.commit()
+        
+        except Exception as e:
+            print(e)
+            return {
+                'status': 'error', 
+                'mensagem': 'Erro interno ao deletar video'
+            }, 500
+        
+        finally:
+            cursor.close()
+            con.close()
+    
+        return {
+            'status': 'success', 
+            'mensagem': 'Video deletado com sucesso'
+        }, 200
+        
+class foto_streamer(Resource):
+    def post(self):
+        token = request.headers.get("X-CSRFToken")
+                
+        check = check_csrf(token)
+        if not check or check.get("status") == "error":
+            return {'status': 'error', 'mensagem': check.get("mensagem")}, 400
+        
+        con = connection()
+        cursor = con.cursor(pymysql.cursors.DictCursor)
+        
+        data = request.get_json()
+        
+        id = data.get('id_streamer')
+        
+        try:
+            query = """select foto_url from usuarios where id_usuario = %s"""
+            cursor.execute(query,(id,))
+            foto = cursor.fetchone()
+        
+        except Exception as e:
+            print(e)
+            return {
+                'status': 'error', 
+                'mensagem': 'Erro interno ao deletar video'
+            }, 500
+        
+        finally:
+            cursor.close()
+            con.close()
+        
+        return {
+            'status': 'success', 
+            'mensagem': 'Foi possivel encontrar dados',
+            'foto_url': foto
+        }, 200
+            
