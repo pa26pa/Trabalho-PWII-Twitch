@@ -450,19 +450,19 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Função para mostrar o cpf
     function info_user_CPF(cpf) {
-        const mostra = document.getElementById('show_cpf')
+        const mostra = document.getElementById('show_cpf');
         if (!cpf || !mostra) return ;
         mostra.textContent = cpf;
     }
 
     function show_seguindo(seguindo) {
-        const mostra = document.getElementById('show_seguindo')
+        const mostra = document.getElementById('show_seguindo');
         //if (!seguindo || !mostra) console.log('ta parando aqui'); return ;
         mostra.textContent = seguindo;
     }
 
     function show_seguidores(seguidores) {
-        const mostra = document.getElementById('show_seguidores')
+        const mostra = document.getElementById('show_seguidores');
         //if (!seguidores || !mostra) return ;
         mostra.textContent = seguidores;
     }
@@ -1865,9 +1865,12 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // ── LIVES: salvar e renderizar histórico no perfil ──
-    async function getLives() {
+    async function getLives(idUsuario) {
         try {
-            const res = await fetch(base_url + "/videos", {
+            const url = idUsuario
+                ? base_url + "/videos?id_usuario=" + idUsuario
+                : base_url + "/videos";
+            const res = await fetch(url, {
                 method: "GET",
                 headers: { "X-CSRFToken": csrfToken },
                 credentials: "include"
@@ -2162,10 +2165,10 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    async function renderVideosPerfil() {
+    async function renderVideosPerfil(idUsuario) {
         const container = document.getElementById('videos-perfil-grid');
         if (!container) return;
-        const lives = await getLives();
+        const lives = await getLives(idUsuario);
         container.innerHTML = '';
 
         if (lives.length === 0) {
@@ -2177,166 +2180,9 @@ document.addEventListener('DOMContentLoaded', function () {
             const dadosViews = await buscarViews(live.id_stream);
             if (dadosViews) live.views = dadosViews.total_views;
 
-            const card = document.createElement('div');
-            card.className = 'video-card-perfil';
-
-            const thumbDiv = document.createElement('div');
-            thumbDiv.className = 'video-thumb-perfil';
-
-            const vid = document.createElement('video');
-            vid.preload = 'metadata';
-            vid.muted = true;
-            vid.loop  = true;
-            if (live.src) vid.src = live.src;
-            thumbDiv.appendChild(vid);
-
-            if (live.thumb) {
-                const capa = document.createElement('img');
-                capa.src = live.thumb;
-                capa.className = 'thumb-cover';
-                capa.alt = live.titulo;
-                thumbDiv.appendChild(capa);
-            }
-
-            if (live.aoVivo) {
-                const badge = document.createElement('span');
-                badge.className = 'thumb-badge-live';
-                badge.textContent = 'AO VIVO';
-                thumbDiv.appendChild(badge);
-            }
-
-            const views = document.createElement('span');
-            views.className = 'thumb-views-perfil';
-            views.textContent = `${live.views} visualizações`;
-            thumbDiv.appendChild(views);
-
-            const progWrap = document.createElement('div');
-            progWrap.className = 'thumb-progress-wrap';
-            const progFill = document.createElement('div');
-            progFill.className = 'thumb-progress-fill';
-            progWrap.appendChild(progFill);
-            thumbDiv.appendChild(progWrap);
-
-            let rafId;
-            thumbDiv.addEventListener('mouseenter', () => {
-                if (!live.src) return;
-                vid.play().catch(() => {});
-                const tick = () => {
-                    if (vid.duration) progFill.style.width = (vid.currentTime / vid.duration * 100) + '%';
-                    rafId = requestAnimationFrame(tick);
-                };
-                rafId = requestAnimationFrame(tick);
-            });
-            thumbDiv.addEventListener('mouseleave', () => {
-                vid.pause(); vid.currentTime = 0;
-                progFill.style.width = '0%';
-                cancelAnimationFrame(rafId);
-            });
-
-            let isDragging = false;
-            const moverBarra = (e) => {
-                const rect = progWrap.getBoundingClientRect();
-                const pct = Math.min(Math.max((e.clientX - rect.left) / rect.width, 0), 1);
-                if (vid.duration) {
-                    vid.currentTime = pct * vid.duration;
-                    progFill.style.width = (pct * 100) + '%';
-                }
-            };
-            progWrap.addEventListener('mousedown', e => { e.stopPropagation(); isDragging = true; moverBarra(e); });
-            document.addEventListener('mousemove', e => { if (isDragging) moverBarra(e); });
-            document.addEventListener('mouseup', () => { isDragging = false; });
-            progWrap.addEventListener('click', e => e.stopPropagation());
-            thumbDiv.addEventListener('click', e => {
-                if (progWrap.contains(e.target)) return;
-                abrirPlayerExpandido(live);
-            });
-
-            const titulo = document.createElement('p');
-            titulo.className = 'video-card-titulo';
-            titulo.textContent = live.titulo;
-
-            const cats = document.createElement('p');
-            cats.className = 'video-card-categorias';
-            cats.textContent = live.categorias?.join(' • ') || '';
-            cats.style.cssText = 'font-size:0.78em;color:var(--color3)';
-
-            const nomeCanal = document.querySelector('.show_name')?.textContent || 'Canal desconhecido';
-            const canal = document.createElement('p');
-            canal.className = 'video-card-canal';
-            canal.textContent = nomeCanal;
-
-            // linha com data + 3 pontos
-            const infoRow = document.createElement('div');
-            infoRow.style.cssText = 'display:flex;justify-content:space-between;align-items:center;width:100%;';
-
-            const dataEl = document.createElement('p');
-            dataEl.className = 'video-card-info';
-            dataEl.textContent = live.data;
-            dataEl.style.margin = '0';
-
-            // wrapper relativo para posicionar o menu
-            const opcWrapper = document.createElement('div');
-            opcWrapper.style.cssText = 'position:relative;flex-shrink:0;';
-
-            const btnOpcoes = document.createElement('button');
-            btnOpcoes.className = 'btn-opcoes-video';
-            btnOpcoes.innerHTML = '<i class="fa-solid fa-ellipsis-vertical"></i>';
-            btnOpcoes.title = 'Opções';
-
-            const menuOpcoes = document.createElement('div');
-            menuOpcoes.className = 'menu-opcoes-video';
-            menuOpcoes.innerHTML = `
-                <button class="opcao-video" data-acao="excluir"><i class="fa-solid fa-trash"></i> Excluir</button>
-                <button class="opcao-video" data-acao="editar"><i class="fa-solid fa-pen"></i> Editar</button>
-                <button class="opcao-video" data-acao="salvar"><i class="fa-solid fa-download"></i> Salvar vídeo</button>
-                <button class="opcao-video" data-acao="clipe"><i class="fa-solid fa-scissors"></i> Criar clipe (60s)</button>
-            `;
-
-            opcWrapper.appendChild(btnOpcoes);
-            opcWrapper.appendChild(menuOpcoes);
-
-            infoRow.appendChild(dataEl);
-            infoRow.appendChild(opcWrapper);
-
-            // monta o card — data e 3 pontos ficam juntos na infoRow
-            card.append(thumbDiv, titulo, cats, canal, infoRow);
+            // menu de opções só aparece no SEU PRÓPRIO canal (sem idUsuario = é você mesmo)
+            const card = criarVideoCard(live, { mostrarOpcoes: !idUsuario });
             container.appendChild(card);
-
-            btnOpcoes.addEventListener('click', e => {
-                e.stopPropagation();
-                document.querySelectorAll('.menu-opcoes-video.show').forEach(m => {
-                    if (m !== menuOpcoes) m.classList.remove('show');
-                });
-                menuOpcoes.classList.toggle('show');
-            });
-
-            menuOpcoes.querySelectorAll('.opcao-video').forEach(btn => {
-                btn.addEventListener('click', e => {
-                    e.stopPropagation();
-                    const acao = btn.dataset.acao;
-
-                    if (acao === 'excluir') {
-                        // TODO: precisa de endpoint DELETE no backend — ainda não existe
-                        mostrarToast('Excluir ainda não está disponível.', 'error');
-
-                    } else if (acao === 'editar') {
-                        // TODO: precisa de endpoint de UPDATE no backend — ainda não existe
-                        mostrarToast('Editar ainda não está disponível.', 'error');
-
-                    } else if (acao === 'salvar') {
-                        if (!live.src) { mostrarToast('Nenhum vídeo disponível para download.', 'error'); return; }
-                        const a = document.createElement('a');
-                        a.href = live.src;
-                        a.download = `${live.titulo}.mp4`;
-                        a.click();
-
-                    } else if (acao === 'clipe') {
-                        criarClipe(live);
-                    }
-
-                    menuOpcoes.classList.remove('show');
-                });
-            });
         });
     }
 
@@ -2867,19 +2713,32 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     //função para passar os vídeos dos usuários para a tela inicial
+    async function getLivesHome() {
+        try {
+            const res = await fetch(base_url + "/videos", {
+                method: "GET",
+                headers: { "X-CSRFToken": csrfToken },
+                credentials: "include"
+            });
+            if (!res.ok) throw new Error("Erro ao buscar vídeos da home");
+            const data = await res.json();
+            return data.videos || [];
+        } catch (error) {
+            console.error(error);
+            return [];
+        }
+    }
+
     async function renderVideosNaHome() {
-        const lives = await getLives();
+        const lives = await getLivesHome(); // não depende mais de sessão
         if (lives.length === 0) return;
 
-        // ── EM ALTA: os 3 com mais visualizações ──
         const emAlta = document.getElementById('grid-em-alta');
         if (emAlta) {
             const top3 = [...lives].sort((a, b) => (b.views || 0) - (a.views || 0)).slice(0, 3);
-            top3.forEach(live => emAlta.appendChild(criarCardHome(live)));
+            top3.forEach(live => emAlta.appendChild(criarVideoCard(live, { mostrarOpcoes: false })));
         }
 
-        // ── SEÇÕES POR CATEGORIA ──
-        // mapeamento: valor do checkbox → id do grid no HTML
         const mapaGrids = {
             'ação&aventura': 'grid-acao-aventura',
             'corrida':       'grid-corrida',
@@ -2899,47 +2758,170 @@ document.addEventListener('DOMContentLoaded', function () {
                 const gridId = mapaGrids[cat];
                 if (!gridId) return;
                 const grid = document.getElementById(gridId);
-                // evita duplicar se a live tem 2 categorias no mesmo grid
-                if (grid && !grid.querySelector(`[data-live-id="${live.id}"]`)) {
-                    const card = criarCardHome(live);
-                    card.dataset.liveId = live.id;
+                // FIX: era "live.id" (undefined em todo vídeo) -> travava depois do 1º card. Agora usa "id_stream"
+                if (grid && !grid.querySelector(`[data-live-id="${live.id_stream}"]`)) {
+                    const card = criarVideoCard(live, { mostrarOpcoes: false });
+                    card.dataset.liveId = live.id_stream;
                     grid.appendChild(card);
                 }
             });
         });
     }
 
-    function criarCardHome(live) {
+    function criarVideoCard(live, { mostrarOpcoes = false } = {}) {
         const card = document.createElement('div');
-        card.className = 'video-card';
-        card.style.cursor = 'pointer';
-        card.innerHTML = `
-            <div class="video-thumb" style="position:relative;aspect-ratio:16/9;background:#1a1a2e;border-radius:12px;overflow:hidden;">
-                ${live.aoVivo ? '<span class="badge-live">AO VIVO</span>' : ''}
-                ${live.thumb
-                    ? `<img src="${live.thumb}" style="width:100%;height:100%;object-fit:cover;" alt="${live.titulo}">`
-                    : `<video src="${live.src || ''}" preload="metadata" style="width:100%;height:100%;object-fit:cover;"></video>`
-                }
-                <span class="thumb-views" style="position:absolute;bottom:8px;right:8px;color:#fff;font-size:0.8em;text-shadow:0 1px 3px rgba(0,0,0,0.8);">
-                    ${live.views || 0} views
-                </span>
-            </div>
-            <p class="thumb-title">${live.titulo}</p>
-            <p class="thumb-user" style="color:#9147FF;">${live.canal || ''}</p>
-        `;
+        card.className = 'video-card-perfil';
 
-        // clique no card inteiro -> abre o player (comportamento que já existia)
-        card.addEventListener('click', () => abrirPlayerExpandido(live));
+        const thumbDiv = document.createElement('div');
+        thumbDiv.className = 'video-thumb-perfil';
 
-        // clique no nome do canal -> vai pro perfil de quem postou, sem abrir o player
-        const nomeCanalEl = card.querySelector('.thumb-user');
-        if (nomeCanalEl) {
-            nomeCanalEl.addEventListener('click', (e) => {
-                e.stopPropagation(); // impede que o clique "vaze" pro card e abra o player também
-                irParaPerfil(live.id_streamer, live.canal, live.canal_foto);
+        const vid = document.createElement('video');
+        vid.preload = 'metadata';
+        vid.muted = true;
+        vid.loop = true;
+        if (live.src) vid.src = live.src;
+        thumbDiv.appendChild(vid);
+
+        if (live.thumb) {
+            const capa = document.createElement('img');
+            capa.src = live.thumb;
+            capa.className = 'thumb-cover';
+            capa.alt = live.titulo;
+            thumbDiv.appendChild(capa);
+        }
+
+        if (live.aoVivo) {
+            const badge = document.createElement('span');
+            badge.className = 'thumb-badge-live';
+            badge.textContent = 'AO VIVO';
+            thumbDiv.appendChild(badge);
+        }
+
+        const views = document.createElement('span');
+        views.className = 'thumb-views-perfil';
+        views.textContent = `${live.views || 0} visualizações`;
+        thumbDiv.appendChild(views);
+
+        const progWrap = document.createElement('div');
+        progWrap.className = 'thumb-progress-wrap';
+        const progFill = document.createElement('div');
+        progFill.className = 'thumb-progress-fill';
+        progWrap.appendChild(progFill);
+        thumbDiv.appendChild(progWrap);
+
+        let rafId;
+        thumbDiv.addEventListener('mouseenter', () => {
+            if (!live.src) return;
+            vid.play().catch(() => {});
+            const tick = () => {
+                if (vid.duration) progFill.style.width = (vid.currentTime / vid.duration * 100) + '%';
+                rafId = requestAnimationFrame(tick);
+            };
+            rafId = requestAnimationFrame(tick);
+        });
+        thumbDiv.addEventListener('mouseleave', () => {
+            vid.pause(); vid.currentTime = 0;
+            progFill.style.width = '0%';
+            cancelAnimationFrame(rafId);
+        });
+
+        let isDragging = false;
+        const moverBarra = (e) => {
+            const rect = progWrap.getBoundingClientRect();
+            const pct = Math.min(Math.max((e.clientX - rect.left) / rect.width, 0), 1);
+            if (vid.duration) {
+                vid.currentTime = pct * vid.duration;
+                progFill.style.width = (pct * 100) + '%';
+            }
+        };
+        progWrap.addEventListener('mousedown', e => { e.stopPropagation(); isDragging = true; moverBarra(e); });
+        document.addEventListener('mousemove', e => { if (isDragging) moverBarra(e); });
+        document.addEventListener('mouseup', () => { isDragging = false; });
+        progWrap.addEventListener('click', e => e.stopPropagation());
+
+        // ── abre o player expandido, igual já fazia no perfil ──
+        thumbDiv.addEventListener('click', e => {
+            if (progWrap.contains(e.target)) return;
+            abrirPlayerExpandido(live);
+        });
+
+        const titulo = document.createElement('p');
+        titulo.className = 'video-card-titulo';
+        titulo.textContent = live.titulo;
+
+        const cats = document.createElement('p');
+        cats.className = 'video-card-categorias';
+        cats.textContent = live.categorias?.join(' • ') || '';
+        cats.style.cssText = 'font-size:0.78em;color:var(--color3)';
+
+        const nomeCanal = live.canal || document.querySelector('.show_name')?.textContent || 'Canal desconhecido';
+        const canal = document.createElement('p');
+        canal.className = 'video-card-canal';
+        canal.textContent = nomeCanal;
+        canal.style.cursor = 'pointer';
+        canal.addEventListener('click', e => {
+            e.stopPropagation();
+            if (live.id_streamer) irParaPerfil(live.id_streamer, live.canal, live.canal_foto);
+        });
+
+        const infoRow = document.createElement('div');
+        infoRow.style.cssText = 'display:flex;justify-content:space-between;align-items:center;width:100%;';
+
+        const dataEl = document.createElement('p');
+        dataEl.className = 'video-card-info';
+        dataEl.textContent = live.data;
+        dataEl.style.margin = '0';
+        infoRow.appendChild(dataEl);
+
+        // menu de opções (editar/excluir/salvar/clipe) só aparece no SEU PRÓPRIO canal
+        if (mostrarOpcoes) {
+            const opcWrapper = document.createElement('div');
+            opcWrapper.style.cssText = 'position:relative;flex-shrink:0;';
+
+            const btnOpcoes = document.createElement('button');
+            btnOpcoes.className = 'btn-opcoes-video';
+            btnOpcoes.innerHTML = '<i class="fa-solid fa-ellipsis-vertical"></i>';
+            btnOpcoes.title = 'Opções';
+
+            const menuOpcoes = document.createElement('div');
+            menuOpcoes.className = 'menu-opcoes-video';
+            menuOpcoes.innerHTML = `
+                <button class="opcao-video" data-acao="excluir"><i class="fa-solid fa-trash"></i> Excluir</button>
+                <button class="opcao-video" data-acao="editar"><i class="fa-solid fa-pen"></i> Editar</button>
+                <button class="opcao-video" data-acao="salvar"><i class="fa-solid fa-download"></i> Salvar vídeo</button>
+                <button class="opcao-video" data-acao="clipe"><i class="fa-solid fa-scissors"></i> Criar clipe (60s)</button>
+            `;
+
+            opcWrapper.append(btnOpcoes, menuOpcoes);
+            infoRow.appendChild(opcWrapper);
+
+            btnOpcoes.addEventListener('click', e => {
+                e.stopPropagation();
+                document.querySelectorAll('.menu-opcoes-video.show').forEach(m => {
+                    if (m !== menuOpcoes) m.classList.remove('show');
+                });
+                menuOpcoes.classList.toggle('show');
+            });
+
+            menuOpcoes.querySelectorAll('.opcao-video').forEach(btn => {
+                btn.addEventListener('click', e => {
+                    e.stopPropagation();
+                    const acao = btn.dataset.acao;
+                    if (acao === 'excluir') mostrarToast('Excluir ainda não está disponível.', 'error');
+                    else if (acao === 'editar') mostrarToast('Editar ainda não está disponível.', 'error');
+                    else if (acao === 'salvar') {
+                        if (!live.src) { mostrarToast('Nenhum vídeo disponível para download.', 'error'); return; }
+                        const a = document.createElement('a');
+                        a.href = live.src;
+                        a.download = `${live.titulo}.mp4`;
+                        a.click();
+                    } else if (acao === 'clipe') criarClipe(live);
+                    menuOpcoes.classList.remove('show');
+                });
             });
         }
 
+        card.append(thumbDiv, titulo, cats, canal, infoRow);
         return card;
     }
 
