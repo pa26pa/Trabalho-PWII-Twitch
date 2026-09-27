@@ -1,3 +1,4 @@
+<!--ÚLTIMO CTRL Z-->
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -8,7 +9,7 @@
     <link rel="stylesheet" href="{{url_for('static', filename='style.css')}}">
     <link rel="icon" type="image/x-icon" href="{{url_for('static', filename='witch.png')}}">
 </head>
-<body id="body-perfil">
+<body id="body-perfil" data-id-visualizado="{{ id_visualizado or '' }}">
     <header id="header"> 
         <div class="logo"><a href="{{url_for('home')}}"><img id="logo" src="{{url_for('static', filename='witch.png')}}" alt="logo"></a></div>
         <div class="header-center">
@@ -324,6 +325,7 @@
                     </form>
                 </dialog>
             </div>
+            <div id="botoes-sociais-perfil"></div>
         </section>
 
         <!--

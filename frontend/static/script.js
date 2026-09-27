@@ -1841,7 +1841,8 @@ document.addEventListener('DOMContentLoaded', function () {
         await carregarCsrf();
        // mostrarDeslogado()
         await verificarSessao();
-        renderVideosNaHome();
+        await renderVideosNaHome();
+        await iniciarPerfil();
 
         if (document.getElementById('block-btn')) {
             fetch(base_url +'/bloqueados', {
@@ -2926,9 +2927,126 @@ document.addEventListener('DOMContentLoaded', function () {
             <p class="thumb-title">${live.titulo}</p>
             <p class="thumb-user" style="color:#9147FF;">${live.canal || ''}</p>
         `;
+
+        // clique no card inteiro -> abre o player (comportamento que já existia)
         card.addEventListener('click', () => abrirPlayerExpandido(live));
+
+        // clique no nome do canal -> vai pro perfil de quem postou, sem abrir o player
+        const nomeCanalEl = card.querySelector('.thumb-user');
+        if (nomeCanalEl) {
+            nomeCanalEl.addEventListener('click', (e) => {
+                e.stopPropagation(); // impede que o clique "vaze" pro card e abra o player também
+                irParaPerfil(live.id_streamer, live.canal, live.canal_foto);
+            });
+        }
+
         return card;
     }
 
+    // detecta se é o próprio perfil ou de outra pessoa
+    async function iniciarPerfil() {
+        const params = new URLSearchParams(window.location.search);
+        const idParam = params.get('id');
+
+        if (!idParam) return; // sem ?id= na URL -> é o próprio perfil, segue o fluxo normal que já existe
+
+        // confere se o id da URL não é o do próprio usuário logado
+        const res = await fetch(base_url + "/session", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "X-CSRFToken": csrfToken }
+        });
+        const sessao = await res.json();
+
+        if (sessao.logado && String(sessao.id) === String(idParam)) {
+            // é o próprio perfil, só que acessado via link -> limpa a URL e segue normal
+            window.history.replaceState({}, '', '/perfil');
+            return;
+        }
+
+        ativarModoVisitante(idParam, params.get('nome'), params.get('foto'));
+    }
+
+    function ativarModoVisitante(idVisitado, nome, foto) {
+        // esconde os botões que só fazem sentido pro dono da conta
+        document.getElementById('btn-editar')?.style.setProperty('display', 'none');
+        document.getElementById('btn-start-live')?.style.setProperty('display', 'none');
+
+        // nome e foto chegam via URL (vieram do clique no card, sem precisar de backend novo)
+        if (nome) document.querySelectorAll('.show_name').forEach(el => el.textContent = decodeURIComponent(nome));
+        if (foto) {
+            const fotoEl = document.querySelector('.photo-user');
+            if (fotoEl) fotoEl.src = decodeURIComponent(foto);
+        }
+
+        montarBotoesSociais(idVisitado);
+        carregarSeguidoresDe(idVisitado);
+        renderVideosPerfil(idVisitado); // reaproveita a função que você já tem
+    }
+
+    function montarBotoesSociais(idVisitado) {
+        const container = document.getElementById('botoes-sociais-perfil');
+        if (!container) return;
+
+        container.innerHTML = `
+            <button class="btn-perfil" id="btn-seguir-visitante">Seguir</button>
+            <button class="btn-perfil" id="btn-sub-visitante">Sub</button>
+        `;
+
+        document.getElementById('btn-seguir-visitante').addEventListener('click', async () => {
+            const res = await fetch(base_url + "/subscribe", {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "X-CSRFToken": csrfToken },
+                body: JSON.stringify({ criador: idVisitado })
+            });
+            const data = await res.json();
+            mostrarToast(data.mensagem, data.status);
+            if (data.status !== 'error') carregarSeguidoresDe(idVisitado);
+        });
+    }
+
+    function irParaPerfil(id, nome, foto) {
+        const params = new URLSearchParams();
+        params.set('id', id);
+        if (nome) params.set('nome', encodeURIComponent(nome));
+        if (foto) params.set('foto', encodeURIComponent(foto));
+        window.location.href = '/perfil?' + params.toString();
+    }
+
+    // tela pagamento turbo
+    const btnTurbo = document.querySelectorAll('.btn-turbo-sub');
+    btnTurbo.forEach(btnTurbo => {
+        btnTurbo.addEventListener('click', () => {
+            const turboModal = document.querySelector('.turbo-modal');
+            const pagTurbo = document.querySelector('.pagamento-turbo');
+
+            turboModal.style.display = 'none';
+            pagTurbo.style.display = 'flex';
+        });
+    });
+
+    // máscara dos inputs do forms de pagamento do turbo
+    document.getElementById('numero').addEventListener('input', function(e) {
+        let value = e.target.value.replace(/\D/g, ''); // Remove tudo que não é dígito
+        value = value.substring(0, 16);
+        e.target.value = value.replace(/(\d{4})/g, '$1 ').trim();
+    });
+
+    document.getElementById('validade').addEventListener('input', function(e) {
+        let value = e.target.value.replace(/\D/g, ''); // Remove tudo que não é dígito
+        value = value.substring(0, 4);
+        e.target.value = value.replace(/(\d{2})(\d{2})/, '$1/$2');
+    });
+
+    document.getElementById('cvv').addEventListener('input', function(e) {
+        let value = e.target.value.replace(/\D/g, ''); // Remove tudo que não é dígito
+        value = value.substring(0, 3);
+        e.target.value = value;
+    });
+
+    // notificação de sucesso ao enviar o form
+    document.querySelector('form').addEventListener('submit', function(e) {
+        e.preventDefault(); // Evita o envio do formulário
+        alert('Compra realizada com sucesso!');
+    });
     init();
 });
