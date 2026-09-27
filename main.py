@@ -66,6 +66,10 @@ def ajuda():
 def perfil():
     return render_template("perfil.html")
 
+@app.route("/turbo")
+def turbo():
+    return render_template("turbo.html")
+
 @app.errorhandler(RequestEntityTooLarge)
 def handle_large_file(e):
     return {'status': 'error', 'mensagem': 'Arquivo muito grande'}, 413
