@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            display: flex;
+            height: 100vh;
+            justify-content: center;
+            align-items: center;
+        }
+        .pagamento-turbo {
+            display: flex;
+            background-color: white;
+            height: 400px;
+            width: 300px;
+            padding: 20px;
+            align-items: center;
+            border-radius: 15px;
+            box-shadow: 0 0 15px 10px rgba(0, 0, 0, 0.1);
+        }
+        .pagamento-turbo form{
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+        }
+        .pagamento-turbo input {
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        .pagamento-turbo input:focus {
+            outline: none;
+            border-color: #007BFF;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+        }
+        .pagamento-turbo button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .pagamento-turbo button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="pagamento-turbo">
+        <form action="#">
+            <label for="numero">Número do cartão:</label>
+            <input type="text" id="numero" name="numero" placeholder="1234 5678 9012 3456" required><br>
+            <label for="nome">Nome no cartão:</label>
+            <input type="text" id="nome" name="nome" placeholder="John Doe" required><br>
+            <label for="validade">Validade:</label>
+            <input type="text" id="validade" name="validade" placeholder="MM/AA" required><br>
+            <label for="cvv">CVV:</label>
+            <input type="text" id="cvv" name="cvv" placeholder="123" required><br>
+            <button type="submit">Comprar Turbo</button>
+        </form>
+    </div>
+    <script>
+        // máscara dos inputs do forms de pagamento do turbo
+        document.getElementById('numero').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, ''); // Remove tudo que não é dígito
+            value = value.substring(0, 16);
+            e.target.value = value.replace(/(\d{4})/g, '$1 ').trim();
+        });
+
+        document.getElementById('validade').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, ''); // Remove tudo que não é dígito
+            value = value.substring(0, 4);
+            e.target.value = value.replace(/(\d{2})(\d{2})/, '$1/$2');
+        });
+
+        document.getElementById('cvv').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, ''); // Remove tudo que não é dígito
+            value = value.substring(0, 3);
+            e.target.value = value;
+        });
+
+        // notificação de sucesso ao enviar o form
+        document.querySelector('form').addEventListener('submit', function(e) {
+            e.preventDefault(); // Evita o envio do formulário
+            alert('Compra realizada com sucesso!');
+        });
+    </script>
+</body>
+</html>

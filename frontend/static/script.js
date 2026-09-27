@@ -1,6 +1,6 @@
 //DOMContentLoaded garante que o script só rode depois de todo o HTML estar carregado
 document.addEventListener('DOMContentLoaded', function () {
-    base_url = "";
+    base_url = "http://127.0.0.1:5000";
 
     // CARREGAMENTO DO CSRF TOKEN 
     // o token é necessário para proteger contra ataques CSRF, garantindo que as requisições venham de fontes confiáveis
@@ -1841,6 +1841,8 @@ document.addEventListener('DOMContentLoaded', function () {
         await carregarCsrf();
        // mostrarDeslogado()
         await verificarSessao();
+        await renderVideosNaHome();
+        await iniciarPerfil();
 
         if (document.getElementById('block-btn')) {
             fetch(base_url +'/bloqueados', {
@@ -2263,12 +2265,18 @@ document.addEventListener('DOMContentLoaded', function () {
             canal.className = 'video-card-canal';
             canal.textContent = nomeCanal;
 
+            // linha com data + 3 pontos
+            const infoRow = document.createElement('div');
+            infoRow.style.cssText = 'display:flex;justify-content:space-between;align-items:center;width:100%;';
+
             const dataEl = document.createElement('p');
             dataEl.className = 'video-card-info';
             dataEl.textContent = live.data;
+            dataEl.style.margin = '0';
 
-            const infoRow = document.createElement('div');
-            infoRow.style.cssText = 'display:flex;justify-content:space-between;align-items:center;';
+            // wrapper relativo para posicionar o menu
+            const opcWrapper = document.createElement('div');
+            opcWrapper.style.cssText = 'position:relative;flex-shrink:0;';
 
             const btnOpcoes = document.createElement('button');
             btnOpcoes.className = 'btn-opcoes-video';
@@ -2283,6 +2291,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 <button class="opcao-video" data-acao="salvar"><i class="fa-solid fa-download"></i> Salvar vídeo</button>
                 <button class="opcao-video" data-acao="clipe"><i class="fa-solid fa-scissors"></i> Criar clipe (60s)</button>
             `;
+
+            opcWrapper.appendChild(btnOpcoes);
+            opcWrapper.appendChild(menuOpcoes);
+
+            infoRow.appendChild(dataEl);
+            infoRow.appendChild(opcWrapper);
+
+            // monta o card — data e 3 pontos ficam juntos na infoRow
+            card.append(thumbDiv, titulo, cats, canal, infoRow);
+            container.appendChild(card);
 
             btnOpcoes.addEventListener('click', e => {
                 e.stopPropagation();
@@ -2319,19 +2337,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     menuOpcoes.classList.remove('show');
                 });
             });
-
-            document.addEventListener('click', () => menuOpcoes.classList.remove('show'));
-
-            infoRow.appendChild(dataEl);
-            infoRow.appendChild(btnOpcoes);
-
-            const opcWrapper = document.createElement('div');
-            opcWrapper.style.cssText = 'position:relative;';
-            opcWrapper.appendChild(btnOpcoes);
-            opcWrapper.appendChild(menuOpcoes);
-
-            card.append(thumbDiv, titulo, cats, canal, infoRow, opcWrapper);
-            container.appendChild(card);
         });
     }
 
@@ -2861,5 +2866,187 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    //função para passar os vídeos dos usuários para a tela inicial
+    function renderVideosNaHome() {
+        const lives = getLives();
+        if (lives.length === 0) return;
+
+        // ── EM ALTA: os 3 com mais visualizações ──
+        const emAlta = document.getElementById('grid-em-alta');
+        if (emAlta) {
+            const top3 = [...lives].sort((a, b) => (b.views || 0) - (a.views || 0)).slice(0, 3);
+            top3.forEach(live => emAlta.appendChild(criarCardHome(live)));
+        }
+
+        // ── SEÇÕES POR CATEGORIA ──
+        // mapeamento: valor do checkbox → id do grid no HTML
+        const mapaGrids = {
+            'ação&aventura': 'grid-acao-aventura',
+            'corrida':       'grid-corrida',
+            'esporte':       'grid-esporte',
+            'e-sports':      'grid-e-sport',
+            'estratégia':    'grid-estrategia',
+            'FPS&tiro':      'grid-fps-tiro',
+            'luta':          'grid-luta',
+            'RPG':           'grid-rpg',
+            'terror':        'grid-terror',
+            '+18':           'grid-18',
+            'não-jogo':      'grid-outros',
+        };
+
+        lives.forEach(live => {
+            (live.categorias || []).forEach(cat => {
+                const gridId = mapaGrids[cat];
+                if (!gridId) return;
+                const grid = document.getElementById(gridId);
+                // evita duplicar se a live tem 2 categorias no mesmo grid
+                if (grid && !grid.querySelector(`[data-live-id="${live.id}"]`)) {
+                    const card = criarCardHome(live);
+                    card.dataset.liveId = live.id;
+                    grid.appendChild(card);
+                }
+            });
+        });
+    }
+
+    function criarCardHome(live) {
+        const card = document.createElement('div');
+        card.className = 'video-card';
+        card.style.cursor = 'pointer';
+        card.innerHTML = `
+            <div class="video-thumb" style="position:relative;aspect-ratio:16/9;background:#1a1a2e;border-radius:12px;overflow:hidden;">
+                ${live.aoVivo ? '<span class="badge-live">AO VIVO</span>' : ''}
+                ${live.thumb
+                    ? `<img src="${live.thumb}" style="width:100%;height:100%;object-fit:cover;" alt="${live.titulo}">`
+                    : `<video src="${live.src || ''}" preload="metadata" style="width:100%;height:100%;object-fit:cover;"></video>`
+                }
+                <span class="thumb-views" style="position:absolute;bottom:8px;right:8px;color:#fff;font-size:0.8em;text-shadow:0 1px 3px rgba(0,0,0,0.8);">
+                    ${live.views || 0} views
+                </span>
+            </div>
+            <p class="thumb-title">${live.titulo}</p>
+            <p class="thumb-user" style="color:#9147FF;">${live.canal || ''}</p>
+        `;
+
+        // clique no card inteiro -> abre o player (comportamento que já existia)
+        card.addEventListener('click', () => abrirPlayerExpandido(live));
+
+        // clique no nome do canal -> vai pro perfil de quem postou, sem abrir o player
+        const nomeCanalEl = card.querySelector('.thumb-user');
+        if (nomeCanalEl) {
+            nomeCanalEl.addEventListener('click', (e) => {
+                e.stopPropagation(); // impede que o clique "vaze" pro card e abra o player também
+                irParaPerfil(live.id_streamer, live.canal, live.canal_foto);
+            });
+        }
+
+        return card;
+    }
+
+    // detecta se é o próprio perfil ou de outra pessoa
+    async function iniciarPerfil() {
+        const params = new URLSearchParams(window.location.search);
+        const idParam = params.get('id');
+
+        if (!idParam) return; // sem ?id= na URL -> é o próprio perfil, segue o fluxo normal que já existe
+
+        // confere se o id da URL não é o do próprio usuário logado
+        const res = await fetch(base_url + "/session", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "X-CSRFToken": csrfToken }
+        });
+        const sessao = await res.json();
+
+        if (sessao.logado && String(sessao.id) === String(idParam)) {
+            // é o próprio perfil, só que acessado via link -> limpa a URL e segue normal
+            window.history.replaceState({}, '', '/perfil');
+            return;
+        }
+
+        ativarModoVisitante(idParam, params.get('nome'), params.get('foto'));
+    }
+
+    function ativarModoVisitante(idVisitado, nome, foto) {
+        // esconde os botões que só fazem sentido pro dono da conta
+        document.getElementById('btn-editar')?.style.setProperty('display', 'none');
+        document.getElementById('btn-start-live')?.style.setProperty('display', 'none');
+
+        // nome e foto chegam via URL (vieram do clique no card, sem precisar de backend novo)
+        if (nome) document.querySelectorAll('.show_name').forEach(el => el.textContent = decodeURIComponent(nome));
+        if (foto) {
+            const fotoEl = document.querySelector('.photo-user');
+            if (fotoEl) fotoEl.src = decodeURIComponent(foto);
+        }
+
+        montarBotoesSociais(idVisitado);
+        carregarSeguidoresDe(idVisitado);
+        renderVideosPerfil(idVisitado); // reaproveita a função que você já tem
+    }
+
+    function montarBotoesSociais(idVisitado) {
+        const container = document.getElementById('botoes-sociais-perfil');
+        if (!container) return;
+
+        container.innerHTML = `
+            <button class="btn-perfil" id="btn-seguir-visitante">Seguir</button>
+            <button class="btn-perfil" id="btn-sub-visitante">Sub</button>
+        `;
+
+        document.getElementById('btn-seguir-visitante').addEventListener('click', async () => {
+            const res = await fetch(base_url + "/subscribe", {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "X-CSRFToken": csrfToken },
+                body: JSON.stringify({ criador: idVisitado })
+            });
+            const data = await res.json();
+            mostrarToast(data.mensagem, data.status);
+            if (data.status !== 'error') carregarSeguidoresDe(idVisitado);
+        });
+    }
+
+    function irParaPerfil(id, nome, foto) {
+        const params = new URLSearchParams();
+        params.set('id', id);
+        if (nome) params.set('nome', encodeURIComponent(nome));
+        if (foto) params.set('foto', encodeURIComponent(foto));
+        window.location.href = '/perfil?' + params.toString();
+    }
+
+    // tela pagamento turbo
+    const btnTurbo = document.querySelectorAll('.btn-turbo-sub');
+    btnTurbo.forEach(btnTurbo => {
+        btnTurbo.addEventListener('click', () => {
+            const turboModal = document.querySelector('.turbo-modal');
+            const pagTurbo = document.querySelector('.pagamento-turbo');
+
+            turboModal.style.display = 'none';
+            pagTurbo.style.display = 'flex';
+        });
+    });
+
+    // máscara dos inputs do forms de pagamento do turbo
+    document.getElementById('numero').addEventListener('input', function(e) {
+        let value = e.target.value.replace(/\D/g, ''); // Remove tudo que não é dígito
+        value = value.substring(0, 16);
+        e.target.value = value.replace(/(\d{4})/g, '$1 ').trim();
+    });
+
+    document.getElementById('validade').addEventListener('input', function(e) {
+        let value = e.target.value.replace(/\D/g, ''); // Remove tudo que não é dígito
+        value = value.substring(0, 4);
+        e.target.value = value.replace(/(\d{2})(\d{2})/, '$1/$2');
+    });
+
+    document.getElementById('cvv').addEventListener('input', function(e) {
+        let value = e.target.value.replace(/\D/g, ''); // Remove tudo que não é dígito
+        value = value.substring(0, 3);
+        e.target.value = value;
+    });
+
+    // notificação de sucesso ao enviar o form
+    document.querySelector('form').addEventListener('submit', function(e) {
+        e.preventDefault(); // Evita o envio do formulário
+        alert('Compra realizada com sucesso!');
+    });
     init();
 });
