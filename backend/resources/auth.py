@@ -2082,3 +2082,41 @@ class deletar_video(Resource):
             'status': 'success', 
             'mensagem': 'Video deletado com sucesso'
         }, 200
+        
+class foto_streamer(Resource):
+    def post(self):
+        token = request.headers.get("X-CSRFToken")
+                
+        check = check_csrf(token)
+        if not check or check.get("status") == "error":
+            return {'status': 'error', 'mensagem': check.get("mensagem")}, 400
+        
+        con = connection()
+        cursor = con.cursor(pymysql.cursors.DictCursor)
+        
+        data = request.get_json()
+        
+        id = data.get('id_streamer')
+        
+        try:
+            query = """select foto_url from usuarios where id_usuario = %s"""
+            cursor.execute(query,(id,))
+            foto = cursor.fetchone()
+        
+        except Exception as e:
+            print(e)
+            return {
+                'status': 'error', 
+                'mensagem': 'Erro interno ao deletar video'
+            }, 500
+        
+        finally:
+            cursor.close()
+            con.close()
+        
+        return {
+            'status': 'success', 
+            'mensagem': 'Foi possivel encontrar dados',
+            'foto_url': foto
+        }, 200
+            
