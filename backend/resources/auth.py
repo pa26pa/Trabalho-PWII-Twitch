@@ -1611,14 +1611,21 @@ class videos(Resource):
         
         try:
             if not id_streamer:
-                query = """select id_stream, categoria, titulo, descrisao, video_url, data_upload, capa from streams order by data_upload desc;"""
-
-                cursor.execute(query,)
+                query = """select s.id_stream, s.categoria, s.titulo, s.descrisao, s.video_url, s.data_upload, s.capa,
+                                  s.id_streamer, u.user_name as canal, u.foto_url as canal_foto
+                           from streams s
+                           join usuarios u on u.id_usuario = s.id_streamer
+                           order by s.data_upload desc;"""
+                cursor.execute(query)
                 rows = cursor.fetchall()
-
-            if id_streamer:
-                query = """select id_stream, categoria, titulo, descrisao, video_url, data_upload, capa from streams where id_streamer = %s order by data_upload desc;"""
-                cursor.execute(query,)
+            else:
+                query = """select s.id_stream, s.categoria, s.titulo, s.descrisao, s.video_url, s.data_upload, s.capa,
+                                  s.id_streamer, u.user_name as canal, u.foto_url as canal_foto
+                           from streams s
+                           join usuarios u on u.id_usuario = s.id_streamer
+                           where s.id_streamer = %s
+                           order by s.data_upload desc;"""
+                cursor.execute(query, (id_streamer,))
                 rows = cursor.fetchall()
             
             videos = []
@@ -1631,6 +1638,9 @@ class videos(Resource):
                     "src": row["video_url"],
                     "thumb": row["capa"],
                     "data": row["data_upload"].strftime("%d/%m/%Y"),
+                    "id_streamer": row["id_streamer"],
+                    "canal": row["canal"],
+                    "canal_foto": row["canal_foto"],
                     "views": 0,
                     "curtidas": 0,
                     "comentarios": [],
@@ -1645,8 +1655,7 @@ class videos(Resource):
 
         finally:
             cursor.close()
-            con.close() 
-                 
+            con.close()                 
 class salvar_video(Resource):
     def post(self):
         token = request.headers.get("X-CSRFToken")
@@ -2026,4 +2035,97 @@ class zerar_cadastro_google(Resource):
             'status':'success',
             'mensagem':'Cadastro finalizado'
         }, 200
+
+class deletar_video(Resource):
+    def delete():
+        token = request.headers.get("X-CSRFToken")
         
+                     
+        check = check_csrf(token)
+        if not check or check.get("status") == "error":
+            return {'status': 'error', 'mensagem': check.get("mensagem")}, 400
+        
+        con = connection()
+        cursor = con.cursor(pymysql.cursors.DictCursor)
+        
+        data = request.get_json()
+        
+        id_stream = data.get('id_stream')
+        
+        video_url = "https://cloudinary.com"
+        parte_final = video_url.split("/upload/")[-1]
+
+        if parte_final.startswith("v"):
+            parte_final = parte_final.split("/", 1)[1]
+
+        public_id = parte_final.rsplit(".", 1)[0]
+        
+        resultado = cloudinary.uploader.destroy(public_id, resource_type="video")
+        
+        try:
+            query_streams = """delete from streams where id_stream = %s"""
+            query_curtidas = """delete from curtidas where id_stream = %s"""
+            query_views = """delete from views where id_stream = %s"""
+            query_comentarios = """delete from comentarios where id_stream = %s"""
+            cursor.execute(query_streams,(id_stream,))
+            con.commit()
+            cursor.execute(query_curtidas,(id_stream,))
+            con.commit()
+            cursor.execute(query_views,(id_stream,))
+            con.commit()
+            cursor.execute(query_comentarios,(id_stream,))
+            con.commit()
+        
+        except Exception as e:
+            print(e)
+            return {
+                'status': 'error', 
+                'mensagem': 'Erro interno ao deletar video'
+            }, 500
+        
+        finally:
+            cursor.close()
+            con.close()
+    
+        return {
+            'status': 'success', 
+            'mensagem': 'Video deletado com sucesso'
+        }, 200
+        
+class foto_streamer(Resource):
+    def post(self):
+        token = request.headers.get("X-CSRFToken")
+                
+        check = check_csrf(token)
+        if not check or check.get("status") == "error":
+            return {'status': 'error', 'mensagem': check.get("mensagem")}, 400
+        
+        con = connection()
+        cursor = con.cursor(pymysql.cursors.DictCursor)
+        
+        data = request.get_json()
+        
+        id = data.get('id_streamer')
+        
+        try:
+            query = """select foto_url from usuarios where id_usuario = %s"""
+            cursor.execute(query,(id,))
+            foto = cursor.fetchone()
+        
+        except Exception as e:
+            print(e)
+            return {
+                'status': 'error', 
+                'mensagem': 'Erro interno ao deletar video'
+            }, 500
+        
+        finally:
+            cursor.close()
+            con.close()
+        
+        return {
+            'status': 'success', 
+            'mensagem': 'Foi possivel encontrar dados',
+            'foto_url': foto['foto_url']
+        }, 200
+            
