@@ -1,6 +1,6 @@
 //DOMContentLoaded garante que o script só rode depois de todo o HTML estar carregado
 document.addEventListener('DOMContentLoaded', function () {
-    base_url = "http://127.0.0.1:5000";
+    base_url = "";
 
     // CARREGAMENTO DO CSRF TOKEN 
     // o token é necessário para proteger contra ataques CSRF, garantindo que as requisições venham de fontes confiáveis
