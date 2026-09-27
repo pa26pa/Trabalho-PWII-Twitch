@@ -3048,5 +3048,6 @@ document.addEventListener('DOMContentLoaded', function () {
         e.preventDefault(); // Evita o envio do formulário
         alert('Compra realizada com sucesso!');
     });
+
     init();
 });
