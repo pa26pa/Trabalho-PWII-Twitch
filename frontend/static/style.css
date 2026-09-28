@@ -2138,6 +2138,10 @@ a {text-decoration: none;}
 }
 
 .botoes-sociais-perfil {display: flex; flex-direction: column;}
+.btn-perfil.ativo {
+    background: var(--color3);
+    color: #F4ECFF;
+}
 /*modal de iniciar live*/
 /* SELECT CUSTOMIZADO */
 #modal-6 .modal-buttons {

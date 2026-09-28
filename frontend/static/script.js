@@ -103,6 +103,13 @@ document.addEventListener('DOMContentLoaded', function () {
             const modalId = button.getAttribute('data-modal');
             const modal = document.getElementById(modalId);
             if (modal) { // ← proteção para evitar erros se o modal não existir
+                if (modalId === 'modal-5') {
+                    const turboModal = modal.querySelector('.turbo-modal');
+                    const pagTurbo = modal.querySelector('.pagamento-turbo');
+                    if (turboModal) turboModal.style.display = 'block';
+                    if (pagTurbo) pagTurbo.style.display = 'none';
+                    modal.style.background = '#1a1a2e';
+                }
                 modal.showModal(); // método nativo para mostrar modais <dialog>
                 document.body.classList.add('modal-open');// classe para evitar scroll do fundo
             }
@@ -563,6 +570,11 @@ document.addEventListener('DOMContentLoaded', function () {
             show_seguidores(data.seguidores);
             show_seguindo(data.seguindo);
             
+            const btnSeguir = document.getElementById('btn-seguir-visitante');
+            if (btnSeguir && typeof data.seguindo_eu === 'boolean') {
+                btnSeguir.textContent = data.seguindo_eu ? 'Seguindo' : 'Seguir';
+                btnSeguir.classList.toggle('ativo', data.seguindo_eu);
+            }
         })
     }
 
@@ -1223,115 +1235,6 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         });
     }
-
-    // Página Inicial - Em Alta (galeria de lives)
-    const carouselHome = document.querySelector('.carousel-wrap');
-    const trackHome = document.getElementById('track-home');
-
-    if (carouselHome && trackHome) {
-        let currentHome = 0;
-        const totalHome = trackHome.children.length; // pega automático
-
-        function goToHome(i) {
-            currentHome = (i + totalHome) % totalHome;
-            const w = trackHome.children[0].offsetWidth;
-            trackHome.style.transform = `translateX(-${currentHome * w}px)`;
-        }
-
-        document.getElementById('prev').addEventListener('click', () => goToHome(currentHome - 1));
-        document.getElementById('next').addEventListener('click', () => goToHome(currentHome + 1));
-        window.addEventListener('resize', () => goToHome(currentHome));
-    }
-
-    /*controles dos videos
-    const player = document.getElementById('player');
-    const gifImg = document.getElementById('gif-img');
-    const playBtn = document.getElementById('play-btn');
-    const playIcon = document.getElementById('play-icon');
-    const progFill = document.getElementById('progress-fill');
-    const progWrap = document.getElementById('progress-wrap');
-    const muteBtn = document.getElementById('mute-btn');
-    const volIcon = document.getElementById('vol-icon');
-    const volRange = document.getElementById('vol-range');
-    const fsBtn = document.getElementById('fs-btn');
-    const fsIcon = document.getElementById('fs-icon');
-
-    if (player) {
-        let playing = true;
-        let muted = false;
-        let progress = 0;
-        let timer;
-
-        // ── PROGRESSO SIMULADO (GIF não tem timeupdate) ──
-        function startProgress() {
-            clearInterval(timer);
-            timer = setInterval(() => {
-                progress = (progress + 0.08) % 100; // loop de 0 a 100
-                progFill.style.width = progress + '%';
-            }, 100);
-        }
-        function stopProgress() { clearInterval(timer); }
-
-        // ── PLAY / PAUSE ──
-        function togglePlay() {
-            playing = !playing;
-            if (playing) {
-                player.classList.remove('paused');
-                playIcon.className = 'ti ti-player-pause'; // ícone de pause
-                gifImg.src = gifImg.src; // reinicia o GIF (truque para simular play)
-                startProgress();
-            } else {
-                player.classList.add('paused');
-                playIcon.className = 'ti ti-player-play';
-                stopProgress();
-            }
-        }
-
-        // clique no botão ou na área do vídeo
-        playBtn.addEventListener('click', e => { e.stopPropagation(); togglePlay(); });
-        player.addEventListener('click', togglePlay);
-
-        // ── BARRA DE PROGRESSO ──
-        progWrap.addEventListener('click', e => {
-            e.stopPropagation();
-            const rect = progWrap.getBoundingClientRect();
-            progress = ((e.clientX - rect.left) / rect.width) * 100;
-            progFill.style.width = progress + '%';
-        });
-
-        // ── MUTE ──
-        muteBtn.addEventListener('click', e => {
-            e.stopPropagation();
-            muted = !muted;
-            volIcon.className = muted ? 'ti ti-volume-off' : 'ti ti-volume';
-            volRange.value    = muted ? 0 : 80;
-        });
-
-        // ── VOLUME ──
-        volRange.addEventListener('input', e => {
-            e.stopPropagation();
-            muted = volRange.value == 0;
-            // ícone muda conforme o nível
-            if (muted) volIcon.className = 'ti ti-volume-off';
-            else if (volRange.value < 50) volIcon.className = 'ti ti-volume-2';
-            else volIcon.className = 'ti ti-volume';
-        });
-
-        // ── TELA CHEIA ──
-        fsBtn.addEventListener('click', e => {
-            e.stopPropagation();
-            if (!document.fullscreenElement) {
-                player.requestFullscreen?.();
-                fsIcon.className = 'ti ti-arrows-minimize';
-            } else {
-                document.exitFullscreen?.();
-                fsIcon.className = 'ti ti-arrows-maximize';
-            }
-        });
-
-        // inicia o progresso simulado ao carregar
-        startProgress();
-    }*/
 
     //----------------MOON--------------------
     // CARROUSSEL 
@@ -3069,14 +2972,10 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     async function renderVideosNaHome() {
-        const lives = await getLivesHome(); // não depende mais de sessão
+        const lives = await getLivesHome();
         if (lives.length === 0) return;
 
-        const emAlta = document.getElementById('grid-em-alta');
-        if (emAlta) {
-            const top3 = [...lives].sort((a, b) => (b.views || 0) - (a.views || 0)).slice(0, 3);
-            top3.forEach(live => emAlta.appendChild(criarVideoCard(live, { mostrarOpcoes: false })));
-        }
+        montarEmAlta(lives);
 
         const mapaGrids = {
             'ação&aventura': 'grid-acao-aventura',
@@ -3092,19 +2991,107 @@ document.addEventListener('DOMContentLoaded', function () {
             'não-jogo':      'grid-outros',
         };
 
+        const porCategoria = {};
         lives.forEach(live => {
             (live.categorias || []).forEach(cat => {
-                const gridId = mapaGrids[cat];
-                if (!gridId) return;
-                const grid = document.getElementById(gridId);
-                // FIX: era "live.id" (undefined em todo vídeo) -> travava depois do 1º card. Agora usa "id_stream"
-                if (grid && !grid.querySelector(`[data-live-id="${live.id_stream}"]`)) {
-                    const card = criarVideoCard(live, { mostrarOpcoes: false });
-                    card.dataset.liveId = live.id_stream;
-                    grid.appendChild(card);
-                }
+                if (!mapaGrids[cat]) return;
+                if (!porCategoria[cat]) porCategoria[cat] = [];
+                porCategoria[cat].push(live);
             });
         });
+
+        Object.entries(mapaGrids).forEach(([cat, gridId]) => {
+            const grid = document.getElementById(gridId);
+            if (!grid) return;
+
+            const videosCat = (porCategoria[cat] || []).slice(0, 10); // até 10, já vem ordenado por data desc
+
+            if (videosCat.length === 0) {
+                grid.closest('.section-home')?.style.setProperty('display', 'none');
+                return;
+            }
+
+            videosCat.forEach(live => grid.appendChild(criarVideoCard(live, { mostrarOpcoes: false })));
+
+            const wrap = garantirWrapComSetas(grid);
+            montarCarrossel(wrap, grid);
+        });
+    }
+
+    function montarEmAlta(lives) {
+        const track = document.getElementById('track-home');
+        if (!track) return;
+        track.innerHTML = '';
+
+        const top3 = [...lives].sort((a, b) => (b.views || 0) - (a.views || 0)).slice(0, 3);
+        const secao = track.closest('.section-home');
+
+        if (top3.length === 0) {
+            if (secao) secao.style.display = 'none';
+            return;
+        }
+        if (secao) secao.style.display = '';
+
+        top3.forEach(live => {
+            const slide = document.createElement('div');
+            slide.className = 'carousel-slide';
+
+            const thumb = document.createElement('div');
+            thumb.className = 'video-thumb';
+            thumb.style.cursor = 'pointer';
+            thumb.innerHTML = `
+                <span class="badge-live">AO VIVO</span>
+                ${live.thumb
+                    ? `<img src="${live.thumb}" alt="${live.titulo}" style="width:100%;height:100%;object-fit:cover;">`
+                    : `<video src="${live.src || ''}" preload="metadata" muted style="width:100%;height:100%;object-fit:cover;"></video>`}
+                <span class="thumb-views">${live.views || 0} visualizações</span>
+            `;
+            thumb.addEventListener('click', () => abrirPlayerExpandido(live));
+
+            const titulo = document.createElement('p');
+            titulo.className = 'thumb-title';
+            titulo.textContent = live.titulo;
+
+            const canal = document.createElement('p');
+            canal.className = 'thumb-user';
+            canal.textContent = live.canal || 'Canal desconhecido';
+            canal.style.cursor = 'pointer';
+            canal.addEventListener('click', e => {
+                e.stopPropagation();
+                if (live.id_streamer) irParaPerfil(live.id_streamer, live.canal, live.canal_foto);
+            });
+
+            slide.append(thumb, titulo, canal);
+            track.appendChild(slide);
+        });
+
+        iniciarCarrosselEmAlta(top3.length);
+    }
+
+    function iniciarCarrosselEmAlta(total) {
+        const track = document.getElementById('track-home');
+        const prevBtn = document.getElementById('prev');
+        const nextBtn = document.getElementById('next');
+        if (!track || total === 0) return;
+
+        let current = 0;
+        function goTo(i) {
+            current = (i + total) % total;
+            const w = track.children[0]?.offsetWidth || 0;
+            track.style.transform = `translateX(-${current * w}px)`;
+        }
+
+        if (prevBtn) { prevBtn.style.display = total > 1 ? '' : 'none'; prevBtn.onclick = () => { goTo(current - 1); resetAutoplay(); }; }
+        if (nextBtn) { nextBtn.style.display = total > 1 ? '' : 'none'; nextBtn.onclick = () => { goTo(current + 1); resetAutoplay(); }; }
+        window.addEventListener('resize', () => goTo(current));
+
+        let intervalId;
+        function resetAutoplay() {
+            clearInterval(intervalId);
+            if (total > 1) intervalId = setInterval(() => goTo(current + 1), 6000);
+        }
+        resetAutoplay();
+        goTo(0);
     }
 
     function criarVideoCard(live, { mostrarOpcoes = false } = {}) {
@@ -3289,19 +3276,47 @@ document.addEventListener('DOMContentLoaded', function () {
             row.appendChild(card);
         });
     }
+    
+    // carrossel de vídeos
+    function montarCarrossel(wrap, scroller) {
+        wrap.querySelectorAll('.arrow-btn, .row-arrow-btn').forEach(b => b.remove());
 
-    function configurarSetasExplorar() {
-        document.querySelectorAll('.explorar-row-wrap').forEach(wrap => {
-            const row = wrap.querySelector('.explorar-row');
-            const prev = wrap.querySelector('.arrow-prev');
-            const next = wrap.querySelector('.arrow-next');
-            if (!row || !prev || !next) return;
+        const criarBotao = (dir) => {
+            const b = document.createElement('button');
+            b.type = 'button';
+            b.className = `row-arrow-btn ${dir}`;
+            b.setAttribute('aria-label', dir === 'prev' ? 'Anterior' : 'Próximo');
+            b.innerHTML = `<i class="fa-solid fa-chevron-${dir === 'prev' ? 'left' : 'right'}"></i>`;
+            return b;
+        };
+        const prev = criarBotao('prev');
+        const next = criarBotao('next');
+        wrap.append(prev, next);
 
-            const scrollAmount = () => row.clientWidth * 0.9;
+        const atualizar = () => {
+            const max = scroller.scrollWidth - scroller.clientWidth;
+            prev.classList.toggle('visivel', max > 4 && scroller.scrollLeft > 4);
+            next.classList.toggle('visivel', max > 4 && scroller.scrollLeft < max - 4);
+        };
+        const passo = () => scroller.clientWidth * 0.85;
 
-            prev.addEventListener('click', () => row.scrollBy({ left: -scrollAmount(), behavior: 'smooth' }));
-            next.addEventListener('click', () => row.scrollBy({ left: scrollAmount(), behavior: 'smooth' }));
-        });
+        prev.addEventListener('click', () => scroller.scrollBy({ left: -passo(), behavior: 'smooth' }));
+        next.addEventListener('click', () => scroller.scrollBy({ left: passo(), behavior: 'smooth' }));
+        scroller.addEventListener('scroll', atualizar, { passive: true });
+        new ResizeObserver(atualizar).observe(scroller);
+        window.addEventListener('resize', atualizar);
+        atualizar();
+    }
+
+    function garantirWrapComSetas(el) {
+        if (el.closest('.explorar-row-wrap')) return el.closest('.explorar-row-wrap');
+        const wrap = document.createElement('div');
+        wrap.className = 'explorar-row-wrap';
+        el.parentNode.insertBefore(wrap, el);
+        wrap.appendChild(el);
+        el.classList.remove('video-grid');
+        el.classList.add('explorar-row');
+        return wrap;
     }
 
     async function iniciarExplorar() {
@@ -3356,11 +3371,18 @@ document.addEventListener('DOMContentLoaded', function () {
             const outros = videos.filter(v => (v.categorias || []).includes('não-jogo'));
             preencherLinha('row-videos-final', outros, { forcarAoVivo: false });
 
-            configurarSetasExplorar();
-
         } catch (error) {
             console.error("Erro ao carregar Explorar:", error);
         }
+
+        document.querySelectorAll('.explorar-row-wrap').forEach(wrap => {
+            const row = wrap.querySelector('.explorar-row');
+            if (!row || row.children.length === 0) {
+                wrap.closest('section').style.display = 'none';
+                return;
+            }
+            montarCarrossel(wrap, row);
+        });
     }
 
     // detecta se é o próprio perfil ou de outra pessoa
@@ -3482,7 +3504,7 @@ document.addEventListener('DOMContentLoaded', function () {
         alert('Compra realizada com sucesso!');
         fecharModal(form);
     });
-    
+
     //TELA SEGUINDO
     const LIMITE_SEGUINDO = 10;
     const FILTRO_SEGUINDO_KEY = 'witch_seguindo_filtro';

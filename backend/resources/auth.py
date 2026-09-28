@@ -745,6 +745,14 @@ class inscritos(Resource):
             cursor.execute(query2,(id,))
             seguindo = cursor.fetchone()["total"]
 
+            seguindo_eu = False
+            if 'usuario_id' in session:
+                cursor.execute(
+                    "select 1 from seguidores where id_seguidor=%s and id_seguido=%s",
+                    (session['usuario_id'], id)
+                )
+                seguindo_eu = cursor.fetchone() is not None
+
         except Exception as e:
             print(e)
             return {
@@ -756,7 +764,8 @@ class inscritos(Resource):
             'status':'success',
             'mensagem':'Informações buscadas com sucesso',
             'seguidores':seguidores,
-            'seguindo':seguindo
+            'seguindo':seguindo,
+            'seguindo_eu': seguindo_eu
         }, 200
     
     
