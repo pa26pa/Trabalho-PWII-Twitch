@@ -3482,8 +3482,7 @@ document.addEventListener('DOMContentLoaded', function () {
         alert('Compra realizada com sucesso!');
         fecharModal(form);
     });
-
-<<<<<<< HEAD
+    
     //TELA SEGUINDO
     const LIMITE_SEGUINDO = 10;
     const FILTRO_SEGUINDO_KEY = 'witch_seguindo_filtro';
@@ -3646,7 +3645,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
         atualizarUI();
     }
-=======
     // botão de voltar no modal turbo
     const btnBackTurbo = document.querySelector('.back-modal-turbo');
     if (btnBackTurbo) {
@@ -3656,8 +3654,6 @@ document.addEventListener('DOMContentLoaded', function () {
             modal.style.background = '#1a1a2e';
         });
     }
-
->>>>>>> 9d626f3d2baadf70839c7bca2da3f20cd675eaac
 
     init();
 });
