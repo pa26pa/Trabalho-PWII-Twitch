@@ -1847,6 +1847,8 @@ document.addEventListener('DOMContentLoaded', function () {
         await verificarSessao();
         await renderVideosNaHome();
         await iniciarPerfil();
+        await iniciarExplorar();
+        await iniciarSeguindo();
 
         if (document.getElementById('block-btn')) {
             fetch(base_url +'/bloqueados', {
@@ -2257,6 +2259,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
         document.getElementById('player-info-titulo').textContent = live.titulo;
         document.getElementById('player-info-cats').textContent   = live.categorias?.join(' • ') || '';
+        const descEl = document.getElementById('player-info-descricao');
+        if (descEl) descEl.textContent = live.descricao || live.descrisao || '';
         document.getElementById('player-info-data').textContent   = live.data;
 
         const nomeCanal = live.canal || 'Canal desconhecido';
@@ -2898,7 +2902,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 data: video.data_upload,
                 id_streamer: video.id_streamer,
                 canal: video.canal,
-                canal_foto: video.canal_foto
+                canal_foto: video.canal_foto,
+                descrisao: video.descrisao || '' 
             };
 
             if (document.getElementById('video-player-overlay')) {
@@ -3124,12 +3129,11 @@ document.addEventListener('DOMContentLoaded', function () {
             thumbDiv.appendChild(capa);
         }
 
-        if (live.aoVivo) {
-            const badge = document.createElement('span');
-            badge.className = 'thumb-badge-live';
-            badge.textContent = 'AO VIVO';
-            thumbDiv.appendChild(badge);
-        }
+        const badge = document.createElement('span');
+        badge.className = 'thumb-badge-live';
+        badge.textContent = 'AO VIVO';
+        thumbDiv.appendChild(badge);
+        
 
         const views = document.createElement('span');
         views.className = 'thumb-views-perfil';
@@ -3262,6 +3266,103 @@ document.addEventListener('DOMContentLoaded', function () {
         return card;
     }
 
+    // TELA EXPLORAR
+    const mapaGridsExplorar = {
+        'ação&aventura': 'exp-acao-aventura',
+        'corrida':       'exp-corrida',
+        'esporte':       'exp-esporte',
+        'e-sports':      'exp-e-sport',
+        'estratégia':    'exp-estrategia',
+        'FPS&tiro':      'exp-fps-tiro',
+        'luta':          'exp-luta',
+        'RPG':           'exp-rpg',
+        'terror':        'exp-terror',
+        '+18':           'exp-18',
+        'não-jogo':      'exp-outros',
+    };
+
+    function preencherLinha(rowId, videos, opts = {}) {
+        const row = document.getElementById(rowId);
+        if (!row) return;
+        videos.forEach(live => {
+            const card = criarVideoCard(live, { mostrarOpcoes: false, forcarAoVivo: opts.forcarAoVivo ?? true });
+            row.appendChild(card);
+        });
+    }
+
+    function configurarSetasExplorar() {
+        document.querySelectorAll('.explorar-row-wrap').forEach(wrap => {
+            const row = wrap.querySelector('.explorar-row');
+            const prev = wrap.querySelector('.arrow-prev');
+            const next = wrap.querySelector('.arrow-next');
+            if (!row || !prev || !next) return;
+
+            const scrollAmount = () => row.clientWidth * 0.9;
+
+            prev.addEventListener('click', () => row.scrollBy({ left: -scrollAmount(), behavior: 'smooth' }));
+            next.addEventListener('click', () => row.scrollBy({ left: scrollAmount(), behavior: 'smooth' }));
+        });
+    }
+
+    async function iniciarExplorar() {
+        const container = document.getElementById('explorar-main');
+        if (!container) return; // não é a página Explorar
+
+        try {
+            const res = await fetch(base_url + "/api/explorar", {
+                method: "GET",
+                headers: { "X-CSRFToken": csrfToken },
+                credentials: "include"
+            });
+            const data = await res.json();
+            if (data.status !== 'success') return;
+
+            const videos = data.videos || [];
+            if (videos.length === 0) return;
+
+            // Canais Iniciantes — streamers com menos seguidores
+            const iniciantes = [...videos]
+                .sort((a, b) => (a.seguidores_streamer || 0) - (b.seguidores_streamer || 0))
+                .slice(0, 12);
+            preencherLinha('row-iniciantes', iniciantes);
+
+            // Mais Curtidos
+            const maisCurtidos = [...videos]
+                .sort((a, b) => (b.curtidas || 0) - (a.curtidas || 0))
+                .slice(0, 12);
+            preencherLinha('row-mais-curtidos', maisCurtidos);
+
+            // Mais Vistos
+            const maisVistos = [...videos]
+                .sort((a, b) => (b.views || 0) - (a.views || 0))
+                .slice(0, 12);
+            preencherLinha('row-mais-vistos', maisVistos);
+
+            // Fileiras por categoria (com badge AO VIVO)
+            videos.forEach(live => {
+                (live.categorias || []).forEach(cat => {
+                    const rowId = mapaGridsExplorar[cat];
+                    if (!rowId) return;
+                    const row = document.getElementById(rowId);
+                    if (row && !row.querySelector(`[data-live-id="${live.id_stream}"]`)) {
+                        const card = criarVideoCard(live, { mostrarOpcoes: false, forcarAoVivo: true });
+                        card.dataset.liveId = live.id_stream;
+                        row.appendChild(card);
+                    }
+                });
+            });
+
+            // Fileira final "Vídeos" — mesmos vídeos de "Outros", SEM badge
+            const outros = videos.filter(v => (v.categorias || []).includes('não-jogo'));
+            preencherLinha('row-videos-final', outros, { forcarAoVivo: false });
+
+            configurarSetasExplorar();
+
+        } catch (error) {
+            console.error("Erro ao carregar Explorar:", error);
+        }
+    }
+
     // detecta se é o próprio perfil ou de outra pessoa
     let idPerfilAtual = null; // null = próprio perfil; id = perfil visitado
     async function iniciarPerfil() {
@@ -3383,47 +3484,168 @@ document.addEventListener('DOMContentLoaded', function () {
         fecharModal(form);
     });
 
+    //TELA SEGUINDO
+    const LIMITE_SEGUINDO = 10;
+    const FILTRO_SEGUINDO_KEY = 'witch_seguindo_filtro';
+    let canaisSeguidos = [];
+    let canaisSelecionados = new Set();
+
+    async function iniciarSeguindo() {
+        const lista = document.getElementById('seguindo-lista');
+        if (!lista) return; // não é a página Seguindo
+
+        if (!usuarioLogado) {
+            lista.innerHTML = '<p class="seguindo-vazio">Faça login para ver os canais que você segue.</p>';
+            return;
+        }
+
+        try {
+            const res = await fetch(base_url + "/seguindo_videos", {
+                method: "GET",
+                headers: { "X-CSRFToken": csrfToken },
+                credentials: "include"
+            });
+            const data = await res.json();
+
+            if (data.status !== 'success' || !data.canais || data.canais.length === 0) {
+                lista.innerHTML = '<p class="seguindo-vazio">Você ainda não segue nenhum canal com vídeos.</p>';
+                return;
+            }
+
+            canaisSeguidos = data.canais;
+            canaisSelecionados = carregarSelecaoSeguindo();
+            montarFiltroSeguindo();
+            renderizarLinhasSeguindo();
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    function carregarSelecaoSeguindo() {
+        const ids = canaisSeguidos.map(c => String(c.id_usuario));
+        let salvos = null;
+        try { salvos = JSON.parse(localStorage.getItem(FILTRO_SEGUINDO_KEY)); } catch {}
+
+        const sel = Array.isArray(salvos)
+            ? salvos.map(String).filter(id => ids.includes(id))
+            : ids;                                   // primeira visita: começa pelos primeiros
+        return new Set(sel.slice(0, LIMITE_SEGUINDO));
+    }
+
+    function salvarSelecaoSeguindo() {
+        try { localStorage.setItem(FILTRO_SEGUINDO_KEY, JSON.stringify([...canaisSelecionados])); } catch {}
+    }
+
+    function renderizarLinhasSeguindo() {
+        const lista = document.getElementById('seguindo-lista');
+        lista.innerHTML = '';
+
+        const visiveis = canaisSeguidos.filter(c => canaisSelecionados.has(String(c.id_usuario)));
+        if (visiveis.length === 0) {
+            lista.innerHTML = '<p class="seguindo-vazio">Nenhum canal selecionado. Use o filtro para escolher até 10 canais.</p>';
+            return;
+        }
+
+        visiveis.forEach(canal => {
+            const section = document.createElement('section');
+            section.className = 'section-home';
+
+            const header = document.createElement('div');
+            header.className = 'seguindo-canal-header';
+            const foto = document.createElement('img');
+            foto.className = 'seguindo-canal-foto';
+            foto.src = canal.foto_url || '/static/user.png';
+            foto.alt = canal.user_name;
+            const nome = document.createElement('h2');
+            nome.className = 'section-title';
+            nome.style.margin = '0';
+            nome.textContent = canal.user_name;
+            header.append(foto, nome);
+            header.addEventListener('click', () => irParaPerfil(canal.id_usuario, canal.user_name, canal.foto_url));
+
+            const wrap = document.createElement('div');
+            wrap.className = 'video-row-wrap';
+            const scroll = document.createElement('div');
+            scroll.className = 'video-row-scroll';
+            canal.videos.forEach(v => scroll.appendChild(criarVideoCard(v, { mostrarOpcoes: false })));
+            wrap.appendChild(scroll);
+
+            section.append(header, wrap);
+            lista.appendChild(section);
+            montarCarrossel(wrap, scroll);
+        });
+    }
+
+    function montarFiltroSeguindo() {
+        const btn = document.getElementById('btn-filtro-seguindo');
+        const painel = document.getElementById('filtro-seguindo-painel');
+        const listaEl = document.getElementById('lista-filtro-canais');
+        const contador = document.getElementById('filtro-contador');
+        const limpar = document.getElementById('filtro-limpar');
+        if (!btn || !painel || !listaEl) return;
+
+        btn.closest('.filtro-seguindo-wrap').style.display = '';
+
+        const atualizarUI = () => {
+            const total = canaisSelecionados.size;
+            contador.textContent = `${total}/${LIMITE_SEGUINDO}`;
+            listaEl.querySelectorAll('input').forEach(cb => {
+                cb.disabled = !cb.checked && total >= LIMITE_SEGUINDO;
+                cb.closest('label').classList.toggle('desabilitado', cb.disabled);
+            });
+        };
+
+        listaEl.innerHTML = '';
+        canaisSeguidos.forEach(canal => {
+            const id = String(canal.id_usuario);
+
+            const label = document.createElement('label');
+            label.className = 'filtro-canal-item';
+
+            const cb = document.createElement('input');
+            cb.type = 'checkbox';
+            cb.checked = canaisSelecionados.has(id);
+
+            const img = document.createElement('img');
+            img.src = canal.foto_url || '/static/user.png';
+            img.alt = '';
+
+            const nome = document.createElement('span');
+            nome.textContent = canal.user_name;
+
+            cb.addEventListener('change', () => {
+                if (cb.checked) canaisSelecionados.add(id);
+                else canaisSelecionados.delete(id);
+                salvarSelecaoSeguindo();
+                atualizarUI();
+                renderizarLinhasSeguindo();
+            });
+
+            label.append(cb, img, nome);
+            listaEl.appendChild(label);
+        });
+
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            painel.classList.toggle('open');
+            btn.classList.toggle('open');
+        });
+        document.addEventListener('click', (e) => {
+            if (!painel.contains(e.target) && !btn.contains(e.target)) {
+                painel.classList.remove('open');
+                btn.classList.remove('open');
+            }
+        });
+        limpar.addEventListener('click', () => {
+            canaisSelecionados.clear();
+            listaEl.querySelectorAll('input').forEach(cb => cb.checked = false);
+            salvarSelecaoSeguindo();
+            atualizarUI();
+            renderizarLinhasSeguindo();
+        });
+
+        atualizarUI();
+    }
+
     init();
 });
-/*
-class subscribe(Resource):
-    def post(self):
-        token = request.headers.get("X-CSRFToken")
-        check = check_csrf(token)
-        if not check or check.get("status") == "error":
-            return {'status': 'error', 'mensagem': check.get("mensagem")}, 400
-
-        if 'usuario_id' not in session:
-            return {'status': 'error', 'mensagem': 'Você precisa estar logado pra se inscrever'}, 400
-
-        data = request.get_json()
-        con = connection()
-        cursor = con.cursor(pymysql.cursors.DictCursor)
-
-        id_criador = data.get('criador')
-        id_seguidor = session['usuario_id']
-
-        if str(id_criador) == str(id_seguidor):
-            cursor.close(); con.close()
-            return {'status': 'error', 'mensagem': 'Você não pode seguir seu próprio canal'}, 400
-
-        try:
-            cursor.execute("select 1 from seguidores where id_seguidor = %s and id_seguido = %s", (id_seguidor, id_criador))
-            ja_segue = cursor.fetchone()
-
-            if ja_segue:
-                cursor.execute("delete from seguidores where id_seguidor = %s and id_seguido = %s", (id_seguidor, id_criador))
-                con.commit()
-                return {'status': 'success', 'mensagem': 'Você deixou de seguir', 'seguindo': False}, 200
-
-            cursor.execute("insert into seguidores (id_seguidor,id_seguido) values (%s,%s)", (id_seguidor, id_criador))
-            con.commit()
-            return {'status': 'success', 'mensagem': 'Você se inscreveu', 'seguindo': True}, 200
-
-        except Exception as e:
-            print(e)
-            return {'status': 'error', 'mensagem': 'Erro ao seguir'}, 500
-
-        finally:
-            cursor.close()
-            con.close()*/
