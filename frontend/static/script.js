@@ -3317,7 +3317,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         container.innerHTML = `
             <button class="btn-perfil" id="btn-seguir-visitante">Seguir</button>
-            <button class="btn-perfil" id="btn-sub-visitante">Sub</button>
+            <button class="btn-perfil" id="btn-sub-visitante">Ser Sub</button>
         `;
 
         document.getElementById('btn-seguir-visitante').addEventListener('click', async (e) => {
@@ -3344,13 +3344,12 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // tela pagamento turbo
+    const turboModal = document.querySelector('.turbo-modal');
+    const pagTurbo = document.querySelector('.pagamento-turbo');
+    const modal = document.getElementById('modal-5');
     const btnTurbo = document.querySelectorAll('.btn-turbo-sub');
     btnTurbo.forEach(btnTurbo => {
         btnTurbo.addEventListener('click', () => {
-            const turboModal = document.querySelector('.turbo-modal');
-            const pagTurbo = document.querySelector('.pagamento-turbo');
-            const modal = document.getElementById('modal-5');
-
             turboModal.style.display = 'none';
             pagTurbo.style.display = 'flex';
             modal.style.background = 'transparent';
@@ -3382,6 +3381,17 @@ document.addEventListener('DOMContentLoaded', function () {
         alert('Compra realizada com sucesso!');
         fecharModal(form);
     });
+
+    // botão de voltar no modal turbo
+    const btnBackTurbo = document.querySelector('.back-modal-turbo');
+    if (btnBackTurbo) {
+        btnBackTurbo.addEventListener('click', () => {
+            turboModal.style.display = 'block';
+            pagTurbo.style.display = 'none';
+            modal.style.background = '#1a1a2e';
+        });
+    }
+
 
     init();
 });
