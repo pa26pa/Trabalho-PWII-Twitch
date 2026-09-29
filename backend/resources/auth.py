@@ -19,6 +19,7 @@ import mimetypes
 from backend.database.connection import connection, data_semana,supabase, acorda_cloudinary, email_valido, data_valida, carregar, salvar, cache_traducoes, file
 from backend.resources.seguranca import cpf_math_validate, cpf_real_or_not, captcha, check_csrf
 from backend.resources.email_code import send_code
+from backend.resources.check_palavras import verificar_palavra
 from datetime import date, datetime, timedelta
 from email_validator import validate_email, EmailNotValidError
 from deep_translator import GoogleTranslator
@@ -107,6 +108,13 @@ class signin(Resource):
                 'status': 'error',
                 'mensagem': 'Todos os campos são obrigatórios'
             }, 400
+
+        user_name_invalido = verificar_palavra(user_name)
+        if user_name_invalido:
+            return {
+                'status':'error',
+                'mensagem':f'Este nome de usuário não é valido por conta de usar a palavra "{user_name_invalido}" nele'
+            }, 406
 
         valido = email_valido(email)
         if valido == False:
@@ -683,6 +691,15 @@ class search(Resource):
             cursor.close(); con.close()
             return {'status': 'success', 'mensagem': 'Pesquisa vazia', 'canais': [], 'videos': []}, 200
 
+         
+        pesquisa_invalida = verificar_palavra(pesquisa)
+        if pesquisa_invalida:
+            return {
+                'status':'error',
+                'mensagem':f'Esta pesquisa não é valida por conta de usar a palavra "{pesquisa_invalida}" nele'
+            }, 406
+        
+        
         p = f"%{pesquisa}%"
 
         try:
@@ -965,6 +982,13 @@ class comentarios(Resource):
         if not id_user:
             return {'status': 'error', 'mensagem': 'Faça login para comentar'}, 401
 
+        comentario_invalido = verificar_palavra(texto)
+        if comentario_invalido:
+            return {
+                'status':'error',
+                'mensagem':f'Este comentario não é valido por conta de usar a palavra "{comentario_invalido}" nele'
+            }, 406
+            
         con = connection()
         cursor = con.cursor(pymysql.cursors.DictCursor)
         try:
@@ -1512,6 +1536,12 @@ class editar_bio(Resource):
         bio = data.get('bio')
         bio = str(escape(bio))
         
+        bio_invalida = verificar_palavra(bio)
+        if bio_invalida:
+            return {
+                'status':'error',
+                'mensagem':f'Esta bio não é valida por conta de usar a palavra "{bio_invalida}" nela'
+            }, 406
         query = """update usuarios set bio = %s where id_usuario = %s"""
         cursor.execute(query,(bio,id))
         
@@ -1583,6 +1613,13 @@ class editar_nome(Resource):
         
         nome = data.get('nome')
         nome = str(escape(nome))
+        
+        user_name_invalido = verificar_palavra(nome)
+        if user_name_invalido:
+            return {
+                'status':'error',
+                'mensagem':f'Este nome de usuário não é valido por conta de usar a palavra "{user_name_invalido}" nele'
+            }, 406
         
         a = """select id_usuario, user_name from usuarios where BINARY user_name = %s"""
         cursor.execute(a,(nome,))
@@ -1678,6 +1715,15 @@ class salvar_video(Resource):
             categoria = json.dumps(categoria_lista)
             titulo = str(escape(request.form["titulo"]))
             descrisao = str(escape(request.form["descrisao"]))
+            
+            titulo_invalido = verificar_palavra(titulo)
+            descrisao_invalido = verificar_palavra(descrisao)
+            if titulo_invalido or descrisao_invalido:
+                return {
+                    'status':'error',
+                    'mensagem':f'Este titulo ou descrição de video não é valido por conta de usar uma palavra impropria'
+                }, 406
+            
             id = session['usuario_id']
             data = date.today()
 
