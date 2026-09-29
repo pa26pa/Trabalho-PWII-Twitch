@@ -2174,4 +2174,61 @@ class foto_streamer(Resource):
             'mensagem': 'Foi possivel encontrar dados',
             'foto_url': foto['foto_url']
         }, 200
+
+class seguindo_live(Resource):
+    def get():
+        token = request.headers.get("X-CSRFToken")
+                
+        check = check_csrf(token)
+        if not check or check.get("status") == "error":
+            return {'status': 'error', 'mensagem': check.get("mensagem")}, 400
+        
+        con = connection()
+        cursor = con.cursor(pymysql.cursors.DictCursor)
+
+        if 'usuario_id' not in session:
+            return {
+                'status': 'error', 
+                'mensagem': 'É necessario estar logado'
+            }, 500
+        
+        id = session.get('usuario_id')
+        try:
+            query = """ 
+                SELECT
+                    u.id_usuario,
+                    u.user_name,
+                    u.foto_url,
+                    s.id_stream,
+                    s.titulo,
+                    s.capa,
+                    s.data_upload,
+                    COUNT(v.id_view) AS total_views
+                FROM seguidores sg
+                JOIN usuarios u ON u.id_usuario = sg.id_seguido
+                JOIN streams  s ON s.id_streamer = u.id_usuario
+                LEFT JOIN views v ON v.id_stream = s.id_stream
+                WHERE sg.id_seguidor = %s
+                AND s.data_upload >= NOW() - INTERVAL 24 HOUR
+                GROUP BY
+                    u.id_usuario, u.user_name, u.foto_url,
+                    s.id_stream, s.titulo, s.capa, s.data_upload
+                ORDER BY s.data_upload DESC
+            """
+            cursor.execute(query,(id,))
+            resultado = cursor.fetchall()
+S
             
+        
+        except Excetion as e:
+            print(e)
+            return {
+                'status': 'error', 
+                'mensagem': 'erro interno'
+            }, 500
+
+        finally:
+            cursor.close()
+            con.close()
+        
+        return resultado

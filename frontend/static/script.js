@@ -3195,6 +3195,26 @@ document.addEventListener('DOMContentLoaded', function () {
         return card;
     }
 
+    function criarLiveAside(pessoa) {
+        const link = document.createElement('a');
+        link.href = pessoa.href || '#';
+        link.className = 'lives-aside';
+        const foto = document.createElement('i');
+        foto.className = `fa-solid ${pessoa.icone || 'fa-circle'} aside-photo`;
+        const nome = document.createElement('span');
+        nome.textContent = pessoa.nome || 'Pessoa desconhecida';
+        const ladoDireito = document.createElement('div');
+        ladoDireito.className = 'aside-right';
+        const views = document.createElement('span');
+        views.textContent = pessoa.views ?? '0';
+        const indicador = document.createElement('i');
+        indicador.className = 'fa-solid fa-circle red-circle';
+        ladoDireito.append(views, indicador);
+        link.append(foto, nome, ladoDireito);
+        return link;
+    }
+
+
     // detecta se é o próprio perfil ou de outra pessoa
     let idPerfilAtual = null; // null = próprio perfil; id = perfil visitado
     async function iniciarPerfil() {
