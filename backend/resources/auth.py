@@ -2231,25 +2231,21 @@ class foto_streamer(Resource):
         }, 200
 
 class seguindo_live(Resource):
-    def get():
+    def get(self):
+        if 'usuario_id' not in session:
+            return {'status': 'error', 'mensagem': 'É necessário estar logado'}, 401
+
         token = request.headers.get("X-CSRFToken")
-                
         check = check_csrf(token)
         if not check or check.get("status") == "error":
-            return {'status': 'error', 'mensagem': check.get("mensagem")}, 400
-        
+            mensagem = check.get("mensagem") if check else "Token CSRF inválido"
+            return {'status': 'error', 'mensagem': mensagem}, 400
+
+        id_usuario = session.get('usuario_id')
         con = connection()
         cursor = con.cursor(pymysql.cursors.DictCursor)
-
-        if 'usuario_id' not in session:
-            return {
-                'status': 'error', 
-                'mensagem': 'É necessario estar logado'
-            }, 500
-        
-        id = session.get('usuario_id')
         try:
-            query = """ 
+            query = """
                 SELECT
                     u.id_usuario,
                     u.user_name,
@@ -2257,6 +2253,8 @@ class seguindo_live(Resource):
                     s.id_stream,
                     s.titulo,
                     s.capa,
+                    s.video_url,
+                    s.categoria,
                     s.data_upload,
                     COUNT(v.id_view) AS total_views
                 FROM seguidores sg
@@ -2264,26 +2262,29 @@ class seguindo_live(Resource):
                 JOIN streams  s ON s.id_streamer = u.id_usuario
                 LEFT JOIN views v ON v.id_stream = s.id_stream
                 WHERE sg.id_seguidor = %s
-                AND s.data_upload >= NOW() - INTERVAL 24 HOUR
+                AND s.data_upload >= CURDATE() - INTERVAL 1 DAY
                 GROUP BY
                     u.id_usuario, u.user_name, u.foto_url,
-                    s.id_stream, s.titulo, s.capa, s.data_upload
+                    s.id_stream, s.titulo, s.capa, s.video_url, s.categoria, s.data_upload
                 ORDER BY s.data_upload DESC
             """
-            cursor.execute(query,(id,))
+            cursor.execute(query, (id_usuario,))
             resultado = cursor.fetchall()
-S
-            
-        
-        except Excetion as e:
+
+            for r in resultado:
+                r['data_upload'] = r['data_upload'].isoformat()
+                if isinstance(r.get('categoria'), str):
+                    try:
+                        r['categoria'] = json.loads(r['categoria'])
+                    except json.JSONDecodeError:
+                        r['categoria'] = []
+
+            return resultado, 200
+
+        except Exception as e:
             print(e)
-            return {
-                'status': 'error', 
-                'mensagem': 'erro interno'
-            }, 500
+            return {'status': 'error', 'mensagem': 'erro interno'}, 500
 
         finally:
             cursor.close()
             con.close()
-        
-        return resultado
