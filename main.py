@@ -73,6 +73,14 @@ def perfil():
 def turbo():
     return render_template("turbo.html")
 
+@app.route("/seguindo")
+def seguindo():
+    return render_template("seguindo.html")
+
+@app.route("/explorar")
+def explorar():
+    return render_template("explorar.html")
+
 @app.errorhandler(RequestEntityTooLarge)
 def handle_large_file(e):
     return {'status': 'error', 'mensagem': 'Arquivo muito grande'}, 413
@@ -158,6 +166,10 @@ api.add_resource(comentarios, '/comentarios')
 api.add_resource(subscribe, '/subscribe')
 api.add_resource(foto_streamer, '/foto_streamer')
 api.add_resource(seguindo_live, '/seguindo_lives')
+
+api.add_resource(explorar_dados, '/api/explorar')
+api.add_resource(seguindo_videos, '/seguindo_videos')
+
 # É só pra garantir que só se pode rodar ele pela main
 #if __name__ == "__main__":
 #    port = int(os.environ.get("PORT", 5000))

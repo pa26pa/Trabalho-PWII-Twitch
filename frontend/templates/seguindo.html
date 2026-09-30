@@ -1,0 +1,310 @@
+<!--ÚLTIMO CTRL Z-->
+<!DOCTYPE html>
+<html lang="pt-br">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Witch | Seguindo</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+        <link rel="stylesheet" href="{{url_for('static', filename='style.css')}}">
+        <link rel="icon" type="image/x-icon" href="{{url_for('static', filename='witch.png')}}">
+    </head> 
+    <body>
+        <header id="header">
+            <div class="logo"><a href="{{url_for('home')}}"><img id="logo" src="{{url_for('static', filename='witch.png')}}" alt="logo"></a></div>
+            <div class="header-center">
+                <!--MENU SUPERIOR-->
+                <div class="top-menu">
+                    <nav><a class="menu-nav home-page" href="{{url_for('home')}}" data-i18n>Início</a></nav>
+                    <nav><a class="menu-nav following-page with-login" href="{{url_for('seguindo')}}" data-i18n>Seguindo</a></nav>
+                    <nav><a class="menu-nav explore-page" href="{{url_for('explorar')}}" data-i18n>Explorar</a></nav>
+                </div>
+                <!--BARRA DE PESQUISA-->
+                <div class="bottom-menu">
+                    <div class="search-bar">
+                        <div class="search-icon">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </div> 
+                        <input type="text" id="search" placeholder="Pesquise aqui" data-i18n-placeholder>
+                    </div>
+                </div>
+            </div>
+
+            <div class="menu-modals">
+            <a href="{{url_for('luna')}}" target="_blank" aria-placeholder="Luna">
+                <button id="btn-moon">
+                    <i class="fa-solid fa-crown moon-crown" style="color: rgb(255, 212, 59);"></i>
+                </button>
+            </a>
+            
+            <button id="btn-turbo" class="btn-open-modal" title="Turbo" data-modal="modal-5">
+                <i class="fa-solid fa-battery-half charge-icon" style="color: rgb(255, 255, 255);"></i>
+            </button>
+
+            <dialog id="modal-5">
+                <div class="turbo-modal">
+                    <div class="modal-buttons">
+                        <i class="fa-solid fa-circle-arrow-left back-modal-turbo"></i>
+                        <button class="btn-close-modal" data-modal="modal-5"><i class="fa-solid fa-x close-x"></i></button>
+                    </div>
+
+                    <!-- banner roxo/pink degradê -->
+                    <div class="turbo-banner">
+                        <h1 class="turbo-logo" data-i18n>Witch <span>TURBO</span></h1>
+                    </div>
+
+                    <div class="turbo-body">
+                        <p class="turbo-price" data-i18n>
+                            <s>R$ 26,99/mês</s> <strong>R$ 18,89/mês</strong> no primeiro mês
+                        </p>
+                        <p class="turbo-sub" data-i18n>Renova automaticamente por R$ 26,99/mês depois disso.</p>
+                        <p class="turbo-headline" data-i18n>Apoie streamers sem interrupções.</p>
+
+                        <div class="turbo-features">
+                            <div class="turbo-feature">
+                                <i class="fa-solid fa-tv"></i>
+                                <div>
+                                    <strong data-i18n>Assista sem anúncios</strong>
+                                    <p data-i18n>Assista seus streamers favoritos sem anúncios em vídeo ou banners.</p>
+                                </div>
+                            </div>
+                            <div class="turbo-feature">
+                                <i class="fa-solid fa-hard-drive"></i>
+                                <div>
+                                    <strong data-i18n>Armazenamento expandido (60 dias)</strong>
+                                    <p data-i18n>Armazene seus VODs por até 60 dias em vez de 14.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="turbo-extras">
+                            <div class="turbo-extra">
+                                <i class="fa-solid fa-comment"></i>
+                                <span data-i18n>Distintivo de chat exclusivo</span>
+                            </div>
+                            <div class="turbo-extra">
+                                <i class="fa-solid fa-face-smile"></i>
+                                <span data-i18n>Dois conjuntos de emotes adicionais</span>
+                            </div>
+                            <div class="turbo-extra">
+                                <i class="fa-solid fa-palette"></i>
+                                <span data-i18n>Cores personalizadas para nomes no chat</span>
+                            </div>
+                        </div>
+
+                        <br><br>
+                        <p class="turbo-disclaimer" data-i18n>Cobrança mensal • Cancele a qualquer momento</p>                         
+                        <div class="turbo-btns">
+                            <button class="btn-turbo-gift" data-i18n>Presentear Turbo</button>
+                            <button class="btn-turbo-sub" data-i18n>Inscrever-se</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="pagamento-turbo" style="display: none;">
+                    <div class="modal-buttons">
+                        <p> </p>
+                        <button class="btn-close-modal" data-modal="modal-5"><i class="fa-solid fa-x close-x"></i></button>
+                    </div>
+                    <form action="#">
+                        <label for="numero">Número do cartão:</label>
+                        <input type="text" id="numero" name="numero" placeholder="1234 5678 9012 3456" required><br>
+                        <label for="nome">Nome no cartão:</label>
+                        <input type="text" id="nome" name="nome" placeholder="John Doe" required><br>
+                        <label for="validade">Validade:</label>
+                        <input type="text" id="validade" name="validade" placeholder="MM/AA" required><br>
+                        <label for="cvv">CVV:</label>
+                        <input type="text" id="cvv" name="cvv" placeholder="123" required><br>
+                        <button type="submit" class="comprar-turbo">Comprar Turbo</button>
+                    </form>
+                </div>
+            </dialog>
+            
+            <!--DROPDOWN MENU-->
+            <div class="dropdown-menu-wrap">
+                <button class="open-modal" id="btn-dropdown">
+                    <i class="fa-solid fa-user menu-icon" style="color: rgb(255, 255, 255);"></i>
+                </button>
+
+                <div id="dropdown-menu" class="dropdown-menu">
+                    <ul>
+                        <li id="dropdown-usuario">
+                            <div class="background-avatar">
+                                <i class="fa-solid fa-user avatar-dropdown" style="color: rgb(255, 255, 255);"></i>
+                            </div>
+                            <div class="show_name"></div>
+                        </li>
+                        <hr>
+
+                        <a href="{{url_for('perfil')}}">
+                            <li><span data-i18n>Meu Canal</span></li>
+                        </a>
+                        <hr>
+                        
+                        <li id="language-item" class="submenu-item">
+                            <span data-i18n>Idioma</span>
+                            <i class="fa-solid fa-angle-up arrow-language"></i>
+
+                            <div id="language-submenu" class="submenu">
+                                <ul>
+                                    <li class="language-option" data-lang="pt">🇧🇷 Português</li>
+                                    <li class="language-option" data-lang="en">🇺🇸 English</li>
+                                    <li class="language-option" data-lang="es">🇪🇸 Español</li>
+                                </ul>
+                            </div>
+                        </li>
+                        <hr>
+                        <li class="toggle-item adjust-slider">
+                            <span data-i18n>Tema Escuro</span>
+                            <label class="switch">
+                                <input type="checkbox"id="dark-theme" class="btn-tema">
+                                <span class="slider"></span>
+                            </label>
+                        </li>
+                        <hr>
+                        <hr class="aside-mobile-divider">
+                        <li id="btn-logout" class="with-login" data-i18n>Sair</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="toast"></div>
+
+        <aside class="normal-aside">
+            <i class="fa-solid fa-angles-right back-aside"></i>
+            
+            <div class="aside-content">
+                <a href="#" class="lives-aside">
+                    <i class="fa-solid fa-circle aside-photo"></i>
+                    <span>Pessoa 1.0</span>
+                    <div class="aside-right">
+                        <span data-i18n>1.3M</span>
+                        <i class="fa-solid fa-circle red-circle"></i>
+                    </div>
+                </a>
+                <hr>
+                <a href="#" class="lives-aside">
+                    <i class="fa-solid fa-circle aside-photo"></i>
+                    <span>Pessoa 2.0</span>
+                    <div class="aside-right">
+                        <span data-i18n>1.3M</span>
+                        <i class="fa-solid fa-circle red-circle"></i>
+                    </div>
+                </a>
+                <hr>
+                <a href="#" class="lives-aside">
+                    <i class="fa-solid fa-circle aside-photo"></i>
+                    <span>Pessoa 3.0</span>
+                    <div class="aside-right">
+                        <span data-i18n>1.3M</span>
+                        <i class="fa-solid fa-circle red-circle"></i>
+                    </div>
+                </a>
+                <hr>
+                <a href="#" class="lives-aside">
+                    <i class="fa-solid fa-circle aside-photo"></i>
+                    <span>Pessoa 4.0</span>
+                    <div class="aside-right">
+                        <span data-i18n>1.3M</span>
+                        <i class="fa-solid fa-circle red-circle"></i>
+                    </div>
+                </a>
+            </div>
+
+            <div class="box-links-pages">
+                <!-- aparece só quando logado -->
+                <a href="{{url_for('config')}}" class="aside-pages with-login">
+                    <i class="fa-solid fa-gear pages-icon-aside"></i>
+                    <span class="span-link-aside" data-i18n>Configurações</span>
+                </a>
+
+                <hr class="aside-hr with-login">
+
+                <a href="{{url_for('ajuda')}}" class="aside-pages">
+                    <i class="fa-regular fa-circle-question pages-icon-aside"></i> 
+                    <span class="span-link-aside" data-i18n>Ajuda</span>
+                </a>
+            </div>
+        </aside>
+
+        <main class="seguindo-main">
+            <div class="seguindo-topo">
+                <h1>Veja as Lives e Vídeos de quem você segue</h1>
+
+                <div class="filtro-seguindo-wrap" style="display:none;">
+                    <button type="button" class="btn-filtro-seguindo" id="btn-filtro-seguindo">
+                        <i class="fa-solid fa-filter"></i>
+                        <span>Filtrar canais</span>
+                        <span class="filtro-contador" id="filtro-contador">0/10</span>
+                        <i class="fa-solid fa-chevron-down filtro-seta"></i>
+                    </button>
+
+                    <div class="filtro-seguindo-painel" id="filtro-seguindo-painel">
+                        <div class="filtro-painel-topo">
+                            <span>Escolha até 10 canais</span>
+                            <button type="button" id="filtro-limpar">Limpar</button>
+                        </div>
+                        <div class="lista-filtro-canais" id="lista-filtro-canais"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="seguindo-lista"><!-- preenchido pelo JS --></div>
+
+            <!-- player expandido (mesmo bloco usado no restante do site) -->
+            <div id="video-player-overlay" class="video-player-overlay">
+                <div class="video-player-box">
+                    <button id="fechar-player" class="fechar-player"><i class="fa-solid fa-x"></i></button>
+                    <div class="player-titulo-topo" id="player-titulo-topo"></div>
+                    <div class="player-wrap-expanded" id="player-wrap-expanded">
+                        <span class="thumb-badge-live">AO VIVO</span>
+                        <video id="video-expandido" preload="metadata"></video>
+                        <div class="controls-expanded" id="controls-expanded">
+                            <input type="range" id="progress-exp" class="progress-exp" min="0" max="100" value="0" step="0.1">
+                            <div class="controls-row">
+                                <button class="ctrl-btn-exp" id="play-btn-exp"><i class="fa-solid fa-play" id="play-icon-exp"></i></button>
+                                <div class="vol-wrap-exp">
+                                    <button class="ctrl-btn-exp" id="mute-btn-exp"><i class="fa-solid fa-volume-high" id="vol-icon-exp"></i></button>
+                                    <input type="range" id="vol-range-exp" min="0" max="100" value="80" class="vol-slider-exp">
+                                </div>
+                                <span class="time-label-exp" id="time-label-exp">0:00 / 0:00</span>
+                                <span class="player-titulo-controle" id="player-titulo-controle"></span>
+                                <button class="ctrl-btn-exp" id="fs-btn-exp"><i class="fa-solid fa-expand" id="fs-icon-exp"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="player-info-panel">
+                        <p class="player-info-titulo" id="player-info-titulo"></p>
+                        <p class="player-info-cats" id="player-info-cats"></p>
+                        <p class="player-info-descricao" id="player-info-descricao"></p>
+                        <div class="player-canal-row">
+                            <img src="/static/user.png" class="player-canal-foto" id="player-canal-foto-img" alt="canal">
+                            <div class="player-canal-texto">
+                                <span class="player-canal-nome" id="player-canal-nome-text"></span>
+                                <span class="player-canal-data" id="player-info-data"></span>
+                            </div>
+                        </div>
+                        <div class="player-acoes">
+                            <button class="player-acao-btn" id="btn-curtir"><i class="fa-solid fa-heart"></i><span id="count-curtidas">0</span></button>
+                            <button class="player-acao-btn" id="btn-comentar"><i class="fa-solid fa-comment"></i> Comentar</button>
+                            <button class="player-acao-btn" id="btn-compartilhar"><i class="fa-solid fa-share-nodes"></i> Compartilhar</button>
+                            <button class="player-acao-btn" id="btn-bits"><i class="fa-solid fa-gem"></i><span>Doar Bits</span></button>
+                        </div>
+                        <div class="player-comentarios">
+                            <h4>Comentários</h4>
+                            <div class="comentario-input-row">
+                                <input type="text" id="comentario-input" class="comentario-input" placeholder="Escreva um comentário...">
+                                <button class="comentario-enviar" id="comentario-enviar">Enviar</button>
+                            </div>
+                            <div class="comentarios-lista" id="comentarios-lista"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <script src="{{url_for('static', filename='tradutor.js')}}"></script>
+        <script src="{{url_for('static', filename='script.js')}}"></script>
+    </body>
+</html>
