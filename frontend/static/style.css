@@ -95,6 +95,11 @@ body {
 
 /*MENU SUPERIOR*/
 .menu-nav {
+    display: flex;
+    align-items: center;
+    height: 40px;
+    box-sizing: border-box;
+    border-bottom: 4px solid transparent;
     text-decoration: none;
     color: var(--color9);
     font-size: 1.2em;
@@ -1319,14 +1324,14 @@ a {text-decoration: none;}
     margin-top: 8px;
     font-weight: bold;
     font-size: 0.95em;
-    color: var(--color14);
+    color: #fff;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 .thumb-user {
     font-size: 0.85em;
-    color: var(--color6);
+    color: #9147FF;
     margin-top: 2px;
 }
 
@@ -1424,6 +1429,7 @@ a {text-decoration: none;}
     object-fit: cover;
     display: block;
 }
+
 
 /* ── Label sobre a imagem ── */
 .slide-label {
@@ -2514,7 +2520,7 @@ a {text-decoration: none;}
     top: 8px;
     left: 8px;
     background: var(--color17);
-    color: var(--color10);
+    color: #fff;
     font-size: 0.75em;
     font-weight: bold;
     padding: 2px 7px;
@@ -2525,9 +2531,9 @@ a {text-decoration: none;}
     position: absolute;
     bottom: 10px;
     right: 8px;
-    color: var(--color10);
+    color: #fff;
     font-size: 0.8em;
-    text-shadow: 0 1px 3px var(--color8);
+    text-shadow:  0 1px 3px rgba(0,0,0,.8);;
     z-index: 3;
 }
 .video-card-titulo {
