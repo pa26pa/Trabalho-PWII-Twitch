@@ -3250,11 +3250,44 @@ document.addEventListener('DOMContentLoaded', function () {
             });
 
             menuOpcoes.querySelectorAll('.opcao-video').forEach(btn => {
-                btn.addEventListener('click', e => {
+                btn.addEventListener('click', async (e) => {
                     e.stopPropagation();
                     const acao = btn.dataset.acao;
-                    if (acao === 'excluir') mostrarToast('Excluir ainda não está disponível.', 'error');
-                    else if (acao === 'editar') mostrarToast('Editar ainda não está disponível.', 'error');
+                    if (acao === 'excluir') {
+                        dados = {
+                            id: live.id_stream
+                        };
+
+                        const res = fetch(base_url + "/videos", {
+                            method: "DELETE",
+                            headers: { "X-CSRFToken": csrfToken, "Content-Type": "application/json"},
+                            body: JSON.stringify(dados)
+                        });
+                        if (!res.ok) {
+                            return;
+                        }
+                    
+                    }
+                    else if (acao === 'editar') {
+                        const nome  = document.getElementById('nome-live');
+                        const desc  = document.getElementById('descricao-live');
+                        const cate = [...document.querySelectorAll('#select-dropdown input:checked')].map(cb => cb.value);
+                        dados = {
+                            id: live.id_stream,
+                            nome: nome,
+                            descrisao: desc,
+                            categoria: cate
+                        };
+
+                        const res = fetch(base_url + "/videos", {
+                            method: "POST",
+                            headers: { "X-CSRFToken": csrfToken, "Content-Type": "application/json"},
+                            body: JSON.stringify(dados)
+                        });
+                        if (!res.ok) {
+                            return;
+                        }
+                    }
                     else if (acao === 'salvar') {
                         if (!live.src) { mostrarToast('Nenhum vídeo disponível para download.', 'error'); return; }
                         const a = document.createElement('a');

@@ -1709,9 +1709,9 @@ class videos(Resource):
             cursor.close()
             con.close()     
     
-    def delete():
+    def delete(self):
         token = request.headers.get("X-CSRFToken")
-        
+        print('aaa')
                         
         check = check_csrf(token)
         if not check or check.get("status") == "error":
@@ -1721,31 +1721,29 @@ class videos(Resource):
         cursor = con.cursor(pymysql.cursors.DictCursor)
         
         data = request.get_json()
-        
-        id_stream = data.get('id_stream')
+        print('ferrou')
+        id_stream = data.get('id')
         
         video_url = "https://cloudinary.com"
         parte_final = video_url.split("/upload/")[-1]
-
+        print('----')
         if parte_final.startswith("v"):
             parte_final = parte_final.split("/", 1)[1]
-
+        print('-----')
         public_id = parte_final.rsplit(".", 1)[0]
-        
+        print('aaa')
         resultado = cloudinary.uploader.destroy(public_id, resource_type="video")
-        
+        print(resultado)
         try:
             query_streams = """delete from streams where id_stream = %s"""
             query_curtidas = """delete from curtidas where id_stream = %s"""
             query_views = """delete from views where id_stream = %s"""
             query_comentarios = """delete from comentarios where id_stream = %s"""
-            cursor.execute(query_streams,(id_stream,))
-            con.commit()
+            
             cursor.execute(query_curtidas,(id_stream,))
-            con.commit()
             cursor.execute(query_views,(id_stream,))
-            con.commit()
             cursor.execute(query_comentarios,(id_stream,))
+            cursor.execute(query_streams,(id_stream,))
             con.commit()
         
         except Exception as e:
@@ -1762,7 +1760,46 @@ class videos(Resource):
         return {
             'status': 'success', 
             'mensagem': 'Video deletado com sucesso'
-        }, 200            
+        }, 200     
+    
+    def post(self):
+        token = request.headers.get("X-CSRFToken")   
+                
+        check = check_csrf(token)
+        if not check or check.get("status") == "error":
+            return {'status': 'error', 'mensagem': check.get("mensagem")}, 400
+        
+        con = connection()
+        cursor = con.cursor(pymysql.cursors.DictCursor)
+        
+        data = request.get_json()
+        
+        id_stream = data.get('id')
+        nome = data.get('nome')
+        descrisao = data.get('descrisao')
+        categoria = data.get('categoria')
+        
+        try:
+            query = """update table set titulo = %s, categoria = %s descrisao = %s where id_stream = %s"""
+            cursor.execute(query,(id_stream,nome,categoria,descrisao))
+            con.commit()
+        
+        except Exception as e:
+            print(e)
+            return {
+                'status': 'error', 
+                'mensagem': 'Erro interno ao deletar video'
+            }, 500
+        
+        finally:
+            cursor.close()
+            con.close()
+    
+        return {
+            'status': 'success', 
+            'mensagem': 'Video deletado com sucesso'
+        }, 200 
+            
     
 class salvar_video(Resource):
     def post(self):
