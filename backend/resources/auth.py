@@ -51,6 +51,19 @@ extensoes_permitidas = {'jpg','jpeg','png','gif','mp4','webm','mov'}
 #chamando função para poder inserir videos e imagens no cloudnary
 acorda_cloudinary()
 
+def verificar_recaptcha(token):
+    """Valida o token do reCAPTCHA com o Google. Retorna True/False."""
+    if not token:
+        return False
+    try:
+        resp = requests.post(
+            'https://www.google.com/recaptcha/api/siteverify',
+            data={'secret': os.getenv("CAPTCHA_SECRET"), 'response': token},
+            timeout=5
+        )
+        return bool(resp.json().get('success'))
+    except (requests.RequestException, ValueError):
+        return False
 
 class signin(Resource):
     """
@@ -91,6 +104,9 @@ class signin(Resource):
         #        'status':'error',
         #        'mensagem':'captcha inválido'
         #    }, 403
+        
+        if not verificar_recaptcha(data.get('captcha')):
+            return {'status': 'error', 'mensagem': 'Captcha inválido. Tente novamente.'}, 403
             
         cpf = str(data.get('cpf'))
         cpf = cpf.strip()
