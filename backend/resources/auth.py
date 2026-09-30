@@ -1691,6 +1691,62 @@ class videos(Resource):
 
         finally:
             cursor.close()
+            con.close()     
+    
+    def delete():
+        token = request.headers.get("X-CSRFToken")
+        
+                        
+        check = check_csrf(token)
+        if not check or check.get("status") == "error":
+            return {'status': 'error', 'mensagem': check.get("mensagem")}, 400
+        
+        con = connection()
+        cursor = con.cursor(pymysql.cursors.DictCursor)
+        
+        data = request.get_json()
+        
+        id_stream = data.get('id_stream')
+        
+        video_url = "https://cloudinary.com"
+        parte_final = video_url.split("/upload/")[-1]
+
+        if parte_final.startswith("v"):
+            parte_final = parte_final.split("/", 1)[1]
+
+        public_id = parte_final.rsplit(".", 1)[0]
+        
+        resultado = cloudinary.uploader.destroy(public_id, resource_type="video")
+        
+        try:
+            query_streams = """delete from streams where id_stream = %s"""
+            query_curtidas = """delete from curtidas where id_stream = %s"""
+            query_views = """delete from views where id_stream = %s"""
+            query_comentarios = """delete from comentarios where id_stream = %s"""
+            cursor.execute(query_streams,(id_stream,))
+            con.commit()
+            cursor.execute(query_curtidas,(id_stream,))
+            con.commit()
+            cursor.execute(query_views,(id_stream,))
+            con.commit()
+            cursor.execute(query_comentarios,(id_stream,))
+            con.commit()
+        
+        except Exception as e:
+            print(e)
+            return {
+                'status': 'error', 
+                'mensagem': 'Erro interno ao deletar video'
+            }, 500
+        
+        finally:
+            cursor.close()
+            con.close()
+    
+        return {
+            'status': 'success', 
+            'mensagem': 'Video deletado com sucesso'
+        }, 200            
             con.close() 
                  
 class salvar_video(Resource):
@@ -2175,6 +2231,60 @@ class foto_streamer(Resource):
             'foto_url': foto
         }, 200
 
+class seguindo_live(Resource):
+    def get(self):
+        if 'usuario_id' not in session:
+            return {'status': 'error', 'mensagem': 'É necessário estar logado'}, 401
+
+        token = request.headers.get("X-CSRFToken")
+        check = check_csrf(token)
+        if not check or check.get("status") == "error":
+            mensagem = check.get("mensagem") if check else "Token CSRF inválido"
+            return {'status': 'error', 'mensagem': mensagem}, 400
+
+        id_usuario = session.get('usuario_id')
+        con = connection()
+        cursor = con.cursor(pymysql.cursors.DictCursor)
+        try:
+            query = """
+                SELECT
+                    u.id_usuario,
+                    u.user_name,
+                    u.foto_url,
+                    s.id_stream,
+                    s.titulo,
+                    s.capa,
+                    s.video_url,
+                    s.categoria,
+                    s.data_upload,
+                    COUNT(v.id_view) AS total_views
+                FROM seguidores sg
+                JOIN usuarios u ON u.id_usuario = sg.id_seguido
+                JOIN streams  s ON s.id_streamer = u.id_usuario
+                LEFT JOIN views v ON v.id_stream = s.id_stream
+                WHERE sg.id_seguidor = %s
+                AND s.data_upload >= CURDATE() - INTERVAL 1 DAY
+                GROUP BY
+                    u.id_usuario, u.user_name, u.foto_url,
+                    s.id_stream, s.titulo, s.capa, s.video_url, s.categoria, s.data_upload
+                ORDER BY s.data_upload DESC
+            """
+            cursor.execute(query, (id_usuario,))
+            resultado = cursor.fetchall()
+
+            for r in resultado:
+                r['data_upload'] = r['data_upload'].isoformat()
+                if isinstance(r.get('categoria'), str):
+                    try:
+                        r['categoria'] = json.loads(r['categoria'])
+                    except json.JSONDecodeError:
+                        r['categoria'] = []
+
+            return resultado, 200
+
+        except Exception as e:
+            print(e)
+            return {'status': 'error', 'mensagem': 'erro interno'}, 500
 class explorar_dados(Resource):
     def get(self):
         con = connection()

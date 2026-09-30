@@ -62,6 +62,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 mostrarLogado(data.name);
                 info_user(data);
                 incritos_info(data.id);
+                getLiveSeguindo();
             } else {
                 usuarioLogado = false
                 mostrarDeslogado();
@@ -2318,15 +2319,11 @@ document.addEventListener('DOMContentLoaded', function () {
         dropdownList.appendChild(hrLives);
         dropdownList.appendChild(tituloLives);
 
-        [['Pessoa 1.0','1.3M'],['Pessoa 2.0','1.3M'],['Pessoa 3.0','1.3M'],['Pessoa 4.0','1.3M']].forEach(([nome, views]) => {
+        livesSeguindo.forEach(p => {
             const li = criarEl('li', 'aside-migrado aside-live-item' + (logado ? '' : ' hidden-deslogado'));
-            li.innerHTML = `
-                <i class="fa-solid fa-circle" style="color:purple;font-size:1.1em;"></i>
-                <span style="flex:1;">${nome}</span>
-                <span style="font-size:0.8em;color:var(--color16);">${views}</span>
-                <i class="fa-solid fa-circle" style="color:red;font-size:0.4em;"></i>`;
+            li.appendChild(criarLiveAside(p));
             dropdownList.appendChild(li);
-        });
+        });;
 
         // Links de configurações e ajuda
         dropdownList.appendChild(criarEl('hr', 'aside-migrado'));
@@ -3251,6 +3248,105 @@ document.addEventListener('DOMContentLoaded', function () {
 
         card.append(thumbDiv, titulo, cats, canal, infoRow);
         return card;
+    }
+
+    function obterContainerLives() {
+        const c = document.getElementById('lista-lives');
+        if (c) {
+            // .with-login vira display:flex em linha; força coluna
+            c.style.flexDirection = 'column';
+            c.style.gap = '8px';
+            c.style.width = '100%';
+        }
+        return c;
+    }
+
+    function formatarViews(n) {
+        n = Number(n) || 0;
+        if (n >= 1e6) return (n / 1e6).toFixed(1).replace('.0', '') + 'M';
+        if (n >= 1e3) return (n / 1e3).toFixed(1).replace('.0', '') + 'K';
+        return String(n);
+    }
+
+    function criarLiveAside(pessoa) {
+        const link = document.createElement('a');
+        link.href = '#';
+        link.className = 'lives-aside';
+        link.addEventListener('click', e => {
+            e.preventDefault();
+            irParaPerfil(pessoa.id, pessoa.nome, pessoa.foto);
+        });
+
+        const foto = document.createElement('img');
+        foto.src = pessoa.foto || '/static/user.png';
+        foto.alt = pessoa.nome || '';
+        foto.onerror = () => { foto.onerror = null; foto.src = '/static/user.png'; };
+        foto.className = 'aside-photo';
+        foto.style.cssText = 'width:38px;height:38px;border-radius:50%;object-fit:cover;flex-shrink:0;display:block;background:#9147FF;';
+        const nome = document.createElement('span');
+        nome.textContent = pessoa.nome || 'Pessoa desconhecida';
+
+        const ladoDireito = document.createElement('div');
+        ladoDireito.className = 'aside-right';
+        const views = document.createElement('span');
+        views.textContent = formatarViews(pessoa.views);
+        const indicador = document.createElement('i');
+        indicador.className = 'fa-solid fa-circle red-circle';
+        ladoDireito.append(views, indicador);
+
+        link.append(foto, nome, ladoDireito);
+        return link;
+    }
+
+    let livesSeguindo = [];
+
+    async function getLiveSeguindo() {
+        const container = obterContainerLives();
+        if (container) container.innerHTML = '';
+
+        try {
+            let lista = [];
+            if (usuarioLogado) {
+                const res = await fetch(base_url + "/seguindo_lives", {
+                    method: "GET",
+                    headers: { "X-CSRFToken": csrfToken },
+                    credentials: "include"
+                });
+                if (!res.ok) {
+                    console.error('[seguindo] erro', res.status, await res.text());
+                    if (container) container.innerHTML = `<p style="padding:10px;">Erro ao carregar (status ${res.status}).</p>`;
+                    return;
+                }
+                const data = await res.json();
+                console.log('[seguindo] data:', data);
+                if (Array.isArray(data)) lista = data;
+            }
+
+            const porStreamer = new Map();
+            lista.forEach(item => {
+                const atual = porStreamer.get(item.id_usuario);
+                if (atual) atual.views += item.total_views;
+                else porStreamer.set(item.id_usuario, {
+                    id: item.id_usuario,
+                    nome: item.user_name,
+                    foto: item.foto_url,
+                    views: item.total_views
+                });
+            });
+            livesSeguindo = [...porStreamer.values()];
+
+            if (container) {
+                if (livesSeguindo.length === 0) {
+                    container.innerHTML = '<p style="padding:10px;">Ninguém que você segue postou recentemente.</p>';
+                } else {
+                    livesSeguindo.forEach(p => container.appendChild(criarLiveAside(p)));
+                }
+            }
+            sincronizarAsideDropdown();
+        } catch (error) {
+            console.error(error);
+            if (container) container.innerHTML = '<p style="padding:10px;">Erro ao carregar.</p>';
+        }
     }
 
     // TELA EXPLORAR
