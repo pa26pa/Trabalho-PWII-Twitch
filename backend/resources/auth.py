@@ -51,6 +51,19 @@ extensoes_permitidas = {'jpg','jpeg','png','gif','mp4','webm','mov'}
 #chamando função para poder inserir videos e imagens no cloudnary
 acorda_cloudinary()
 
+def verificar_recaptcha(token):
+    """Valida o token do reCAPTCHA com o Google. Retorna True/False."""
+    if not token:
+        return False
+    try:
+        resp = requests.post(
+            'https://www.google.com/recaptcha/api/siteverify',
+            data={'secret': os.getenv("CAPTCHA_SECRET"), 'response': token},
+            timeout=5
+        )
+        return bool(resp.json().get('success'))
+    except (requests.RequestException, ValueError):
+        return False
 
 class signin(Resource):
     """
@@ -91,6 +104,9 @@ class signin(Resource):
         #        'status':'error',
         #        'mensagem':'captcha inválido'
         #    }, 403
+        
+        if not verificar_recaptcha(data.get('captcha')):
+            return {'status': 'error', 'mensagem': 'Captcha inválido. Tente novamente.'}, 403
             
         cpf = str(data.get('cpf'))
         cpf = cpf.strip()
@@ -762,6 +778,14 @@ class inscritos(Resource):
             cursor.execute(query2,(id,))
             seguindo = cursor.fetchone()["total"]
 
+            seguindo_eu = False
+            if 'usuario_id' in session:
+                cursor.execute(
+                    "select 1 from seguidores where id_seguidor=%s and id_seguido=%s",
+                    (session['usuario_id'], id)
+                )
+                seguindo_eu = cursor.fetchone() is not None
+
         except Exception as e:
             print(e)
             return {
@@ -773,7 +797,8 @@ class inscritos(Resource):
             'status':'success',
             'mensagem':'Informações buscadas com sucesso',
             'seguidores':seguidores,
-            'seguindo':seguindo
+            'seguindo':seguindo,
+            'seguindo_eu': seguindo_eu
         }, 200
     
     
@@ -1648,21 +1673,14 @@ class videos(Resource):
         
         try:
             if not id_streamer:
-                query = """select s.id_stream, s.categoria, s.titulo, s.descrisao, s.video_url, s.data_upload, s.capa,
-                                  s.id_streamer, u.user_name as canal, u.foto_url as canal_foto
-                           from streams s
-                           join usuarios u on u.id_usuario = s.id_streamer
-                           order by s.data_upload desc;"""
-                cursor.execute(query)
+                query = """select id_stream, categoria, titulo, descrisao, video_url, data_upload, capa from streams order by data_upload desc;"""
+
+                cursor.execute(query,)
                 rows = cursor.fetchall()
-            else:
-                query = """select s.id_stream, s.categoria, s.titulo, s.descrisao, s.video_url, s.data_upload, s.capa,
-                                  s.id_streamer, u.user_name as canal, u.foto_url as canal_foto
-                           from streams s
-                           join usuarios u on u.id_usuario = s.id_streamer
-                           where s.id_streamer = %s
-                           order by s.data_upload desc;"""
-                cursor.execute(query, (id_streamer,))
+
+            if id_streamer:
+                query = """select id_stream, categoria, titulo, descrisao, video_url, data_upload, capa from streams where id_streamer = %s order by data_upload desc;"""
+                cursor.execute(query,)
                 rows = cursor.fetchall()
             
             videos = []
@@ -1675,9 +1693,6 @@ class videos(Resource):
                     "src": row["video_url"],
                     "thumb": row["capa"],
                     "data": row["data_upload"].strftime("%d/%m/%Y"),
-                    "id_streamer": row["id_streamer"],
-                    "canal": row["canal"],
-                    "canal_foto": row["canal_foto"],
                     "views": 0,
                     "curtidas": 0,
                     "comentarios": [],
@@ -1692,7 +1707,64 @@ class videos(Resource):
 
         finally:
             cursor.close()
-            con.close()                 
+            con.close()     
+    
+    def delete():
+        token = request.headers.get("X-CSRFToken")
+        
+                        
+        check = check_csrf(token)
+        if not check or check.get("status") == "error":
+            return {'status': 'error', 'mensagem': check.get("mensagem")}, 400
+        
+        con = connection()
+        cursor = con.cursor(pymysql.cursors.DictCursor)
+        
+        data = request.get_json()
+        
+        id_stream = data.get('id_stream')
+        
+        video_url = "https://cloudinary.com"
+        parte_final = video_url.split("/upload/")[-1]
+
+        if parte_final.startswith("v"):
+            parte_final = parte_final.split("/", 1)[1]
+
+        public_id = parte_final.rsplit(".", 1)[0]
+        
+        resultado = cloudinary.uploader.destroy(public_id, resource_type="video")
+        
+        try:
+            query_streams = """delete from streams where id_stream = %s"""
+            query_curtidas = """delete from curtidas where id_stream = %s"""
+            query_views = """delete from views where id_stream = %s"""
+            query_comentarios = """delete from comentarios where id_stream = %s"""
+            cursor.execute(query_streams,(id_stream,))
+            con.commit()
+            cursor.execute(query_curtidas,(id_stream,))
+            con.commit()
+            cursor.execute(query_views,(id_stream,))
+            con.commit()
+            cursor.execute(query_comentarios,(id_stream,))
+            con.commit()
+        
+        except Exception as e:
+            print(e)
+            return {
+                'status': 'error', 
+                'mensagem': 'Erro interno ao deletar video'
+            }, 500
+        
+        finally:
+            cursor.close()
+            con.close()
+    
+        return {
+            'status': 'success', 
+            'mensagem': 'Video deletado com sucesso'
+        }, 200            
+            con.close() 
+                 
 class salvar_video(Resource):
     def post(self):
         token = request.headers.get("X-CSRFToken")
@@ -2172,6 +2244,174 @@ class foto_streamer(Resource):
         return {
             'status': 'success', 
             'mensagem': 'Foi possivel encontrar dados',
-            'foto_url': foto['foto_url']
+            'foto_url': foto
         }, 200
-            
+
+class seguindo_live(Resource):
+    def get(self):
+        if 'usuario_id' not in session:
+            return {'status': 'error', 'mensagem': 'É necessário estar logado'}, 401
+
+        token = request.headers.get("X-CSRFToken")
+        check = check_csrf(token)
+        if not check or check.get("status") == "error":
+            mensagem = check.get("mensagem") if check else "Token CSRF inválido"
+            return {'status': 'error', 'mensagem': mensagem}, 400
+
+        id_usuario = session.get('usuario_id')
+        con = connection()
+        cursor = con.cursor(pymysql.cursors.DictCursor)
+        try:
+            query = """
+                SELECT
+                    u.id_usuario,
+                    u.user_name,
+                    u.foto_url,
+                    s.id_stream,
+                    s.titulo,
+                    s.capa,
+                    s.video_url,
+                    s.categoria,
+                    s.data_upload,
+                    COUNT(v.id_view) AS total_views
+                FROM seguidores sg
+                JOIN usuarios u ON u.id_usuario = sg.id_seguido
+                JOIN streams  s ON s.id_streamer = u.id_usuario
+                LEFT JOIN views v ON v.id_stream = s.id_stream
+                WHERE sg.id_seguidor = %s
+                AND s.data_upload >= CURDATE() - INTERVAL 1 DAY
+                GROUP BY
+                    u.id_usuario, u.user_name, u.foto_url,
+                    s.id_stream, s.titulo, s.capa, s.video_url, s.categoria, s.data_upload
+                ORDER BY s.data_upload DESC
+            """
+            cursor.execute(query, (id_usuario,))
+            resultado = cursor.fetchall()
+
+            for r in resultado:
+                r['data_upload'] = r['data_upload'].isoformat()
+                if isinstance(r.get('categoria'), str):
+                    try:
+                        r['categoria'] = json.loads(r['categoria'])
+                    except json.JSONDecodeError:
+                        r['categoria'] = []
+
+            return resultado, 200
+
+        except Exception as e:
+            print(e)
+            return {'status': 'error', 'mensagem': 'erro interno'}, 500
+class explorar_dados(Resource):
+    def get(self):
+        con = connection()
+        cursor = con.cursor(pymysql.cursors.DictCursor)
+        try:
+            query = """select s.id_stream, s.categoria, s.titulo, s.descrisao,
+                              s.video_url, s.data_upload, s.capa,
+                              u.id_usuario, u.user_name, u.foto_url
+                       from streams s
+                       join usuarios u on u.id_usuario = s.id_streamer
+                       order by s.data_upload desc
+                       limit 300;"""
+            cursor.execute(query)
+            rows = cursor.fetchall()
+
+            videos = []
+            for row in rows:
+                cursor.execute("select count(*) as total from views where id_stream=%s", (row["id_stream"],))
+                total_views = cursor.fetchone()["total"]
+
+                cursor.execute("select count(*) as total from curtidas where id_stream=%s", (row["id_stream"],))
+                total_curtidas = cursor.fetchone()["total"]
+
+                cursor.execute("select count(*) as total from seguidores where id_seguido=%s", (row["id_usuario"],))
+                total_seguidores = cursor.fetchone()["total"]
+
+                videos.append({
+                    "id_stream": row["id_stream"],
+                    "titulo": row["titulo"],
+                    "descricao": row["descrisao"],
+                    "categorias": json.loads(row["categoria"]) if row["categoria"] else [],
+                    "src": row["video_url"],
+                    "thumb": row["capa"],
+                    "data": row["data_upload"].strftime("%d/%m/%Y"),
+                    "views": total_views,
+                    "curtidas": total_curtidas,
+                    "aoVivo": False,
+                    "canal": row["user_name"],
+                    "canal_foto": row["foto_url"],
+                    "id_streamer": row["id_usuario"],
+                    "seguidores_streamer": total_seguidores
+                })
+
+            return {"status": "success", "videos": videos}, 200
+        except Exception as e:
+            print("erro:", str(e))
+            return {"status": "error", "mensagem": "Erro ao buscar dados da Explorar"}, 500
+        finally:
+            cursor.close(); con.close()
+
+class seguindo_videos(Resource):
+    def get(self):
+        if 'usuario_id' not in session:
+            return {'status': 'error', 'mensagem': 'Você precisa estar logado', 'canais': []}, 401
+
+        id_usuario = session['usuario_id']
+        con = connection()
+        cursor = con.cursor(pymysql.cursors.DictCursor)
+
+        try:
+            # canais seguidos que já postaram pelo menos 1 vídeo
+            cursor.execute("""
+                select u.id_usuario, u.user_name, u.foto_url
+                from seguidores sg
+                join usuarios u on u.id_usuario = sg.id_seguido
+                where sg.id_seguidor = %s
+                  and exists (select 1 from streams s where s.id_streamer = u.id_usuario)
+                order by u.user_name asc
+            """, (id_usuario,))
+            canais = cursor.fetchall()
+
+            resultado = []
+            for canal in canais:
+                cursor.execute("""
+                    select id_stream, categoria, titulo, descrisao, video_url, data_upload, capa
+                    from streams
+                    where id_streamer = %s
+                    order by data_upload desc
+                    limit 10
+                """, (canal['id_usuario'],))
+                videos = cursor.fetchall()
+
+                lista_videos = []
+                for v in videos:
+                    lista_videos.append({
+                        "id_stream": v["id_stream"],
+                        "titulo": v["titulo"],
+                        "descricao": v["descrisao"],
+                        "categorias": json.loads(v["categoria"]) if v["categoria"] else [],
+                        "src": v["video_url"],
+                        "thumb": v["capa"],
+                        "data": v["data_upload"].strftime("%d/%m/%Y"),
+                        "id_streamer": canal["id_usuario"],
+                        "canal": canal["user_name"],
+                        "canal_foto": canal["foto_url"],
+                        "views": 0
+                    })
+
+                resultado.append({
+                    "id_usuario": canal["id_usuario"],
+                    "user_name": canal["user_name"],
+                    "foto_url": canal["foto_url"],
+                    "videos": lista_videos
+                })
+
+            return {"status": "success", "canais": resultado}, 200
+
+        except Exception as e:
+            print(e)
+            return {"status": "error", "mensagem": "Erro ao buscar canais seguidos", "canais": []}, 500
+
+        finally:
+            cursor.close()
+            con.close()

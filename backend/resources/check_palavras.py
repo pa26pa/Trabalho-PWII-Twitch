@@ -37,5 +37,3 @@ def verificar_palavra(frase):
     
     return None
 
-a = verificar_palavra("sexo")
-print(a)

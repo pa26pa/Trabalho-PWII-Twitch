@@ -1,8 +1,8 @@
 //DOMContentLoaded garante que o script só rode depois de todo o HTML estar carregado
 document.addEventListener('DOMContentLoaded', function () {
-    base_url = "";
+    base_url = "http://127.0.0.1:5000";
     let usuarioLogado = false;
-    let meuUserId = null;
+
     // CARREGAMENTO DO CSRF TOKEN 
     // o token é necessário para proteger contra ataques CSRF, garantindo que as requisições venham de fontes confiáveis
     let csrfToken = null;
@@ -13,6 +13,34 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     carregarCsrf()
+
+    const RECAPTCHA_SITE_KEY = "6LdwJtgtAAAAAMT4AyhVwMt4EIaPcU8363YdzIMs";
+    let captchaWidgetId = null;
+
+    function renderizarCaptcha() {
+        const container = document.getElementById('recaptcha-container');
+        if (!container || captchaWidgetId !== null) return;
+        
+        // Se o grecaptcha do Google ainda não estiver pronto na memória global, tenta novamente em 500ms
+        if (typeof grecaptcha === 'undefined' || typeof grecaptcha.ready === 'undefined') {
+            setTimeout(renderizarCaptcha, 500);
+            return;
+        }
+        
+        grecaptcha.ready(() => {
+            captchaWidgetId = grecaptcha.render('recaptcha-container', {
+                sitekey: RECAPTCHA_SITE_KEY,
+                theme: localStorage.getItem('witch-tema') === 'escuro' ? 'dark' : 'light'
+            });
+        });
+    }
+
+
+    function resetarCaptcha() {
+        if (typeof grecaptcha !== 'undefined' && captchaWidgetId !== null) {
+            grecaptcha.reset(captchaWidgetId);
+        }
+    }
     // CONTROLE DE ESTADO LOGADO/DESLOGADO
     function mostrarLogado(nome) {
         // esconde elementos de deslogado, mostra de logado
@@ -59,13 +87,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
             if (data.logado) {
                 usuarioLogado = true;
-                meuUserId = data.id;
                 mostrarLogado(data.name);
                 info_user(data);
                 incritos_info(data.id);
+                getLiveSeguindo();
             } else {
                 usuarioLogado = false
-                meuUserId = null;
                 mostrarDeslogado();
             }
 
@@ -105,6 +132,13 @@ document.addEventListener('DOMContentLoaded', function () {
             const modalId = button.getAttribute('data-modal');
             const modal = document.getElementById(modalId);
             if (modal) { // ← proteção para evitar erros se o modal não existir
+                if (modalId === 'modal-5') {
+                    const turboModal = modal.querySelector('.turbo-modal');
+                    const pagTurbo = modal.querySelector('.pagamento-turbo');
+                    if (turboModal) turboModal.style.display = 'block';
+                    if (pagTurbo) pagTurbo.style.display = 'none';
+                    modal.style.background = '#1a1a2e';
+                }
                 modal.showModal(); // método nativo para mostrar modais <dialog>
                 document.body.classList.add('modal-open');// classe para evitar scroll do fundo
             }
@@ -475,7 +509,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // função para mostrar nome
     function info_user_name(user_name) {
-        const mostra = document.querySelectorAll('.show_name:not(#nome-dropdown)');
+        const mostra = document.querySelectorAll('.show_name');
         if (!user_name || !mostra) return ;
         mostra.forEach(mostra => {
             mostra.textContent = user_name;
@@ -565,6 +599,11 @@ document.addEventListener('DOMContentLoaded', function () {
             show_seguidores(data.seguidores);
             show_seguindo(data.seguindo);
             
+            const btnSeguir = document.getElementById('btn-seguir-visitante');
+            if (btnSeguir && typeof data.seguindo_eu === 'boolean') {
+                btnSeguir.textContent = data.seguindo_eu ? 'Seguindo' : 'Seguir';
+                btnSeguir.classList.toggle('ativo', data.seguindo_eu);
+            }
         })
     }
 
@@ -633,12 +672,12 @@ document.addEventListener('DOMContentLoaded', function () {
             // CADASTRO
             if (form.classList.contains('sign')) {
                 if (document.getElementById('cadastro').offsetParent === null) return;
-                //const captcha = grecaptcha.getResponse();
-
-                //if (captcha.length === 0) {
-                //    mostrarToast('Por favor, marque a caixa "Não sou um robô"', 'error')
-                //    return;
-                //}
+                
+                const captcha = (captchaWidgetId !== null) ? grecaptcha.getResponse(captchaWidgetId) : '';
+                if (!captcha) {
+                    mostrarToast('Por favor, marque a caixa "Não sou um robô"', 'error');
+                    return;
+                }
                 
                 const dados = {
                     cpf: document.getElementById("cpf").value,
@@ -646,7 +685,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     user_name: document.getElementById("user-cadastro").value,
                     data_nascimento: document.getElementById("data-nascimento").value,
                     senha: document.getElementById("senha").value,
-                    //captcha: captcha
+                    captcha: captcha
                 };
                 
                 
@@ -668,6 +707,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             if (errData.mensagem) msg = errData.mensagem;
                         } catch {}
                         mostrarToast(msg, 'error');
+                        resetarCaptcha();
                         return null; // sinaliza que não deve continuar pro login
                     }
                     return res.json();
@@ -677,6 +717,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     if (data.status == 'error') {
                         mostrarToast(data.mensagem, data.status);
+                        resetarCaptcha();
                     } else {
                         const dado = {
                             username_email: dados['user_name'],
@@ -711,6 +752,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 })
                 .catch(() => {
                     mostrarToast('Erro de conexão com o servidor.', 'error');
+                    resetarCaptcha();
                 });
             }
 
@@ -1068,9 +1110,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 const checkbox = document.getElementById('checkbox');
                 if (checkbox) checkbox.checked = false;
 
-                //if (typeof grecaptcha !== 'undefined') {
-                //    grecaptcha.reset();
-                //}
+                resetarCaptcha();
             }
         });
     });
@@ -1085,13 +1125,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 document.querySelectorAll('.erroSenha, .erroSenha2, #erroIdade').forEach(el => el.style.display = 'none');
                 document.querySelectorAll('.input-erro').forEach(el => el.classList.remove('input-erro'));
 
-                // renderiza o captcha só quando o cadastro aparecer
-                //if (checkbox.checked && !captchaRendered) {
-                //    grecaptcha.render('recaptcha-container', {
-                //        sitekey: '6LemWTAtAAAAAM2v-HHAGkaNtjG8vm-Huju47Nvs'
-                //    });
-                //    captchaRendered = true;
-                //}
+                if (checkbox.checked) renderizarCaptcha(); 
             });
         }
 
@@ -1225,115 +1259,6 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         });
     }
-
-    // Página Inicial - Em Alta (galeria de lives)
-    const carouselHome = document.querySelector('.carousel-wrap');
-    const trackHome = document.getElementById('track-home');
-
-    if (carouselHome && trackHome) {
-        let currentHome = 0;
-        const totalHome = trackHome.children.length; // pega automático
-
-        function goToHome(i) {
-            currentHome = (i + totalHome) % totalHome;
-            const w = trackHome.children[0].offsetWidth;
-            trackHome.style.transform = `translateX(-${currentHome * w}px)`;
-        }
-
-        document.getElementById('prev').addEventListener('click', () => goToHome(currentHome - 1));
-        document.getElementById('next').addEventListener('click', () => goToHome(currentHome + 1));
-        window.addEventListener('resize', () => goToHome(currentHome));
-    }
-
-    /*controles dos videos
-    const player = document.getElementById('player');
-    const gifImg = document.getElementById('gif-img');
-    const playBtn = document.getElementById('play-btn');
-    const playIcon = document.getElementById('play-icon');
-    const progFill = document.getElementById('progress-fill');
-    const progWrap = document.getElementById('progress-wrap');
-    const muteBtn = document.getElementById('mute-btn');
-    const volIcon = document.getElementById('vol-icon');
-    const volRange = document.getElementById('vol-range');
-    const fsBtn = document.getElementById('fs-btn');
-    const fsIcon = document.getElementById('fs-icon');
-
-    if (player) {
-        let playing = true;
-        let muted = false;
-        let progress = 0;
-        let timer;
-
-        // ── PROGRESSO SIMULADO (GIF não tem timeupdate) ──
-        function startProgress() {
-            clearInterval(timer);
-            timer = setInterval(() => {
-                progress = (progress + 0.08) % 100; // loop de 0 a 100
-                progFill.style.width = progress + '%';
-            }, 100);
-        }
-        function stopProgress() { clearInterval(timer); }
-
-        // ── PLAY / PAUSE ──
-        function togglePlay() {
-            playing = !playing;
-            if (playing) {
-                player.classList.remove('paused');
-                playIcon.className = 'ti ti-player-pause'; // ícone de pause
-                gifImg.src = gifImg.src; // reinicia o GIF (truque para simular play)
-                startProgress();
-            } else {
-                player.classList.add('paused');
-                playIcon.className = 'ti ti-player-play';
-                stopProgress();
-            }
-        }
-
-        // clique no botão ou na área do vídeo
-        playBtn.addEventListener('click', e => { e.stopPropagation(); togglePlay(); });
-        player.addEventListener('click', togglePlay);
-
-        // ── BARRA DE PROGRESSO ──
-        progWrap.addEventListener('click', e => {
-            e.stopPropagation();
-            const rect = progWrap.getBoundingClientRect();
-            progress = ((e.clientX - rect.left) / rect.width) * 100;
-            progFill.style.width = progress + '%';
-        });
-
-        // ── MUTE ──
-        muteBtn.addEventListener('click', e => {
-            e.stopPropagation();
-            muted = !muted;
-            volIcon.className = muted ? 'ti ti-volume-off' : 'ti ti-volume';
-            volRange.value    = muted ? 0 : 80;
-        });
-
-        // ── VOLUME ──
-        volRange.addEventListener('input', e => {
-            e.stopPropagation();
-            muted = volRange.value == 0;
-            // ícone muda conforme o nível
-            if (muted) volIcon.className = 'ti ti-volume-off';
-            else if (volRange.value < 50) volIcon.className = 'ti ti-volume-2';
-            else volIcon.className = 'ti ti-volume';
-        });
-
-        // ── TELA CHEIA ──
-        fsBtn.addEventListener('click', e => {
-            e.stopPropagation();
-            if (!document.fullscreenElement) {
-                player.requestFullscreen?.();
-                fsIcon.className = 'ti ti-arrows-minimize';
-            } else {
-                document.exitFullscreen?.();
-                fsIcon.className = 'ti ti-arrows-maximize';
-            }
-        });
-
-        // inicia o progresso simulado ao carregar
-        startProgress();
-    }*/
 
     //----------------MOON--------------------
     // CARROUSSEL 
@@ -1849,6 +1774,8 @@ document.addEventListener('DOMContentLoaded', function () {
         await verificarSessao();
         await renderVideosNaHome();
         await iniciarPerfil();
+        await iniciarExplorar();
+        await iniciarSeguindo();
 
         if (document.getElementById('block-btn')) {
             fetch(base_url +'/bloqueados', {
@@ -1883,14 +1810,7 @@ document.addEventListener('DOMContentLoaded', function () {
             });
             if (!res.ok) throw new Error("Erro ao buscar as lives");
             const data = await res.json();
-            const videos = data.videos || [];
-            await Promise.all(videos.map(async (live) => {
-                if (!live.canal_foto && live.id_streamer) {
-                    const fotoUrl = await getFotoStreamerCache(live.id_streamer);
-                    if (fotoUrl) live.canal_foto = fotoUrl;
-                }
-            }));
-            return videos;
+            return data.videos || [];
         } catch (error) {
             console.error("Erro ao pegar videos:", error);
             return [];
@@ -1928,34 +1848,28 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     async function foto_streamer(idStreamer) {
-        if (!idStreamer) return null;
         try {
-            const res = await fetch(base_url + "/foto_streamer", {   // ← vírgula adicionada
+            const res = await fetch(base_url + "/foto_streamer", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                     "X-CSRFToken": csrfToken
                 },
                 credentials: "include",
-                body: JSON.stringify({ id_streamer: idStreamer })
+                body: JSON.stringify({ id_stream: idStreamer })
             });
+
             const data = await res.json();
-            if (data.mensagem !== "success") return null;
-            return data.foto_url;
+            if (!res.ok || data.status === "error") {
+                mostrarToast(data.mensagem || "Erro ao curtir.", "error");
+                return null;
+            }
+
+            return data.foto_url; // { curtido: true/false, total_curtidas: N }
+
         } catch (error) {
-            console.error("Erro ao buscar foto do streamer:", error);
             return null;
         }
-    }
-
-    // cache simples pra não repetir a mesma busca várias vezes
-    const cacheFotoStreamer = {};
-    async function getFotoStreamerCache(idStreamer) {
-        if (!idStreamer) return null;
-        if (cacheFotoStreamer[idStreamer] !== undefined) return cacheFotoStreamer[idStreamer];
-        const foto = await foto_streamer(idStreamer);
-        cacheFotoStreamer[idStreamer] = foto;
-        return foto;
     }
 
     async function curtirVideo(idStream) {
@@ -2081,19 +1995,22 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    document.getElementById('btn-bits').onclick = () => {
-        if (!usuarioLogado) {
-            mostrarToast('Você precisa estar logado para doar bits.', 'error');
-            return;
-        }
-        const wrap = document.querySelector('.player-wrap-expanded');
-        const anim = document.createElement('div');
-        anim.className = 'bits-animacao';
-        anim.innerHTML = `<i class="fa-solid fa-gem"></i><span>Você acaba de doar bits!</span>`;
-        wrap.appendChild(anim);
-        anim.addEventListener('animationend', () => anim.remove());
-        mostrarToast('Você acaba de doar bits', 'success');
-    };
+    const btnBits = document.getElementById('btn-bits');
+    if (btnBits) {
+        btnBits.addEventListener('click', () => {
+            if (!usuarioLogado) {
+                mostrarToast('Você precisa estar logado para doar bits.', 'error');
+                return;
+            }
+            const wrap = document.querySelector('.player-wrap-expanded');
+            const anim = document.createElement('div');
+            anim.className = 'bits-animacao';
+            anim.innerHTML = `<i class="fa-solid fa-gem"></i><span>Você acaba de doar bits!</span>`;
+            wrap.appendChild(anim);
+            anim.addEventListener('animationend', () => anim.remove());
+            mostrarToast('Você acaba de doar bits', 'success');
+        });
+    }
 
     // referências de DOM usadas pelos handlers abaixo — precisam vir ANTES de serem usadas
     const modal6 = document.getElementById('modal-6');
@@ -2183,7 +2100,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
             mostrarToast("Vídeo salvo!", "success");
-            await renderVideosPerfil(meuUserId, true);
+            await renderVideosPerfil();
 
             if (modal6) {
                 modal6.close();
@@ -2223,7 +2140,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    async function renderVideosPerfil(idUsuario, isOwnProfile = false) {
+    async function renderVideosPerfil(idUsuario) {
         const container = document.getElementById('videos-perfil-grid');
         if (!container) return;
         const lives = await getLives(idUsuario);
@@ -2237,7 +2154,9 @@ document.addEventListener('DOMContentLoaded', function () {
         lives.forEach(async live => {
             const dadosViews = await buscarViews(live.id_stream);
             if (dadosViews) live.views = dadosViews.total_views;
-            const card = criarVideoCard(live, { mostrarOpcoes: isOwnProfile }); // ← troca !idUsuario por isOwnProfile
+
+            // menu de opções só aparece no SEU PRÓPRIO canal (sem idUsuario = é você mesmo)
+            const card = criarVideoCard(live, { mostrarOpcoes: !idUsuario });
             container.appendChild(card);
         });
     }
@@ -2267,20 +2186,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
         document.getElementById('player-info-titulo').textContent = live.titulo;
         document.getElementById('player-info-cats').textContent   = live.categorias?.join(' • ') || '';
+        const descEl = document.getElementById('player-info-descricao');
+        if (descEl) descEl.textContent = live.descricao || live.descrisao || '';
         document.getElementById('player-info-data').textContent   = live.data;
 
         const nomeCanal = live.canal || 'Canal desconhecido';
         const fotoCanal = live.canal_foto || '/static/user.png';
         document.getElementById('player-canal-nome-text').textContent = nomeCanal;
         document.getElementById('player-canal-foto-img').src          = fotoCanal;
-        if (!live.canal_foto && live.id_streamer) {
-            getFotoStreamerCache(live.id_streamer).then(fotoUrl => {
-                if (fotoUrl) {
-                    live.canal_foto = fotoUrl;
-                    document.getElementById('player-canal-foto-img').src = fotoUrl;
-                }
-            });
-        }
 
         const btnCurtir     = document.getElementById('btn-curtir');
         const countCurtidas = document.getElementById('count-curtidas');
@@ -2404,13 +2317,13 @@ document.addEventListener('DOMContentLoaded', function () {
             document.body.classList.remove('modal-open');
             cancelAnimationFrame(rafId);
             playIcon.className = 'fa-solid fa-play';
-            renderVideosPerfil(idPerfilAtual ?? meuUserId, idPerfilAtual == null); 
+            renderVideosPerfil(idPerfilAtual); 
         };
         fecharBtn.onclick = fechar;
         overlay.onclick = e => { if (e.target === overlay) fechar(); };
     }
 
-    // ── ASIDE → DROPDOWN em telas < 1024px ──
+    // ── ASIDE → DROPDOWN em telas < 1280px ──
     // sincroniza o conteúdo do aside para dentro do dropdown
     function sincronizarAsideDropdown() {
         const dropdownList = document.querySelector('#dropdown-menu ul');
@@ -2418,7 +2331,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         dropdownList.querySelectorAll('.aside-migrado').forEach(el => el.remove());
 
-        if (window.innerWidth >= 1024) return;
+        if (window.innerWidth >= 1280) return;
 
         const logado = document.querySelector('.with-login')?.style.display !== 'none';
 
@@ -2429,15 +2342,11 @@ document.addEventListener('DOMContentLoaded', function () {
         dropdownList.appendChild(hrLives);
         dropdownList.appendChild(tituloLives);
 
-        [['Pessoa 1.0','1.3M'],['Pessoa 2.0','1.3M'],['Pessoa 3.0','1.3M'],['Pessoa 4.0','1.3M']].forEach(([nome, views]) => {
+        livesSeguindo.forEach(p => {
             const li = criarEl('li', 'aside-migrado aside-live-item' + (logado ? '' : ' hidden-deslogado'));
-            li.innerHTML = `
-                <i class="fa-solid fa-circle" style="color:purple;font-size:1.1em;"></i>
-                <span style="flex:1;">${nome}</span>
-                <span style="font-size:0.8em;color:var(--color16);">${views}</span>
-                <i class="fa-solid fa-circle" style="color:red;font-size:0.4em;"></i>`;
+            li.appendChild(criarLiveAside(p));
             dropdownList.appendChild(li);
-        });
+        });;
 
         // Links de configurações e ajuda
         dropdownList.appendChild(criarEl('hr', 'aside-migrado'));
@@ -2479,33 +2388,31 @@ document.addEventListener('DOMContentLoaded', function () {
     // o mesmo top layer do dialog (acima do ::backdrop, acima de tudo).
     const modal1 = document.getElementById('modal-1');
 
-    //const recaptchaObserver = new MutationObserver(() => {
-        //if (!modal1 || !modal1.open) return;
+    const recaptchaObserver = new MutationObserver(() => {
+        if (!modal1 || !modal1.open) return;
 
-        //document.querySelectorAll('body > div').forEach(div => {
-            // ignora o próprio dialog e qualquer wrapper já processado
-            //if (div === modal1 || div.dataset.recaptchaMoved === 'true') return;
+        document.querySelectorAll('body > div').forEach(div => {
+            // ignora o próprio dialog e wrappers já processados
+            if (div === modal1 || div.dataset.recaptchaMoved === 'true') return;
 
-            //const isRecaptchaDiv = div.querySelector('iframe[src*="recaptcha"]');
-            //if (isRecaptchaDiv) {
-            //    div.classList.add('recaptcha-challenge-wrapper');
-                //div.dataset.recaptchaMoved = 'true'; // FIX: evita reprocessar o mesmo div em loop
-                //modal1.appendChild(div);
+            if (div.querySelector('iframe[src*="recaptcha"]')) {
+                div.classList.add('recaptcha-challenge-wrapper');
+                div.dataset.recaptchaMoved = 'true';
+                modal1.appendChild(div);
 
-                // FIX: quando o iframe do desafio for removido pelo Google
-                // (resolveu o captcha ou fechou), some o wrapper inteiro
-                //const innerObserver = new MutationObserver(() => {
-                //    if (!div.querySelector('iframe[src*="recaptcha"]')) {
-                //        div.remove();
-                //        innerObserver.disconnect();
-                //    }
-                //});
-                //innerObserver.observe(div, { childList: true, subtree: true });
-            //}
-        //});
-    //});
+                // quando o Google remover o iframe do desafio, some o wrapper
+                const innerObserver = new MutationObserver(() => {
+                    if (!div.querySelector('iframe[src*="recaptcha"]')) {
+                        div.remove();
+                        innerObserver.disconnect();
+                    }
+                });
+                innerObserver.observe(div, { childList: true, subtree: true });
+            }
+        });
+    });
 
-    //recaptchaObserver.observe(document.body, { childList: true });
+    recaptchaObserver.observe(document.body, { childList: true });
 
     //----------AJUDA-----------
     //extensão pra mostrar resposta da dúvida frequente
@@ -2778,7 +2685,10 @@ document.addEventListener('DOMContentLoaded', function () {
     // barra de pesquisa funioical em todas as páginas
     // BUSCA DE CANAIS E VÍDEOS (barra do header, #search)
     const canalSearchInput = document.getElementById('search');
-    if (canalSearchInput) {
+    const configMain = document.getElementById('config-main');
+    if (canalSearchInput && configMain) {
+        setupConfigSearch(canalSearchInput, configMain);
+    } else if (canalSearchInput) {
         const canalOverlay = document.createElement('div');
         canalOverlay.className = 'canal-search-overlay';
         canalOverlay.innerHTML = `
@@ -2913,7 +2823,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 data: video.data_upload,
                 id_streamer: video.id_streamer,
                 canal: video.canal,
-                canal_foto: video.canal_foto
+                canal_foto: video.canal_foto,
+                descrisao: video.descrisao || '' 
             };
 
             if (document.getElementById('video-player-overlay')) {
@@ -2963,6 +2874,104 @@ document.addEventListener('DOMContentLoaded', function () {
         }, true);
     }
 
+    // pesquisa das configurações (ctrl+F)
+    function setupConfigSearch(input, container) {
+        let matches = [];
+        let currentIndex = -1;
+
+        const counter = document.createElement('span');
+        counter.className = 'config-search-count';
+        input.closest('.search-bar').appendChild(counter);
+
+        function limparHighlights() {
+            container.querySelectorAll('mark.config-search-mark').forEach(mark => {
+                const parent = mark.parentNode;
+                parent.replaceChild(document.createTextNode(mark.textContent), mark);
+                parent.normalize();
+            });
+        }
+
+        function destacar(termo) {
+            limparHighlights();
+            matches = [];
+            currentIndex = -1;
+            if (!termo) { atualizarContador(); return; }
+
+            const termoLower = termo.toLowerCase();
+            const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT, {
+                acceptNode(node) {
+                    if (!node.textContent.trim()) return NodeFilter.FILTER_REJECT;
+                    if (node.parentElement.closest('script, style, mark')) return NodeFilter.FILTER_REJECT;
+                    return NodeFilter.FILTER_ACCEPT;
+                }
+            });
+
+            const nodes = [];
+            let node;
+            while (node = walker.nextNode()) nodes.push(node);
+
+            nodes.forEach(textNode => {
+                const texto = textNode.textContent;
+                const textoLower = texto.toLowerCase();
+                let idx = textoLower.indexOf(termoLower);
+                if (idx === -1) return;
+
+                const frag = document.createDocumentFragment();
+                let lastIndex = 0;
+                while (idx !== -1) {
+                    frag.appendChild(document.createTextNode(texto.slice(lastIndex, idx)));
+                    const mark = document.createElement('mark');
+                    mark.className = 'config-search-mark';
+                    mark.textContent = texto.slice(idx, idx + termo.length);
+                    frag.appendChild(mark);
+                    matches.push(mark);
+                    lastIndex = idx + termo.length;
+                    idx = textoLower.indexOf(termoLower, lastIndex);
+                }
+                frag.appendChild(document.createTextNode(texto.slice(lastIndex)));
+                textNode.parentNode.replaceChild(frag, textNode);
+            });
+
+            if (matches.length > 0) irParaResultado(0);
+            atualizarContador();
+        }
+
+        function atualizarContador() {
+            counter.textContent = matches.length ? `${currentIndex + 1} de ${matches.length}`
+                : (input.value ? '0 de 0' : '');
+        }
+
+        function irParaResultado(i) {
+            if (matches.length === 0) return;
+            if (currentIndex >= 0) matches[currentIndex].classList.remove('config-search-mark-ativo');
+            currentIndex = (i + matches.length) % matches.length;
+            matches[currentIndex].classList.add('config-search-mark-ativo');
+
+            // abre a aba de configuração onde o resultado está, se ela não estiver visível
+            const secao = matches[currentIndex].closest('.section-config');
+            if (secao && !secao.classList.contains('active')) {
+                configNav.forEach(l => l.classList.remove('active'));
+                configSections.forEach(s => s.classList.remove('active'));
+                secao.classList.add('active');
+                const link = document.querySelector(`.nav-config a[data-target="${secao.id}"]`);
+                if (link) link.classList.add('active');
+            }
+
+            matches[currentIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
+            atualizarContador();
+        }
+
+        input.addEventListener('input', () => destacar(input.value.trim()));
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                if (matches.length === 0) return;
+                if (e.shiftKey) irParaResultado(currentIndex - 1);
+                else irParaResultado(currentIndex + 1);
+            }
+        });
+    }
+
     //função para passar os vídeos dos usuários para a tela inicial
     async function getLivesHome() {
         try {
@@ -2973,14 +2982,7 @@ document.addEventListener('DOMContentLoaded', function () {
             });
             if (!res.ok) throw new Error("Erro ao buscar vídeos da home");
             const data = await res.json();
-            const videos = data.videos || [];
-            await Promise.all(videos.map(async (live) => {
-                if (!live.canal_foto && live.id_streamer) {
-                    const fotoUrl = await getFotoStreamerCache(live.id_streamer);
-                    if (fotoUrl) live.canal_foto = fotoUrl;
-                }
-            }));
-            return videos;
+            return data.videos || [];
         } catch (error) {
             console.error(error);
             return [];
@@ -2988,14 +2990,10 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     async function renderVideosNaHome() {
-        const lives = await getLivesHome(); // não depende mais de sessão
+        const lives = await getLivesHome();
         if (lives.length === 0) return;
 
-        const emAlta = document.getElementById('grid-em-alta');
-        if (emAlta) {
-            const top3 = [...lives].sort((a, b) => (b.views || 0) - (a.views || 0)).slice(0, 3);
-            top3.forEach(live => emAlta.appendChild(criarVideoCard(live, { mostrarOpcoes: false })));
-        }
+        montarEmAlta(lives);
 
         const mapaGrids = {
             'ação&aventura': 'grid-acao-aventura',
@@ -3011,19 +3009,107 @@ document.addEventListener('DOMContentLoaded', function () {
             'não-jogo':      'grid-outros',
         };
 
+        const porCategoria = {};
         lives.forEach(live => {
             (live.categorias || []).forEach(cat => {
-                const gridId = mapaGrids[cat];
-                if (!gridId) return;
-                const grid = document.getElementById(gridId);
-                // FIX: era "live.id" (undefined em todo vídeo) -> travava depois do 1º card. Agora usa "id_stream"
-                if (grid && !grid.querySelector(`[data-live-id="${live.id_stream}"]`)) {
-                    const card = criarVideoCard(live, { mostrarOpcoes: false });
-                    card.dataset.liveId = live.id_stream;
-                    grid.appendChild(card);
-                }
+                if (!mapaGrids[cat]) return;
+                if (!porCategoria[cat]) porCategoria[cat] = [];
+                porCategoria[cat].push(live);
             });
         });
+
+        Object.entries(mapaGrids).forEach(([cat, gridId]) => {
+            const grid = document.getElementById(gridId);
+            if (!grid) return;
+
+            const videosCat = (porCategoria[cat] || []).slice(0, 10); // até 10, já vem ordenado por data desc
+
+            if (videosCat.length === 0) {
+                grid.closest('.section-home')?.style.setProperty('display', 'none');
+                return;
+            }
+
+            videosCat.forEach(live => grid.appendChild(criarVideoCard(live, { mostrarOpcoes: false })));
+
+            const wrap = garantirWrapComSetas(grid);
+            montarCarrossel(wrap, grid);
+        });
+    }
+
+    function montarEmAlta(lives) {
+        const track = document.getElementById('track-home');
+        if (!track) return;
+        track.innerHTML = '';
+
+        const top3 = [...lives].sort((a, b) => (b.views || 0) - (a.views || 0)).slice(0, 3);
+        const secao = track.closest('.section-home');
+
+        if (top3.length === 0) {
+            if (secao) secao.style.display = 'none';
+            return;
+        }
+        if (secao) secao.style.display = '';
+
+        top3.forEach(live => {
+            const slide = document.createElement('div');
+            slide.className = 'carousel-slide';
+
+            const thumb = document.createElement('div');
+            thumb.className = 'video-thumb';
+            thumb.style.cursor = 'pointer';
+            thumb.innerHTML = `
+                <span class="badge-live">AO VIVO</span>
+                ${live.thumb
+                    ? `<img src="${live.thumb}" alt="${live.titulo}" style="width:100%;height:100%;object-fit:cover;">`
+                    : `<video src="${live.src || ''}" preload="metadata" muted style="width:100%;height:100%;object-fit:cover;"></video>`}
+                <span class="thumb-views">${live.views || 0} visualizações</span>
+            `;
+            thumb.addEventListener('click', () => abrirPlayerExpandido(live));
+
+            const titulo = document.createElement('p');
+            titulo.className = 'thumb-title';
+            titulo.textContent = live.titulo;
+
+            const canal = document.createElement('p');
+            canal.className = 'thumb-user';
+            canal.textContent = live.canal || 'Canal desconhecido';
+            canal.style.cursor = 'pointer';
+            canal.addEventListener('click', e => {
+                e.stopPropagation();
+                if (live.id_streamer) irParaPerfil(live.id_streamer, live.canal, live.canal_foto);
+            });
+
+            slide.append(thumb, titulo, canal);
+            track.appendChild(slide);
+        });
+
+        iniciarCarrosselEmAlta(top3.length);
+    }
+
+    function iniciarCarrosselEmAlta(total) {
+        const track = document.getElementById('track-home');
+        const prevBtn = document.getElementById('prev');
+        const nextBtn = document.getElementById('next');
+        if (!track || total === 0) return;
+
+        let current = 0;
+        function goTo(i) {
+            current = (i + total) % total;
+            const w = track.children[0]?.offsetWidth || 0;
+            track.style.transform = `translateX(-${current * w}px)`;
+        }
+
+        if (prevBtn) { prevBtn.style.display = total > 1 ? '' : 'none'; prevBtn.onclick = () => { goTo(current - 1); resetAutoplay(); }; }
+        if (nextBtn) { nextBtn.style.display = total > 1 ? '' : 'none'; nextBtn.onclick = () => { goTo(current + 1); resetAutoplay(); }; }
+        window.addEventListener('resize', () => goTo(current));
+
+        let intervalId;
+        function resetAutoplay() {
+            clearInterval(intervalId);
+            if (total > 1) intervalId = setInterval(() => goTo(current + 1), 6000);
+        }
+        resetAutoplay();
+        goTo(0);
     }
 
     function criarVideoCard(live, { mostrarOpcoes = false } = {}) {
@@ -3048,12 +3134,11 @@ document.addEventListener('DOMContentLoaded', function () {
             thumbDiv.appendChild(capa);
         }
 
-        if (live.aoVivo) {
-            const badge = document.createElement('span');
-            badge.className = 'thumb-badge-live';
-            badge.textContent = 'AO VIVO';
-            thumbDiv.appendChild(badge);
-        }
+        const badge = document.createElement('span');
+        badge.className = 'thumb-badge-live';
+        badge.textContent = 'AO VIVO';
+        thumbDiv.appendChild(badge);
+        
 
         const views = document.createElement('span');
         views.className = 'thumb-views-perfil';
@@ -3114,21 +3199,12 @@ document.addEventListener('DOMContentLoaded', function () {
         cats.style.cssText = 'font-size:0.9em;color:#9147FF';
 
         const nomeCanal = live.canal || document.querySelector('.show_name')?.textContent || 'Canal desconhecido';
-        const canalWrap = document.createElement('div');
-        canalWrap.style.cssText = 'display:flex;align-items:center;gap:6px;cursor:pointer;';
-
-        const canalFotoImg = document.createElement('img');
-        canalFotoImg.src = live.canal_foto || '/static/user.png';
-        canalFotoImg.alt = nomeCanal;
-        canalFotoImg.style.cssText = 'width:20px;height:20px;border-radius:50%;object-fit:cover;flex-shrink:0;';
-
         const canal = document.createElement('p');
         canal.className = 'video-card-canal';
         canal.textContent = nomeCanal;
-        canal.style.cssText = 'font-size:0.9em;font-weight:bold;color:#9147FF;margin:0;';
-
-        canalWrap.append(canalFotoImg, canal);
-        canalWrap.addEventListener('click', e => {
+        canal.style.cursor = 'pointer';
+        canal.style.cssText = 'font-size:0.9em;font-weight:bold;color:#9147FF';
+        canal.addEventListener('click', e => {
             e.stopPropagation();
             if (live.id_streamer) irParaPerfil(live.id_streamer, live.canal, live.canal_foto);
         });
@@ -3191,18 +3267,255 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         }
 
-        card.append(thumbDiv, titulo, cats, canalWrap, infoRow);
+        card.append(thumbDiv, titulo, cats, canal, infoRow);
         return card;
+    }
+
+    function obterContainerLives() {
+        const c = document.getElementById('lista-lives');
+        if (c) {
+            // .with-login vira display:flex em linha; força coluna
+            c.style.flexDirection = 'column';
+            c.style.gap = '8px';
+            c.style.width = '100%';
+        }
+        return c;
+    }
+
+    function formatarViews(n) {
+        n = Number(n) || 0;
+        if (n >= 1e6) return (n / 1e6).toFixed(1).replace('.0', '') + 'M';
+        if (n >= 1e3) return (n / 1e3).toFixed(1).replace('.0', '') + 'K';
+        return String(n);
+    }
+
+    function criarLiveAside(pessoa) {
+        const link = document.createElement('a');
+        link.href = '#';
+        link.className = 'lives-aside';
+        link.addEventListener('click', e => {
+            e.preventDefault();
+            irParaPerfil(pessoa.id, pessoa.nome, pessoa.foto);
+        });
+
+        const foto = document.createElement('img');
+        foto.src = pessoa.foto || '/static/user.png';
+        foto.alt = pessoa.nome || '';
+        foto.onerror = () => { foto.onerror = null; foto.src = '/static/user.png'; };
+        foto.className = 'aside-photo';
+        foto.style.cssText = 'width:38px;height:38px;border-radius:50%;object-fit:cover;flex-shrink:0;display:block;background:#9147FF;';
+        const nome = document.createElement('span');
+        nome.textContent = pessoa.nome || 'Pessoa desconhecida';
+
+        const ladoDireito = document.createElement('div');
+        ladoDireito.className = 'aside-right';
+        const views = document.createElement('span');
+        views.textContent = formatarViews(pessoa.views);
+        const indicador = document.createElement('i');
+        indicador.className = 'fa-solid fa-circle red-circle';
+        ladoDireito.append(views, indicador);
+
+        link.append(foto, nome, ladoDireito);
+        return link;
+    }
+
+    let livesSeguindo = [];
+
+    async function getLiveSeguindo() {
+        const container = obterContainerLives();
+        if (container) container.innerHTML = '';
+
+        try {
+            let lista = [];
+            if (usuarioLogado) {
+                const res = await fetch(base_url + "/seguindo_lives", {
+                    method: "GET",
+                    headers: { "X-CSRFToken": csrfToken },
+                    credentials: "include"
+                });
+                if (!res.ok) {
+                    console.error('[seguindo] erro', res.status, await res.text());
+                    if (container) container.innerHTML = `<p style="padding:10px;">Erro ao carregar (status ${res.status}).</p>`;
+                    return;
+                }
+                const data = await res.json();
+                console.log('[seguindo] data:', data);
+                if (Array.isArray(data)) lista = data;
+            }
+
+            const porStreamer = new Map();
+            lista.forEach(item => {
+                const atual = porStreamer.get(item.id_usuario);
+                if (atual) atual.views += item.total_views;
+                else porStreamer.set(item.id_usuario, {
+                    id: item.id_usuario,
+                    nome: item.user_name,
+                    foto: item.foto_url,
+                    views: item.total_views
+                });
+            });
+            livesSeguindo = [...porStreamer.values()];
+
+            if (container) {
+                if (livesSeguindo.length === 0) {
+                    container.innerHTML = '<p style="padding:10px;">Ninguém que você segue postou recentemente.</p>';
+                } else {
+                    livesSeguindo.forEach(p => container.appendChild(criarLiveAside(p)));
+                }
+            }
+            sincronizarAsideDropdown();
+        } catch (error) {
+            console.error(error);
+            if (container) container.innerHTML = '<p style="padding:10px;">Erro ao carregar.</p>';
+        }
+    }
+
+    // TELA EXPLORAR
+    const mapaGridsExplorar = {
+        'ação&aventura': 'exp-acao-aventura',
+        'corrida':       'exp-corrida',
+        'esporte':       'exp-esporte',
+        'e-sports':      'exp-e-sport',
+        'estratégia':    'exp-estrategia',
+        'FPS&tiro':      'exp-fps-tiro',
+        'luta':          'exp-luta',
+        'RPG':           'exp-rpg',
+        'terror':        'exp-terror',
+        '+18':           'exp-18',
+        'não-jogo':      'exp-outros',
+    };
+
+    function preencherLinha(rowId, videos, opts = {}) {
+        const row = document.getElementById(rowId);
+        if (!row) return;
+        videos.forEach(live => {
+            const card = criarVideoCard(live, { mostrarOpcoes: false, forcarAoVivo: opts.forcarAoVivo ?? true });
+            row.appendChild(card);
+        });
+    }
+    
+    // carrossel de vídeos
+    function montarCarrossel(wrap, scroller) {
+        wrap.querySelectorAll('.arrow-btn, .row-arrow-btn').forEach(b => b.remove());
+
+        const criarBotao = (dir) => {
+            const b = document.createElement('button');
+            b.type = 'button';
+            b.className = `row-arrow-btn ${dir}`;
+            b.setAttribute('aria-label', dir === 'prev' ? 'Anterior' : 'Próximo');
+            b.innerHTML = `<i class="fa-solid fa-chevron-${dir === 'prev' ? 'left' : 'right'}"></i>`;
+            return b;
+        };
+        const prev = criarBotao('prev');
+        const next = criarBotao('next');
+        wrap.append(prev, next);
+
+        const atualizar = () => {
+            const max = scroller.scrollWidth - scroller.clientWidth;
+            prev.classList.toggle('visivel', max > 4 && scroller.scrollLeft > 4);
+            next.classList.toggle('visivel', max > 4 && scroller.scrollLeft < max - 4);
+        };
+        const passo = () => scroller.clientWidth * 0.85;
+
+        prev.addEventListener('click', () => scroller.scrollBy({ left: -passo(), behavior: 'smooth' }));
+        next.addEventListener('click', () => scroller.scrollBy({ left: passo(), behavior: 'smooth' }));
+        scroller.addEventListener('scroll', atualizar, { passive: true });
+        new ResizeObserver(atualizar).observe(scroller);
+        window.addEventListener('resize', atualizar);
+        atualizar();
+    }
+
+    function garantirWrapComSetas(el) {
+        if (el.closest('.explorar-row-wrap')) return el.closest('.explorar-row-wrap');
+        const wrap = document.createElement('div');
+        wrap.className = 'explorar-row-wrap';
+        el.parentNode.insertBefore(wrap, el);
+        wrap.appendChild(el);
+        el.classList.remove('video-grid');
+        el.classList.add('explorar-row');
+        return wrap;
+    }
+
+    async function iniciarExplorar() {
+        const container = document.getElementById('explorar-main');
+        if (!container) return; // não é a página Explorar
+
+        try {
+            const res = await fetch(base_url + "/api/explorar", {
+                method: "GET",
+                headers: { "X-CSRFToken": csrfToken },
+                credentials: "include"
+            });
+            const data = await res.json();
+            if (data.status !== 'success') return;
+
+            const videos = data.videos || [];
+            if (videos.length === 0) return;
+
+            // Canais Iniciantes — streamers com menos seguidores
+            const iniciantes = [...videos]
+                .sort((a, b) => (a.seguidores_streamer || 0) - (b.seguidores_streamer || 0))
+                .slice(0, 12);
+            preencherLinha('row-iniciantes', iniciantes);
+
+            // Mais Curtidos
+            const maisCurtidos = [...videos]
+                .sort((a, b) => (b.curtidas || 0) - (a.curtidas || 0))
+                .slice(0, 12);
+            preencherLinha('row-mais-curtidos', maisCurtidos);
+
+            // Mais Vistos
+            const maisVistos = [...videos]
+                .sort((a, b) => (b.views || 0) - (a.views || 0))
+                .slice(0, 12);
+            preencherLinha('row-mais-vistos', maisVistos);
+
+            // Fileiras por categoria (com badge AO VIVO)
+            videos.forEach(live => {
+                (live.categorias || []).forEach(cat => {
+                    const rowId = mapaGridsExplorar[cat];
+                    if (!rowId) return;
+                    const row = document.getElementById(rowId);
+                    if (row && !row.querySelector(`[data-live-id="${live.id_stream}"]`)) {
+                        const card = criarVideoCard(live, { mostrarOpcoes: false, forcarAoVivo: true });
+                        card.dataset.liveId = live.id_stream;
+                        row.appendChild(card);
+                    }
+                });
+            });
+
+            // Fileira final "Vídeos" — mesmos vídeos de "Outros", SEM badge
+            const outros = videos.filter(v => (v.categorias || []).includes('não-jogo'));
+            preencherLinha('row-videos-final', outros, { forcarAoVivo: false });
+
+        } catch (error) {
+            console.error("Erro ao carregar Explorar:", error);
+        }
+
+        document.querySelectorAll('.explorar-row-wrap').forEach(wrap => {
+            const row = wrap.querySelector('.explorar-row');
+            if (!row || row.children.length === 0) {
+                wrap.closest('section').style.display = 'none';
+                return;
+            }
+            montarCarrossel(wrap, row);
+        });
     }
 
     // detecta se é o próprio perfil ou de outra pessoa
     let idPerfilAtual = null; // null = próprio perfil; id = perfil visitado
     async function iniciarPerfil() {
         const container = document.getElementById('videos-perfil-grid');
-        if (!container) return;
+        if (!container) return; // página não é a de perfil
 
         const params = new URLSearchParams(window.location.search);
         const idParam = params.get('id');
+
+        if (!idParam) {
+            idPerfilAtual = null;
+            await renderVideosPerfil();
+            return;
+        }
 
         const res = await fetch(base_url + "/session", {
             method: "POST",
@@ -3210,18 +3523,10 @@ document.addEventListener('DOMContentLoaded', function () {
         });
         const sessao = await res.json();
 
-        if (!idParam) {
-            idPerfilAtual = null;
-            if (sessao.logado) {
-                await renderVideosPerfil(sessao.id, true); // ← id explícito
-            }
-            return;
-        }
-
         if (sessao.logado && String(sessao.id) === String(idParam)) {
             window.history.replaceState({}, '', '/perfil');
             idPerfilAtual = null;
-            await renderVideosPerfil(sessao.id, true);
+            await renderVideosPerfil();
             return;
         }
 
@@ -3229,41 +3534,22 @@ document.addEventListener('DOMContentLoaded', function () {
         ativarModoVisitante(idParam, params.get('nome'), params.get('foto'));
     }
 
-    async function ativarModoVisitante(idVisitado, nome, foto) {
-    document.getElementById('btn-editar')?.style.setProperty('display', 'none');
-    document.getElementById('btn-start-live')?.style.setProperty('display', 'none');
+    function ativarModoVisitante(idVisitado, nome, foto) {
+        // esconde os botões que só fazem sentido pro dono da conta
+        document.getElementById('btn-editar')?.style.setProperty('display', 'none');
+        document.getElementById('btn-start-live')?.style.setProperty('display', 'none');
 
-    document.getElementById('titulo-canal')?.style.setProperty('display', 'none');
-    
-    const fotoEl = document.querySelector('.photo-user');
-    if (fotoEl) {
-        fotoEl.src = '/static/user.png';
-        fotoEl.classList.remove('tem-foto');
-    }
-
-    if (nome) {
-        document.querySelectorAll('.show_name:not(#nome-dropdown)').forEach(el => {
-            el.textContent = decodeURIComponent(nome);
-        });
-    }
-
-    if (foto) {
-        if (fotoEl) {
-            fotoEl.src = decodeURIComponent(foto);
-            fotoEl.classList.add('tem-foto');
+        // nome e foto chegam via URL (vieram do clique no card, sem precisar de backend novo)
+        if (nome) document.querySelectorAll('.show_name').forEach(el => el.textContent = decodeURIComponent(nome));
+        if (foto) {
+            const fotoEl = document.querySelector('.photo-user');
+            if (fotoEl) fotoEl.src = decodeURIComponent(foto);
         }
-    } else {
-        const fotoUrl = await getFotoStreamerCache(idVisitado);
-        if (fotoUrl && fotoEl) {
-            fotoEl.src = fotoUrl;
-            fotoEl.classList.add('tem-foto');
-        }
-    }
 
-    montarBotoesSociais(idVisitado);
-    incritos_info(idVisitado);
-    renderVideosPerfil(idVisitado, false);
-}
+        montarBotoesSociais(idVisitado);
+        incritos_info(idVisitado);
+        renderVideosPerfil(idVisitado); // reaproveita a função que você já tem
+    }
 
     function montarBotoesSociais(idVisitado) {
         const container = document.getElementById('botoes-sociais-perfil');
@@ -3271,7 +3557,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         container.innerHTML = `
             <button class="btn-perfil" id="btn-seguir-visitante">Seguir</button>
-            <button class="btn-perfil" id="btn-sub-visitante">Sub</button>
+            <button class="btn-perfil" id="btn-sub-visitante">Ser Sub</button>
         `;
 
         document.getElementById('btn-seguir-visitante').addEventListener('click', async (e) => {
@@ -3298,14 +3584,15 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // tela pagamento turbo
+    const turboModal = document.querySelector('.turbo-modal');
+    const pagTurbo = document.querySelector('.pagamento-turbo');
+    const modal = document.getElementById('modal-5');
     const btnTurbo = document.querySelectorAll('.btn-turbo-sub');
     btnTurbo.forEach(btnTurbo => {
         btnTurbo.addEventListener('click', () => {
-            const turboModal = document.querySelector('.turbo-modal');
-            const pagTurbo = document.querySelector('.pagamento-turbo');
-
             turboModal.style.display = 'none';
             pagTurbo.style.display = 'flex';
+            modal.style.background = 'transparent';
         });
     });
 
@@ -3335,47 +3622,177 @@ document.addEventListener('DOMContentLoaded', function () {
         fecharModal(form);
     });
 
+    //TELA SEGUINDO
+    const LIMITE_SEGUINDO = 10;
+    const FILTRO_SEGUINDO_KEY = 'witch_seguindo_filtro';
+    let canaisSeguidos = [];
+    let canaisSelecionados = new Set();
+
+    async function iniciarSeguindo() {
+        const lista = document.getElementById('seguindo-lista');
+        if (!lista) return; // não é a página Seguindo
+
+        if (!usuarioLogado) {
+            lista.innerHTML = '<p class="seguindo-vazio">Faça login para ver os canais que você segue.</p>';
+            return;
+        }
+
+        try {
+            const res = await fetch(base_url + "/seguindo_videos", {
+                method: "GET",
+                headers: { "X-CSRFToken": csrfToken },
+                credentials: "include"
+            });
+            const data = await res.json();
+
+            if (data.status !== 'success' || !data.canais || data.canais.length === 0) {
+                lista.innerHTML = '<p class="seguindo-vazio">Você ainda não segue nenhum canal com vídeos.</p>';
+                return;
+            }
+
+            canaisSeguidos = data.canais;
+            canaisSelecionados = carregarSelecaoSeguindo();
+            montarFiltroSeguindo();
+            renderizarLinhasSeguindo();
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    function carregarSelecaoSeguindo() {
+        const ids = canaisSeguidos.map(c => String(c.id_usuario));
+        let salvos = null;
+        try { salvos = JSON.parse(localStorage.getItem(FILTRO_SEGUINDO_KEY)); } catch {}
+
+        const sel = Array.isArray(salvos)
+            ? salvos.map(String).filter(id => ids.includes(id))
+            : ids;                                   // primeira visita: começa pelos primeiros
+        return new Set(sel.slice(0, LIMITE_SEGUINDO));
+    }
+
+    function salvarSelecaoSeguindo() {
+        try { localStorage.setItem(FILTRO_SEGUINDO_KEY, JSON.stringify([...canaisSelecionados])); } catch {}
+    }
+
+    function renderizarLinhasSeguindo() {
+        const lista = document.getElementById('seguindo-lista');
+        lista.innerHTML = '';
+
+        const visiveis = canaisSeguidos.filter(c => canaisSelecionados.has(String(c.id_usuario)));
+        if (visiveis.length === 0) {
+            lista.innerHTML = '<p class="seguindo-vazio">Nenhum canal selecionado. Use o filtro para escolher até 10 canais.</p>';
+            return;
+        }
+
+        visiveis.forEach(canal => {
+            const section = document.createElement('section');
+            section.className = 'section-home';
+
+            const header = document.createElement('div');
+            header.className = 'seguindo-canal-header';
+            const foto = document.createElement('img');
+            foto.className = 'seguindo-canal-foto';
+            foto.src = canal.foto_url || '/static/user.png';
+            foto.alt = canal.user_name;
+            const nome = document.createElement('h2');
+            nome.className = 'section-title';
+            nome.style.margin = '0';
+            nome.textContent = canal.user_name;
+            header.append(foto, nome);
+            header.addEventListener('click', () => irParaPerfil(canal.id_usuario, canal.user_name, canal.foto_url));
+
+            const wrap = document.createElement('div');
+            wrap.className = 'video-row-wrap';
+            const scroll = document.createElement('div');
+            scroll.className = 'video-row-scroll';
+            canal.videos.forEach(v => scroll.appendChild(criarVideoCard(v, { mostrarOpcoes: false })));
+            wrap.appendChild(scroll);
+
+            section.append(header, wrap);
+            lista.appendChild(section);
+            montarCarrossel(wrap, scroll);
+        });
+    }
+
+    function montarFiltroSeguindo() {
+        const btn = document.getElementById('btn-filtro-seguindo');
+        const painel = document.getElementById('filtro-seguindo-painel');
+        const listaEl = document.getElementById('lista-filtro-canais');
+        const contador = document.getElementById('filtro-contador');
+        const limpar = document.getElementById('filtro-limpar');
+        if (!btn || !painel || !listaEl) return;
+
+        btn.closest('.filtro-seguindo-wrap').style.display = '';
+
+        const atualizarUI = () => {
+            const total = canaisSelecionados.size;
+            contador.textContent = `${total}/${LIMITE_SEGUINDO}`;
+            listaEl.querySelectorAll('input').forEach(cb => {
+                cb.disabled = !cb.checked && total >= LIMITE_SEGUINDO;
+                cb.closest('label').classList.toggle('desabilitado', cb.disabled);
+            });
+        };
+
+        listaEl.innerHTML = '';
+        canaisSeguidos.forEach(canal => {
+            const id = String(canal.id_usuario);
+
+            const label = document.createElement('label');
+            label.className = 'filtro-canal-item';
+
+            const cb = document.createElement('input');
+            cb.type = 'checkbox';
+            cb.checked = canaisSelecionados.has(id);
+
+            const img = document.createElement('img');
+            img.src = canal.foto_url || '/static/user.png';
+            img.alt = '';
+
+            const nome = document.createElement('span');
+            nome.textContent = canal.user_name;
+
+            cb.addEventListener('change', () => {
+                if (cb.checked) canaisSelecionados.add(id);
+                else canaisSelecionados.delete(id);
+                salvarSelecaoSeguindo();
+                atualizarUI();
+                renderizarLinhasSeguindo();
+            });
+
+            label.append(cb, img, nome);
+            listaEl.appendChild(label);
+        });
+
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            painel.classList.toggle('open');
+            btn.classList.toggle('open');
+        });
+        document.addEventListener('click', (e) => {
+            if (!painel.contains(e.target) && !btn.contains(e.target)) {
+                painel.classList.remove('open');
+                btn.classList.remove('open');
+            }
+        });
+        limpar.addEventListener('click', () => {
+            canaisSelecionados.clear();
+            listaEl.querySelectorAll('input').forEach(cb => cb.checked = false);
+            salvarSelecaoSeguindo();
+            atualizarUI();
+            renderizarLinhasSeguindo();
+        });
+
+        atualizarUI();
+    }
+    // botão de voltar no modal turbo
+    const btnBackTurbo = document.querySelector('.back-modal-turbo');
+    if (btnBackTurbo) {
+        btnBackTurbo.addEventListener('click', () => {
+            turboModal.style.display = 'block';
+            pagTurbo.style.display = 'none';
+            modal.style.background = '#1a1a2e';
+        });
+    }
+
     init();
 });
-/*
-class subscribe(Resource):
-    def post(self):
-        token = request.headers.get("X-CSRFToken")
-        check = check_csrf(token)
-        if not check or check.get("status") == "error":
-            return {'status': 'error', 'mensagem': check.get("mensagem")}, 400
-
-        if 'usuario_id' not in session:
-            return {'status': 'error', 'mensagem': 'Você precisa estar logado pra se inscrever'}, 400
-
-        data = request.get_json()
-        con = connection()
-        cursor = con.cursor(pymysql.cursors.DictCursor)
-
-        id_criador = data.get('criador')
-        id_seguidor = session['usuario_id']
-
-        if str(id_criador) == str(id_seguidor):
-            cursor.close(); con.close()
-            return {'status': 'error', 'mensagem': 'Você não pode seguir seu próprio canal'}, 400
-
-        try:
-            cursor.execute("select 1 from seguidores where id_seguidor = %s and id_seguido = %s", (id_seguidor, id_criador))
-            ja_segue = cursor.fetchone()
-
-            if ja_segue:
-                cursor.execute("delete from seguidores where id_seguidor = %s and id_seguido = %s", (id_seguidor, id_criador))
-                con.commit()
-                return {'status': 'success', 'mensagem': 'Você deixou de seguir', 'seguindo': False}, 200
-
-            cursor.execute("insert into seguidores (id_seguidor,id_seguido) values (%s,%s)", (id_seguidor, id_criador))
-            con.commit()
-            return {'status': 'success', 'mensagem': 'Você se inscreveu', 'seguindo': True}, 200
-
-        except Exception as e:
-            print(e)
-            return {'status': 'error', 'mensagem': 'Erro ao seguir'}, 500
-
-        finally:
-            cursor.close()
-            con.close()*/

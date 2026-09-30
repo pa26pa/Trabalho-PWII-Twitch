@@ -6,8 +6,14 @@
     <title>Witch | Entrar com Google</title>
     <link rel="icon" type="image/x-icon" href="{{url_for('static', filename='witch.png')}}">
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
         body {
             display: flex;
+            flex-direction: column;
             height: 100vh;
             justify-content: center;
             align-items: center;
@@ -20,6 +26,7 @@
             padding: 20px;
             align-items: center;
             border-radius: 25px;
+            margin-top: 10px;
             box-shadow: 0 0 25px 5px rgba(145,71,255, 0.5);
         }
         .pagamento-turbo form {
@@ -77,7 +84,7 @@
     </style>
 </head>
 <body>
-    <p>Continuar cadastro com google</p>
+    <h1 style="color: #3e2368;">Continuar Cadastro com Google</h1>
     <div class="pagamento-turbo">
         <form id='form-completar-google' action="#">
             <label for="cpf" data-i18n>CPF</label>
@@ -93,7 +100,7 @@
         </form>
     </div>
     <script>
-        base_url = "";
+        base_url = "http://127.0.0.1:5000/";
 
         let csrfToken = null;
         async function carregarCsrf() {
