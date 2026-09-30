@@ -17,6 +17,7 @@ def padronizador(frase):
     texto = str(conteudo).lower() 
     texto = unicodedata.normalize("NFD", texto)     
 
+    
     return texto 
 
 def caracteres_remover(frase):
