@@ -1,6 +1,6 @@
 from flask import Flask, render_template, redirect, url_for, session 
 from flask_restful import Api, Resource
-from backend.resources.auth import seguindo_live, foto_streamer,subscribe ,zerar_cadastro_google, videos,comentarios, inscritos, curtidas ,views ,update_Password, parametros, preferencias,signin, login, salvar_foto, bloqueados, salvar_video, editar_bio, editar_nome, forgot,redefine_password,delete_Account,bloquear, logout,desbloquear, check_login , search,translate, resend_code, check_codigo, google
+from backend.resources.auth import explorar_dados, seguindo_videos, seguindo_live, foto_streamer,subscribe ,zerar_cadastro_google, videos,comentarios, inscritos, curtidas ,views ,update_Password, parametros, preferencias,signin, login, salvar_foto, bloqueados, salvar_video, editar_bio, editar_nome, forgot,redefine_password,delete_Account,bloquear, logout,desbloquear, check_login , search,translate, resend_code, check_codigo, google
 from dotenv import load_dotenv
 from authlib.integrations.flask_client import OAuth
 import os
