@@ -1168,68 +1168,74 @@ class delete_Account(Resource):
         Endpoint responsável por apagar a conta do usuário
     """
     def delete(self):
-        """
-            Apaga a conta do usuário do Banco de Dados
-            
-            Verificações:
-                Token, usuário logado
-            
-            Retornos: 
-                400 = Usuário não está logado
-                200 = Conta excluida com sucesso
-                500 = Erro interno ao tentar excluir conta
-        """
-        
-        con = connection()
-        cursor = con.cursor(pymysql.cursors.DictCursor)
-        
         if 'usuario_id' not in session:
             return {
-                "status":"error",
-                "mensagem":"Você precisa estar logado para deletar sua conta"
+                "status": "error",
+                "mensagem": "Você precisa estar logado para deletar sua conta"
             }, 400
+
         id = session['usuario_id']
 
-        try: 
-            a = """delete from bloqueados where id_bloqueador = %s or id_bloqueado = %s"""
-            cursor.execute(a, (id,id))
-            
-            ab = """delete from streams where id_streamer = %s"""
-            cursor.execute(ab, (id,))
+        con = connection()
+        cursor = con.cursor(pymysql.cursors.DictCursor)
 
-            ac = """delete from subs where id_usuario = %s or id_streamer = %s"""
-            cursor.execute(ac, (id,))
+        try:
+            # 1) tudo que está pendurado nos vídeos do usuário
+            for tabela in ("curtidas", "views", "comentarios"):
+                cursor.execute(
+                    f"delete from {tabela} where id_stream in "
+                    f"(select id_stream from streams where id_streamer = %s)",
+                    (id,)
+                )
 
+            # 2) curtidas, views e comentários que o usuário fez em vídeos de outros
+            for tabela in ("curtidas", "views", "comentarios"):
+                cursor.execute(f"delete from {tabela} where id_user = %s", (id,))
 
-            ad = """delete from tipo_sub where id_criador = %s"""
-            cursor.execute(ad, (id,))
+            # 3) bloqueios
+            cursor.execute(
+                "delete from bloqueados where id_bloqueador = %s or id_bloqueado = %s",
+                (id, id)
+            )
 
+            # 4) vídeos
+            cursor.execute("delete from streams where id_streamer = %s", (id,))
 
-            ae = """delete from seguidores where id_seguido = %s or id_seguidor = %s"""
-            cursor.execute(ae, (id,))
+            # 5) inscrições e tipos de sub (subs antes de tipo_sub)
+            cursor.execute(
+                "delete from subs where id_usuario = %s or id_streamer = %s",
+                (id, id)
+            )
+            cursor.execute("delete from tipo_sub where id_criador = %s", (id,))
 
-            
-            query = """delete from usuarios where id_usuario = %s """
-            cursor.execute(query, (id,))
-            
+            # 6) seguidores / seguindo
+            cursor.execute(
+                "delete from seguidores where id_seguido = %s or id_seguidor = %s",
+                (id, id)
+            )
+
+            # 7) por último, o usuário
+            cursor.execute("delete from usuarios where id_usuario = %s", (id,))
+
             con.commit()
             session.clear()
-            
-            cursor.close()
-            con.close()
-        
+
         except Exception as e:
             con.rollback()
+            print("ERRO AO DELETAR CONTA:", repr(e))   # agora você vê o motivo no terminal
             return {
-                'status':'error',
-                'mensagem':'Erro interno ao tentar deletar conta'
+                'status': 'error',
+                'mensagem': 'Erro interno ao tentar deletar conta'
             }, 500
-        
+
+        finally:
+            cursor.close()
+            con.close()
+
         return {
-            'status':'success',
-            'mensagem':'Conta excluida'
+            'status': 'success',
+            'mensagem': 'Conta excluida'
         }, 200
-    
 class update_Password(Resource):
     """
         Endpoint responsável por atualizar a senha de um usuário que já está logado
