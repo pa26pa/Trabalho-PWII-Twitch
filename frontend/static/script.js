@@ -1092,7 +1092,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 document.body.classList.remove('modal-open');
 
                 // limpa todos os inputs do modal ao fechar
-                modal.querySelectorAll('input').forEach(input => input.value = '');
+                modal.querySelectorAll('input').forEach(input => {
+                    if (input.type !== 'checkbox' && input.type !== 'radio') input.value = '';
+                })
                 if (btnRedefinir) {btnRedefinir.disabled = true;} // reseta ao fechar}
                 modal.querySelectorAll('.erroSenha, .erroSenha2, #erroIdade').forEach(el => el.style.display = 'none');
                 modal.querySelectorAll('.input-erro').forEach(el => el.classList.remove('input-erro'));
@@ -2055,6 +2057,115 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    const modalEditar = document.getElementById('modal-7');
+    // ── EDITAR VÍDEO (reaproveita o modal-6) ──
+    let liveEditando = null;
+
+    function limparFormLive() {
+        ['nome-live', 'descricao-live'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.value = '';
+        });
+        document.querySelectorAll('#select-dropdown input[type="checkbox"]').forEach(cb => {
+            if (cb.checked) { cb.checked = false; cb.dispatchEvent(new Event('change')); } // atualiza as tags
+        });
+        const prev = document.getElementById('preview-thumb');
+        if (prev) { prev.src = ''; prev.classList.remove('tem-foto'); }
+        const inputThumb = document.getElementById('upload-thumb');
+        if (inputThumb) inputThumb.value = '';
+        thumbTemp = null;
+        thumbFile = null;
+    }
+
+    function mostrarUploadVideo(mostrar) {
+        ['label-upload-video', 'wrap-upload-video'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.style.display = mostrar ? '' : 'none';
+        });
+    }
+
+    function abrirModalEditar(live) {
+        if (!modal6) return;
+        liveEditando = live;
+
+        document.getElementById('nome-live').value = live.titulo || '';
+        document.getElementById('descricao-live').value = live.descricao || live.descrisao || '';
+
+        // categorias: marca os checkboxes e dispara "change" para montar as tags
+        document.querySelectorAll('#select-dropdown input[type="checkbox"]').forEach(cb => {
+            cb.checked = (live.categorias || []).includes(cb.value);
+            cb.dispatchEvent(new Event('change'));
+        });
+
+        // capa atual
+        const prev = document.getElementById('preview-thumb');
+        thumbFile = null;
+        thumbTemp = null;
+        if (prev) {
+            if (live.thumb) { prev.src = live.thumb; prev.classList.add('tem-foto'); }
+            else { prev.src = ''; prev.classList.remove('tem-foto'); }
+        }
+
+        mostrarUploadVideo(false);                       // não dá para trocar o vídeo, só os dados
+        btnUpload.dataset.textoOriginal = btnUpload.textContent;
+        btnUpload.textContent = 'Salvar';
+
+        modal6.showModal();
+        document.body.classList.add('modal-open');
+    }
+
+    async function salvarEdicao() {
+        if (!liveEditando) return;
+
+        const nome = document.getElementById('nome-live').value.trim();
+        const descrisao = document.getElementById('descricao-live').value.trim();
+        const categorias = [...document.querySelectorAll('#select-dropdown input:checked')].map(cb => cb.value);
+
+        if (!nome) { mostrarToast('O vídeo precisa ter um nome!', 'error'); return; }
+        if (categorias.length === 0) { mostrarToast('Escolha pelo menos uma categoria!', 'error'); return; }
+
+        const formData = new FormData();
+        formData.append('id', liveEditando.id_stream);
+        formData.append('nome', nome);
+        formData.append('descrisao', descrisao);
+        formData.append('categoria', JSON.stringify(categorias));
+        if (thumbFile) formData.append('capa', thumbFile);   // só envia se trocou a capa
+
+        btnUpload.disabled = true;
+        try {
+            const res = await fetch(base_url + "/videos", {
+                method: "PUT",
+                headers: { "X-CSRFToken": csrfToken },
+                credentials: "include",
+                body: formData
+            });
+            const data = await res.json();
+            mostrarToast(data.mensagem, data.status);
+
+            if (res.ok && data.status === 'success') {
+                modal6.close();                              // o evento "close" abaixo limpa tudo
+                await renderVideosPerfil(idPerfilAtual);
+            }
+        } catch (error) {
+            console.error(error);
+            mostrarToast('Erro ao editar vídeo.', 'error');
+        } finally {
+            btnUpload.disabled = false;
+        }
+    }
+
+    if (modal6) {
+        // roda ao fechar por qualquer caminho (Cancelar, X, ESC, salvar)
+        modal6.addEventListener('close', () => {
+            document.body.classList.remove('modal-open');
+            if (!liveEditando) return;
+            liveEditando = null;
+            limparFormLive();
+            mostrarUploadVideo(true);
+            btnUpload.textContent = btnUpload.dataset.textoOriginal || 'Confirmar';
+        });
+    }
+
     // salvar vídeo — único handler, chama de fato o backend
     const salvarLive = async () => {
         const nomeLive = document.getElementById('nome-live')?.value.trim();
@@ -2120,7 +2231,7 @@ document.addEventListener('DOMContentLoaded', function () {
     };
 
     if (btnUpload) {
-        btnUpload.addEventListener('click', salvarLive);
+        btnUpload.addEventListener('click', () => liveEditando ? salvarEdicao() : salvarLive());
     }
 
     function formatarTempo(s) {
@@ -3253,40 +3364,23 @@ document.addEventListener('DOMContentLoaded', function () {
                 btn.addEventListener('click', async (e) => {
                     e.stopPropagation();
                     const acao = btn.dataset.acao;
-                    if (acao === 'excluir') {
-                        dados = {
-                            id: live.id_stream
-                        };
 
-                        const res = fetch(base_url + "/videos", {
-                            method: "DELETE",
-                            headers: { "X-CSRFToken": csrfToken, "Content-Type": "application/json"},
-                            body: JSON.stringify(dados)
-                        });
-                        if (!res.ok) {
-                            return;
+                    if (acao === 'excluir') {
+                        try {
+                            const res = await fetch(base_url + "/videos", {
+                                method: "DELETE",
+                                headers: { "X-CSRFToken": csrfToken, "Content-Type": "application/json" },
+                                body: JSON.stringify({ id: live.id_stream })
+                            });
+                            const data = await res.json();
+                            mostrarToast(data.mensagem, data.status);
+                            if (res.ok) renderVideosPerfil(idPerfilAtual);
+                        } catch {
+                            mostrarToast('Erro ao excluir vídeo.', 'error');
                         }
-                    
                     }
                     else if (acao === 'editar') {
-                        const nome  = document.getElementById('nome-live');
-                        const desc  = document.getElementById('descricao-live');
-                        const cate = [...document.querySelectorAll('#select-dropdown input:checked')].map(cb => cb.value);
-                        dados = {
-                            id: live.id_stream,
-                            nome: nome,
-                            descrisao: desc,
-                            categoria: cate
-                        };
-
-                        const res = fetch(base_url + "/videos", {
-                            method: "POST",
-                            headers: { "X-CSRFToken": csrfToken, "Content-Type": "application/json"},
-                            body: JSON.stringify(dados)
-                        });
-                        if (!res.ok) {
-                            return;
-                        }
+                        abrirModalEditar(live);
                     }
                     else if (acao === 'salvar') {
                         if (!live.src) { mostrarToast('Nenhum vídeo disponível para download.', 'error'); return; }
@@ -3294,7 +3388,9 @@ document.addEventListener('DOMContentLoaded', function () {
                         a.href = live.src;
                         a.download = `${live.titulo}.mp4`;
                         a.click();
-                    } else if (acao === 'clipe') criarClipe(live);
+                    }
+                    else if (acao === 'clipe') criarClipe(live);
+
                     menuOpcoes.classList.remove('show');
                 });
             });
