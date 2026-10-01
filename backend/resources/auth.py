@@ -998,15 +998,18 @@ class comentarios(Resource):
         comentario_invalido = verificar_palavra(texto)
         if comentario_invalido:
             return {
-                'status':'error',
-                'mensagem':f'Este comentario não é valido por conta de usar a palavra "{comentario_invalido}" nele'
+                'status': 'error',
+                'mensagem': f'Este comentario não é valido por conta de usar a palavra "{comentario_invalido}" nele'
             }, 406
-            
+
         con = connection()
         cursor = con.cursor(pymysql.cursors.DictCursor)
         try:
+            cursor.execute("SET time_zone = '+00:00'")   # esta conexão trabalha em UTC
+
             cursor.execute(
-                "insert into comentarios (id_stream, id_user, comentario) values (%s, %s, %s)",
+                "insert into comentarios (id_stream, id_user, comentario, data_comentario) "
+                "values (%s, %s, %s, UTC_TIMESTAMP())",
                 (id_stream, id_user, texto)
             )
             id_novo = cursor.lastrowid
@@ -1035,9 +1038,10 @@ class comentarios(Resource):
             cursor.close()
             con.close()
 
-        novo['criado_em'] = novo['criado_em'].isoformat()
+        # o "Z" avisa o navegador que o horário é UTC, e ele converte para o fuso de quem vê
+        novo['criado_em'] = novo['criado_em'].isoformat() + 'Z'
         return {'status': 'success', 'comentario': novo}, 200
-    
+
     def get(self):
         id_stream = request.args.get("id_stream", type=int)
         if not id_stream:
@@ -1046,6 +1050,8 @@ class comentarios(Resource):
         con = connection()
         cursor = con.cursor(pymysql.cursors.DictCursor)
         try:
+            cursor.execute("SET time_zone = '+00:00'")   # lê no mesmo fuso em que gravou
+
             cursor.execute("""
                 select c.id_comentario,
                        c.comentario as texto,
@@ -1069,14 +1075,13 @@ class comentarios(Resource):
             con.close()
 
         for c in lista:
-            c['criado_em'] = c['criado_em'].isoformat()
+            c['criado_em'] = c['criado_em'].isoformat() + 'Z'
 
         return {
             'status': 'success',
-            'mensagem':'Comentarios pegos com sucesso',
+            'mensagem': 'Comentarios pegos com sucesso',
             'comentarios': lista
-        }, 200
-        
+        }, 200        
 class block_code(Resource):
         
     """
