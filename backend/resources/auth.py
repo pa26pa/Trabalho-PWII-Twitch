@@ -1762,43 +1762,84 @@ class videos(Resource):
             'mensagem': 'Video deletado com sucesso'
         }, 200     
     
-    def post(self):
-        token = request.headers.get("X-CSRFToken")   
-                
+    def put(self):
+        token = request.headers.get("X-CSRFToken")
         check = check_csrf(token)
         if not check or check.get("status") == "error":
-            return {'status': 'error', 'mensagem': check.get("mensagem")}, 400
-        
+            return {'status': 'error', 'mensagem': check.get("mensagem") if check else 'CSRF inválido'}, 400
+
+        if 'usuario_id' not in session:
+            return {'status': 'error', 'mensagem': 'Você precisa estar logado'}, 401
+
+        id_stream = request.form.get('id', type=int)
+        nome = (request.form.get('nome') or '').strip()
+        descrisao = (request.form.get('descrisao') or '').strip()
+
+        try:
+            categoria = json.loads(request.form.get('categoria') or '[]')
+            if not isinstance(categoria, list) or not all(isinstance(c, str) for c in categoria):
+                raise ValueError
+        except ValueError:
+            return {'status': 'error', 'mensagem': 'Categoria inválida'}, 400
+
+        if not id_stream or not nome:
+            return {'status': 'error', 'mensagem': 'Nome do vídeo é obrigatório'}, 400
+
+        invalida = verificar_palavra(nome) or verificar_palavra(descrisao)
+        if invalida:
+            return {'status': 'error', 'mensagem': f'Não é possível usar a palavra "{invalida}" no título ou na descrição'}, 406
+
+        nome = str(escape(nome))
+        descrisao = str(escape(descrisao))
+
+        # capa nova (opcional)
+        nova_capa = None
+        capa = request.files.get('capa')
+        if capa and capa.filename:
+            ext_capa = capa.filename.rsplit('.', 1)[-1].lower()
+            if ext_capa not in {'jpg', 'jpeg', 'png', 'gif', 'webp'}:
+                return {'status': 'error', 'mensagem': 'Esse formato de imagem não é permitido'}, 400
+            try:
+                resp = cloudinary.uploader.upload(capa.stream, resource_type="image", public_id=str(uuid4()))
+                nova_capa = resp["secure_url"]
+            except Exception as e:
+                print(e)
+                return {'status': 'error', 'mensagem': 'Erro ao salvar a capa'}, 500
+
         con = connection()
         cursor = con.cursor(pymysql.cursors.DictCursor)
-        
-        data = request.get_json()
-        
-        id_stream = data.get('id')
-        nome = data.get('nome')
-        descrisao = data.get('descrisao')
-        categoria = data.get('categoria')
-        
         try:
-            query = """update table set titulo = %s, categoria = %s descrisao = %s where id_stream = %s"""
-            cursor.execute(query,(id_stream,nome,categoria,descrisao))
+            cursor.execute(
+                "select id_stream from streams where id_stream = %s and id_streamer = %s",
+                (id_stream, session['usuario_id'])
+            )
+            if not cursor.fetchone():
+                return {'status': 'error', 'mensagem': 'Vídeo não encontrado'}, 404
+
+            if nova_capa:
+                cursor.execute(
+                    "update streams set titulo = %s, descrisao = %s, categoria = %s, capa = %s "
+                    "where id_stream = %s and id_streamer = %s",
+                    (nome, descrisao, json.dumps(categoria), nova_capa, id_stream, session['usuario_id'])
+                )
+            else:
+                cursor.execute(
+                    "update streams set titulo = %s, descrisao = %s, categoria = %s "
+                    "where id_stream = %s and id_streamer = %s",
+                    (nome, descrisao, json.dumps(categoria), id_stream, session['usuario_id'])
+                )
             con.commit()
-        
+
         except Exception as e:
+            con.rollback()
             print(e)
-            return {
-                'status': 'error', 
-                'mensagem': 'Erro interno ao deletar video'
-            }, 500
-        
+            return {'status': 'error', 'mensagem': 'Erro interno ao editar vídeo'}, 500
+
         finally:
             cursor.close()
             con.close()
-    
-        return {
-            'status': 'success', 
-            'mensagem': 'Video deletado com sucesso'
-        }, 200 
+
+        return {'status': 'success', 'mensagem': 'Vídeo atualizado com sucesso'}, 200
             
     
 class salvar_video(Resource):

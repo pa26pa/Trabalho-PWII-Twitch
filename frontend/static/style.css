@@ -3870,3 +3870,20 @@ a {text-decoration: none;}
 .filtro-canal-item span { color: var(--color9); font-weight: bold; }
 .filtro-canal-item.desabilitado { opacity: 0.45; cursor: not-allowed; }
 .filtro-canal-item.desabilitado input { cursor: not-allowed; }
+
+dialog#modal-6 {
+    width: min(92vw, 520px);
+    max-width: 92vw;
+    max-height: 90dvh;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    box-sizing: border-box;
+}
+dialog#modal-6 *, dialog#modal-6 *::before, dialog#modal-6 *::after { box-sizing: border-box; }
+dialog#modal-6 input[type="text"], dialog#modal-6 textarea { max-width: 100%; font-size: 16px; }
+dialog#modal-6 .upload-video-btns, dialog#modal-6 .box-btn-modal-perfil { flex-wrap: wrap; }
+
+@media (max-width: 480px) {
+    dialog#modal-6 { width: 100vw; max-width: 100vw; height: 100dvh; max-height: 100dvh; border-radius: 0; }
+}
