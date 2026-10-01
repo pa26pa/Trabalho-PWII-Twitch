@@ -13,6 +13,34 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     carregarCsrf()
+
+    const RECAPTCHA_SITE_KEY = "6LdwJtgtAAAAAMT4AyhVwMt4EIaPcU8363YdzIMs";
+    let captchaWidgetId = null;
+
+    function renderizarCaptcha() {
+        const container = document.getElementById('recaptcha-container');
+        if (!container || captchaWidgetId !== null) return;
+        
+        // Se o grecaptcha do Google ainda não estiver pronto na memória global, tenta novamente em 500ms
+        if (typeof grecaptcha === 'undefined' || typeof grecaptcha.ready === 'undefined') {
+            setTimeout(renderizarCaptcha, 500);
+            return;
+        }
+        
+        grecaptcha.ready(() => {
+            captchaWidgetId = grecaptcha.render('recaptcha-container', {
+                sitekey: RECAPTCHA_SITE_KEY,
+                theme: localStorage.getItem('witch-tema') === 'escuro' ? 'dark' : 'light'
+            });
+        });
+    }
+
+
+    function resetarCaptcha() {
+        if (typeof grecaptcha !== 'undefined' && captchaWidgetId !== null) {
+            grecaptcha.reset(captchaWidgetId);
+        }
+    }
     // CONTROLE DE ESTADO LOGADO/DESLOGADO
     function mostrarLogado(nome) {
         // esconde elementos de deslogado, mostra de logado
@@ -644,12 +672,12 @@ document.addEventListener('DOMContentLoaded', function () {
             // CADASTRO
             if (form.classList.contains('sign')) {
                 if (document.getElementById('cadastro').offsetParent === null) return;
-                //const captcha = grecaptcha.getResponse();
-
-                //if (captcha.length === 0) {
-                //    mostrarToast('Por favor, marque a caixa "Não sou um robô"', 'error')
-                //    return;
-                //}
+                
+                const captcha = (captchaWidgetId !== null) ? grecaptcha.getResponse(captchaWidgetId) : '';
+                if (!captcha) {
+                    mostrarToast('Por favor, marque a caixa "Não sou um robô"', 'error');
+                    return;
+                }
                 
                 const dados = {
                     cpf: document.getElementById("cpf").value,
@@ -657,7 +685,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     user_name: document.getElementById("user-cadastro").value,
                     data_nascimento: document.getElementById("data-nascimento").value,
                     senha: document.getElementById("senha").value,
-                    //captcha: captcha
+                    captcha: captcha
                 };
                 
                 
@@ -679,6 +707,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             if (errData.mensagem) msg = errData.mensagem;
                         } catch {}
                         mostrarToast(msg, 'error');
+                        resetarCaptcha();
                         return null; // sinaliza que não deve continuar pro login
                     }
                     return res.json();
@@ -688,6 +717,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     if (data.status == 'error') {
                         mostrarToast(data.mensagem, data.status);
+                        resetarCaptcha();
                     } else {
                         const dado = {
                             username_email: dados['user_name'],
@@ -722,6 +752,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 })
                 .catch(() => {
                     mostrarToast('Erro de conexão com o servidor.', 'error');
+                    resetarCaptcha();
                 });
             }
 
@@ -1079,9 +1110,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 const checkbox = document.getElementById('checkbox');
                 if (checkbox) checkbox.checked = false;
 
-                //if (typeof grecaptcha !== 'undefined') {
-                //    grecaptcha.reset();
-                //}
+                resetarCaptcha();
             }
         });
     });
@@ -1096,13 +1125,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 document.querySelectorAll('.erroSenha, .erroSenha2, #erroIdade').forEach(el => el.style.display = 'none');
                 document.querySelectorAll('.input-erro').forEach(el => el.classList.remove('input-erro'));
 
-                // renderiza o captcha só quando o cadastro aparecer
-                //if (checkbox.checked && !captchaRendered) {
-                //    grecaptcha.render('recaptcha-container', {
-                //        sitekey: '6LemWTAtAAAAAM2v-HHAGkaNtjG8vm-Huju47Nvs'
-                //    });
-                //    captchaRendered = true;
-                //}
+                if (checkbox.checked) renderizarCaptcha(); 
             });
         }
 
@@ -2365,33 +2388,31 @@ document.addEventListener('DOMContentLoaded', function () {
     // o mesmo top layer do dialog (acima do ::backdrop, acima de tudo).
     const modal1 = document.getElementById('modal-1');
 
-    //const recaptchaObserver = new MutationObserver(() => {
-        //if (!modal1 || !modal1.open) return;
+    const recaptchaObserver = new MutationObserver(() => {
+        if (!modal1 || !modal1.open) return;
 
-        //document.querySelectorAll('body > div').forEach(div => {
-            // ignora o próprio dialog e qualquer wrapper já processado
-            //if (div === modal1 || div.dataset.recaptchaMoved === 'true') return;
+        document.querySelectorAll('body > div').forEach(div => {
+            // ignora o próprio dialog e wrappers já processados
+            if (div === modal1 || div.dataset.recaptchaMoved === 'true') return;
 
-            //const isRecaptchaDiv = div.querySelector('iframe[src*="recaptcha"]');
-            //if (isRecaptchaDiv) {
-            //    div.classList.add('recaptcha-challenge-wrapper');
-                //div.dataset.recaptchaMoved = 'true'; // FIX: evita reprocessar o mesmo div em loop
-                //modal1.appendChild(div);
+            if (div.querySelector('iframe[src*="recaptcha"]')) {
+                div.classList.add('recaptcha-challenge-wrapper');
+                div.dataset.recaptchaMoved = 'true';
+                modal1.appendChild(div);
 
-                // FIX: quando o iframe do desafio for removido pelo Google
-                // (resolveu o captcha ou fechou), some o wrapper inteiro
-                //const innerObserver = new MutationObserver(() => {
-                //    if (!div.querySelector('iframe[src*="recaptcha"]')) {
-                //        div.remove();
-                //        innerObserver.disconnect();
-                //    }
-                //});
-                //innerObserver.observe(div, { childList: true, subtree: true });
-            //}
-        //});
-    //});
+                // quando o Google remover o iframe do desafio, some o wrapper
+                const innerObserver = new MutationObserver(() => {
+                    if (!div.querySelector('iframe[src*="recaptcha"]')) {
+                        div.remove();
+                        innerObserver.disconnect();
+                    }
+                });
+                innerObserver.observe(div, { childList: true, subtree: true });
+            }
+        });
+    });
 
-    //recaptchaObserver.observe(document.body, { childList: true });
+    recaptchaObserver.observe(document.body, { childList: true });
 
     //----------AJUDA-----------
     //extensão pra mostrar resposta da dúvida frequente
@@ -3229,11 +3250,44 @@ document.addEventListener('DOMContentLoaded', function () {
             });
 
             menuOpcoes.querySelectorAll('.opcao-video').forEach(btn => {
-                btn.addEventListener('click', e => {
+                btn.addEventListener('click', async (e) => {
                     e.stopPropagation();
                     const acao = btn.dataset.acao;
-                    if (acao === 'excluir') mostrarToast('Excluir ainda não está disponível.', 'error');
-                    else if (acao === 'editar') mostrarToast('Editar ainda não está disponível.', 'error');
+                    if (acao === 'excluir') {
+                        dados = {
+                            id: live.id_stream
+                        };
+
+                        const res = fetch(base_url + "/videos", {
+                            method: "DELETE",
+                            headers: { "X-CSRFToken": csrfToken, "Content-Type": "application/json"},
+                            body: JSON.stringify(dados)
+                        });
+                        if (!res.ok) {
+                            return;
+                        }
+                    
+                    }
+                    else if (acao === 'editar') {
+                        const nome  = document.getElementById('nome-live');
+                        const desc  = document.getElementById('descricao-live');
+                        const cate = [...document.querySelectorAll('#select-dropdown input:checked')].map(cb => cb.value);
+                        dados = {
+                            id: live.id_stream,
+                            nome: nome,
+                            descrisao: desc,
+                            categoria: cate
+                        };
+
+                        const res = fetch(base_url + "/videos", {
+                            method: "POST",
+                            headers: { "X-CSRFToken": csrfToken, "Content-Type": "application/json"},
+                            body: JSON.stringify(dados)
+                        });
+                        if (!res.ok) {
+                            return;
+                        }
+                    }
                     else if (acao === 'salvar') {
                         if (!live.src) { mostrarToast('Nenhum vídeo disponível para download.', 'error'); return; }
                         const a = document.createElement('a');
