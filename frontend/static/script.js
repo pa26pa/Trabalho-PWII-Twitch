@@ -33,6 +33,34 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     carregarCsrf()
+
+    const RECAPTCHA_SITE_KEY = "6LdwJtgtAAAAAMT4AyhVwMt4EIaPcU8363YdzIMs";
+    let captchaWidgetId = null;
+
+    function renderizarCaptcha() {
+        const container = document.getElementById('recaptcha-container');
+        if (!container || captchaWidgetId !== null) return;
+        
+        // Se o grecaptcha do Google ainda não estiver pronto na memória global, tenta novamente em 500ms
+        if (typeof grecaptcha === 'undefined' || typeof grecaptcha.ready === 'undefined') {
+            setTimeout(renderizarCaptcha, 500);
+            return;
+        }
+        
+        grecaptcha.ready(() => {
+            captchaWidgetId = grecaptcha.render('recaptcha-container', {
+                sitekey: RECAPTCHA_SITE_KEY,
+                theme: localStorage.getItem('witch-tema') === 'escuro' ? 'dark' : 'light'
+            });
+        });
+    }
+
+
+    function resetarCaptcha() {
+        if (typeof grecaptcha !== 'undefined' && captchaWidgetId !== null) {
+            grecaptcha.reset(captchaWidgetId);
+        }
+    }
     // CONTROLE DE ESTADO LOGADO/DESLOGADO
     function mostrarLogado(nome) {
         // esconde elementos de deslogado, mostra de logado
@@ -659,12 +687,12 @@ document.addEventListener('DOMContentLoaded', function () {
             // CADASTRO
             if (form.classList.contains('sign')) {
                 if (document.getElementById('cadastro').offsetParent === null) return;
-                //const captcha = grecaptcha.getResponse();
-
-                //if (captcha.length === 0) {
-                //    mostrarToast('Por favor, marque a caixa "Não sou um robô"', 'error')
-                //    return;
-                //}
+                
+                const captcha = (captchaWidgetId !== null) ? grecaptcha.getResponse(captchaWidgetId) : '';
+                if (!captcha) {
+                    mostrarToast('Por favor, marque a caixa "Não sou um robô"', 'error');
+                    return;
+                }
                 
                 const dados = {
                     cpf: document.getElementById("cpf").value,
@@ -672,7 +700,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     user_name: document.getElementById("user-cadastro").value,
                     data_nascimento: document.getElementById("data-nascimento").value,
                     senha: document.getElementById("senha").value,
-                    //captcha: captcha
+                    captcha: captcha
                 };
                 
                 
@@ -694,6 +722,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             if (errData.mensagem) msg = errData.mensagem;
                         } catch {}
                         mostrarToast(msg, 'error');
+                        resetarCaptcha();
                         return null; // sinaliza que não deve continuar pro login
                     }
                     return res.json();
@@ -703,6 +732,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     if (data.status == 'error') {
                         mostrarToast(data.mensagem, data.status);
+                        resetarCaptcha();
                     } else {
                         const dado = {
                             username_email: dados['user_name'],
@@ -737,6 +767,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 })
                 .catch(() => {
                     mostrarToast('Erro de conexão com o servidor.', 'error');
+                    resetarCaptcha();
                 });
             }
 
@@ -1046,7 +1077,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 document.body.classList.remove('modal-open');
 
                 // limpa todos os inputs do modal ao fechar
-                modal.querySelectorAll('input').forEach(input => input.value = '');
+                modal.querySelectorAll('input').forEach(input => {
+                    if (input.type !== 'checkbox' && input.type !== 'radio') input.value = '';
+                })
                 if (btnRedefinir) {btnRedefinir.disabled = true;} // reseta ao fechar}
                 modal.querySelectorAll('.erroSenha, .erroSenha2, #erroIdade').forEach(el => el.style.display = 'none');
                 modal.querySelectorAll('.input-erro').forEach(el => el.classList.remove('input-erro'));
@@ -1064,9 +1097,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 const checkbox = document.getElementById('checkbox');
                 if (checkbox) checkbox.checked = false;
 
-                //if (typeof grecaptcha !== 'undefined') {
-                //    grecaptcha.reset();
-                //}
+                resetarCaptcha();
             }
         });
     });
@@ -1081,13 +1112,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 document.querySelectorAll('.erroSenha, .erroSenha2, #erroIdade').forEach(el => el.style.display = 'none');
                 document.querySelectorAll('.input-erro').forEach(el => el.classList.remove('input-erro'));
 
-                // renderiza o captcha só quando o cadastro aparecer
-                //if (checkbox.checked && !captchaRendered) {
-                //    grecaptcha.render('recaptcha-container', {
-                //        sitekey: '6LemWTAtAAAAAM2v-HHAGkaNtjG8vm-Huju47Nvs'
-                //    });
-                //    captchaRendered = true;
-                //}
+                if (checkbox.checked) renderizarCaptcha(); 
             });
         }
 
@@ -2088,6 +2113,115 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    const modalEditar = document.getElementById('modal-7');
+    // ── EDITAR VÍDEO (reaproveita o modal-6) ──
+    let liveEditando = null;
+
+    function limparFormLive() {
+        ['nome-live', 'descricao-live'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.value = '';
+        });
+        document.querySelectorAll('#select-dropdown input[type="checkbox"]').forEach(cb => {
+            if (cb.checked) { cb.checked = false; cb.dispatchEvent(new Event('change')); } // atualiza as tags
+        });
+        const prev = document.getElementById('preview-thumb');
+        if (prev) { prev.src = ''; prev.classList.remove('tem-foto'); }
+        const inputThumb = document.getElementById('upload-thumb');
+        if (inputThumb) inputThumb.value = '';
+        thumbTemp = null;
+        thumbFile = null;
+    }
+
+    function mostrarUploadVideo(mostrar) {
+        ['label-upload-video', 'wrap-upload-video'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.style.display = mostrar ? '' : 'none';
+        });
+    }
+
+    function abrirModalEditar(live) {
+        if (!modal6) return;
+        liveEditando = live;
+
+        document.getElementById('nome-live').value = live.titulo || '';
+        document.getElementById('descricao-live').value = live.descricao || live.descrisao || '';
+
+        // categorias: marca os checkboxes e dispara "change" para montar as tags
+        document.querySelectorAll('#select-dropdown input[type="checkbox"]').forEach(cb => {
+            cb.checked = (live.categorias || []).includes(cb.value);
+            cb.dispatchEvent(new Event('change'));
+        });
+
+        // capa atual
+        const prev = document.getElementById('preview-thumb');
+        thumbFile = null;
+        thumbTemp = null;
+        if (prev) {
+            if (live.thumb) { prev.src = live.thumb; prev.classList.add('tem-foto'); }
+            else { prev.src = ''; prev.classList.remove('tem-foto'); }
+        }
+
+        mostrarUploadVideo(false);                       // não dá para trocar o vídeo, só os dados
+        btnUpload.dataset.textoOriginal = btnUpload.textContent;
+        btnUpload.textContent = 'Salvar';
+
+        modal6.showModal();
+        document.body.classList.add('modal-open');
+    }
+
+    async function salvarEdicao() {
+        if (!liveEditando) return;
+
+        const nome = document.getElementById('nome-live').value.trim();
+        const descrisao = document.getElementById('descricao-live').value.trim();
+        const categorias = [...document.querySelectorAll('#select-dropdown input:checked')].map(cb => cb.value);
+
+        if (!nome) { mostrarToast('O vídeo precisa ter um nome!', 'error'); return; }
+        if (categorias.length === 0) { mostrarToast('Escolha pelo menos uma categoria!', 'error'); return; }
+
+        const formData = new FormData();
+        formData.append('id', liveEditando.id_stream);
+        formData.append('nome', nome);
+        formData.append('descrisao', descrisao);
+        formData.append('categoria', JSON.stringify(categorias));
+        if (thumbFile) formData.append('capa', thumbFile);   // só envia se trocou a capa
+
+        btnUpload.disabled = true;
+        try {
+            const res = await fetch(base_url + "/videos", {
+                method: "PUT",
+                headers: { "X-CSRFToken": csrfToken },
+                credentials: "include",
+                body: formData
+            });
+            const data = await res.json();
+            mostrarToast(data.mensagem, data.status);
+
+            if (res.ok && data.status === 'success') {
+                modal6.close();                              // o evento "close" abaixo limpa tudo
+                await renderVideosPerfil(idPerfilAtual);
+            }
+        } catch (error) {
+            console.error(error);
+            mostrarToast('Erro ao editar vídeo.', 'error');
+        } finally {
+            btnUpload.disabled = false;
+        }
+    }
+
+    if (modal6) {
+        // roda ao fechar por qualquer caminho (Cancelar, X, ESC, salvar)
+        modal6.addEventListener('close', () => {
+            document.body.classList.remove('modal-open');
+            if (!liveEditando) return;
+            liveEditando = null;
+            limparFormLive();
+            mostrarUploadVideo(true);
+            btnUpload.textContent = btnUpload.dataset.textoOriginal || 'Confirmar';
+        });
+    }
+
     // salvar vídeo — único handler, chama de fato o backend
     const salvarLive = async () => {
         if (btnUpload.disabled) return; // já está enviando, ignora clique
@@ -2161,7 +2295,7 @@ document.addEventListener('DOMContentLoaded', function () {
     };
 
     if (btnUpload) {
-        btnUpload.addEventListener('click', salvarLive);
+        btnUpload.addEventListener('click', () => liveEditando ? salvarEdicao() : salvarLive());
     }
 
     function formatarTempo(s) {
@@ -2420,33 +2554,31 @@ document.addEventListener('DOMContentLoaded', function () {
     // o mesmo top layer do dialog (acima do ::backdrop, acima de tudo).
     const modal1 = document.getElementById('modal-1');
 
-    //const recaptchaObserver = new MutationObserver(() => {
-        //if (!modal1 || !modal1.open) return;
+    const recaptchaObserver = new MutationObserver(() => {
+        if (!modal1 || !modal1.open) return;
 
-        //document.querySelectorAll('body > div').forEach(div => {
-            // ignora o próprio dialog e qualquer wrapper já processado
-            //if (div === modal1 || div.dataset.recaptchaMoved === 'true') return;
+        document.querySelectorAll('body > div').forEach(div => {
+            // ignora o próprio dialog e wrappers já processados
+            if (div === modal1 || div.dataset.recaptchaMoved === 'true') return;
 
-            //const isRecaptchaDiv = div.querySelector('iframe[src*="recaptcha"]');
-            //if (isRecaptchaDiv) {
-            //    div.classList.add('recaptcha-challenge-wrapper');
-                //div.dataset.recaptchaMoved = 'true'; // FIX: evita reprocessar o mesmo div em loop
-                //modal1.appendChild(div);
+            if (div.querySelector('iframe[src*="recaptcha"]')) {
+                div.classList.add('recaptcha-challenge-wrapper');
+                div.dataset.recaptchaMoved = 'true';
+                modal1.appendChild(div);
 
-                // FIX: quando o iframe do desafio for removido pelo Google
-                // (resolveu o captcha ou fechou), some o wrapper inteiro
-                //const innerObserver = new MutationObserver(() => {
-                //    if (!div.querySelector('iframe[src*="recaptcha"]')) {
-                //        div.remove();
-                //        innerObserver.disconnect();
-                //    }
-                //});
-                //innerObserver.observe(div, { childList: true, subtree: true });
-            //}
-        //});
-    //});
+                // quando o Google remover o iframe do desafio, some o wrapper
+                const innerObserver = new MutationObserver(() => {
+                    if (!div.querySelector('iframe[src*="recaptcha"]')) {
+                        div.remove();
+                        innerObserver.disconnect();
+                    }
+                });
+                innerObserver.observe(div, { childList: true, subtree: true });
+            }
+        });
+    });
 
-    //recaptchaObserver.observe(document.body, { childList: true });
+    recaptchaObserver.observe(document.body, { childList: true });
 
     //----------AJUDA-----------
     //extensão pra mostrar resposta da dúvida frequente
@@ -3354,11 +3486,27 @@ document.addEventListener('DOMContentLoaded', function () {
             });
 
             menuOpcoes.querySelectorAll('.opcao-video').forEach(btn => {
-                btn.addEventListener('click', e => {
+                btn.addEventListener('click', async (e) => {
                     e.stopPropagation();
                     const acao = btn.dataset.acao;
-                    if (acao === 'excluir') mostrarToast('Excluir ainda não está disponível.', 'error');
-                    else if (acao === 'editar') mostrarToast('Editar ainda não está disponível.', 'error');
+
+                    if (acao === 'excluir') {
+                        try {
+                            const res = await fetch(base_url + "/videos", {
+                                method: "DELETE",
+                                headers: { "X-CSRFToken": csrfToken, "Content-Type": "application/json" },
+                                body: JSON.stringify({ id: live.id_stream })
+                            });
+                            const data = await res.json();
+                            mostrarToast(data.mensagem, data.status);
+                            if (res.ok) renderVideosPerfil(idPerfilAtual);
+                        } catch {
+                            mostrarToast('Erro ao excluir vídeo.', 'error');
+                        }
+                    }
+                    else if (acao === 'editar') {
+                        abrirModalEditar(live);
+                    }
                     else if (acao === 'salvar') {
                         if (opcoesTerceiros && !turboAtivo) {
                             mostrarToast('Você precisa ter o Turbo para salvar vídeos de outros canais.', 'error');
@@ -3370,12 +3518,18 @@ document.addEventListener('DOMContentLoaded', function () {
                         a.href = live.src;
                         a.download = `${live.titulo}.mp4`;
                         a.click();
+<<<<<<< HEAD
                     } else if (acao === 'compartilhar') {
                         const linkVideo = live.src || window.location.href;
                         navigator.clipboard?.writeText(linkVideo)
                             .then(() => mostrarToast('Link do vídeo copiado!', 'success'))
                             .catch(() => mostrarToast('Não foi possível copiar.', 'error'));
                     }
+=======
+                    }
+                    else if (acao === 'clipe') criarClipe(live);
+
+>>>>>>> c8406f698f6493d7af2231207bd8f1c50c90cce3
                     menuOpcoes.classList.remove('show');
                 });
             });
