@@ -3835,7 +3835,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
         container.innerHTML = `
             <button class="btn-perfil" id="btn-seguir-visitante">Seguir</button>
-            <button class="btn-perfil" id="btn-sub-visitante">Ser Sub</button>
         `;
 
         document.getElementById('btn-seguir-visitante').addEventListener('click', async (e) => {
