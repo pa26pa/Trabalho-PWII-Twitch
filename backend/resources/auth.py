@@ -708,12 +708,12 @@ class search(Resource):
             return {'status': 'success', 'mensagem': 'Pesquisa vazia', 'canais': [], 'videos': []}, 200
 
          
-        pesquisa_invalida = verificar_palavra(pesquisa)
-        if pesquisa_invalida:
-            return {
-                'status':'error',
-                'mensagem':f'Esta pesquisa não é valida por conta de usar a palavra "{pesquisa_invalida}" nele'
-            }, 406
+     #   pesquisa_invalida = verificar_palavra(pesquisa)
+      #  if pesquisa_invalida:
+       #     return {
+        #        'status':'error',
+         #       'mensagem':f'Esta pesquisa não é valida por conta de usar a palavra "{pesquisa_invalida}" nele'
+          #  }, 406
         
         
         p = f"%{pesquisa}%"
@@ -726,12 +726,12 @@ class search(Resource):
             canais = cursor.fetchall()
 
             cursor.execute("""select s.id_stream, s.titulo, s.descrisao, s.categoria,
-                                      s.video_url, s.data_upload, s.capa,
-                                      s.id_streamer, u.user_name as canal, u.foto_url as canal_foto
-                               from streams s
-                               join usuarios u on u.id_usuario = s.id_streamer
-                               where s.titulo like %s or s.categoria like %s
-                               limit 10""", (p, p))
+                                s.video_url, s.data_upload, s.capa,
+                                s.id_streamer, u.user_name as canal, u.foto_url as canal_foto
+                                from streams s
+                                join usuarios u on u.id_usuario = s.id_streamer
+                                where s.titulo like %s
+                                limit 10""", (p,))
             videos = cursor.fetchall()
 
             for v in videos:
@@ -907,9 +907,6 @@ class curtidas(Resource):
                 
 class views(Resource):
     def get(self):
-        id_user = session.get('usuario_id')
-        if not id_user:
-            return {'status': 'error', 'mensagem': 'Usuário não autenticado'}, 401
 
         id_stream = request.args.get("id_stream", type=int)
         if not id_stream:
@@ -1001,15 +998,18 @@ class comentarios(Resource):
         comentario_invalido = verificar_palavra(texto)
         if comentario_invalido:
             return {
-                'status':'error',
-                'mensagem':f'Este comentario não é valido por conta de usar a palavra "{comentario_invalido}" nele'
+                'status': 'error',
+                'mensagem': f'Este comentario não é valido por conta de usar a palavra "{comentario_invalido}" nele'
             }, 406
-            
+
         con = connection()
         cursor = con.cursor(pymysql.cursors.DictCursor)
         try:
+            cursor.execute("SET time_zone = '+00:00'")   # esta conexão trabalha em UTC
+
             cursor.execute(
-                "insert into comentarios (id_stream, id_user, comentario) values (%s, %s, %s)",
+                "insert into comentarios (id_stream, id_user, comentario, data_comentario) "
+                "values (%s, %s, %s, UTC_TIMESTAMP())",
                 (id_stream, id_user, texto)
             )
             id_novo = cursor.lastrowid
@@ -1038,9 +1038,10 @@ class comentarios(Resource):
             cursor.close()
             con.close()
 
-        novo['criado_em'] = novo['criado_em'].isoformat()
+        # o "Z" avisa o navegador que o horário é UTC, e ele converte para o fuso de quem vê
+        novo['criado_em'] = novo['criado_em'].isoformat() + 'Z'
         return {'status': 'success', 'comentario': novo}, 200
-    
+
     def get(self):
         id_stream = request.args.get("id_stream", type=int)
         if not id_stream:
@@ -1049,6 +1050,8 @@ class comentarios(Resource):
         con = connection()
         cursor = con.cursor(pymysql.cursors.DictCursor)
         try:
+            cursor.execute("SET time_zone = '+00:00'")   # lê no mesmo fuso em que gravou
+
             cursor.execute("""
                 select c.id_comentario,
                        c.comentario as texto,
@@ -1072,14 +1075,13 @@ class comentarios(Resource):
             con.close()
 
         for c in lista:
-            c['criado_em'] = c['criado_em'].isoformat()
+            c['criado_em'] = c['criado_em'].isoformat() + 'Z'
 
         return {
             'status': 'success',
-            'mensagem':'Comentarios pegos com sucesso',
+            'mensagem': 'Comentarios pegos com sucesso',
             'comentarios': lista
-        }, 200
-        
+        }, 200        
 class block_code(Resource):
         
     """
@@ -1171,68 +1173,74 @@ class delete_Account(Resource):
         Endpoint responsável por apagar a conta do usuário
     """
     def delete(self):
-        """
-            Apaga a conta do usuário do Banco de Dados
-            
-            Verificações:
-                Token, usuário logado
-            
-            Retornos: 
-                400 = Usuário não está logado
-                200 = Conta excluida com sucesso
-                500 = Erro interno ao tentar excluir conta
-        """
-        
-        con = connection()
-        cursor = con.cursor(pymysql.cursors.DictCursor)
-        
         if 'usuario_id' not in session:
             return {
-                "status":"error",
-                "mensagem":"Você precisa estar logado para deletar sua conta"
+                "status": "error",
+                "mensagem": "Você precisa estar logado para deletar sua conta"
             }, 400
+
         id = session['usuario_id']
 
-        try: 
-            a = """delete from bloqueados where id_bloqueador = %s or id_bloqueado = %s"""
-            cursor.execute(a, (id,id))
-            
-            ab = """delete from streams where id_streamer = %s"""
-            cursor.execute(ab, (id,))
+        con = connection()
+        cursor = con.cursor(pymysql.cursors.DictCursor)
 
-            ac = """delete from subs where id_usuario = %s or id_streamer = %s"""
-            cursor.execute(ac, (id,))
+        try:
+            # 1) tudo que está pendurado nos vídeos do usuário
+            for tabela in ("curtidas", "views", "comentarios"):
+                cursor.execute(
+                    f"delete from {tabela} where id_stream in "
+                    f"(select id_stream from streams where id_streamer = %s)",
+                    (id,)
+                )
 
+            # 2) curtidas, views e comentários que o usuário fez em vídeos de outros
+            for tabela in ("curtidas", "views", "comentarios"):
+                cursor.execute(f"delete from {tabela} where id_user = %s", (id,))
 
-            ad = """delete from tipo_sub where id_criador = %s"""
-            cursor.execute(ad, (id,))
+            # 3) bloqueios
+            cursor.execute(
+                "delete from bloqueados where id_bloqueador = %s or id_bloqueado = %s",
+                (id, id)
+            )
 
+            # 4) vídeos
+            cursor.execute("delete from streams where id_streamer = %s", (id,))
 
-            ae = """delete from seguidores where id_seguido = %s or id_seguidor = %s"""
-            cursor.execute(ae, (id,))
+            # 5) inscrições e tipos de sub (subs antes de tipo_sub)
+            cursor.execute(
+                "delete from subs where id_usuario = %s or id_streamer = %s",
+                (id, id)
+            )
+            cursor.execute("delete from tipo_sub where id_criador = %s", (id,))
 
-            
-            query = """delete from usuarios where id_usuario = %s """
-            cursor.execute(query, (id,))
-            
+            # 6) seguidores / seguindo
+            cursor.execute(
+                "delete from seguidores where id_seguido = %s or id_seguidor = %s",
+                (id, id)
+            )
+
+            # 7) por último, o usuário
+            cursor.execute("delete from usuarios where id_usuario = %s", (id,))
+
             con.commit()
             session.clear()
-            
-            cursor.close()
-            con.close()
-        
+
         except Exception as e:
             con.rollback()
+            print("ERRO AO DELETAR CONTA:", repr(e))   # agora você vê o motivo no terminal
             return {
-                'status':'error',
-                'mensagem':'Erro interno ao tentar deletar conta'
+                'status': 'error',
+                'mensagem': 'Erro interno ao tentar deletar conta'
             }, 500
-        
+
+        finally:
+            cursor.close()
+            con.close()
+
         return {
-            'status':'success',
-            'mensagem':'Conta excluida'
+            'status': 'success',
+            'mensagem': 'Conta excluida'
         }, 200
-    
 class update_Password(Resource):
     """
         Endpoint responsável por atualizar a senha de um usuário que já está logado
@@ -1668,21 +1676,32 @@ class videos(Resource):
     def get(self):
         con = connection()
         cursor = con.cursor(pymysql.cursors.DictCursor)
-        
+
         id_streamer = request.args.get('id_usuario', type=int)
-        
+
         try:
-            if not id_streamer:
-                query = """select id_stream, categoria, titulo, descrisao, video_url, data_upload, capa from streams order by data_upload desc;"""
-
-                cursor.execute(query,)
-                rows = cursor.fetchall()
-
             if id_streamer:
-                query = """select id_stream, categoria, titulo, descrisao, video_url, data_upload, capa from streams where id_streamer = %s order by data_upload desc;"""
-                cursor.execute(query,)
-                rows = cursor.fetchall()
-            
+                query = """select s.id_stream, s.categoria, s.titulo, s.descrisao,
+                                  s.video_url, s.data_upload, s.capa,
+                                  u.user_name as canal, u.foto_url as canal_foto,
+                                  u.id_usuario as id_streamer
+                           from streams s
+                           join usuarios u on u.id_usuario = s.id_streamer
+                           where s.id_streamer = %s
+                           order by s.data_upload desc;"""
+                cursor.execute(query, (id_streamer,))
+            else:
+                query = """select s.id_stream, s.categoria, s.titulo, s.descrisao,
+                                  s.video_url, s.data_upload, s.capa,
+                                  u.user_name as canal, u.foto_url as canal_foto,
+                                  u.id_usuario as id_streamer
+                           from streams s
+                           join usuarios u on u.id_usuario = s.id_streamer
+                           order by s.data_upload desc;"""
+                cursor.execute(query)
+
+            rows = cursor.fetchall()
+
             videos = []
             for row in rows:
                 videos.append({
@@ -1696,6 +1715,9 @@ class videos(Resource):
                     "views": 0,
                     "curtidas": 0,
                     "comentarios": [],
+                    "canal": row["canal"],
+                    "canal_foto": row["canal_foto"],
+                    "id_streamer": row["id_streamer"],
                     "aoVivo": False
                 })
 
@@ -1707,11 +1729,11 @@ class videos(Resource):
 
         finally:
             cursor.close()
-            con.close()     
+            con.close()  
     
-    def delete():
+    def delete(self):
         token = request.headers.get("X-CSRFToken")
-        
+        print('aaa')
                         
         check = check_csrf(token)
         if not check or check.get("status") == "error":
@@ -1721,31 +1743,29 @@ class videos(Resource):
         cursor = con.cursor(pymysql.cursors.DictCursor)
         
         data = request.get_json()
-        
-        id_stream = data.get('id_stream')
+        print('ferrou')
+        id_stream = data.get('id')
         
         video_url = "https://cloudinary.com"
         parte_final = video_url.split("/upload/")[-1]
-
+        print('----')
         if parte_final.startswith("v"):
             parte_final = parte_final.split("/", 1)[1]
-
+        print('-----')
         public_id = parte_final.rsplit(".", 1)[0]
-        
+        print('aaa')
         resultado = cloudinary.uploader.destroy(public_id, resource_type="video")
-        
+        print(resultado)
         try:
             query_streams = """delete from streams where id_stream = %s"""
             query_curtidas = """delete from curtidas where id_stream = %s"""
             query_views = """delete from views where id_stream = %s"""
             query_comentarios = """delete from comentarios where id_stream = %s"""
-            cursor.execute(query_streams,(id_stream,))
-            con.commit()
+            
             cursor.execute(query_curtidas,(id_stream,))
-            con.commit()
             cursor.execute(query_views,(id_stream,))
-            con.commit()
             cursor.execute(query_comentarios,(id_stream,))
+            cursor.execute(query_streams,(id_stream,))
             con.commit()
         
         except Exception as e:
@@ -1762,7 +1782,87 @@ class videos(Resource):
         return {
             'status': 'success', 
             'mensagem': 'Video deletado com sucesso'
-        }, 200            
+        }, 200              
+    
+    def put(self):
+        token = request.headers.get("X-CSRFToken")
+        check = check_csrf(token)
+        if not check or check.get("status") == "error":
+            return {'status': 'error', 'mensagem': check.get("mensagem") if check else 'CSRF inválido'}, 400
+
+        if 'usuario_id' not in session:
+            return {'status': 'error', 'mensagem': 'Você precisa estar logado'}, 401
+
+        id_stream = request.form.get('id', type=int)
+        nome = (request.form.get('nome') or '').strip()
+        descrisao = (request.form.get('descrisao') or '').strip()
+
+        try:
+            categoria = json.loads(request.form.get('categoria') or '[]')
+            if not isinstance(categoria, list) or not all(isinstance(c, str) for c in categoria):
+                raise ValueError
+        except ValueError:
+            return {'status': 'error', 'mensagem': 'Categoria inválida'}, 400
+
+        if not id_stream or not nome:
+            return {'status': 'error', 'mensagem': 'Nome do vídeo é obrigatório'}, 400
+
+        invalida = verificar_palavra(nome) or verificar_palavra(descrisao)
+        if invalida:
+            return {'status': 'error', 'mensagem': f'Não é possível usar a palavra "{invalida}" no título ou na descrição'}, 406
+
+        nome = str(escape(nome))
+        descrisao = str(escape(descrisao))
+
+        # capa nova (opcional)
+        nova_capa = None
+        capa = request.files.get('capa')
+        if capa and capa.filename:
+            ext_capa = capa.filename.rsplit('.', 1)[-1].lower()
+            if ext_capa not in {'jpg', 'jpeg', 'png', 'gif', 'webp'}:
+                return {'status': 'error', 'mensagem': 'Esse formato de imagem não é permitido'}, 400
+            try:
+                resp = cloudinary.uploader.upload(capa.stream, resource_type="image", public_id=str(uuid4()))
+                nova_capa = resp["secure_url"]
+            except Exception as e:
+                print(e)
+                return {'status': 'error', 'mensagem': 'Erro ao salvar a capa'}, 500
+
+        con = connection()
+        cursor = con.cursor(pymysql.cursors.DictCursor)
+        try:
+            cursor.execute(
+                "select id_stream from streams where id_stream = %s and id_streamer = %s",
+                (id_stream, session['usuario_id'])
+            )
+            if not cursor.fetchone():
+                return {'status': 'error', 'mensagem': 'Vídeo não encontrado'}, 404
+
+            if nova_capa:
+                cursor.execute(
+                    "update streams set titulo = %s, descrisao = %s, categoria = %s, capa = %s "
+                    "where id_stream = %s and id_streamer = %s",
+                    (nome, descrisao, json.dumps(categoria), nova_capa, id_stream, session['usuario_id'])
+                )
+            else:
+                cursor.execute(
+                    "update streams set titulo = %s, descrisao = %s, categoria = %s "
+                    "where id_stream = %s and id_streamer = %s",
+                    (nome, descrisao, json.dumps(categoria), id_stream, session['usuario_id'])
+                )
+            con.commit()
+
+        except Exception as e:
+            con.rollback()
+            print(e)
+            return {'status': 'error', 'mensagem': 'Erro interno ao editar vídeo'}, 500
+
+        finally:
+            cursor.close()
+            con.close()
+
+        return {'status': 'success', 'mensagem': 'Vídeo atualizado com sucesso'}, 200
+            
     
 class salvar_video(Resource):
     def post(self):

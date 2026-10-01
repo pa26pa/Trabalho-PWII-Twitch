@@ -69,7 +69,7 @@
 
                         <div class="turbo-body">
                             <p class="turbo-price" data-i18n>
-                                <s>R$ 26,99/mês</s> <strong>R$ 18,89/mês</strong> no primeiro mês
+                                <strong>R$ 18,89/mês</strong> no primeiro mês
                             </p>
                             <p class="turbo-sub" data-i18n>Renova automaticamente por R$ 26,99/mês depois disso.</p>
                             <p class="turbo-headline" data-i18n>Apoie streamers sem interrupções.</p>
@@ -85,32 +85,23 @@
                                 <div class="turbo-feature">
                                     <i class="fa-solid fa-hard-drive"></i>
                                     <div>
-                                        <strong data-i18n>Armazenamento expandido (60 dias)</strong>
-                                        <p data-i18n>Armazene seus VODs por até 60 dias em vez de 14.</p>
+                                        <strong data-i18n>Salve vídeos</strong>
+                                        <p data-i18n>Salve seus vídeos preferidos de qualquer canal.</p>
                                     </div>
                                 </div>
-                            </div>
-
-                            <div class="turbo-extras">
-                                <div class="turbo-extra">
-                                    <i class="fa-solid fa-comment"></i>
-                                    <span data-i18n>Distintivo de chat exclusivo</span>
-                                </div>
-                                <div class="turbo-extra">
-                                    <i class="fa-solid fa-face-smile"></i>
-                                    <span data-i18n>Dois conjuntos de emotes adicionais</span>
-                                </div>
-                                <div class="turbo-extra">
-                                    <i class="fa-solid fa-palette"></i>
-                                    <span data-i18n>Cores personalizadas para nomes no chat</span>
+                                <div class="turbo-feature">
+                                    <i class="fa-solid fa-star" style="color: rgb(177, 151, 252);"></i>
+                                    <div>
+                                        <strong data-i18n>Ganhe destaque</strong>
+                                        <p data-i18n>Apareça num espaço destinado aos iniciantes</p>
+                                    </div>
                                 </div>
                             </div>
 
                             <br><br>
                             <p class="turbo-disclaimer" data-i18n>Cobrança mensal • Cancele a qualquer momento</p>                         
                             <div class="turbo-btns">
-                                <button class="btn-turbo-gift" data-i18n>Presentear Turbo</button>
-                                <button class="btn-turbo-sub" data-i18n>Inscrever-se</button>
+                                <button class="btn-turbo-sub" data-i18n>Comprar Turbo</button>
                             </div>
                         </div>
                     </div>
@@ -166,7 +157,7 @@
                                             <label for="user_email" data-i18n>Nome de Usuário ou Email</label>
                                         </div>
                                         <div class="caixa-input password-box">
-                                            <input type="password" class="password"  id='senha_login' name="password" required>
+                                            <input type="password" class="password"  id='senha_login' name="password" required autocomplete="current-password">
                                             <label for="password" data-i18n>Senha</label>
                                             <p class="erroSenha" data-i18n>Senha Inválida (mínimo 5 caracteres)</p>
                                         </div>
@@ -250,12 +241,12 @@
                                             <h2 data-i18n>Redefina sua Senha</h2> <br>
                                             <p data-i18n>Por favor, insira uma nova senha para sua conta.</p> <br><br><br>
                                             <div class="caixa-input password-box">
-                                                <input type="password" class="password password1" name="password" required>
+                                                <input type="password" class="password password1" name="password" required autocomplete="new-password">
                                                 <label for="password" data-i18n>Nova Senha</label>
                                                 <p class="erroSenha" data-i18n>Senha Inválida (mínimo 5 caracteres)</p>
                                             </div><br>
                                             <div class="caixa-input">
-                                                <input type="password" class="password2" name="password" required>
+                                                <input type="password" class="password2" name="password" required autocomplete="new-password">
                                                 <label for="password" data-i18n>Confirmar Senha</label>
                                                 <p class="erroSenha2" data-i18n>A senha não é igual</p>
                                             </div><br><br><br>
@@ -286,7 +277,7 @@
                                             <p id="erroIdade" data-i18n>Deve ser maior de 18 anos</p>
                                         </div>
                                         <div class="caixa-input password-box">
-                                            <input type="password" class="password" id="senha" name="password" required>
+                                            <input type="password" class="password" id="senha" name="password" required autocomplete="new-password">
                                             <label for="password" data-i18n>Senha</label>
                                             <p class="erroSenha" data-i18n>Senha Inválida (mínimo 5 caracteres)</p>
                                         </div>
@@ -368,7 +359,6 @@
         <div class="toast"></div>
 
         <aside class="normal-aside">
-            <i class="fa-solid fa-angles-right back-aside"></i>
             
             <div class="aside-content">
                 <div class="with-login" id="lista-lives"></div>
