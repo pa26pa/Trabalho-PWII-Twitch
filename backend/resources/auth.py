@@ -1771,11 +1771,7 @@ class videos(Resource):
         return {
             'status': 'success', 
             'mensagem': 'Video deletado com sucesso'
-<<<<<<< HEAD
-        }, 200          
-                 
-=======
-        }, 200     
+        }, 200              
     
     def put(self):
         token = request.headers.get("X-CSRFToken")
@@ -1857,7 +1853,6 @@ class videos(Resource):
         return {'status': 'success', 'mensagem': 'Vídeo atualizado com sucesso'}, 200
             
     
->>>>>>> c8406f698f6493d7af2231207bd8f1c50c90cce3
 class salvar_video(Resource):
     def post(self):
         token = request.headers.get("X-CSRFToken")

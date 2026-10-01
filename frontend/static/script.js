@@ -3518,18 +3518,14 @@ document.addEventListener('DOMContentLoaded', function () {
                         a.href = live.src;
                         a.download = `${live.titulo}.mp4`;
                         a.click();
-<<<<<<< HEAD
                     } else if (acao === 'compartilhar') {
                         const linkVideo = live.src || window.location.href;
                         navigator.clipboard?.writeText(linkVideo)
                             .then(() => mostrarToast('Link do vídeo copiado!', 'success'))
                             .catch(() => mostrarToast('Não foi possível copiar.', 'error'));
                     }
-=======
-                    }
                     else if (acao === 'clipe') criarClipe(live);
 
->>>>>>> c8406f698f6493d7af2231207bd8f1c50c90cce3
                     menuOpcoes.classList.remove('show');
                 });
             });
