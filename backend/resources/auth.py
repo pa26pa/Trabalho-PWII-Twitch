@@ -692,12 +692,12 @@ class search(Resource):
             return {'status': 'success', 'mensagem': 'Pesquisa vazia', 'canais': [], 'videos': []}, 200
 
          
-        pesquisa_invalida = verificar_palavra(pesquisa)
-        if pesquisa_invalida:
-            return {
-                'status':'error',
-                'mensagem':f'Esta pesquisa não é valida por conta de usar a palavra "{pesquisa_invalida}" nele'
-            }, 406
+     #   pesquisa_invalida = verificar_palavra(pesquisa)
+      #  if pesquisa_invalida:
+       #     return {
+        #        'status':'error',
+         #       'mensagem':f'Esta pesquisa não é valida por conta de usar a palavra "{pesquisa_invalida}" nele'
+          #  }, 406
         
         
         p = f"%{pesquisa}%"
@@ -710,12 +710,12 @@ class search(Resource):
             canais = cursor.fetchall()
 
             cursor.execute("""select s.id_stream, s.titulo, s.descrisao, s.categoria,
-                                      s.video_url, s.data_upload, s.capa,
-                                      s.id_streamer, u.user_name as canal, u.foto_url as canal_foto
-                               from streams s
-                               join usuarios u on u.id_usuario = s.id_streamer
-                               where s.titulo like %s or s.categoria like %s
-                               limit 10""", (p, p))
+                                s.video_url, s.data_upload, s.capa,
+                                s.id_streamer, u.user_name as canal, u.foto_url as canal_foto
+                                from streams s
+                                join usuarios u on u.id_usuario = s.id_streamer
+                                where s.titulo like %s
+                                limit 10""", (p,))
             videos = cursor.fetchall()
 
             for v in videos:
@@ -891,9 +891,6 @@ class curtidas(Resource):
                 
 class views(Resource):
     def get(self):
-        id_user = session.get('usuario_id')
-        if not id_user:
-            return {'status': 'error', 'mensagem': 'Usuário não autenticado'}, 401
 
         id_stream = request.args.get("id_stream", type=int)
         if not id_stream:
@@ -1652,21 +1649,32 @@ class videos(Resource):
     def get(self):
         con = connection()
         cursor = con.cursor(pymysql.cursors.DictCursor)
-        
+
         id_streamer = request.args.get('id_usuario', type=int)
-        
+
         try:
-            if not id_streamer:
-                query = """select id_stream, categoria, titulo, descrisao, video_url, data_upload, capa from streams order by data_upload desc;"""
-
-                cursor.execute(query,)
-                rows = cursor.fetchall()
-
             if id_streamer:
-                query = """select id_stream, categoria, titulo, descrisao, video_url, data_upload, capa from streams where id_streamer = %s order by data_upload desc;"""
-                cursor.execute(query,)
-                rows = cursor.fetchall()
-            
+                query = """select s.id_stream, s.categoria, s.titulo, s.descrisao,
+                                  s.video_url, s.data_upload, s.capa,
+                                  u.user_name as canal, u.foto_url as canal_foto,
+                                  u.id_usuario as id_streamer
+                           from streams s
+                           join usuarios u on u.id_usuario = s.id_streamer
+                           where s.id_streamer = %s
+                           order by s.data_upload desc;"""
+                cursor.execute(query, (id_streamer,))
+            else:
+                query = """select s.id_stream, s.categoria, s.titulo, s.descrisao,
+                                  s.video_url, s.data_upload, s.capa,
+                                  u.user_name as canal, u.foto_url as canal_foto,
+                                  u.id_usuario as id_streamer
+                           from streams s
+                           join usuarios u on u.id_usuario = s.id_streamer
+                           order by s.data_upload desc;"""
+                cursor.execute(query)
+
+            rows = cursor.fetchall()
+
             videos = []
             for row in rows:
                 videos.append({
@@ -1680,6 +1688,9 @@ class videos(Resource):
                     "views": 0,
                     "curtidas": 0,
                     "comentarios": [],
+                    "canal": row["canal"],
+                    "canal_foto": row["canal_foto"],
+                    "id_streamer": row["id_streamer"],
                     "aoVivo": False
                 })
 
@@ -1691,7 +1702,7 @@ class videos(Resource):
 
         finally:
             cursor.close()
-            con.close()     
+            con.close()  
     
     def delete():
         token = request.headers.get("X-CSRFToken")
@@ -1746,8 +1757,7 @@ class videos(Resource):
         return {
             'status': 'success', 
             'mensagem': 'Video deletado com sucesso'
-        }, 200            
-            con.close() 
+        }, 200          
                  
 class salvar_video(Resource):
     def post(self):
